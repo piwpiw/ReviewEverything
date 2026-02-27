@@ -1,0 +1,69 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Platform {
+  id         Int               @id @default(autoincrement())
+  name       String            @unique
+  base_url   String
+  is_active  Boolean           @default(true)
+  created_at DateTime          @default(now()) @db.Timestamptz(6)
+  campaigns  Campaign[]
+  ingestRuns IngestRun[]
+}
+
+model Campaign {
+  id             Int                @id @default(autoincrement())
+  platform_id    Int
+  original_id    String
+  title          String
+  campaign_type  String?            // VST, SHP, PRS
+  media_type     String?            // BP, IP, YP, etc.
+  location       String?
+  reward_text    String?
+  thumbnail_url  String?
+  url            String
+  apply_end_date DateTime?          @db.Timestamptz(6)
+  created_at     DateTime           @default(now()) @db.Timestamptz(6)
+  updated_at     DateTime           @default(now()) @db.Timestamptz(6)
+  
+  platform       Platform           @relation(fields: [platform_id], references: [id], onDelete: Cascade)
+  snapshots      CampaignSnapshot[]
+
+  @@unique([platform_id, original_id])
+  @@index([campaign_type])
+  @@index([media_type])
+  @@index([apply_end_date])
+}
+
+model CampaignSnapshot {
+  id               Int      @id @default(autoincrement())
+  campaign_id      Int
+  recruit_count    Int      @default(0)
+  applicant_count  Int      @default(0)
+  competition_rate Decimal  @default(0.0) @db.Decimal(10, 2)
+  scraped_at       DateTime @default(now()) @db.Timestamptz(6)
+
+  campaign         Campaign @relation(fields: [campaign_id], references: [id], onDelete: Cascade)
+
+  @@index([campaign_id])
+}
+
+model IngestRun {
+  id             Int       @id @default(autoincrement())
+  platform_id    Int
+  status         String    // 'RUNNING', 'SUCCESS', 'FAILED'
+  records_added  Int       @default(0)
+  records_updated Int      @default(0)
+  error_log      String?
+  start_time     DateTime  @default(now()) @db.Timestamptz(6)
+  end_time       DateTime? @db.Timestamptz(6)
+
+  platform       Platform  @relation(fields: [platform_id], references: [id], onDelete: Cascade)
+}
