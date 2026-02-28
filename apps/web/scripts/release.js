@@ -46,8 +46,24 @@ function parseArgs() {
     noBuild: args.includes('--skip-build'),
   };
 
-  const msgArg = args.find((a) => a.startsWith('--message='));
-  if (msgArg) parsed.message = msgArg.split('=')[1];
+  for (let i = 0; i < args.length; i++) {
+    const a = args[i];
+    if (a === '--message' && i + 1 < args.length) {
+      parsed.message = args[i + 1];
+      i++;
+      continue;
+    }
+    if (a.startsWith('--message=')) {
+      parsed.message = a.split('=')[1];
+
+      // Handle edge case where shell splits quoted message with spaces (npm / win32 quirk).
+      if (i + 1 < args.length && !args[i + 1].startsWith('--")) {
+        parsed.message = `${parsed.message} ${args[i + 1]}`;
+        i++;
+      }
+      continue;
+    }
+  }
 
   return parsed;
 }
