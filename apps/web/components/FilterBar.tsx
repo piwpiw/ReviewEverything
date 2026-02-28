@@ -1,7 +1,7 @@
 ﻿"use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useTransition, useState, useEffect } from "react";
+import { useCallback, useTransition, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ChevronDown,
@@ -91,6 +91,17 @@ export default function FilterBar() {
       return [];
     }
   });
+  const cur = {
+    platform: searchParams.get("platform_id") || "",
+    type: searchParams.get("campaign_type") || "VST",
+    media: searchParams.get("media_type") || "",
+    depth1: searchParams.get("region_depth1") || "",
+    depth2: searchParams.get("region_depth2") || "",
+    category: searchParams.get("category") || "",
+    minReward: searchParams.get("min_reward") || "",
+    maxComp: searchParams.get("max_comp") || "",
+  };
+
   const saveToRecent = useCallback(() => {
     const params = new URLSearchParams(searchParams.toString());
     const filterKey = params.toString();
@@ -164,7 +175,7 @@ export default function FilterBar() {
       <div className="glass-card rounded-[2.5rem] border border-white/60 shadow-xl shadow-slate-900/5 p-6 flex flex-col gap-6 relative overflow-hidden">
         {/* Platform Selection */}
         <div className="flex items-start gap-4">
-          <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-2 w-12 shrink-0">?뚮옯??/span>
+          <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-2 w-12 shrink-0">플랫폼</span>
           <div className="flex flex-wrap gap-1.5">
             {PLATFORMS.map(p => (
               <Pill key={p.id} active={cur.platform === p.id} label={p.label} onClick={() => handleSelect("platform_id", p.id)} />
@@ -187,7 +198,7 @@ export default function FilterBar() {
         {cur.type === 'VST' && (
           <div className="flex flex-col gap-4 pt-4 border-t border-slate-50">
             <div className="flex items-start gap-4 text-slate-400">
-              <span className="text-[9px] font-black uppercase tracking-widest mt-2 w-12 shrink-0">吏??/span>
+              <span className="text-[9px] font-black uppercase tracking-widest mt-2 w-12 shrink-0">지역</span>
               <div className="flex flex-wrap gap-1.5">
                 <Pill active={cur.depth1 === ""} label="?꾩껜" onClick={() => handleSelect("region_depth1", "")} />
                 {Object.keys(REGIONS).map(reg => (
