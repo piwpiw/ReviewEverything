@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { InitializedAdapters } from "@/sources/registry";
+import { executeIngestionTask } from "@/lib/ingest";
 
 export async function GET(req: NextRequest) {
     const authHeader = req.headers.get('authorization');
@@ -13,13 +14,14 @@ export async function GET(req: NextRequest) {
     try {
         const activePlatforms = await db.platform.findMany({ where: { is_active: true } });
 
-        // In production, you'd spawn independent workers or Vercel functions for each platform
-        // For this prototype, we'll hit internal /api/admin/ingest or call the logic directly
         const responses = activePlatforms.map(p => {
             const adapter = InitializedAdapters[p.name.toLowerCase()];
             if (adapter) {
-                // Push task
-                return `Started ${p.name}`;
+                // Fire and forget so we don't timeout the cron request
+                executeIngestionTask(adapter, p.id).catch(err => {
+                    console.error(`Cron fail for ${p.name}:`, err);
+                });
+                return `Triggered ${p.name}`;
             }
             return `Skipped ${p.name} (no adapter)`;
         });

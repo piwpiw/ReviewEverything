@@ -55,5 +55,5 @@ export function buildCampaignsQuery(searchParams: URLSearchParams) {
 
     const skip = (page - 1) * limit;
 
-    return { where, orderBy, skip, take: limit, page, limit };
+    return { where, orderBy, skip, take: limit, page, limit, sort };
 }

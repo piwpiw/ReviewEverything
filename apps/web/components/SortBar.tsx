@@ -2,6 +2,7 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback } from "react";
+import React from "react";
 
 export default function SortBar({ currentSort }: { currentSort: string }) {
     const router = useRouter();
@@ -22,8 +23,12 @@ export default function SortBar({ currentSort }: { currentSort: string }) {
         { key: "competition_asc", label: "경쟁률 낮은 순(꿀알바)" }
     ];
 
+    const [isPending, startTransition] = React.useTransition();
+
     const handleSort = (key: string) => {
-        router.push("?" + createQueryString("sort", key), { scroll: false });
+        startTransition(() => {
+            router.push("?" + createQueryString("sort", key), { scroll: false });
+        });
     }
 
     return (
@@ -33,8 +38,8 @@ export default function SortBar({ currentSort }: { currentSort: string }) {
                     key={tab.key}
                     onClick={() => handleSort(tab.key)}
                     className={`py-2 px-4 text-sm font-bold rounded-lg transition-all duration-300 ${currentSort === tab.key
-                            ? "bg-white text-blue-600 shadow-sm"
-                            : "text-slate-500 hover:text-slate-700 hover:bg-slate-200"
+                        ? "bg-white text-blue-600 shadow-sm"
+                        : "text-slate-500 hover:text-slate-700 hover:bg-slate-200"
                         }`}
                 >
                     {tab.label}

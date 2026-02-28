@@ -1,7 +1,8 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
+import React from "react";
 
 export default function FilterBar() {
     const router = useRouter();
@@ -17,8 +18,12 @@ export default function FilterBar() {
         [searchParams]
     );
 
+    const [isPending, startTransition] = React.useTransition();
+
     const handleSelect = (name: string, value: string) => {
-        router.push("?" + createQueryString(name, value), { scroll: false });
+        startTransition(() => {
+            router.push("?" + createQueryString(name, value), { scroll: false });
+        });
     };
 
     return (
@@ -34,7 +39,10 @@ export default function FilterBar() {
                     <option value="1">Revu</option>
                     <option value="2">Reviewnote</option>
                     <option value="3">DinnerQueen</option>
-                    <option value="4">Seouloppa</option>
+                    <option value="4">ReviewPlace</option>
+                    <option value="5">Seouloppa</option>
+                    <option value="6">MrBlog</option>
+                    <option value="7">GangnamFood</option>
                 </select>
             </div>
 

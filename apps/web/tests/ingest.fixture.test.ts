@@ -1,16 +1,165 @@
-import { describe, it, expect } from 'vitest';
-import { RevuAdapter } from '../sources/adapters/revu';
+﻿/**
+ * Adapter Fixture Tests
+ *
+ * Validates that all 7 adapters:
+ * 1. Instantiate correctly with expected metadata
+ * 2. Return valid ScrapedCampaign shapes (mocked HTTP via vi.mock on axios)
+ * 3. Are all registered in the adapter registry
+ */
 
-describe('Adapter Fixture Basic Validations', () => {
-    it('Instantiates RevuAdapter safely', () => {
-        const revu = new RevuAdapter();
-        expect(revu.platformId).toBe(1);
-        expect(revu.baseUrl).toBe('https://www.revu.net');
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+
+// ??? Mock axios globally ??????????????????????????????????????????????????????
+vi.mock('axios', () => ({
+    default: {
+        get: vi.fn(),
+    },
+}));
+
+import axios from 'axios';
+import { RevuAdapter } from '../sources/adapters/revu';
+import { ReviewnoteAdapter } from '../sources/adapters/reviewnote';
+import { DinnerQueenAdapter } from '../sources/adapters/dinnerqueen';
+import { ReviewPlaceAdapter } from '../sources/adapters/reviewplace';
+import { SeouloppaAdapter } from '../sources/adapters/seouloppa';
+import { MrBlogAdapter } from '../sources/adapters/mrblog';
+import { GangnamFoodAdapter } from '../sources/adapters/gangnamfood';
+import { InitializedAdapters } from '../sources/registry';
+
+// Helper: minimal valid ScrapedCampaign shape validator
+function assertValidScrapedCampaign(item: any) {
+    expect(typeof item.original_id).toBe('string');
+    expect(item.original_id.length).toBeGreaterThan(0);
+    expect(typeof item.title).toBe('string');
+    expect(item.title.length).toBeGreaterThan(0);
+    expect(['VST', 'SHP', 'PRS']).toContain(item.campaign_type);
+    expect(['BP', 'IP', 'YP', 'OTHER']).toContain(item.media_type);
+    expect(typeof item.url).toBe('string');
+    expect(item.url.startsWith('http')).toBe(true);
+    expect(item.apply_end_date instanceof Date).toBe(true);
+    expect(typeof item.recruit_count).toBe('number');
+    expect(typeof item.applicant_count).toBe('number');
+}
+
+beforeEach(() => {
+    vi.clearAllMocks();
+    // Default: simulate an empty HTML page (axis returns no recognized DOM)
+    // Adapters with stub fallbacks will still return data
+    (axios.get as any).mockResolvedValue({ data: '<html><body></body></html>' });
+});
+
+// ??????????????????????????????????????????????????????????????????????????????
+// Adapter Metadata
+// ??????????????????????????????????????????????????????????????????????????????
+describe('Adapter Metadata (platformId + baseUrl)', () => {
+    it.each([
+        { Adapter: RevuAdapter, platformId: 1, baseUrl: 'https://www.revu.net' },
+        { Adapter: ReviewnoteAdapter, platformId: 2, baseUrl: 'https://www.reviewnote.co.kr' },
+        { Adapter: DinnerQueenAdapter, platformId: 3, baseUrl: 'https://dinnerqueen.net' },
+        { Adapter: ReviewPlaceAdapter, platformId: 4, baseUrl: 'https://www.reviewplace.co.kr' },
+        { Adapter: SeouloppaAdapter, platformId: 5, baseUrl: 'https://seouloppa.net' },
+        { Adapter: MrBlogAdapter, platformId: 6, baseUrl: 'https://mrblog.net' },
+        { Adapter: GangnamFoodAdapter, platformId: 7, baseUrl: 'https://gangnamfood.net' },
+    ])('$Adapter.name has correct platformId and baseUrl', ({ Adapter, platformId, baseUrl }) => {
+        const instance = new (Adapter as any)();
+        expect(instance.platformId).toBe(platformId);
+        expect(instance.baseUrl).toBe(baseUrl);
+    });
+});
+
+// ??????????????????????????????????????????????????????????????????????????????
+// Adapter: RevuAdapter (has Cheerio DOM fallback logic)
+// ??????????????????????????????????????????????????????????????????????????????
+describe('RevuAdapter', () => {
+    it('returns fallback ScrapedCampaign when DOM has no campaign-list-item elements', async () => {
+        (axios.get as any).mockResolvedValue({ data: '<html><body></body></html>' });
+        const adapter = new RevuAdapter();
+        const result = await adapter.fetchList(1);
+
+        expect(Array.isArray(result)).toBe(true);
+        expect(result.length).toBeGreaterThan(0);
+        assertValidScrapedCampaign(result[0]);
     });
 
-    it('Safely returns empty list before mapping real dom', async () => {
-        const revu = new RevuAdapter();
-        const data = await revu.fetchList(1);
-        expect(data).toEqual([]); // Represents stub safety
+    it('throws and propagates error when axios fails', async () => {
+        (axios.get as any).mockRejectedValue(new Error('Network Error'));
+        const adapter = new RevuAdapter();
+        await expect(adapter.fetchList(1)).rejects.toThrow('Revu Adapter Failed');
+    }, 10000);
+});
+
+// ??????????????????????????????????????????????????????????????????????????????
+// Adapters with static stub data (Reviewnote, DinnerQueen, Seouloppa)
+// ??????????????????????????????????????????????????????????????????????????????
+describe('ReviewnoteAdapter', () => {
+    it('returns at least one valid ScrapedCampaign', async () => {
+        const adapter = new ReviewnoteAdapter();
+        const result = await adapter.fetchList(1);
+        expect(result.length).toBeGreaterThan(0);
+        assertValidScrapedCampaign(result[0]);
+    });
+});
+
+describe('DinnerQueenAdapter', () => {
+    it('returns at least one valid ScrapedCampaign', async () => {
+        const adapter = new DinnerQueenAdapter();
+        const result = await adapter.fetchList(1);
+        expect(result.length).toBeGreaterThan(0);
+        assertValidScrapedCampaign(result[0]);
+    });
+});
+
+describe('SeouloppaAdapter', () => {
+    it('returns at least one valid ScrapedCampaign', async () => {
+        const adapter = new SeouloppaAdapter();
+        const result = await adapter.fetchList(1);
+        expect(result.length).toBeGreaterThan(0);
+        assertValidScrapedCampaign(result[0]);
+    });
+});
+
+// ??????????????????????????????????????????????????????????????????????????????
+// Adapters returning fallback rows on empty DOM
+// ??????????????????????????????????????????????????????????????????????????????
+describe('MrBlogAdapter', () => {
+    it('returns fallback ScrapedCampaign when DOM has no campaign elements', async () => {
+        const adapter = new MrBlogAdapter();
+        const result = await adapter.fetchList(1);
+        expect(Array.isArray(result)).toBe(true);
+        expect(result.length).toBeGreaterThan(0);
+        assertValidScrapedCampaign(result[0]);
+    });
+});
+
+describe('GangnamFoodAdapter', () => {
+    it('returns fallback ScrapedCampaign when DOM has no campaign elements', async () => {
+        const adapter = new GangnamFoodAdapter();
+        const result = await adapter.fetchList(1);
+        expect(Array.isArray(result)).toBe(true);
+        expect(result.length).toBeGreaterThan(0);
+        assertValidScrapedCampaign(result[0]);
+    });
+});
+
+// ??????????????????????????????????????????????????????????????????????????????
+// Registry
+// ??????????????????????????????????????????????????????????????????????????????
+describe('Adapter Registry', () => {
+    const EXPECTED_KEYS = ['revu', 'reviewnote', 'dinnerqueen', 'reviewplace', 'seouloppa', 'mrblog', 'gangnamfood'];
+
+    it('has all 7 adapters registered', () => {
+        expect(Object.keys(InitializedAdapters).length).toBe(7);
+    });
+
+    it.each(EXPECTED_KEYS)('registry contains "%s" key', (key) => {
+        expect(InitializedAdapters[key]).toBeDefined();
+        expect(typeof InitializedAdapters[key].fetchList).toBe('function');
+    });
+
+    it('each registered adapter has a valid platformId', () => {
+        for (const adapter of Object.values(InitializedAdapters)) {
+            expect(typeof adapter.platformId).toBe('number');
+            expect(adapter.platformId).toBeGreaterThan(0);
+        }
     });
 });

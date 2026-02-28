@@ -1,18 +1,43 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { db } from "@/lib/db";
 
 // Using Mock wrapper directly for preview, same logic as index page
-const MOCK_CAMPAIGNS: Record<string, any> = {
-    "1": { id: 1, title: "[강남] 최고급 프리미엄 오마카세 2인 식사권", location: "서울 강남구", media_type: "IP", campaign_type: "VST", platform: { name: "Revu" }, thumbnail_url: "https://images.unsplash.com/photo-1544025162-831518f8887b?auto=format&fit=crop&q=80&w=1200", reward: "오마카세 A코스 2인 (18만원 상당)", url: "https://example.com/apply", snapshots: [{ recruit_count: 5, applicant_count: 2, competition_rate: 0.4 }] }
-};
+const MOCK_DETAIL = { id: 1, title: "[강남] 최고급 프리미엄 오마카세 2인 식사권", location: "서울 강남구", media_type: "IP", campaign_type: "VST", platform: { name: "Revu" }, thumbnail_url: "https://images.unsplash.com/photo-1544025162-831518f8887b?auto=format&fit=crop&q=80&w=1200", reward: "오마카세 A코스 2인 (18만원 상당)", url: "https://example.com/apply", snapshots: [{ recruit_count: 5, applicant_count: 2, competition_rate: 0.4 }] };
 
-export default async function CampaignDetail({ params }: { params: { id: string } }) {
+export default async function CampaignDetail({ params }: { params: Promise<{ id: string }> }) {
     const resolvedParams = await params;
-    const campaign = MOCK_CAMPAIGNS[resolvedParams.id] || MOCK_CAMPAIGNS["1"]; // Fallback to 1 for demo purposes
+    const id = parseInt(resolvedParams.id, 10);
 
-    if (!campaign) return notFound();
+    let campaign: any = null;
 
-    const compRate = campaign.snapshots[0].competition_rate;
+    try {
+        if (!isNaN(id)) {
+            campaign = await db.campaign.findUnique({
+                where: { id },
+                include: {
+                    platform: true,
+                    snapshots: {
+                        orderBy: { scraped_at: 'desc' },
+                        take: 1
+                    }
+                }
+            });
+        }
+    } catch (e) {
+        console.error("Database fetch failed on detail page", e);
+    }
+
+    // Fallback for demo
+    if (!campaign) {
+        if (resolvedParams.id === "1" || isNaN(id)) {
+            campaign = MOCK_DETAIL;
+        } else {
+            return notFound();
+        }
+    }
+
+    const compRate = campaign.snapshots[0]?.competition_rate || 0;
 
     return (
         <main className="max-w-5xl mx-auto p-4 md:p-8 flex flex-col gap-8 pb-32">
