@@ -1,3 +1,9 @@
+"use client";
+
+import { useMemo, useEffect, useRef, useState } from "react";
+import Link from "next/link";
+import { motion, AnimatePresence } from "framer-motion";
+
 const TYPE_COLOR: Record<string, string> = {
   VST: "#3b82f6",
   SHP: "#10b981",
