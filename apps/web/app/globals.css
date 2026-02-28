@@ -17,6 +17,15 @@
     --background: #f8fafc;
     --foreground: #020617;
     --nav-height: 60px;
+    --card-bg: rgba(255, 255, 255, 0.75);
+    --card-border: rgba(255, 255, 255, 0.45);
+  }
+
+  [data-theme='dark'] {
+    --background: #020617;
+    --foreground: #f8fafc;
+    --card-bg: rgba(15, 23, 42, 0.8);
+    --card-border: rgba(255, 255, 255, 0.1);
   }
 
   html {
@@ -27,8 +36,11 @@
     background-color: var(--background);
     color: var(--foreground);
     font-family: "Pretendard", "Outfit", -apple-system, BlinkMacSystemFont, sans-serif;
+    line-height: 1.6;
+    letter-spacing: -0.025em;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    transition: background-color 0.3s ease, color 0.3s ease;
   }
 
   * {

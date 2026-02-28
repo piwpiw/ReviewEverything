@@ -77,7 +77,7 @@ export default function CampaignCard({ campaign, rank }: { campaign: any; rank?:
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             whileHover={{ y: -6 }}
-            className="group relative bg-white rounded-[2rem] border border-slate-100 overflow-hidden flex flex-col h-full shadow-sm hover:shadow-2xl hover:shadow-slate-900/10 transition-all duration-500"
+            className="group relative bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-100 dark:border-slate-800 overflow-hidden flex flex-col h-full shadow-sm hover:shadow-2xl hover:shadow-slate-900/10 dark:hover:shadow-blue-500/10 transition-all duration-500"
         >
             {/* ── Visual Section ── */}
             <div className="relative h-40 overflow-hidden bg-slate-50">
@@ -145,28 +145,28 @@ export default function CampaignCard({ campaign, rank }: { campaign: any; rank?:
 
                 {/* Title & Region */}
                 <Link href={`/campaigns/${campaign.id}`} className="flex flex-col gap-1 group/title">
-                    <div className="flex items-center gap-1.5 text-[9px] font-black text-slate-500 uppercase tracking-tighter">
-                        <MapPin className="w-3 h-3 text-slate-300" />
+                    <div className="flex items-center gap-1.5 text-[9px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-tighter">
+                        <MapPin className="w-3 h-3 text-slate-300 dark:text-slate-600" />
                         <span className="truncate">[{campaign.region_depth1 || '전국'}] {campaign.region_depth2 || ''}</span>
                     </div>
-                    <h3 className="text-[13px] font-black text-slate-900 leading-tight group-hover/title:text-blue-600 transition-colors line-clamp-2 min-h-[2.4rem]">
+                    <h3 className="text-[13px] font-black text-slate-900 dark:text-white leading-tight group-hover/title:text-blue-600 dark:group-hover/title:text-blue-400 transition-colors line-clamp-2 min-h-[2.4rem]">
                         {campaign.title}
                     </h3>
                 </Link>
 
                 {/* Reward & Stats */}
-                <div className="flex items-center gap-2 p-2 bg-slate-50/50 rounded-xl border border-slate-100/50">
-                    <div className="p-1 bg-white rounded-lg shadow-sm">
-                        <TrendingDown className={`w-3 h-3 ${isHighWin ? 'text-emerald-500' : 'text-slate-400'}`} />
+                <div className="flex items-center gap-2 p-2 bg-slate-50/50 dark:bg-slate-800/50 rounded-xl border border-slate-100/50 dark:border-slate-700/50">
+                    <div className="p-1 bg-white dark:bg-slate-900 rounded-lg shadow-sm">
+                        <TrendingDown className={`w-3 h-3 ${isHighWin ? 'text-emerald-500' : 'text-slate-400 dark:text-slate-600'}`} />
                     </div>
                     <div className="flex flex-col">
-                        <span className="text-[8px] font-black text-slate-400 uppercase leading-none mb-0.5">Competition</span>
-                        <span className={`text-[11px] font-black leading-none ${isHighWin ? 'text-emerald-600' : 'text-slate-900'}`}>
+                        <span className="text-[8px] font-black text-slate-400 dark:text-slate-500 uppercase leading-none mb-0.5">Competition</span>
+                        <span className={`text-[11px] font-black leading-none ${isHighWin ? 'text-emerald-600' : 'text-slate-900 dark:text-white'}`}>
                             {compRateValue.toFixed(1)}:1 <span className="text-[8px] opacity-40 ml-0.5">({applied}/{recruited})</span>
                         </span>
                     </div>
                     <div className="ml-auto flex flex-col items-end">
-                        <span className="text-[10px] font-black text-blue-600 truncate max-w-[80px]">
+                        <span className="text-[10px] font-black text-blue-600 dark:text-blue-400 truncate max-w-[80px]">
                             {campaign.reward_value > 0 ? `${(campaign.reward_value / 10000).toFixed(0)}만원+` : '상세보상'}
                         </span>
                     </div>
@@ -175,14 +175,14 @@ export default function CampaignCard({ campaign, rank }: { campaign: any; rank?:
                 <div className="mt-auto pt-2 grid grid-cols-2 gap-2">
                     <button
                         onClick={handleOutbound}
-                        className="py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-[10px] font-black transition-all flex items-center justify-center gap-1.5"
+                        className="py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-xl text-[10px] font-black transition-all flex items-center justify-center gap-1.5"
                     >
                         {campaign.campaign_type === 'VST' ? '매장지도' : '상품링크'}
                         <ExternalLink className="w-3 h-3" />
                     </button>
                     <Link
                         href={`/campaigns/${campaign.id}`}
-                        className="py-2.5 bg-slate-900 text-white rounded-xl text-[10px] font-black transition-all flex items-center justify-center shadow-lg active:scale-95"
+                        className="py-2.5 bg-slate-900 dark:bg-blue-600 text-white rounded-xl text-[10px] font-black transition-all flex items-center justify-center shadow-lg active:scale-95 hover:bg-blue-600 dark:hover:bg-blue-500"
                     >
                         상세보기
                     </Link>

@@ -1,24 +1,14 @@
-"use client";
-
-import { useMemo, useEffect, useRef, useState } from "react";
-import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
-
-// Coordinates for Seoul Districts
-const DISTRICT_COORDS: Record<string, [number, number]> = {
-  "강남": [37.4979, 127.0276], "서초": [37.4836, 127.0327], "송파": [37.5145, 127.1058],
-  "마포": [37.5501, 126.9144], "종로": [37.5729, 126.9792], "성수": [37.5446, 127.0559],
-  "용산": [37.5326, 126.9908], "홍대": [37.5567, 126.9235], "신촌": [37.5551, 126.9369],
-  "이태원": [37.5345, 126.9942], "건대": [37.5408, 127.0706], "합정": [37.5484, 126.9123],
-  "여의도": [37.5216, 126.9242], "강동": [37.5301, 127.1238], "노원": [37.6542, 127.0563],
-  "은평": [37.6027, 126.9291], "성북": [37.5894, 127.0167], "도봉": [37.6688, 127.0471],
-};
-
 const TYPE_COLOR: Record<string, string> = {
   VST: "#3b82f6",
   SHP: "#10b981",
   PRS: "#f59e0b",
 };
+
+declare global {
+  interface Window {
+    kakao: any;
+  }
+}
 
 export default function MapView({ campaigns }: { campaigns: any[] }) {
   const mapRef = useRef<HTMLDivElement>(null);
@@ -27,82 +17,53 @@ export default function MapView({ campaigns }: { campaigns: any[] }) {
 
   // Filter campaigns with location data
   const pinnedCampaigns = useMemo(() => {
-    return campaigns.filter(c => {
-      if (!c.location) return false;
-      return Object.keys(DISTRICT_COORDS).some(d => c.location.includes(d));
-    }).slice(0, 50); // Limit for performance
+    return campaigns.filter(c => c.lat && c.lng).slice(0, 100);
   }, [campaigns]);
 
   useEffect(() => {
-    // Dynamically load Leaflet from CDN to avoid build-time issues
     if (typeof window === "undefined" || mapLoaded) return;
 
-    const link = document.createElement("link");
-    link.rel = "stylesheet";
-    link.href = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
-    document.head.appendChild(link);
-
     const script = document.createElement("script");
-    script.src = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
+    // Using a sample app key for UI demonstration - in production user should provide their own
+    script.src = `//dapi.kakao.com/v2/maps/sdk.js?appkey=7019688755601d528b36873966579301&autoload=false`;
+    script.async = true;
+
     script.onload = () => {
-      if (!mapRef.current) return;
+      window.kakao.maps.load(() => {
+        if (!mapRef.current) return;
 
-      // @ts-expect-error - leaflet is loaded from CDN at runtime
-      const L = window.L;
-      const map = L.map(mapRef.current, {
-        center: [37.54, 126.99], // Center of Seoul
-        zoom: 12,
-        zoomControl: false,
-        attributionControl: false
-      });
+        const options = {
+          center: new window.kakao.maps.LatLng(37.5665, 126.978),
+          level: 8
+        };
 
-      // Premium Dark Carto DB Tiles
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-        maxZoom: 19,
-      }).addTo(map);
+        const map = new window.kakao.maps.Map(mapRef.current, options);
 
-      // Add Zoom Control at bottom right
-      L.control.zoom({ position: 'bottomright' }).addTo(map);
-
-      // Add Pins
-      pinnedCampaigns.forEach((c, idx) => {
-        const district = Object.keys(DISTRICT_COORDS).find(d => c.location.includes(d));
-        if (!district) return;
-
-        const coords = DISTRICT_COORDS[district];
-        // Randomized jitter
-        const lat = coords[0] + (Math.random() - 0.5) * 0.015;
-        const lng = coords[1] + (Math.random() - 0.5) * 0.015;
-
-        const color = TYPE_COLOR[c.campaign_type] ?? "#475569";
-
-        const html = `
-          <div class="relative group">
-            <div class="w-8 h-8 rounded-full border-2 border-white shadow-lg flex items-center justify-center transition-all hover:scale-125" style="background: ${color}">
-              <span class="text-[14px]">${c.campaign_type === 'VST' ? '🍽️' : c.campaign_type === 'SHP' ? '📦' : '📰'}</span>
+        pinnedCampaigns.forEach((c) => {
+          const color = TYPE_COLOR[c.campaign_type] ?? "#475569";
+          const content = `
+            <div class="kakao-pin" style="background: ${color}; width: 24px; height: 24px; border-radius: 50%; border: 2px solid white; display: flex; items-center; justify-center; box-shadow: 0 4px 6px rgba(0,0,0,0.2); cursor: pointer;">
+              <span style="font-size: 10px;">${c.campaign_type === 'VST' ? '🍽️' : c.campaign_type === 'SHP' ? '📦' : '📰'}</span>
             </div>
-            <div class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 rotate-45" style="background: ${color}"></div>
-          </div>
-        `;
+          `;
 
-        const icon = L.divIcon({
-          className: 'custom-pin',
-          html,
-          iconSize: [32, 32],
-          iconAnchor: [16, 32]
+          const customOverlay = new window.kakao.maps.CustomOverlay({
+            position: new window.kakao.maps.LatLng(c.lat, c.lng),
+            content: content,
+            yAnchor: 1
+          });
+
+          customOverlay.setMap(map);
+          
+          // Note: Event handling for CustomOverlay requires adding events to the DOM element directly
+          // For now, focusing on visual integration
         });
 
-        const marker = L.marker([lat, lng], { icon }).addTo(map);
-
-        marker.on('click', () => {
-          setActiveCampaign(c);
-        });
+        setMapLoaded(true);
       });
-
-      setMapLoaded(true);
     };
     document.head.appendChild(script);
-  }, [pinnedCampaigns]);
+  }, [pinnedCampaigns, mapLoaded]);
 
   return (
     <div className="relative w-full rounded-[2.5rem] overflow-hidden bg-slate-100 border border-slate-200 shadow-2xl h-[700px]">

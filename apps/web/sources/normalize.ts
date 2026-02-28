@@ -1,4 +1,4 @@
-﻿import { db } from "../lib/db";
+import { db } from "../lib/db";
 import { ScrapedCampaign } from "./types";
 
 const DISTRICT_COORDS: Record<string, [number, number]> = {
@@ -35,8 +35,21 @@ const WIN = [
   ["report", "기자단", "리포트", "보도", "취재"],
 ];
 
+export function normalizeKoreanText(text: string): string {
+  if (!text) return "";
+  try {
+    // Basic cleanup of common mojibake/broken chars
+    return text
+      .trim()
+      .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F-\u009F]/g, "")
+      .replace(/[^\x00-\x7F\uAC00-\uD7AF\u1100-\u11FF\u3130-\u318F\uA960-\uA97F\uD7B0-\uD7FF]/g, "");
+  } catch {
+    return text;
+  }
+}
+
 export function normalizeCampaignType(typeRaw: string): 'VST' | 'SHP' | 'PRS' {
-  const norm = (typeRaw || '').toLowerCase();
+  const norm = normalizeKoreanText(typeRaw).toLowerCase();
 
   if (WIN[0].some((s) => norm.includes(s.toLowerCase()))) return 'VST';
   if (WIN[1].some((s) => norm.includes(s.toLowerCase()))) return 'SHP';
@@ -126,27 +139,31 @@ export function normalizeCategory(title: string, type: string, reward: string): 
 }
 
 export async function processAndDedupeCampaign(platformId: number, item: ScrapedCampaign) {
+  const sanitizedTitle = normalizeKoreanText(item.title);
+  const sanitizedReward = normalizeKoreanText(item.reward_text || '');
+  const sanitizedLocation = normalizeKoreanText(item.location || '');
+
   const cType = normalizeCampaignType(item.campaign_type);
   const mType = normalizeMediaType(item.media_type);
-  const rewardVal = normalizeRewardValue(item.reward_text || '');
-  const [depth1, depth2] = normalizeRegion(item.location || '');
-  const [lat, lng] = normalizeGeocode(item.location || '', depth2);
-  const [cat, subCat] = normalizeCategory(item.title, cType, item.reward_text || '');
+  const rewardVal = normalizeRewardValue(sanitizedReward);
+  const [depth1, depth2] = normalizeRegion(sanitizedLocation);
+  const [lat, lng] = normalizeGeocode(sanitizedLocation, depth2);
+  const [cat, subCat] = normalizeCategory(sanitizedTitle, cType, sanitizedReward);
 
   const compRate = item.recruit_count > 0 ? item.applicant_count / item.recruit_count : 0;
 
   const commonData = {
-    title: item.title,
+    title: sanitizedTitle,
     campaign_type: cType,
     media_type: mType,
-    location: item.location || null,
+    location: sanitizedLocation || null,
     lat: item.lat || lat,
     lng: item.lng || lng,
     region_depth1: depth1,
     region_depth2: depth2,
     category: cat,
     sub_category: subCat,
-    reward_text: item.reward_text || null,
+    reward_text: sanitizedReward || null,
     reward_value: rewardVal,
     thumbnail_url: item.thumbnail_url || null,
     url: item.url,
