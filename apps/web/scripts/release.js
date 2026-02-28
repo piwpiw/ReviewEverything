@@ -40,11 +40,24 @@ function parseArgs() {
   const parsed = {
     message: 'chore: release',
     autoCommit: args.includes('--auto-commit'),
+    fastMode: args.includes('--fast'),
     includeTest: !args.includes('--skip-tests'),
     includeSmoke: args.includes('--smoke'),
     noPush: args.includes('--no-push'),
     noBuild: args.includes('--skip-build'),
+    waitForDeploy: !args.includes('--no-wait'),
   };
+
+  if (parsed.fastMode) {
+    parsed.includeTest = false;
+    parsed.noBuild = true;
+  }
+
+  if (args.includes('--skip-lint')) {
+    parsed.includeLint = false;
+  } else {
+    parsed.includeLint = true;
+  }
 
   for (let i = 0; i < args.length; i++) {
     const a = args[i];
@@ -105,8 +118,13 @@ function run() {
     process.exit(1);
   }
 
-  runCommand('npm', ['run', 'lint'], { cwd: process.cwd() });
-  runCommand('npm', ['run', 'typecheck'], { cwd: process.cwd() });
+  if (options.includeLint) {
+    runCommand('npm', ['run', 'lint'], { cwd: process.cwd() });
+  }
+
+  if (!options.fastMode) {
+    runCommand('npm', ['run', 'typecheck'], { cwd: process.cwd() });
+  }
 
   if (options.includeTest) {
     runCommand('npm', ['run', 'test:ci'], { cwd: process.cwd() });
@@ -140,6 +158,9 @@ function run() {
   }
 
   const deployArgs = ['--prod', '--yes'];
+  if (options.fastMode && options.waitForDeploy) {
+    deployArgs.push('--no-wait');
+  }
   const deployOutput = runCapture('vercel', deployArgs, { cwd: process.cwd() });
 
   const url = getDeploymentUrl(deployOutput) || 'https://vercel.com/dashboard';

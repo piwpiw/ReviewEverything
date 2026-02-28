@@ -13,6 +13,7 @@
     "typecheck": "tsc --noEmit",
     "release": "node scripts/release.js --auto-commit",
     "release:dry-run": "node scripts/release.js --auto-commit --no-push",
+    "release:fast": "node scripts/release.js --auto-commit --fast",
     "test": "vitest run",
     "test:ci": "vitest run",
     "test:watch": "vitest",
