@@ -1,65 +1,77 @@
-"use client";
+﻿"use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useTransition } from "react";
+import { useCallback, useTransition, useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import {
+  ChevronDown,
+  MapPin,
+  TrendingUp,
+  Clock,
+  Target,
+  X,
+  Search,
+  Filter,
+  Sparkles
+} from "lucide-react";
 
+/* ?? Constants ?? */
 const PLATFORMS = [
   { id: "", label: "전체" },
-  { id: "1", label: "레뷰" },
-  { id: "2", label: "리뷰노트" },
-  { id: "3", label: "디너의여왕" },
-  { id: "4", label: "리뷰플레이스" },
-  { id: "5", label: "서울오빠" },
-  { id: "6", label: "미스터블로그" },
-  { id: "7", label: "강남맛집" },
-];
-const TYPES = [
-  { id: "", label: "유형 전체" },
-  { id: "VST", label: "🍽 방문형" },
-  { id: "SHP", label: "📦 배송형" },
-  { id: "PRS", label: "📰 기자단" },
-];
-const MEDIAS = [
-  { id: "", label: "매체 전체" },
-  { id: "BP", label: "✍️ 블로그" },
-  { id: "IP", label: "📸 인스타" },
-  { id: "YP", label: "🎬 유튜브" },
+  { id: "1", label: "revu" },
+  { id: "2", label: "reviewnote" },
+  { id: "3", label: "dinnerqueen" },
+  { id: "4", label: "reviewplace" },
+  { id: "5", label: "mrblog" },
+  { id: "6", label: "seouloppa" },
+  { id: "7", label: "gangnamfood" },
 ];
 
-function Pills({
-  items,
-  current,
-  name,
-  onSelect,
-}: {
-  items: { id: string; label: string }[];
-  current: string;
-  name: string;
-  onSelect: (name: string, val: string) => void;
-}) {
+const CAMPAIGN_TABS = [
+  { id: "VST", label: "방문형" },
+  { id: "SHP", label: "배송형" },
+  { id: "PRS", label: "프레스" },
+];
+
+const MEDIAS = [
+  { id: "BP", label: "블로그" },
+  { id: "IP", label: "인스타" },
+  { id: "RS", label: "기자단" },
+  { id: "YP", label: "유튜브" },
+  { id: "SH", label: "쇼셜" },
+  { id: "TK", label: "기타" },
+];
+
+const REGIONS: Record<string, string[]> = {
+  "서울": ["전체", "강남", "홍대", "마포", "성수", "신촌"],
+  "경기": ["전체", "수원", "성남", "고양", "용인", "부천"],
+  "부산": ["전체", "해운대", "서면", "남포"],
+  "대구": ["전체", "동성로", "수성"],
+  "기타": ["전체", "전국", "온라인"],
+};
+
+const CATEGORIES = {
+  VST: ["전체", "카페", "음식", "뷰티", "체험", "플레이스", "기타"],
+  SHP: ["전체", "식품", "건강", "패션", "리빙", "디지털", "기타"],
+};
+
+/* ?? Components ?? */
+
+function Pill({ active, label, onClick }: { active: boolean; label: string; onClick: () => void }) {
   return (
-    <div className="flex flex-wrap gap-1.5">
-      {items.map(item => {
-        const active = current === item.id;
-        return (
-          <button
-            key={item.id}
-            onClick={() => onSelect(name, item.id)}
-            className={`pill-btn ${active ? "active" : ""}`}
-          >
-            {active && (
-              <motion.span
-                layoutId={`pill-${name}`}
-                className="absolute inset-0 bg-slate-900 rounded-xl -z-10"
-                transition={{ type: "spring", bounce: 0.15, duration: 0.45 }}
-              />
-            )}
-            {item.label}
-          </button>
-        );
-      })}
-    </div>
+    <button
+      onClick={onClick}
+      className={`relative px-4 py-2 rounded-xl text-[11px] font-black transition-all ${active ? "text-white shadow-lg shadow-slate-900/10" : "text-slate-500 bg-slate-100 hover:bg-slate-200"
+        }`}
+    >
+      {active && (
+        <motion.span
+          layoutId="pill-bg"
+          className="absolute inset-0 bg-slate-900 rounded-xl -z-10"
+        />
+      )}
+      {label}
+    </button>
   );
 }
 
@@ -67,77 +79,263 @@ export default function FilterBar() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
+  const [isAdvancedOpen, setIsAdvancedOpen] = useState(false);
+  const [recentFilters, setRecentFilters] = useState<any[]>(() => {
+    if (typeof window === "undefined") return [];
+    const saved = localStorage.getItem("re_recent_filters");
+    if (!saved) return [];
+    try {
+      const parsed = JSON.parse(saved);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  });
+  const saveToRecent = useCallback(() => {
+    const params = new URLSearchParams(searchParams.toString());
+    const filterKey = params.toString();
+    if (!filterKey) return;
 
-  const createQS = useCallback(
-    (name: string, value: string) => {
-      const p = new URLSearchParams(searchParams.toString());
-      if (value) p.set(name, value);
-      else p.delete(name);
-      return p.toString();
-    },
-    [searchParams]
-  );
+    setRecentFilters(prev => {
+      const filtered = prev.filter(f => f.key !== filterKey);
+      const next = [{ key: filterKey, label: `필터: ${params.get("q") || "검색"}` }, ...filtered].slice(0, 5);
+      localStorage.setItem("re_recent_filters", JSON.stringify(next));
+      return next;
+    });
+  }, [searchParams]);
 
   const handleSelect = (name: string, val: string) => {
+    const p = new URLSearchParams(searchParams.toString());
+    if (val && val !== "?꾩껜") p.set(name, val);
+    else p.delete(name);
+
+    // Reset depth2 if depth1 changes
+    if (name === "region_depth1") p.delete("region_depth2");
+
     startTransition(() => {
-      router.push("/?" + createQS(name, val), { scroll: false });
+      router.push("/?" + p.toString(), { scroll: false });
     });
   };
 
-  const cur = {
-    platform: searchParams.get("platform_id") ?? "",
-    type: searchParams.get("campaign_type") ?? "",
-    media: searchParams.get("media_type") ?? "",
+  const handleQuickFilter = (type: 'win' | 'urgent' | 'hot') => {
+    const p = new URLSearchParams(searchParams.toString());
+    if (type === 'win') { p.set("max_comp", "1.0"); p.set("sort", "competition_asc"); }
+    if (type === 'urgent') { p.set("sort", "deadline_asc"); }
+    if (type === 'hot') { p.set("sort", "applicant_desc"); }
+    router.push("/?" + p.toString(), { scroll: false });
   };
 
-  const activeCount = [cur.platform, cur.type, cur.media].filter(Boolean).length;
+  const activeCount = Array.from(searchParams.keys()).filter(k => k !== 'view').length;
 
   return (
-    <div className="glass-card rounded-[1.75rem] border border-white/60 shadow-lg shadow-slate-900/5 px-5 py-5">
-      <div className="flex flex-col gap-4">
-        {/* Row 1: Platforms */}
-        <div className="flex items-start gap-3">
-          <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-2 w-10 shrink-0">플랫폼</span>
-          <Pills items={PLATFORMS} current={cur.platform} name="platform_id" onSelect={handleSelect} />
+    <div className="flex flex-col gap-4">
+      {/* ?? Layer 1: Global Tabs & Search Count ?? */}
+      <div className="flex items-center justify-between px-2">
+        <div className="flex items-center gap-1.5 bg-white p-1.5 rounded-2xl shadow-sm border border-slate-100">
+          {CAMPAIGN_TABS.map(tab => (
+            <button
+              key={tab.id}
+              onClick={() => handleSelect("campaign_type", tab.id)}
+              className={`px-5 py-2 rounded-xl text-xs font-black transition-all ${cur.type === tab.id ? "bg-slate-900 text-white shadow-lg" : "text-slate-500 hover:text-slate-900"
+                }`}
+            >
+              {tab.id === 'VST' && (cur.depth1 ? `?뱧 ${cur.depth1} 泥댄뿕` : tab.label)}
+              {tab.id !== 'VST' && tab.label}
+            </button>
+          ))}
         </div>
-        {/* Row 2 & 3 */}
-        <div className="flex flex-wrap gap-4">
-          <div className="flex items-start gap-3">
-            <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-2 w-10 shrink-0">유형</span>
-            <Pills items={TYPES} current={cur.type} name="campaign_type" onSelect={handleSelect} />
-          </div>
-          <div className="flex items-start gap-3">
-            <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-2 w-10 shrink-0">매체</span>
-            <Pills items={MEDIAS} current={cur.media} name="media_type" onSelect={handleSelect} />
+        <div className="hidden md:flex items-center gap-2">
+          <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Recent:</span>
+          <div className="flex gap-2">
+            {recentFilters.map((f, i) => (
+              <button
+                key={i}
+                onClick={() => router.push("/?" + f.key)}
+                className="px-3 py-1.5 bg-slate-50 text-[10px] font-black text-slate-500 rounded-lg hover:bg-slate-900 hover:text-white transition-all border border-slate-100"
+              >
+                {f.label}
+              </button>
+            ))}
           </div>
         </div>
       </div>
 
-      {/* Loading + Reset */}
-      <div className="mt-3.5 flex items-center justify-between">
+      {/* ?? Layer 2: Main Filter Box ?? */}
+      <div className="glass-card rounded-[2.5rem] border border-white/60 shadow-xl shadow-slate-900/5 p-6 flex flex-col gap-6 relative overflow-hidden">
+        {/* Platform Selection */}
+        <div className="flex items-start gap-4">
+          <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-2 w-12 shrink-0">?뚮옯??/span>
+          <div className="flex flex-wrap gap-1.5">
+            {PLATFORMS.map(p => (
+              <Pill key={p.id} active={cur.platform === p.id} label={p.label} onClick={() => handleSelect("platform_id", p.id)} />
+            ))}
+          </div>
+        </div>
+
+        {/* Media (Channel) Selection */}
+        <div className="flex items-start gap-4">
+          <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-2 w-12 shrink-0">梨꾨꼸</span>
+          <div className="flex flex-wrap gap-1.5">
+            <Pill active={cur.media === ""} label="?꾩껜" onClick={() => handleSelect("media_type", "")} />
+            {MEDIAS.map(m => (
+              <Pill key={m.id} active={cur.media === m.id} label={m.label} onClick={() => handleSelect("media_type", m.id)} />
+            ))}
+          </div>
+        </div>
+
+        {/* Region Hierarchy (Visit Only) */}
+        {cur.type === 'VST' && (
+          <div className="flex flex-col gap-4 pt-4 border-t border-slate-50">
+            <div className="flex items-start gap-4 text-slate-400">
+              <span className="text-[9px] font-black uppercase tracking-widest mt-2 w-12 shrink-0">吏??/span>
+              <div className="flex flex-wrap gap-1.5">
+                <Pill active={cur.depth1 === ""} label="?꾩껜" onClick={() => handleSelect("region_depth1", "")} />
+                {Object.keys(REGIONS).map(reg => (
+                  <Pill key={reg} active={cur.depth1 === reg} label={reg} onClick={() => handleSelect("region_depth1", reg)} />
+                ))}
+              </div>
+            </div>
+            <AnimatePresence>
+              {cur.depth1 && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  className="flex items-start gap-4 pl-16"
+                >
+                  <div className="flex flex-wrap gap-1">
+                    {REGIONS[cur.depth1]?.map(sub => (
+                      <button
+                        key={sub}
+                        onClick={() => handleSelect("region_depth2", sub)}
+                        className={`px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all ${(cur.depth2 === sub || (sub === '?꾩껜' && !cur.depth2))
+                            ? "bg-blue-600 text-white shadow-md shadow-blue-500/20"
+                            : "text-slate-400 bg-slate-50 hover:bg-slate-100"
+                          }`}
+                      >
+                        {sub}
+                      </button>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        )}
+
+        {/* Category Selection */}
+        <div className="flex items-start gap-4">
+          <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-2 w-12 shrink-0">移댄뀒怨좊━</span>
+          <div className="flex flex-wrap gap-1.5">
+            {CATEGORIES[cur.type as keyof typeof CATEGORIES]?.map(cat => (
+              <Pill key={cat} active={cur.category === (cat === '?꾩껜' ? '' : cat)} label={cat} onClick={() => handleSelect("category", cat === '?꾩껜' ? '' : cat)} />
+            ))}
+          </div>
+        </div>
+
+        {/* Advanced Filters Toggle */}
+        <button
+          onClick={() => setIsAdvancedOpen(!isAdvancedOpen)}
+          className="flex items-center gap-2 text-[10px] font-black text-blue-600 hover:text-blue-800 transition-colors mt-2"
+        >
+          <Filter className="w-3.5 h-3.5" />
+          {isAdvancedOpen ? "?곸꽭 ?꾪꽣 ?リ린" : "?섏튂???곸꽭 ?꾪꽣 ?닿린 (蹂댁긽?? 寃쎌웳瑜???"}
+          <ChevronDown className={`w-3.5 h-3.5 transition-transform ${isAdvancedOpen ? 'rotate-180' : ''}`} />
+        </button>
+
         <AnimatePresence>
-          {isPending && (
+          {isAdvancedOpen && (
             <motion.div
-              initial={{ opacity: 0, x: -8 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -8 }}
-              className="flex items-center gap-1.5 text-[10px] font-bold text-blue-600"
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="grid grid-cols-1 md:grid-cols-3 gap-6 p-6 bg-slate-50 rounded-[2rem] border border-slate-100"
             >
-              <div className="w-3 h-3 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
-              데이터 로딩 중...
+              <div className="flex flex-col gap-2">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                  <Target className="w-3 h-3 text-blue-500" /> ?쒖븞湲덉븸 (???댁긽)
+                </label>
+                <input
+                  type="number"
+                  placeholder="?? 50000"
+                  defaultValue={cur.minReward}
+                  onBlur={(e) => handleSelect("min_reward", e.target.value)}
+                  className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-xs font-bold outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                />
+              </div>
+              <div className="flex flex-col gap-2">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                  <TrendingUp className="w-3 h-3 text-rose-500" /> 寃쎌웳瑜?(~:1 ?댄븯)
+                </label>
+                <input
+                  type="number"
+                  step="0.1"
+                  placeholder="?? 1.0"
+                  defaultValue={cur.maxComp}
+                  onBlur={(e) => handleSelect("max_comp", e.target.value)}
+                  className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-xs font-bold outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all"
+                />
+              </div>
+              <div className="flex items-end">
+                <button
+                  onClick={saveToRecent}
+                  className="w-full py-2.5 bg-slate-900 text-white rounded-xl text-xs font-black flex items-center justify-center gap-2 shadow-lg active:scale-95 transition-all"
+                >
+                  <Sparkles className="w-3.5 h-3.5" /> ???꾪꽣 議고빀 ???                </button>
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
 
+        {/* Quick Access Chips */}
+        <div className="flex items-center gap-3 pt-4 border-t border-slate-50">
+          <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest w-12 shrink-0">QUICK</span>
+          <div className="flex flex-wrap gap-2">
+            <button
+              onClick={() => handleQuickFilter('win')}
+              className="px-4 py-1.5 bg-emerald-50 text-emerald-600 rounded-full text-[10px] font-black border border-emerald-100 hover:bg-emerald-600 hover:text-white transition-all shadow-sm"
+            >
+              ?렞 ?뱀꺼 ?뺣쪧 UP (1:1 ?댄븯)
+            </button>
+            <button
+              onClick={() => handleQuickFilter('urgent')}
+              className="px-4 py-1.5 bg-rose-50 text-rose-600 rounded-full text-[10px] font-black border border-rose-100 hover:bg-rose-600 hover:text-white transition-all shadow-sm"
+            >
+              ???ㅻ뒛/?댁씪 留덇컧
+            </button>
+            <button
+              onClick={() => handleQuickFilter('hot')}
+              className="px-4 py-1.5 bg-amber-50 text-amber-600 rounded-full text-[10px] font-black border border-amber-100 hover:bg-amber-600 hover:text-white transition-all shadow-sm"
+            >
+              ?뵦 吏?먯옄 ??＜ ?멸린??            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* ?? Layer 3: Filter Info & Reset ?? */}
+      <div className="flex items-center justify-between px-4">
+        <div className="flex items-center gap-3">
+          <AnimatePresence>
+            {isPending && (
+              <motion.div
+                initial={{ opacity: 0, x: -8 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -8 }}
+                className="flex items-center gap-2 text-[10px] font-black text-blue-600"
+              >
+                <div className="w-3 h-3 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
+                吏?ν삎 ?꾪꽣 遺꾩꽍 以?..
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+
         {activeCount > 0 && (
           <button
             onClick={() => router.push("/", { scroll: false })}
-            className="ml-auto text-[10px] font-black text-slate-400 hover:text-rose-500 transition-colors flex items-center gap-1"
+            className="text-[10px] font-black text-rose-500 bg-rose-50 px-3 py-1.5 rounded-xl hover:bg-rose-500 hover:text-white transition-all flex items-center gap-2 shadow-sm border border-rose-100"
           >
-            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-            필터 초기화 ({activeCount})
+            <X className="w-3 h-3" />
+            寃???꾪꽣 珥덇린??({activeCount})
           </button>
         )}
       </div>

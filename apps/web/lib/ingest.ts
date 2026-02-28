@@ -2,11 +2,33 @@ import { db } from "./db";
 import { processAndDedupeCampaign } from "@/sources/normalize";
 import { IPlatformAdapter } from "@/sources/types";
 
+const MAX_PAGES_PER_RUN = 10;
+const ACTIVE_RUN_STALE_MINUTES = 45;
+
+export async function isPlatformCurrentlyInProgress(platformId: number): Promise<boolean> {
+    const cutoff = new Date(Date.now() - ACTIVE_RUN_STALE_MINUTES * 60 * 1000);
+
+    const running = await db.ingestRun.findFirst({
+        where: {
+            platform_id: platformId,
+            status: 'RUNNING',
+            start_time: { gte: cutoff }
+        }
+    });
+
+    return Boolean(running);
+}
+
 /**
  * Enhanced task executor to handle more pages and better logging.
  * In production, this would probably use a queue (BullMQ/SQS).
  */
 export async function executeIngestionTask(adapter: IPlatformAdapter, platformId: number) {
+    if (await isPlatformCurrentlyInProgress(platformId)) {
+        console.log(`[Ingest] Skip platform ${platformId}: already running`);
+        return { success: false, reason: "already_running", platformId };
+    }
+
     const run = await db.ingestRun.create({
         data: {
             platform_id: platformId,
@@ -20,7 +42,7 @@ export async function executeIngestionTask(adapter: IPlatformAdapter, platformId
 
     try {
         // Broaden range for full implementation (up to 10 pages)
-        for (let page = 1; page <= 10; page++) {
+        for (let page = 1; page <= MAX_PAGES_PER_RUN; page++) {
             console.log(`[Ingest] Processing platform ${platformId}, page ${page}...`);
             const results = await adapter.fetchList(page);
 

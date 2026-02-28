@@ -1,23 +1,11 @@
 # Deploy Guardrails
 
-## Smoke Targets
-After deployment, probe:
-- `/`
-- `/campaigns`
-- `/admin`
-- `/api/health`
-
-## Pass Criteria
-- Page routes return status `2xx` or `3xx`.
-- `/api/health` returns `200` (or `503` only when DB outage is known and acknowledged).
-
-## Rollback Trigger Conditions
-Trigger rollback when any condition is true:
-- Two consecutive smoke runs fail for the same endpoint.
-- `/api/health` is non-responsive (timeout/error) for more than 3 minutes.
-- Home or campaigns route returns `5xx` after deployment.
-
-## Operational Notes
-- Smoke script is `scripts/smoke.js`.
-- CI consumes `SMOKE_BASE_URL` (or `VERCEL_URL`) for target base URL.
-- Attach `reports/smoke.json` to incident/rollback record.
+> ⚠️ **이 문서는 Team-Agent 아키텍처 전환으로 이관되었습니다.**
+>
+> 모든 배포 가드레일은 **[T09_VALIDATION](./teams/T09_VALIDATION.md)** 팀 문서에서 관리됩니다.
+>
+> - Smoke Targets (4개 엔드포인트) → `T09_VALIDATION § Smoke Targets`
+> - Rollback Trigger Conditions → `T09_VALIDATION § Rollback Trigger Conditions`
+> - smoke 스크립트 (`scripts/smoke.js`) → `T09_VALIDATION § Tools`
+> - CI `SMOKE_BASE_URL` 환경변수 → `T09_VALIDATION § Tools`
+> - `reports/smoke.json` 발행 → **[T10_OBSERVABILITY](./teams/T10_OBSERVABILITY.md) § Report Formats**

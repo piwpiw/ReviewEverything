@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { InitializedAdapters } from "@/sources/registry";
 import { executeIngestionTask } from "@/lib/ingest";
+import { InitializedAdapters } from "@/sources/registry";
 
 export async function POST(req: NextRequest) {
     try {
@@ -14,17 +14,22 @@ export async function POST(req: NextRequest) {
         const platform = await db.platform.findUnique({ where: { id: platform_id } });
         if (!platform) return NextResponse.json({ error: "Platform not found" }, { status: 404 });
 
-        const adapterKey = platform.name.toLowerCase();
-        const adapter = InitializedAdapters[adapterKey];
+        const adapterName = platform.name.toLowerCase();
+        const adapter = InitializedAdapters[adapterName];
 
         if (!adapter) {
-            return NextResponse.json({ error: "Adapter not implemented for this platform" }, { status: 501 });
+            return NextResponse.json({ error: "Adapter not initialized for platform" }, { status: 500 });
         }
 
-        // Trigger async
-        executeIngestionTask(adapter, platform.id).catch(console.error);
+        // Run ingestion asynchronously so the API responds before Vercel timeout
+        executeIngestionTask(adapter, platform.id).catch(e => {
+            console.error(`[Ingest Route] Background error for ${platform.name}:`, e);
+        });
 
-        return NextResponse.json({ message: "Ingestion started" });
+        return NextResponse.json({
+            message: "Ingestion job started asynchronously",
+            platform_id: platform.id,
+        });
     } catch (err: any) {
         return NextResponse.json({ error: err.message }, { status: 500 });
     }

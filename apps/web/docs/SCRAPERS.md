@@ -1,56 +1,10 @@
-# 🕷 Scraper Adapters Reference
+# Scraper Adapters Reference
 
-The `ReviewEverything` project aggregates data using an array of Cheerio-based scrapers. All scrapers reside in `apps/web/sources/adapters/`.
-
-## 1. Supported Platforms & File Index
-
-| ID | Platform Name | Adapter File | Method |
-|:---|:---|:---|:---|
-| 1 | Revu (레뷰) | `revu.ts` | HTML DOM Parsing (Cheerio) |
-| 2 | ReviewNote (리뷰노트) | `reviewnote.ts` | HTML DOM Parsing (Cheerio) |
-| 3 | DinnerQueen (디너의여왕) | `dinnerqueen.ts` | HTML DOM Parsing (Cheerio) |
-| 4 | ReviewPlace (리뷰플레이스) | `reviewplace.ts` | HTML DOM Parsing (Cheerio) |
-| 5 | SeoulOppa (서울오빠) | `seouloppa.ts` | HTML DOM Parsing (Cheerio) |
-| 6 | MrBlog (미스터블로그) | `mrblog.ts` | HTML DOM Parsing (Cheerio) |
-| 7 | GangnamFood (강남맛집) | `gangnamfood.ts` | HTML DOM Parsing (Cheerio) |
-
-## 2. Adapter Architecture (`IPlatformAdapter`)
-
-Every adapter must implement the interface found in `sources/types.ts`:
-
-```typescript
-export interface IPlatformAdapter {
-    platformId: number;
-    baseUrl: string;
-    fetchList(page: number): Promise<ScrapedCampaign[]>;
-}
-```
-
-## 3. Resilience and Fallback Tactics
-
-Scraping 7 platforms asynchronously presents challenges like IP blocking, WAF triggered errors, and dynamic HTML DOM rendering.
-
-### Randomized Delays & Exponential Backoff
-Before making requests, adapters implement a mandatory pseudo-random delay. Furthermore, all requests are routed through `fetchWithRetry` (`lib/fetcher.ts`) which automatically implements exponential backoff to handle network timeouts or `5xx` server errors up to 3 times before falling back.
-```typescript
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-await delay(1500 + Math.random() * 500); // Base anti-bot delay
-```
-
-### Try-Catch Fallbacks
-If a request fails (e.g., 403 Forbidden, 503 Gateway Error, DOM parsing undefined error due to site update), the system gracefully catches it.
-Instead of crashing the ingestion task, the adapter logs the error, and provides a dummy `[Fallback]` payload to ensure testing and application UI does not break.
-
-### Headers injection
-All `axios` requests fake basic browser footprints to prevent rudimentary blocklists.
-```typescript
-headers: { 'User-Agent': 'Mozilla/5.0' }
-```
-
-## 4. Expanding the Pipeline
-
-To add a new platform:
-1. Create `new_platform.ts` in `adapters/`.
-2. Add the `IPlatformAdapter` implementation.
-3. Import and export it inside `sources/registry.ts`.
-4. Trigger the platform ID via `/api/admin/ingest` to test.
+> ⚠️ **이 문서는 Team-Agent 아키텍처 전환으로 이관되었습니다.**
+>
+> 모든 스크래퍼 어댑터 명세는 **[T01_SCRAPER](./teams/T01_SCRAPER.md)** 팀 문서에서 관리됩니다.
+>
+> - 지원 플랫폼 7개 인덱스 → `T01_SCRAPER § Platform Index`
+> - `IPlatformAdapter` 인터페이스 계약 → `T01_SCRAPER § Adapter Interface Contract`
+> - 탄력성 전술 (지수 백오프, fallback) → `T01_SCRAPER § Agent Roles`
+> - 어댑터 추가 방법 → `T01_SCRAPER § Expanding the Pipeline`

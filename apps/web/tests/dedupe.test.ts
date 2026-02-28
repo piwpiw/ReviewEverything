@@ -47,8 +47,8 @@ beforeEach(() => {
 
 describe('processAndDedupeCampaign – new campaign', () => {
     it('creates a new Campaign + Snapshot when no existing record is found', async () => {
-        (db.campaign.findUnique as any).mockResolvedValue(null);
-        (db.campaign.create as any).mockResolvedValue({ id: 42 });
+        vi.mocked(db.campaign.findUnique).mockResolvedValue(null as any);
+        vi.mocked(db.campaign.create).mockResolvedValue({ id: 42 } as any);
 
         const result = await processAndDedupeCampaign(PLATFORM_ID, sampleCampaign);
 
@@ -56,37 +56,42 @@ describe('processAndDedupeCampaign – new campaign', () => {
         expect(db.campaign.create).toHaveBeenCalledTimes(1);
 
         // Verify create shape: should include inline snapshot
-        const createArgs = (db.campaign.create as any).mock.calls[0][0].data;
-        expect(createArgs.platform_id).toBe(PLATFORM_ID);
-        expect(createArgs.original_id).toBe('rv_001');
-        expect(createArgs.snapshots.create.recruit_count).toBe(10);
-        expect(createArgs.snapshots.create.applicant_count).toBe(4);
-        expect(createArgs.snapshots.create.competition_rate).toBeCloseTo(0.4);
+        const mockCallArgs: any = vi.mocked(db.campaign.create).mock.calls[0][0];
+
+        expect(mockCallArgs.data.platform_id).toBe(PLATFORM_ID);
+        expect(mockCallArgs.data.original_id).toBe('rv_001');
+
+        const snapCreate: any = mockCallArgs.data.snapshots.create;
+        expect(snapCreate.recruit_count).toBe(10);
+        expect(snapCreate.applicant_count).toBe(4);
+        expect(snapCreate.competition_rate).toBeCloseTo(0.4);
 
         expect(result.status).toBe('created');
         expect(result.id).toBe(42);
     });
 
     it('correctly calculates competition_rate as applicant/recruit', async () => {
-        (db.campaign.findUnique as any).mockResolvedValue(null);
-        (db.campaign.create as any).mockResolvedValue({ id: 1 });
+        vi.mocked(db.campaign.findUnique).mockResolvedValue(null as any);
+        vi.mocked(db.campaign.create).mockResolvedValue({ id: 1 } as any);
 
         const campaign: ScrapedCampaign = { ...sampleCampaign, recruit_count: 5, applicant_count: 15 };
         await processAndDedupeCampaign(PLATFORM_ID, campaign);
 
-        const rate = (db.campaign.create as any).mock.calls[0][0].data.snapshots.create.competition_rate;
-        expect(rate).toBeCloseTo(3.0); // 15/5
+        const mockCallArgs: any = vi.mocked(db.campaign.create).mock.calls[0][0];
+        const snapCreate: any = mockCallArgs.data.snapshots.create;
+        expect(snapCreate.competition_rate).toBeCloseTo(3.0); // 15/5
     });
 
     it('sets competition_rate to 0 when recruit_count is 0 (avoids division by zero)', async () => {
-        (db.campaign.findUnique as any).mockResolvedValue(null);
-        (db.campaign.create as any).mockResolvedValue({ id: 1 });
+        vi.mocked(db.campaign.findUnique).mockResolvedValue(null as any);
+        vi.mocked(db.campaign.create).mockResolvedValue({ id: 1 } as any);
 
         const campaign: ScrapedCampaign = { ...sampleCampaign, recruit_count: 0, applicant_count: 0 };
         await processAndDedupeCampaign(PLATFORM_ID, campaign);
 
-        const rate = (db.campaign.create as any).mock.calls[0][0].data.snapshots.create.competition_rate;
-        expect(rate).toBe(0);
+        const mockCallArgs: any = vi.mocked(db.campaign.create).mock.calls[0][0];
+        const snapCreate: any = mockCallArgs.data.snapshots.create;
+        expect(snapCreate.competition_rate).toBe(0);
     });
 });
 
@@ -103,8 +108,8 @@ describe('processAndDedupeCampaign – existing campaign (upsert)', () => {
     };
 
     it('updates title/apply_end_date but does NOT create new snapshot if counts unchanged', async () => {
-        (db.campaign.findUnique as any).mockResolvedValue(existingBase);
-        (db.campaign.update as any).mockResolvedValue(existingBase);
+        vi.mocked(db.campaign.findUnique).mockResolvedValue(existingBase as any);
+        vi.mocked(db.campaign.update).mockResolvedValue(existingBase as any);
 
         const result = await processAndDedupeCampaign(PLATFORM_ID, sampleCampaign);
 
@@ -116,9 +121,9 @@ describe('processAndDedupeCampaign – existing campaign (upsert)', () => {
 
     it('creates a new snapshot when applicant_count has changed', async () => {
         const existing = { ...existingBase, snapshots: [{ ...existingBase.snapshots[0], applicant_count: 2 }] };
-        (db.campaign.findUnique as any).mockResolvedValue(existing);
-        (db.campaign.update as any).mockResolvedValue(existing);
-        (db.campaignSnapshot.create as any).mockResolvedValue({ id: 200 });
+        vi.mocked(db.campaign.findUnique).mockResolvedValue(existing as any);
+        vi.mocked(db.campaign.update).mockResolvedValue(existing as any);
+        vi.mocked(db.campaignSnapshot.create).mockResolvedValue({ id: 200 } as any);
 
         const result = await processAndDedupeCampaign(PLATFORM_ID, {
             ...sampleCampaign,
@@ -131,9 +136,9 @@ describe('processAndDedupeCampaign – existing campaign (upsert)', () => {
 
     it('creates a new snapshot when recruit_count has changed', async () => {
         const existing = { ...existingBase, snapshots: [{ ...existingBase.snapshots[0], recruit_count: 5 }] };
-        (db.campaign.findUnique as any).mockResolvedValue(existing);
-        (db.campaign.update as any).mockResolvedValue(existing);
-        (db.campaignSnapshot.create as any).mockResolvedValue({ id: 201 });
+        vi.mocked(db.campaign.findUnique).mockResolvedValue(existing as any);
+        vi.mocked(db.campaign.update).mockResolvedValue(existing as any);
+        vi.mocked(db.campaignSnapshot.create).mockResolvedValue({ id: 201 } as any);
 
         const result = await processAndDedupeCampaign(PLATFORM_ID, {
             ...sampleCampaign,
@@ -146,9 +151,9 @@ describe('processAndDedupeCampaign – existing campaign (upsert)', () => {
 
     it('creates a new snapshot when no previous snapshots exist on the existing campaign', async () => {
         const existing = { ...existingBase, snapshots: [] };
-        (db.campaign.findUnique as any).mockResolvedValue(existing);
-        (db.campaign.update as any).mockResolvedValue(existing);
-        (db.campaignSnapshot.create as any).mockResolvedValue({ id: 202 });
+        vi.mocked(db.campaign.findUnique).mockResolvedValue(existing as any);
+        vi.mocked(db.campaign.update).mockResolvedValue(existing as any);
+        vi.mocked(db.campaignSnapshot.create).mockResolvedValue({ id: 202 } as any);
 
         const result = await processAndDedupeCampaign(PLATFORM_ID, sampleCampaign);
 

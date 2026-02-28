@@ -1,32 +1,34 @@
-import { NextRequest, NextResponse } from "next/server";
-import { db } from "@/lib/db";
-import { InitializedAdapters } from "@/sources/registry";
-import { executeIngestionTask } from "@/lib/ingest";
+import { NextRequest, NextResponse } from 'next/server';
+import { enqueueIngestJobs, enqueueReminderJob, runJobs } from '@/lib/backgroundWorker';
 
 export async function GET(req: NextRequest) {
     const authHeader = req.headers.get('authorization');
     const cronSecret = process.env.CRON_SECRET;
 
     if (authHeader !== `Bearer ${cronSecret}`) {
-        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     try {
-        const activePlatforms = await db.platform.findMany({ where: { is_active: true } });
+        const [created, reminder] = await Promise.all([
+            enqueueIngestJobs(),
+            enqueueReminderJob()
+        ]);
 
-        const responses = activePlatforms.map(p => {
-            const adapter = InitializedAdapters[p.name.toLowerCase()];
-            if (adapter) {
-                // Fire and forget so we don't timeout the cron request
-                executeIngestionTask(adapter, p.id).catch(err => {
-                    console.error(`Cron fail for ${p.name}:`, err);
-                });
-                return `Triggered ${p.name}`;
-            }
-            return `Skipped ${p.name} (no adapter)`;
+        const runNow = req.nextUrl.searchParams.get('runNow') === 'true';
+        const parsed = Number(req.nextUrl.searchParams.get('limit') || '6');
+        const limit = Number.isFinite(parsed) ? Math.min(Math.max(parsed, 1), 100) : 6;
+        const runResult = runNow ? await runJobs(limit) : null;
+
+        return NextResponse.json({
+            message: 'Cron executed',
+            enqueue: {
+                ingestJobs: created.length,
+                reminderJob: reminder.id ? 1 : 0,
+                runNow,
+            },
+            run: runResult,
         });
-
-        return NextResponse.json({ message: "Cron triggered for platforms", details: responses });
     } catch (err: any) {
         return NextResponse.json({ error: err.message }, { status: 500 });
     }

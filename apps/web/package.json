@@ -16,6 +16,8 @@
     "test:ci": "vitest run",
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
+    "agent:review": "node scripts/agent-gate.js review",
+    "agent:qa": "node scripts/agent-gate.js qa",
     "smoke:ci": "node scripts/smoke.js",
     "refactor:analyze": "node scripts/refactor/analyzer.js",
     "refactor:apply": "node scripts/refactor/refactor-safe.js",

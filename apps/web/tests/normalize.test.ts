@@ -77,8 +77,8 @@ describe('normalizeMediaType', () => {
     });
 
     // OTHER fallback
-    it('defaults to OTHER for unknown media type', () => {
-        expect(normalizeMediaType('틱톡 숏폼')).toBe('OTHER');
+    it('normalizes 틱톡 숏폼 → TK', () => {
+        expect(normalizeMediaType('틱톡 숏폼')).toBe('TK');
     });
     it('defaults to OTHER for empty string', () => {
         expect(normalizeMediaType('')).toBe('OTHER');

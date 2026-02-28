@@ -16,6 +16,7 @@ model Platform {
   created_at DateTime    @default(now()) @db.Timestamptz(6)
   campaigns  Campaign[]
   ingestRuns IngestRun[]
+  backgroundJobs BackgroundJob[]
 }
 
 model Campaign {
@@ -23,23 +24,50 @@ model Campaign {
   platform_id    Int
   original_id    String
   title          String
-  campaign_type  String? // VST, SHP, PRS
-  media_type     String? // BP, IP, YP, etc.
+  campaign_type  String? // VST (방문), SHP (배송), PRS (기자단)
+  media_type     String? // BP, IP, YP, RS (Reels), SH (Shorts), TK (TikTok), CL (Clip)
+  
+  // Category & Region
+  category       String?
+  sub_category   String?
+  region_depth1  String?
+  region_depth2  String?
+  
   location       String?
+  lat            Float?
+  lng            Float?
+  
+  // Rewards & Links
   reward_text    String?
+  reward_value   Int?      @default(0) // 정규화된 보상 가치 (정수)
+  shop_url       String?   // 외부 사이트 (네이버 지도, 쇼핑몰 등) 연결 링크
+  
   thumbnail_url  String?
-  url            String
+  url            String    // 원본 상세 페이지 링크
+  
+  // Stats for sorting
+  recruit_count   Int      @default(0)
+  applicant_count Int      @default(0)
+  competition_rate Decimal @default(0.0) @db.Decimal(10, 2)
+  
   apply_end_date DateTime? @db.Timestamptz(6)
   created_at     DateTime  @default(now()) @db.Timestamptz(6)
   updated_at     DateTime  @default(now()) @db.Timestamptz(6)
 
   platform  Platform           @relation(fields: [platform_id], references: [id], onDelete: Cascade)
   snapshots CampaignSnapshot[]
+  userSchedules UserSchedule[]
 
   @@unique([platform_id, original_id])
+  @@index([platform_id])
   @@index([campaign_type])
   @@index([media_type])
+  @@index([category])
+  @@index([region_depth1, region_depth2])
+  @@index([reward_value])
+  @@index([competition_rate])
   @@index([apply_end_date])
+  @@index([created_at])
 }
 
 model CampaignSnapshot {
@@ -68,4 +96,82 @@ model IngestRun {
   end_time        DateTime? @db.Timestamptz(6)
 
   platform Platform @relation(fields: [platform_id], references: [id], onDelete: Cascade)
+}
+
+model BackgroundJob {
+  id          Int      @id @default(autoincrement())
+  type        String
+  platform_id Int?
+  payload     String?
+  status      String    @default("PENDING")
+  attempts    Int       @default(0)
+  max_attempts Int      @default(3)
+  error_log   String?
+  locked_by   String?
+  locked_until DateTime?
+  next_run_at  DateTime? @default(now()) @db.Timestamptz(6)
+  started_at   DateTime? @db.Timestamptz(6)
+  finished_at  DateTime? @db.Timestamptz(6)
+  created_at   DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at   DateTime  @default(now()) @db.Timestamptz(6)
+
+  platform Platform? @relation(fields: [platform_id], references: [id], onDelete: Cascade)
+
+  @@index([status])
+  @@index([type, status])
+  @@index([next_run_at])
+  @@index([platform_id, status])
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  nickname  String?
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+
+  schedules UserSchedule[]
+  notificationDeliveries NotificationDelivery[]
+}
+
+model UserSchedule {
+  id                Int      @id @default(autoincrement())
+  user_id           Int
+  campaign_id       Int?
+  custom_title      String?
+  status            String    @default("APPLIED")
+  visit_date        DateTime? @db.Timestamptz(6)
+  deadline_date     DateTime? @db.Timestamptz(6)
+  sponsorship_value Int       @default(0)
+  ad_fee            Int       @default(0)
+  alarm_enabled     Boolean   @default(true)
+  memo              String?
+  created_at        DateTime  @default(now()) @db.Timestamptz(6)
+
+  user              User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  campaign          Campaign? @relation(fields: [campaign_id], references: [id], onDelete: SetNull)
+  notificationDeliveries NotificationDelivery[]
+
+  @@index([user_id, deadline_date])
+  @@index([status])
+}
+
+model NotificationDelivery {
+  id               Int      @id @default(autoincrement())
+  user_id          Int
+  user_schedule_id Int
+  channel          String   @default("push")
+  due_days         Int
+  status           String   @default("PENDING")
+  message          String?
+  error_message    String?
+  sent_at          DateTime? @db.Timestamptz(6)
+  created_at       DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at       DateTime  @default(now()) @db.Timestamptz(6)
+
+  user         User        @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  userSchedule UserSchedule @relation(fields: [user_schedule_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id, status])
+  @@index([status])
+  @@index([created_at])
 }

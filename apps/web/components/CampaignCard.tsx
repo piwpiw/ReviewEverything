@@ -2,180 +2,191 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+import { useFavorites } from "@/lib/useFavorites";
+import {
+    MapPin,
+    ExternalLink,
+    ShoppingBag,
+    Store,
+    Zap,
+    TrendingDown,
+    Clock,
+    Heart
+} from "lucide-react";
 
 /* ── Helpers ── */
-const getDDay = (date: Date | string | null): { label: string; cls: string } => {
-    if (!date) return { label: "상시", cls: "dday-ok" };
+const getDDay = (date: Date | string | null): { label: string; cls: string; diff: number } => {
+    if (!date) return { label: "상시", cls: "dday-ok", diff: 99 };
     const d = new Date(date);
     const diff = Math.ceil((d.getTime() - Date.now()) / 86_400_000);
-    if (diff < 0) return { label: "마감", cls: "dday-urgent" };
-    if (diff === 0) return { label: "D-Day", cls: "dday-urgent" };
-    if (diff <= 3) return { label: `D-${diff}`, cls: "dday-urgent" };
-    if (diff <= 7) return { label: `D-${diff}`, cls: "dday-soon" };
-    return { label: `D-${diff}`, cls: "dday-ok" };
+    if (diff < 0) return { label: "마감", cls: "text-slate-400 bg-slate-100", diff: -1 };
+    if (diff === 0) return { label: "마감임박", cls: "text-rose-600 bg-rose-50 animate-pulse", diff: 0 };
+    if (diff <= 3) return { label: `D-${diff}`, cls: "text-rose-500 bg-rose-50", diff };
+    return { label: `D-${diff}`, cls: "text-blue-600 bg-blue-50", diff };
 };
 
-const MEDIA_ICON: Record<string, string> = {
-    IP: "📸",
-    BP: "✍️",
-    YP: "🎬",
-    OTHER: "🔗",
-};
-const MEDIA_LABEL: Record<string, string> = {
-    IP: "인스타",
-    BP: "블로그",
-    YP: "유튜브",
-    OTHER: "기타",
-};
-const TYPE_LABEL: Record<string, string> = {
-    VST: "방문형",
-    SHP: "배송형",
-    PRS: "기자단",
+const B_COLORS: Record<string, string> = {
+    Revu: "#2563eb", Reviewnote: "#7c3aed", DinnerQueen: "#ea580c",
+    ReviewPlace: "#059669", Seouloppa: "#dc2626", MrBlog: "#4f46e5", GangnamFood: "#d97706"
 };
 
-const PLATFORM_COLOR: Record<string, string> = {
-    Revu: "#3b82f6",
-    Reviewnote: "#8b5cf6",
-    DinnerQueen: "#f59e0b",
-    ReviewPlace: "#10b981",
-    Seouloppa: "#ef4444",
-    MrBlog: "#6366f1",
-    GangnamFood: "#f97316",
+const MEDIA_MAP: Record<string, { label: string; color: string }> = {
+    BP: { label: "블로그", color: "bg-emerald-500" },
+    IP: { label: "인스타", color: "bg-pink-500" },
+    RS: { label: "릴스", color: "bg-indigo-500" },
+    YP: { label: "유튜브", color: "bg-rose-600" },
+    SH: { label: "쇼츠", color: "bg-red-500" },
+    TK: { label: "틱톡", color: "bg-slate-900" },
+    CL: { label: "클립", color: "bg-blue-500" },
+    OTHER: { label: "기타", color: "bg-slate-400" }
 };
 
 export default function CampaignCard({ campaign, rank }: { campaign: any; rank?: number }) {
-    const snap = campaign.snapshots?.[0] ?? {};
-    const recruited = snap.recruit_count ?? 0;
-    const applied = snap.applicant_count ?? 0;
-    const compRate = recruited > 0 ? applied / recruited : 0;
-    const progress = recruited > 0 ? Math.min((applied / recruited) * 100, 100) : 0;
-    const isHot = compRate >= 2.5 || applied >= 50;
-    const isFull = progress >= 100;
-    const { label: dLabel, cls: dCls } = getDDay(campaign.apply_end_date);
-    const platformColor = PLATFORM_COLOR[campaign.platform?.name] ?? "#64748b";
+    const { isFavorite, toggleFavorite } = useFavorites();
+    const pinned = isFavorite(campaign.id);
 
-    const fallbackThumb =
-        "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&q=60&w=400";
+    const recruited = campaign.recruit_count ?? 1;
+    const applied = campaign.applicant_count ?? 0;
+    const compRateValue = campaign.competition_rate ? Number(campaign.competition_rate) : (recruited > 0 ? applied / recruited : 0);
+    const progress = recruited > 0 ? Math.min((applied / recruited) * 100, 100) : 0;
+    const { label: dLabel, cls: dCls, diff: dDiff } = getDDay(campaign.apply_end_date);
+
+    const isHighWin = compRateValue <= 1.2 && recruited >= 3;
+    const platformColor = B_COLORS[campaign.platform?.name] ?? "#64748b";
+    const media = MEDIA_MAP[campaign.media_type] || MEDIA_MAP.OTHER;
+
+    const handleOutbound = (e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (campaign.shop_url) {
+            window.open(campaign.shop_url, '_blank');
+        } else {
+            // Fallback for VST: Naver Map search
+            if (campaign.campaign_type === 'VST') {
+                window.open(`https://map.naver.com/v5/search/${encodeURIComponent(campaign.title)}`, '_blank');
+            } else {
+                window.open(campaign.url, '_blank');
+            }
+        }
+    };
 
     return (
         <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-40px" }}
-            className="lift-card group bg-white rounded-2xl border border-slate-100 overflow-hidden flex flex-col h-full shadow-sm"
+            layout
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            whileHover={{ y: -6 }}
+            className="group relative bg-white rounded-[2rem] border border-slate-100 overflow-hidden flex flex-col h-full shadow-sm hover:shadow-2xl hover:shadow-slate-900/10 transition-all duration-500"
         >
-            {/* ── Thumbnail ── */}
-            <div className="relative h-40 overflow-hidden bg-slate-50 flex-shrink-0">
-                {campaign.thumbnail_url ? (
-                    <Image
-                        src={campaign.thumbnail_url}
-                        alt={campaign.title}
-                        fill
-                        sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 17vw"
-                        className="object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
-                        unoptimized={campaign.thumbnail_url.includes("unsplash")}
-                    />
-                ) : (
-                    <Image src={fallbackThumb} alt="thumb" fill className="object-cover opacity-60" unoptimized />
-                )}
+            {/* ── Visual Section ── */}
+            <div className="relative h-40 overflow-hidden bg-slate-50">
+                <Image
+                    src={campaign.thumbnail_url || "https://via.placeholder.com/400?text=No+Image"}
+                    alt={campaign.title}
+                    fill
+                    className="object-cover group-hover:scale-110 transition-transform duration-1000 ease-in-out"
+                    unoptimized={campaign.thumbnail_url?.includes("unsplash")}
+                />
 
-                {/* Gradient overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                {/* Outbound Link Overlay (Moaview Style) */}
+                <div className="absolute inset-x-0 bottom-0 p-3 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex justify-between items-end opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20">
+                    <button
+                        onClick={handleOutbound}
+                        className="px-3 py-1.5 bg-white/10 backdrop-blur-md rounded-xl text-[10px] font-black text-white hover:bg-white hover:text-slate-900 transition-all flex items-center gap-1.5 border border-white/20"
+                    >
+                        {campaign.campaign_type === 'VST' ? <Store className="w-3 h-3" /> : <ShoppingBag className="w-3 h-3" />}
+                        {campaign.campaign_type === 'VST' ? '지도 바로가기' : '상품 페이지'}
+                    </button>
+                    <button
+                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleFavorite(campaign.id); }}
+                        className={`w-8 h-8 rounded-xl backdrop-blur-md flex items-center justify-center transition-all ${pinned ? 'bg-rose-500 text-white' : 'bg-white/10 text-white hover:bg-white hover:text-rose-500 border border-white/20'}`}
+                    >
+                        <Heart className={`w-4 h-4 ${pinned ? 'fill-current' : ''}`} />
+                    </button>
+                </div>
 
-                {/* Top badges */}
-                <div className="absolute top-2 left-2 flex flex-wrap gap-1 z-10">
-                    <span className="badge-platform" style={{ background: platformColor }}>
-                        {campaign.platform?.name ?? "?"}
-                    </span>
-                    {rank && rank <= 3 && (
-                        <span className="flex items-center justify-center w-5 h-5 rounded-full bg-amber-400 text-white text-[9px] font-black shadow">
-                            {rank}
+                {/* Status Badges */}
+                <div className="absolute top-3 left-3 flex flex-col gap-1.5 z-10 pointer-events-none">
+                    <div className="flex gap-1.5">
+                        <span className={`px-2 py-1 rounded-lg text-[8px] font-black text-white ${media.color} uppercase tracking-widest shadow-lg`}>
+                            {media.label}
                         </span>
+                        {rank && (
+                            <span className="px-2 py-1 rounded-lg bg-slate-900 text-white text-[8px] font-black shadow-lg">TOP {rank}</span>
+                        )}
+                    </div>
+                    {isHighWin && (
+                        <div className="w-fit flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-500 text-white text-[9px] font-black shadow-xl animate-pulse">
+                            <Zap className="w-2.5 h-2.5 fill-current" />
+                            당첨 확률 HIGH
+                        </div>
                     )}
                 </div>
 
-                {/* D-Day */}
-                <div className="absolute top-2 right-2 z-10">
-                    <span className={dCls}>{dLabel}</span>
+                <div className="absolute top-3 right-3 z-10 pointer-events-none">
+                    <span className={`px-3 py-1.5 rounded-xl font-black text-[9px] shadow-xl border border-white/30 backdrop-blur-md ${dCls}`}>
+                        {dLabel}
+                    </span>
                 </div>
-
-                {/* Bottom hot badge */}
-                {isHot && !isFull && (
-                    <div className="absolute bottom-2 left-2 z-10">
-                        <span className="badge-hot">🔥 인기</span>
-                    </div>
-                )}
-                {isFull && (
-                    <div className="absolute bottom-2 left-2 z-10">
-                        <span className="px-2 py-0.5 rounded-lg bg-slate-700/80 text-white text-[10px] font-black">마감임박</span>
-                    </div>
-                )}
             </div>
 
-            {/* ── Body ── */}
-            <div className="flex flex-col flex-1 p-3 gap-2">
-                {/* Media / Type row */}
+            {/* ── Content Section ── */}
+            <div className="p-4 flex flex-col flex-1 gap-2.5 relative">
+                {/* Meta Labels */}
                 <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-1">
-                        <span className="text-[10px]">{MEDIA_ICON[campaign.media_type] ?? "🔗"}</span>
-                        <span className="text-[10px] font-bold text-slate-400">
-                            {MEDIA_LABEL[campaign.media_type] ?? "기타"} · {TYPE_LABEL[campaign.campaign_type] ?? "기타"}
-                        </span>
+                    <div className="flex items-center gap-1.5">
+                        <span className="text-[9px] font-black text-slate-400">#{campaign.platform?.name}</span>
+                        {campaign.category && (
+                            <span className="text-[9px] font-black text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded-md">#{campaign.category}</span>
+                        )}
                     </div>
-                    {compRate > 0 && (
-                        <span className="text-[10px] font-black text-rose-500">{compRate.toFixed(1)}:1</span>
-                    )}
                 </div>
 
-                {/* Title */}
-                <h3 className="text-[12px] font-bold text-slate-900 group-hover:text-blue-700 transition-colors leading-snug line-clamp-2 min-h-[2.2rem]">
-                    {campaign.title}
-                </h3>
-
-                {/* Location */}
-                {campaign.location && (
-                    <div className="flex items-center gap-1 text-[10px] text-slate-400 font-medium">
-                        <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                        </svg>
-                        <span className="truncate">{campaign.location}</span>
+                {/* Title & Region */}
+                <Link href={`/campaigns/${campaign.id}`} className="flex flex-col gap-1 group/title">
+                    <div className="flex items-center gap-1.5 text-[9px] font-black text-slate-500 uppercase tracking-tighter">
+                        <MapPin className="w-3 h-3 text-slate-300" />
+                        <span className="truncate">[{campaign.region_depth1 || '전국'}] {campaign.region_depth2 || ''}</span>
                     </div>
-                )}
-
-                {/* Reward */}
-                {campaign.reward_text && (
-                    <div className="text-[10px] font-bold text-blue-700 bg-blue-50 px-2 py-1 rounded-lg truncate border border-blue-100/50">
-                        🎁 {campaign.reward_text}
-                    </div>
-                )}
-
-                {/* Progress */}
-                {recruited > 0 && (
-                    <div className="space-y-1">
-                        <div className="flex justify-between text-[9px] font-bold text-slate-400">
-                            <span>모집 현황</span>
-                            <span className={isFull ? "text-rose-500" : "text-blue-600"}>
-                                {applied}/{recruited} ({Math.round(progress)}%)
-                            </span>
-                        </div>
-                        <div className="progress-bar">
-                            <div className={`progress-fill${isFull ? " hot" : ""}`} style={{ width: `${progress}%` }} />
-                        </div>
-                    </div>
-                )}
-
-                {/* CTA */}
-                <Link
-                    href={`/campaigns/${campaign.id}`}
-                    className="mt-auto w-full py-2 bg-slate-900 hover:bg-blue-600 text-white rounded-xl text-[11px] font-black flex items-center justify-center gap-1 transition-all active:scale-95 group-hover:shadow-md"
-                >
-                    상세보기
-                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M9 5l7 7-7 7" />
-                    </svg>
+                    <h3 className="text-[13px] font-black text-slate-900 leading-tight group-hover/title:text-blue-600 transition-colors line-clamp-2 min-h-[2.4rem]">
+                        {campaign.title}
+                    </h3>
                 </Link>
+
+                {/* Reward & Stats */}
+                <div className="flex items-center gap-2 p-2 bg-slate-50/50 rounded-xl border border-slate-100/50">
+                    <div className="p-1 bg-white rounded-lg shadow-sm">
+                        <TrendingDown className={`w-3 h-3 ${isHighWin ? 'text-emerald-500' : 'text-slate-400'}`} />
+                    </div>
+                    <div className="flex flex-col">
+                        <span className="text-[8px] font-black text-slate-400 uppercase leading-none mb-0.5">Competition</span>
+                        <span className={`text-[11px] font-black leading-none ${isHighWin ? 'text-emerald-600' : 'text-slate-900'}`}>
+                            {compRateValue.toFixed(1)}:1 <span className="text-[8px] opacity-40 ml-0.5">({applied}/{recruited})</span>
+                        </span>
+                    </div>
+                    <div className="ml-auto flex flex-col items-end">
+                        <span className="text-[10px] font-black text-blue-600 truncate max-w-[80px]">
+                            {campaign.reward_value > 0 ? `${(campaign.reward_value / 10000).toFixed(0)}만원+` : '상세보상'}
+                        </span>
+                    </div>
+                </div>
+
+                <div className="mt-auto pt-2 grid grid-cols-2 gap-2">
+                    <button
+                        onClick={handleOutbound}
+                        className="py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-[10px] font-black transition-all flex items-center justify-center gap-1.5"
+                    >
+                        {campaign.campaign_type === 'VST' ? '매장지도' : '상품링크'}
+                        <ExternalLink className="w-3 h-3" />
+                    </button>
+                    <Link
+                        href={`/campaigns/${campaign.id}`}
+                        className="py-2.5 bg-slate-900 text-white rounded-xl text-[10px] font-black transition-all flex items-center justify-center shadow-lg active:scale-95"
+                    >
+                        상세보기
+                    </Link>
+                </div>
             </div>
         </motion.div>
     );

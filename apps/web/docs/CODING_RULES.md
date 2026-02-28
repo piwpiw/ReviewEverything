@@ -1,34 +1,11 @@
 # Coding Rules
 
-## Purpose
-This document defines merge-blocking coding rules for `apps/web`.
-
-## Required
-- Use TypeScript types/interfaces for non-trivial data structures.
-- Keep API contracts explicit and stable (`data`, `meta`, `error`).
-- Prefer server components by default; use client components only when needed.
-- Use `next/link` for internal navigation.
-- Use `next/image` for campaign/media thumbnails unless there is a hard blocker.
-- Handle async failures explicitly with safe fallback/error responses.
-
-## Forbidden
-- New `any` usage in app/runtime code.
-- Silent catches that swallow errors.
-- Inline DB query strings duplicated across routes.
-- UI text corruption from encoding issues.
-
-## Error Handling Standard
-- `catch (error: unknown)` + safe formatter:
-- Return structured errors in APIs.
-- Log context once, not repeatedly in hot loops.
-
-## Review Checklist
-- Is behavior backward compatible?
-- Are failure modes explicit?
-- Is there a test for regression-sensitive logic?
-- Do lint/typecheck/test pass locally and in CI?
-
-## Test Minimum
-- Unit tests for parser/normalizer/utility logic.
-- API-path smoke checks for critical routes.
-- Admin-trigger path should keep basic success/error behavior covered.
+> ⚠️ **이 문서는 Team-Agent 아키텍처 전환으로 이관되었습니다.**
+>
+> 모든 코딩 규칙은 **[T09_VALIDATION](./teams/T09_VALIDATION.md)** 팀 문서에서 관리됩니다.
+>
+> - TypeScript 금지 패턴 (`any`, silent catch, inline DB 쿼리) → `T09_VALIDATION § Coding Rules Enforcement`
+> - Merge 기준 체크리스트 → `T09_VALIDATION § Merge Criteria`
+> - 에러 핸들링 표준 → `T09_VALIDATION § Coding Rules Enforcement`
+> - 리뷰 체크리스트 → `T09_VALIDATION § Merge Criteria`
+> - 테스트 최소 기준 → `T09_VALIDATION § Tasks`

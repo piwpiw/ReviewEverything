@@ -57,7 +57,7 @@ function parseArgs() {
       parsed.message = a.split('=')[1];
 
       // Handle edge case where shell splits quoted message with spaces (npm / win32 quirk).
-      if (i + 1 < args.length && !args[i + 1].startsWith('--")) {
+      if (i + 1 < args.length && !args[i + 1].startsWith('--')) {
         parsed.message = `${parsed.message} ${args[i + 1]}`;
         i++;
       }
