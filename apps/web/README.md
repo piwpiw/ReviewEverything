@@ -102,3 +102,88 @@ npx prisma studio   # Direct database management
 - GitHub Actions workflow: `.github/workflows/ci.yml` (`main` 브랜치 `push`/`pull_request` 기준)
 - CI 실행 명령: `apps/web` 디렉터리에서 `npm run test:ci`
 - 테스트 로그는 `apps/web/test_output.txt`로 남기고 워크플로우 아티팩트(`web-test-output`, 14일)로 보관됩니다.
+- [Campaigns](../app/page.tsx)
+- [Admin](../app/admin/page.tsx)
++ [Campaigns](./app/page.tsx)
++ [Admin](./app/admin/page.tsx)
++
++## Fast Release Command
++
++Use one command to run the full deployment flow:
++
++```bash
++npm run release -- --auto-commit
++```
++
++What it does:
++- run lint
++- run typecheck
++- run full test suite
++- run build
++- commit local changes with a default message (or override with `--message="..."`)
++- push current branch
++- run `vercel --prod --yes`
++- print the production deployment URL
++
++Recommended options:
++- `npm run release -- --auto-commit --message="release: ..."`
++- `npm run release -- --auto-commit --skip-tests`
++- `npm run release -- --auto-commit --skip-build`
++- `npm run release -- --auto-commit --no-push`
++
++Prerequisites:
++- Vercel CLI installed (`npm i -g vercel`) or available in PATH
++- `VERCEL_TOKEN` configured if your shell requires token-based deployment
++- Working tree clean before release (or use `--auto-commit`)
+
+## Fast Release Command
+
+One command can run the whole flow now:
+
+```bash
+npm run release -- --message="release: production"
+```
+
+Flow:
+- run `lint`, `typecheck`, `test:ci`, `build`
+- auto-commit local changes when needed
+- push current branch
+- run `vercel --prod --yes`
+- print the production URL
+
+Optional flags:
+- `--skip-tests`: skip test run
+- `--skip-build`: skip build
+- `--no-push`: run locally without pushing
+- `--auto-commit` is enabled for `release`, can be replaced in `npm run release:dry-run`
+- `--message="..."` custom commit message
+
+Prerequisites:
+- Vercel CLI installed and available in PATH (`npm i -g vercel`)
+- `VERCEL_TOKEN` if required by your deployment environment
+
+## Fast Release Command
+
+One command can run the whole flow now:
+
+```bash
+npm run release -- --message="release: production"
+```
+
+Flow:
+- run `lint`, `typecheck`, `test:ci`, `build`
+- auto-commit local changes when needed
+- push current branch
+- run `vercel --prod --yes`
+- print the production URL
+
+Optional flags:
+- `--skip-tests`: skip test run
+- `--skip-build`: skip build
+- `--no-push`: run locally without pushing
+- `--auto-commit` is enabled for `release`, can be replaced in `release:dry-run`
+- `--message="..."` custom commit message
+
+Prerequisites:
+- Vercel CLI installed and available in PATH (`npm i -g vercel`)
+- `VERCEL_TOKEN` if required by your deployment environment

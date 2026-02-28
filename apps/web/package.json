@@ -10,6 +10,8 @@
     "lint": "eslint",
     "lint:ci": "eslint . --format json --output-file reports/eslint.json",
     "typecheck": "tsc --noEmit",
+    "release": "node scripts/release.js --auto-commit",
+    "release:dry-run": "node scripts/release.js --auto-commit --no-push",
     "test": "vitest run",
     "test:ci": "vitest run",
     "test:watch": "vitest",
