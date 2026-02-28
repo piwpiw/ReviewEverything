@@ -2,114 +2,145 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useTransition } from "react";
-import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Layers, MousePointer2, Share2, Loader2 } from "lucide-react";
 
 const PLATFORMS = [
-    { id: "", label: "전체 플랫폼" },
-    { id: "1", label: "레뷰(Revu)" },
-    { id: "2", label: "리뷰노트" },
-    { id: "3", label: "디너의여왕" },
-    { id: "4", label: "리뷰플레이스" },
-    { id: "5", label: "서울오빠" },
-    { id: "6", label: "미스터블로그" },
-    { id: "7", label: "강남맛집" },
+  { id: "", label: "전체" },
+  { id: "1", label: "레뷰" },
+  { id: "2", label: "리뷰노트" },
+  { id: "3", label: "디너의여왕" },
+  { id: "4", label: "리뷰플레이스" },
+  { id: "5", label: "서울오빠" },
+  { id: "6", label: "미스터블로그" },
+  { id: "7", label: "강남맛집" },
 ];
-
 const TYPES = [
-    { id: "", label: "전체 유형" },
-    { id: "VST", label: "방문형" },
-    { id: "SHP", label: "배송형" },
-    { id: "PRS", label: "기자단" },
+  { id: "", label: "유형 전체" },
+  { id: "VST", label: "🍽 방문형" },
+  { id: "SHP", label: "📦 배송형" },
+  { id: "PRS", label: "📰 기자단" },
+];
+const MEDIAS = [
+  { id: "", label: "매체 전체" },
+  { id: "BP", label: "✍️ 블로그" },
+  { id: "IP", label: "📸 인스타" },
+  { id: "YP", label: "🎬 유튜브" },
 ];
 
-const MEDIA = [
-    { id: "", label: "전체 매체" },
-    { id: "BP", label: "블로그" },
-    { id: "IP", label: "인스타그램" },
-    { id: "YP", label: "유튜브" },
-];
+function Pills({
+  items,
+  current,
+  name,
+  onSelect,
+}: {
+  items: { id: string; label: string }[];
+  current: string;
+  name: string;
+  onSelect: (name: string, val: string) => void;
+}) {
+  return (
+    <div className="flex flex-wrap gap-1.5">
+      {items.map(item => {
+        const active = current === item.id;
+        return (
+          <button
+            key={item.id}
+            onClick={() => onSelect(name, item.id)}
+            className={`pill-btn ${active ? "active" : ""}`}
+          >
+            {active && (
+              <motion.span
+                layoutId={`pill-${name}`}
+                className="absolute inset-0 bg-slate-900 rounded-xl -z-10"
+                transition={{ type: "spring", bounce: 0.15, duration: 0.45 }}
+              />
+            )}
+            {item.label}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
 
 export default function FilterBar() {
-    const router = useRouter();
-    const searchParams = useSearchParams();
-    const [isPending, startTransition] = useTransition();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [isPending, startTransition] = useTransition();
 
-    const currentPlatform = searchParams.get("platform_id") || "";
-    const currentType = searchParams.get("campaign_type") || "";
-    const currentMedia = searchParams.get("media_type") || "";
+  const createQS = useCallback(
+    (name: string, value: string) => {
+      const p = new URLSearchParams(searchParams.toString());
+      if (value) p.set(name, value);
+      else p.delete(name);
+      return p.toString();
+    },
+    [searchParams]
+  );
 
-    const createQueryString = useCallback(
-        (name: string, value: string) => {
-            const params = new URLSearchParams(searchParams.toString());
-            if (value) params.set(name, value);
-            else params.delete(name);
-            return params.toString();
-        },
-        [searchParams]
-    );
+  const handleSelect = (name: string, val: string) => {
+    startTransition(() => {
+      router.push("/?" + createQS(name, val), { scroll: false });
+    });
+  };
 
-    const handleSelect = (name: string, value: string) => {
-        startTransition(() => {
-            router.push("?" + createQueryString(name, value), { scroll: false });
-        });
-    };
+  const cur = {
+    platform: searchParams.get("platform_id") ?? "",
+    type: searchParams.get("campaign_type") ?? "",
+    media: searchParams.get("media_type") ?? "",
+  };
 
-    const Section = ({ title, items, current, name, icon: Icon }: any) => (
-        <div className="flex flex-col gap-2.5">
-            <div className="flex items-center gap-1.5 px-1">
-                <Icon className="w-3 h-3 text-slate-400" />
-                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{title}</span>
-            </div>
-            <div className="flex flex-wrap gap-1.5">
-                {items.map((item: any) => {
-                    const isActive = current === item.id;
-                    return (
-                        <button
-                            key={item.id}
-                            onClick={() => handleSelect(name, item.id)}
-                            className={`relative px-3.5 py-1.5 rounded-xl text-[11px] font-bold transition-all duration-200 border ${isActive
-                                    ? 'bg-slate-900 text-white border-slate-900 shadow-md scale-[1.02] z-10'
-                                    : 'bg-white text-slate-500 border-slate-100 hover:border-slate-300 hover:text-slate-900'
-                                }`}
-                        >
-                            {isActive && (
-                                <motion.div
-                                    layoutId={`${name}-active`}
-                                    className="absolute inset-0 bg-slate-900 rounded-xl -z-10"
-                                    transition={{ type: "spring", bounce: 0.1, duration: 0.5 }}
-                                />
-                            )}
-                            {item.label}
-                        </button>
-                    )
-                })}
-            </div>
+  const activeCount = [cur.platform, cur.type, cur.media].filter(Boolean).length;
+
+  return (
+    <div className="glass-card rounded-[1.75rem] border border-white/60 shadow-lg shadow-slate-900/5 px-5 py-5">
+      <div className="flex flex-col gap-4">
+        {/* Row 1: Platforms */}
+        <div className="flex items-start gap-3">
+          <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-2 w-10 shrink-0">플랫폼</span>
+          <Pills items={PLATFORMS} current={cur.platform} name="platform_id" onSelect={handleSelect} />
         </div>
-    );
-
-    return (
-        <div className="w-full glass-card p-6 rounded-[2rem] shadow-xl shadow-slate-900/5 mb-8 flex flex-col gap-6 border border-white/50 premium-blur">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-6">
-                <Section title="Platforms" items={PLATFORMS} current={currentPlatform} name="platform_id" icon={Layers} />
-                <Section title="Campaign Types" items={TYPES} current={currentType} name="campaign_type" icon={MousePointer2} />
-                <Section title="Social Media" items={MEDIA} current={currentMedia} name="media_type" icon={Share2} />
-            </div>
-
-            <AnimatePresence>
-                {isPending && (
-                    <motion.div
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -10 }}
-                        className="flex items-center gap-2 justify-center text-blue-600 font-bold text-[10px] bg-blue-50/50 py-2 rounded-xl border border-blue-100/50"
-                    >
-                        <Loader2 className="w-3 h-3 animate-spin" />
-                        데이터를 불러오는 중입니다...
-                    </motion.div>
-                )}
-            </AnimatePresence>
+        {/* Row 2 & 3 */}
+        <div className="flex flex-wrap gap-4">
+          <div className="flex items-start gap-3">
+            <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-2 w-10 shrink-0">유형</span>
+            <Pills items={TYPES} current={cur.type} name="campaign_type" onSelect={handleSelect} />
+          </div>
+          <div className="flex items-start gap-3">
+            <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-2 w-10 shrink-0">매체</span>
+            <Pills items={MEDIAS} current={cur.media} name="media_type" onSelect={handleSelect} />
+          </div>
         </div>
-    );
+      </div>
+
+      {/* Loading + Reset */}
+      <div className="mt-3.5 flex items-center justify-between">
+        <AnimatePresence>
+          {isPending && (
+            <motion.div
+              initial={{ opacity: 0, x: -8 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -8 }}
+              className="flex items-center gap-1.5 text-[10px] font-bold text-blue-600"
+            >
+              <div className="w-3 h-3 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+              데이터 로딩 중...
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {activeCount > 0 && (
+          <button
+            onClick={() => router.push("/", { scroll: false })}
+            className="ml-auto text-[10px] font-black text-slate-400 hover:text-rose-500 transition-colors flex items-center gap-1"
+          >
+            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+            필터 초기화 ({activeCount})
+          </button>
+        )}
+      </div>
+    </div>
+  );
 }

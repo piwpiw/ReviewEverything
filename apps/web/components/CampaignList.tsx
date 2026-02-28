@@ -5,9 +5,12 @@ import CampaignCard from "./CampaignCard";
 import MapView from "./MapView";
 import { Zap } from "lucide-react";
 
-export default async function CampaignList({ searchParams }: { searchParams: { [key: string]: string | undefined } }) {
+export default async function CampaignList({
+    searchParams,
+    viewMode = "list",
+}: { searchParams: Record<string, string | undefined>; viewMode?: string }) {
     const isFiltered = Boolean(searchParams?.q || searchParams?.platform_id || searchParams?.campaign_type || searchParams?.media_type);
-    const viewMode = searchParams.view || "list";
+    const mode = viewMode || searchParams.view || "list";
 
     let filtered: any[] = [];
     let trending: any[] = [];
@@ -21,8 +24,8 @@ export default async function CampaignList({ searchParams }: { searchParams: { [
             db.campaign.findMany({
                 where: qb.where,
                 orderBy: qb.sort === 'competition_asc' ? { created_at: 'desc' } : (qb.orderBy as any),
-                skip: viewMode === 'map' ? 0 : qb.skip,
-                take: viewMode === 'map' ? 100 : qb.take, // Take more for map view
+                skip: mode === 'map' ? 0 : qb.skip,
+                take: mode === 'map' ? 100 : qb.take, // Take more for map view
                 include: { platform: true, snapshots: { orderBy: { scraped_at: "desc" }, take: 1 } },
             }),
             getTrendingCampaigns(5),
@@ -46,7 +49,7 @@ export default async function CampaignList({ searchParams }: { searchParams: { [
         dataMode = "empty";
     }
 
-    if (viewMode === "map") {
+    if (mode === "map") {
         return <MapView campaigns={filtered} />;
     }
 

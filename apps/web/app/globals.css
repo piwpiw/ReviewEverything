@@ -1,44 +1,186 @@
 @import "tailwindcss";
+@import url("https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800;900&family=Outfit:wght@400;700;900&display=swap");
 
 @theme {
-  --font-sans: "Outfit", sans-serif;
+  --font-sans: "Pretendard", "Outfit", sans-serif;
   --color-primary: #2563eb;
   --color-primary-glow: rgba(37, 99, 235, 0.15);
-  --color-glass: rgba(255, 255, 255, 0.7);
-  --color-glass-border: rgba(255, 255, 255, 0.4);
+  --color-glass: rgba(255, 255, 255, 0.75);
+  --color-glass-dark: rgba(15, 23, 42, 0.8);
+  --color-glass-border: rgba(255, 255, 255, 0.45);
+  --color-accent: #f59e0b;
+  --radius-card: 1.5rem;
 }
 
 @layer base {
   :root {
-    --background: #fafafa;
+    --background: #f8fafc;
     --foreground: #020617;
+    --nav-height: 60px;
+  }
+
+  html {
+    scroll-behavior: smooth;
   }
 
   body {
     background-color: var(--background);
     color: var(--foreground);
-    @apply antialiased;
+    font-family: "Pretendard", "Outfit", -apple-system, BlinkMacSystemFont, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  * {
+    box-sizing: border-box;
   }
 }
 
 @layer components {
+
+  /* Glass morphism */
   .glass-card {
     background: var(--color-glass);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: saturate(200%) blur(20px);
+    -webkit-backdrop-filter: saturate(200%) blur(20px);
     border: 1px solid var(--color-glass-border);
   }
 
-  .premium-blur {
-    backdrop-filter: saturate(180%) blur(20px);
-    -webkit-backdrop-filter: saturate(180%) blur(20px);
+  .glass-dark {
+    background: var(--color-glass-dark);
+    backdrop-filter: saturate(180%) blur(24px);
+    -webkit-backdrop-filter: saturate(180%) blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
   }
 
+  .premium-blur {
+    backdrop-filter: saturate(200%) blur(24px);
+    -webkit-backdrop-filter: saturate(200%) blur(24px);
+  }
+
+  /* Typography utilities */
   .text-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-br from-slate-900 via-slate-800 to-blue-900;
+    @apply bg-clip-text text-transparent bg-gradient-to-br from-slate-900 via-blue-800 to-indigo-900;
+  }
+
+  .text-gradient-blue {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-500;
+  }
+
+  /* Status Badges */
+  .badge-hot {
+    @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-rose-500 text-white text-[10px] font-black uppercase tracking-wide;
+    animation: pulse-badge 1.5s ease-in-out infinite;
+  }
+
+  .badge-new {
+    @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-emerald-500 text-white text-[10px] font-black uppercase tracking-wide;
+  }
+
+  .badge-platform {
+    @apply inline-flex items-center px-2.5 py-1 rounded-lg bg-slate-900 text-white text-[10px] font-black shadow-md;
+  }
+
+  /* Card Hover Lift */
+  .lift-card {
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+  }
+
+  .lift-card:hover {
+    transform: translateY(-6px) scale(1.01);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+  }
+
+  /* Progress bar */
+  .progress-bar {
+    height: 4px;
+    border-radius: 99px;
+    background: #e2e8f0;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    border-radius: 99px;
+    background: linear-gradient(90deg, #3b82f6, #6366f1);
+    transition: width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .progress-fill.hot {
+    background: linear-gradient(90deg, #f97316, #ef4444);
+  }
+
+  /* Nav active indicator */
+  .nav-link {
+    @apply relative text-sm font-semibold text-slate-500 hover:text-slate-900 transition-colors pb-0.5;
+  }
+
+  .nav-link.active {
+    @apply text-blue-600;
+  }
+
+  .nav-link.active::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    border-radius: 99px;
+    background: #2563eb;
+  }
+
+  /* Skeleton shimmer */
+  .skeleton {
+    @apply bg-slate-100 relative overflow-hidden rounded-xl;
+  }
+
+  .skeleton::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.6) 50%, transparent 100%);
+    animation: shimmer 1.5s infinite;
+  }
+
+  /* Filter pill button */
+  .pill-btn {
+    @apply relative px-3.5 py-1.5 rounded-xl text-[11px] font-bold transition-all duration-200 border cursor-pointer select-none;
+  }
+
+  .pill-btn.active {
+    @apply bg-slate-900 text-white border-slate-900 shadow-md;
+  }
+
+  .pill-btn:not(.active) {
+    @apply bg-white text-slate-500 border-slate-100 hover:border-slate-300 hover:text-slate-900;
+  }
+
+  /* D-Day badges */
+  .dday-urgent {
+    @apply px-2 py-0.5 rounded-lg bg-rose-500/90 text-white text-[10px] font-black;
+  }
+
+  .dday-soon {
+    @apply px-2 py-0.5 rounded-lg bg-amber-500/90 text-white text-[10px] font-black;
+  }
+
+  .dday-ok {
+    @apply px-2 py-0.5 rounded-lg bg-white/85 text-slate-800 text-[10px] font-black border border-slate-200;
+  }
+
+  /* Scrollbar hide utility */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
   }
 }
 
+/* ── Animations ── */
 @keyframes shimmer {
   0% {
     transform: translateX(-100%);
@@ -61,7 +203,7 @@
   }
 
   50% {
-    transform: translateY(-10px);
+    transform: translateY(-8px);
   }
 }
 
@@ -69,9 +211,57 @@
   animation: bounce-slow 3s ease-in-out infinite;
 }
 
-/* Custom Scrollbar */
+@keyframes pulse-badge {
+
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+  }
+
+  50% {
+    box-shadow: 0 0 0 6px rgba(239, 68, 68, 0);
+  }
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-up {
+  animation: fade-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes gradient-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradient-shift 6s ease infinite;
+}
+
+/* ── Custom Scrollbar ── */
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 5px;
+  height: 5px;
 }
 
 ::-webkit-scrollbar-track {

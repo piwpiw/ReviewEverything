@@ -2,199 +2,236 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
-import { ArrowLeft, ExternalLink, MapPin, Gift, Share2, Calendar, Activity } from "lucide-react";
 
-type CampaignPlatform = {
-  name: string;
-};
-
-type CampaignSnapshot = {
-  recruit_count: number | null;
-  applicant_count: number | null;
-  competition_rate: number | null;
-};
-
-type CampaignModel = {
-  id: number;
-  title: string;
-  location: string | null;
-  media_type: string | null;
-  campaign_type: string | null;
-  platform: CampaignPlatform;
-  thumbnail_url: string | null;
-  reward_text: string | null;
-  url: string;
-  snapshots: CampaignSnapshot[];
-  apply_end_date: Date | null;
-};
+const MEDIA_LABEL: Record<string, string> = { IP: "인스타그램", BP: "네이버 블로그", YP: "유튜브", OTHER: "기타" };
+const TYPE_LABEL: Record<string, string> = { VST: "방문 체험단", SHP: "무료 배송 제품", PRS: "기자단/앰버서더" };
+const MEDIA_ICON: Record<string, string> = { IP: "📸", BP: "✍️", YP: "🎬", OTHER: "🔗" };
 
 const getDDay = (date: Date | null) => {
   if (!date) return null;
-  const now = new Date();
-  const diff = date.getTime() - now.getTime();
-  const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
-  if (days < 0) return "마감됨";
-  if (days === 0) return "오늘 마감";
-  return `D-${days}`;
+  const diff = Math.ceil((date.getTime() - Date.now()) / 86_400_000);
+  if (diff < 0) return "마감됨";
+  if (diff === 0) return "오늘 마감";
+  return `D-${diff}`;
 };
 
-export default async function CampaignDetail({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
-  const resolvedParams = await params;
-  const id = parseInt(resolvedParams.id, 10);
+export default async function CampaignDetail({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const numId = parseInt(id, 10);
+  if (isNaN(numId)) return notFound();
 
-  let campaign: CampaignModel | null = null;
+  let campaign: any = null;
+  let relatedCampaigns: any[] = [];
 
   try {
-    if (!Number.isNaN(id)) {
-      const dbCampaign = await db.campaign.findUnique({
-        where: { id },
+    [campaign, relatedCampaigns] = await Promise.all([
+      db.campaign.findUnique({
+        where: { id: numId },
         include: {
           platform: true,
-          snapshots: {
-            orderBy: { scraped_at: "desc" },
-            take: 1,
-          },
+          snapshots: { orderBy: { scraped_at: "desc" }, take: 3 },
         },
-      });
-
-      if (dbCampaign) {
-        campaign = {
-          id: dbCampaign.id,
-          title: dbCampaign.title,
-          location: dbCampaign.location,
-          media_type: dbCampaign.media_type,
-          campaign_type: dbCampaign.campaign_type,
-          platform: { name: dbCampaign.platform.name },
-          thumbnail_url: dbCampaign.thumbnail_url,
-          reward_text: dbCampaign.reward_text,
-          url: dbCampaign.url,
-          apply_end_date: dbCampaign.apply_end_date,
-          snapshots: dbCampaign.snapshots.map((snapshot) => ({
-            recruit_count: snapshot.recruit_count,
-            applicant_count: snapshot.applicant_count,
-            competition_rate: Number(snapshot.competition_rate),
-          })),
-        };
-      }
-    }
-  } catch (error) {
-    console.error("Database fetch failed on detail page", error);
-  }
-
-  if (!campaign) {
+      }),
+      db.campaign.findMany({
+        where: { id: { not: numId } },
+        orderBy: { created_at: "desc" },
+        take: 4,
+        include: { platform: true, snapshots: { orderBy: { scraped_at: "desc" }, take: 1 } },
+      }),
+    ]);
+  } catch {
     return notFound();
   }
 
-  const compRate = campaign.snapshots[0]?.competition_rate ?? 0;
-  const mediaTypeLabel = campaign.media_type === "IP" ? "인스타그램" :
-    campaign.media_type === "YP" ? "유튜브" : "네이버 블로그";
-  const dDay = getDDay(campaign.apply_end_date);
+  if (!campaign) return notFound();
 
-  const thumbnailUrl =
-    campaign.thumbnail_url ||
-    "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&q=80&w=1200";
+  const snap = campaign.snapshots[0] ?? {};
+  const recruited = snap.recruit_count ?? 0;
+  const applied = snap.applicant_count ?? 0;
+  const compRate = recruited > 0 ? (applied / recruited).toFixed(1) : "0";
+  const progress = recruited > 0 ? Math.min((applied / recruited) * 100, 100) : 0;
+  const dDay = getDDay(campaign.apply_end_date);
+  const thumb = campaign.thumbnail_url ||
+    "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&q=80&w=1400";
 
   return (
-    <main className="max-w-6xl mx-auto p-6 md:p-12 flex flex-col gap-10 pb-40">
-      <Link
-        href="/"
-        className="inline-flex items-center gap-2 text-xs font-black text-slate-500 hover:text-slate-900 transition-colors w-max px-5 py-2.5 bg-white border border-slate-200 rounded-xl shadow-sm hover:shadow-md active:scale-95"
-      >
-        <ArrowLeft className="w-4 h-4" /> 목록으로 돌아가기
-      </Link>
+    <main className="max-w-[1200px] mx-auto px-4 md:px-8 py-8 pb-40">
+      {/* Breadcrumb */}
+      <div className="flex items-center gap-2 text-[11px] font-bold text-slate-400 mb-6">
+        <Link href="/" className="hover:text-blue-600 transition-colors">홈</Link>
+        <span>›</span>
+        <span className="text-slate-600">{campaign.platform?.name}</span>
+        <span>›</span>
+        <span className="text-slate-900 line-clamp-1">{campaign.title}</span>
+      </div>
 
-      <div className="bg-white border border-slate-100 rounded-[3rem] shadow-2xl overflow-hidden flex flex-col lg:flex-row">
-        {/* Left Side: Visuals */}
-        <div className="w-full lg:w-[55%] h-[400px] lg:h-auto relative">
-          <Image
-            src={thumbnailUrl}
-            alt={`${campaign.title} thumbnail`}
-            fill
-            className="object-cover"
-            sizes="(min-width: 1024px) 55vw, 100vw"
-            priority
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-10">
-            <div className="flex gap-2 mb-4">
-              <span className="bg-blue-600 text-white font-black px-4 py-2 rounded-xl text-xs shadow-xl backdrop-blur-md">
-                {campaign.platform.name}
-              </span>
-              <span className="bg-white/90 text-slate-900 font-black px-4 py-2 rounded-xl text-xs shadow-xl backdrop-blur-md">
-                {campaign.campaign_type === 'VST' ? '방문 체험단' : '배송형 제품'}
-              </span>
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        {/* ── Left: Image ── */}
+        <div className="lg:col-span-5">
+          <div className="relative rounded-[2.5rem] overflow-hidden aspect-[4/3] shadow-2xl shadow-slate-900/10">
+            <Image
+              src={thumb}
+              alt={campaign.title}
+              fill
+              className="object-cover"
+              priority
+              unoptimized={thumb.includes("unsplash")}
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+            {/* Platform badge */}
+            <div className="absolute top-4 left-4 px-3 py-1.5 rounded-xl bg-blue-600/90 backdrop-blur-sm text-white text-xs font-black shadow-lg">
+              {campaign.platform?.name}
             </div>
-            <h1 className="text-3xl md:text-4xl font-black text-white leading-tight drop-shadow-md">{campaign.title}</h1>
+            {/* D-Day */}
+            {dDay && (
+              <div className={`absolute top-4 right-4 px-3 py-1.5 rounded-xl text-xs font-black ${dDay.includes("D-") && parseInt(dDay.split("-")[1]) <= 3
+                  ? "bg-rose-500 text-white"
+                  : "bg-white/90 text-slate-900"
+                }`}>
+                {dDay}
+              </div>
+            )}
           </div>
+
+          {/* Snapshot history (mini chart) */}
+          {campaign.snapshots.length > 1 && (
+            <div className="mt-4 bg-white rounded-2xl border border-slate-100 p-4 shadow-sm">
+              <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">신청 추이</div>
+              <div className="flex items-end gap-2 h-12">
+                {campaign.snapshots.slice().reverse().map((s: any, i: number) => {
+                  const h = recruited > 0 ? Math.max((s.applicant_count / recruited) * 100, 4) : 4;
+                  return (
+                    <div key={i} className="flex-1 flex flex-col items-center gap-1">
+                      <div
+                        className="w-full rounded-t-md bg-blue-500 transition-all"
+                        style={{ height: `${h}%`, minHeight: "4px" }}
+                      />
+                      <span className="text-[8px] text-slate-400">{s.applicant_count}명</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </div>
 
-        {/* Right Side: Data */}
-        <div className="w-full lg:w-[45%] p-10 md:p-14 flex flex-col gap-10 bg-slate-50/30">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm flex flex-col gap-2">
-              <div className="flex items-center gap-2 text-rose-500 font-black text-[10px] uppercase tracking-widest">
-                <Activity className="w-3 h-3" /> 경쟁률
-              </div>
-              <div className="text-2xl font-black text-slate-900">{compRate}:1</div>
+        {/* ── Right: Info ── */}
+        <div className="lg:col-span-7 flex flex-col gap-6">
+          {/* Header */}
+          <div>
+            <div className="flex flex-wrap gap-2 mb-3">
+              <span className="px-3 py-1 rounded-xl bg-blue-50 text-blue-700 text-xs font-black border border-blue-100">
+                {MEDIA_ICON[campaign.media_type] ?? "🔗"} {MEDIA_LABEL[campaign.media_type] ?? "기타"}
+              </span>
+              <span className="px-3 py-1 rounded-xl bg-slate-100 text-slate-600 text-xs font-black">
+                {TYPE_LABEL[campaign.campaign_type] ?? "기타"}
+              </span>
             </div>
-            <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm flex flex-col gap-2">
-              <div className="flex items-center gap-2 text-blue-600 font-black text-[10px] uppercase tracking-widest">
-                <Calendar className="w-3 h-3" /> 남은 기간
-              </div>
-              <div className="text-2xl font-black text-slate-900">{dDay || "정보 없음"}</div>
-            </div>
+            <h1 className="text-2xl md:text-3xl font-black text-slate-900 leading-tight">
+              {campaign.title}
+            </h1>
           </div>
 
-          <div className="flex flex-col gap-4">
-            <div className="flex items-start gap-5 bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm">
-              <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center shrink-0">
-                <Gift className="w-6 h-6" />
+          {/* Stats grid */}
+          <div className="grid grid-cols-3 gap-3">
+            {[
+              { label: "모집 인원", value: recruited > 0 ? `${recruited.toLocaleString()}명` : "비공개" },
+              { label: "현재 신청", value: applied > 0 ? `${applied.toLocaleString()}명` : "-" },
+              {
+                label: "경쟁률", value: recruited > 0 ? `${compRate}:1` : "-",
+                cls: Number(compRate) >= 3 ? "text-rose-600" : "text-slate-900"
+              },
+            ].map(stat => (
+              <div key={stat.label} className="bg-white rounded-2xl border border-slate-100 p-4 shadow-sm text-center">
+                <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{stat.label}</div>
+                <div className={`text-lg font-black ${stat.cls ?? "text-slate-900"}`}>{stat.value}</div>
               </div>
-              <div>
-                <div className="text-[10px] font-black text-slate-400 tracking-widest uppercase mb-1">제공 혜택 및 리워드</div>
-                <div className="font-bold text-slate-800 leading-snug">{campaign.reward_text || "모집 상세 페이지에서 제공 혜택을 확인하세요."}</div>
+            ))}
+          </div>
+
+          {/* Progress bar */}
+          {recruited > 0 && (
+            <div>
+              <div className="flex justify-between text-[11px] font-bold text-slate-500 mb-1.5">
+                <span>모집 현황</span>
+                <span className={progress >= 100 ? "text-rose-500" : "text-blue-600"}>{Math.round(progress)}% 채워짐</span>
+              </div>
+              <div className="progress-bar h-2.5">
+                <div
+                  className={`progress-fill${progress >= 100 ? " hot" : ""}`}
+                  style={{ width: `${progress}%` }}
+                />
               </div>
             </div>
+          )}
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm flex items-center gap-4">
-                <div className="w-10 h-10 bg-slate-50 text-slate-400 rounded-xl flex items-center justify-center">
-                  <Share2 className="w-5 h-5" />
-                </div>
+          {/* Info list */}
+          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm divide-y divide-slate-50">
+            {[
+              { icon: "🎁", label: "제공 혜택", value: campaign.reward_text || "모집 페이지 참조" },
+              { icon: "📍", label: "진행 지역", value: campaign.location || "전국 / 재택 가능" },
+              { icon: "📅", label: "마감일", value: campaign.apply_end_date ? new Date(campaign.apply_end_date).toLocaleDateString("ko-KR", { year: "numeric", month: "long", day: "numeric" }) : "상시 모집" },
+              { icon: "🏢", label: "플랫폼", value: campaign.platform?.name ?? "-" },
+            ].map(row => (
+              <div key={row.label} className="flex items-start gap-4 px-5 py-4">
+                <span className="text-lg shrink-0">{row.icon}</span>
                 <div>
-                  <div className="text-[10px] font-black text-slate-400 tracking-widest uppercase">매체 타입</div>
-                  <div className="font-bold text-slate-800 text-sm">{mediaTypeLabel}</div>
+                  <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{row.label}</div>
+                  <div className="text-sm font-bold text-slate-800 mt-0.5">{row.value}</div>
                 </div>
               </div>
-              <div className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm flex items-center gap-4">
-                <div className="w-10 h-10 bg-slate-50 text-slate-400 rounded-xl flex items-center justify-center">
-                  <MapPin className="w-5 h-5" />
-                </div>
-                <div>
-                  <div className="text-[10px] font-black text-slate-400 tracking-widest uppercase">진행 지역</div>
-                  <div className="font-bold text-slate-800 text-sm">{campaign.location || "전국 / 재택 가능"}</div>
-                </div>
-              </div>
-            </div>
+            ))}
           </div>
 
-          <div className="mt-auto pt-8">
-            <a
-              href={campaign.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center justify-center gap-3 w-full bg-slate-900 text-white font-black py-6 rounded-[1.5rem] hover:bg-blue-600 hover:-translate-y-1 transition-all shadow-2xl hover:shadow-blue-500/40 text-lg group"
-            >
-              캠페인 신청하러 가기
-              <ExternalLink className="w-5 h-5 group-hover:rotate-12 transition-transform" />
-            </a>
-            <p className="text-center text-[10px] text-slate-400 font-bold mt-4 tracking-tight">본 캠페인은 외부 플랫폼({campaign.platform.name})에서 관리하며 신청 시 해당 사이트로 이동합니다.</p>
-          </div>
+          {/* CTA */}
+          <a
+            href={campaign.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-center gap-3 w-full bg-slate-900 text-white font-black py-5 rounded-2xl hover:bg-blue-600 transition-all shadow-2xl hover:shadow-blue-500/30 text-base group"
+          >
+            {campaign.platform?.name}에서 신청하기
+            <svg className="w-5 h-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+            </svg>
+          </a>
+          <p className="text-center text-[10px] text-slate-400 font-bold -mt-4">
+            버튼 클릭 시 {campaign.platform?.name} 원본 페이지로 이동합니다
+          </p>
         </div>
       </div>
+
+      {/* ── Related ── */}
+      {relatedCampaigns.length > 0 && (
+        <div className="mt-16">
+          <h2 className="text-lg font-black text-slate-900 mb-5">다른 체험단도 확인해보세요</h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {relatedCampaigns.map(c => {
+              const rSnap = c.snapshots[0] ?? {};
+              return (
+                <Link key={c.id} href={`/campaigns/${c.id}`} className="group bg-white rounded-2xl border border-slate-100 overflow-hidden hover:shadow-lg transition-all lift-card">
+                  <div className="relative h-28 bg-slate-100 overflow-hidden">
+                    {c.thumbnail_url ? (
+                      <Image src={c.thumbnail_url} alt={c.title} fill className="object-cover group-hover:scale-105 transition-transform" unoptimized={c.thumbnail_url.includes("unsplash")} />
+                    ) : (
+                      <div className="w-full h-full bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center text-2xl">📋</div>
+                    )}
+                  </div>
+                  <div className="p-3">
+                    <div className="text-[9px] font-black text-slate-400 mb-1">{c.platform?.name}</div>
+                    <div className="text-[11px] font-bold text-slate-900 line-clamp-2">{c.title}</div>
+                    {rSnap.recruit_count > 0 && (
+                      <div className="text-[10px] text-rose-500 font-black mt-1">
+                        경쟁 {(rSnap.applicant_count / rSnap.recruit_count).toFixed(1)}:1
+                      </div>
+                    )}
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </main>
   );
 }

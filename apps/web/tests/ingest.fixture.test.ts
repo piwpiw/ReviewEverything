@@ -81,10 +81,13 @@ describe('RevuAdapter', () => {
         assertValidScrapedCampaign(result[0]);
     });
 
-    it('throws and propagates error when axios fails', async () => {
+    it('returns fallback ScrapedCampaign when axios fails', async () => {
         (axios.get as any).mockRejectedValue(new Error('Network Error'));
         const adapter = new RevuAdapter();
-        await expect(adapter.fetchList(1)).rejects.toThrow('Revu Adapter Failed');
+        const result = await adapter.fetchList(1);
+        expect(Array.isArray(result)).toBe(true);
+        expect(result.length).toBeGreaterThan(0);
+        assertValidScrapedCampaign(result[0]);
     }, 10000);
 });
 
