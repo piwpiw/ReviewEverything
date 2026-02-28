@@ -1,47 +1,113 @@
+import { Suspense } from "react";
 import FilterBar from "@/components/FilterBar";
 import SortBar from "@/components/SortBar";
 import CampaignList from "@/components/CampaignList";
 import ListSkeleton from "@/components/ListSkeleton";
-import { Suspense } from "react";
+import { Search, Sparkles, Map as MapIcon, List as ListIcon } from "lucide-react";
 
-export default async function Home({ searchParams }: { searchParams: Promise<{ [key: string]: string | undefined }> }) {
-  const params = await searchParams;
-  const keyword = params?.q || '';
-  const sort = params?.sort || 'latest_desc';
+export default async function Home({ searchParams }: { searchParams: Promise<any> }) {
+  const sp = await searchParams;
+  const viewMode = sp.view || "list";
 
   return (
-    <main className="max-w-7xl mx-auto p-4 md:p-8 flex flex-col gap-8 pb-32">
-      {/* Hero Section */}
-      <div className="flex flex-col gap-3 py-6 relative">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-blue-400 rounded-full blur-[100px] opacity-20 -z-10 animate-pulse"></div>
-        <div className="absolute bottom-0 left-10 w-48 h-48 bg-purple-400 rounded-full blur-[80px] opacity-20 -z-10 animate-pulse delay-700"></div>
-        <h1 className="text-4xl md:text-5xl font-black tracking-tight text-slate-800">
-          당신을 위한 <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-500">최적의 캠페인</span>
-        </h1>
-        <p className="text-slate-500 font-medium text-lg">7개의 흩어진 플랫폼, 이제 한 곳에서 프리미엄하게 비교하세요.</p>
+    <main className="min-h-screen bg-[#fafafa]">
+      {/* --- Premium Animated Hero Section --- */}
+      <div className="relative pt-24 pb-16 overflow-hidden border-b border-slate-100 bg-white">
+        {/* Background Blobs - Subtle */}
+        <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-[600px] h-[600px] bg-blue-50/50 rounded-full blur-[120px] -z-10" />
+
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-10">
+            <div className="flex-1">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-100 mb-6">
+                <Sparkles className="w-3.5 h-3.5 text-blue-600" />
+                <span className="text-[10px] font-black text-blue-700 tracking-tight uppercase">대한민국 7대 플랫폼 통합 탐색기</span>
+              </div>
+
+              <h1 className="text-[3.5rem] md:text-[4.5rem] font-black text-slate-900 leading-[1.1] tracking-[-0.04em] mb-6">
+                체험단의 <span className="text-blue-600">모든 것</span>을<br />한눈에 확인하세요.
+              </h1>
+
+              <p className="max-w-xl text-md text-slate-500 font-medium leading-relaxed">
+                레뷰, 리뷰노트, 디너의여왕 등 국내 주요 7개 체험단 사이트의 데이터를 실시간으로 수집하고 분석하여 고효율 캠페인을 선별해 드립니다.
+              </p>
+            </div>
+
+            {/* Elite Search Interface - Denser */}
+            <div className="w-full md:w-[450px] relative group">
+              <form action="/" method="GET" className="relative z-10">
+                <input
+                  type="text"
+                  name="q"
+                  defaultValue={sp.q || ""}
+                  placeholder="맛집, 상품, 키워드로 검색..."
+                  className="w-full pl-14 pr-6 py-5 rounded-2xl bg-slate-50 border border-slate-200 text-md font-semibold outline-none focus:ring-4 focus:ring-blue-100 focus:bg-white focus:border-blue-500 transition-all placeholder:text-slate-400"
+                />
+                <div className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors">
+                  <Search className="w-6 h-6" />
+                </div>
+                <button type="submit" className="hidden">Search</button>
+              </form>
+              <div className="mt-4 flex gap-3 overflow-x-auto pb-1 no-scrollbar">
+                {['#성수맛집', '#화장품', '#인스타협찬', '#블로그배송'].map(tag => (
+                  <span key={tag} className="text-[11px] font-bold text-slate-400 hover:text-blue-600 cursor-pointer whitespace-nowrap">{tag}</span>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
-      {/* Search & Filter Section */}
-      <div className="flex flex-col gap-6 -mt-2">
-        <form action="/" className="flex border-2 border-slate-200 rounded-2xl overflow-hidden focus-within:ring-4 focus-within:ring-blue-500/20 focus-within:border-blue-500 transition-all shadow-sm bg-white">
-          <input type="text" name="q" defaultValue={keyword} placeholder="어떤 캠페인을 찾으시나요? (강남역 맛집, 기초 화장품...)" className="w-full p-4 md:p-5 outline-none text-slate-700 text-lg" />
-          {params?.platform_id && <input type="hidden" name="platform_id" value={params.platform_id} />}
-          {params?.campaign_type && <input type="hidden" name="campaign_type" value={params.campaign_type} />}
-          {params?.media_type && <input type="hidden" name="media_type" value={params.media_type} />}
-          {params?.sort && <input type="hidden" name="sort" value={params.sort} />}
-          <button type="submit" className="bg-slate-900 text-white px-8 md:px-12 font-bold text-lg hover:bg-blue-600 transition-colors">검색</button>
-        </form>
-        <FilterBar />
+      {/* --- Main Content Area --- */}
+      <div className="max-w-[1440px] mx-auto px-6 pb-40 mt-8">
+        {/* Glass Sticky Navigation */}
+        <div className="sticky top-6 z-50 mb-10">
+          <Suspense fallback={<div className="h-24 bg-white/50 animate-pulse rounded-[2rem]" />}>
+            <FilterBar />
+          </Suspense>
+        </div>
+
+        <div className="flex flex-col gap-8">
+          {/* List/Map Toggle & Sort */}
+          <div className="flex flex-wrap justify-between items-center gap-4 px-2">
+            <div className="flex items-center gap-2 bg-slate-100 p-1 rounded-xl border border-slate-200">
+              <form action="/" method="GET" className="flex items-center gap-1">
+                {/* Preserve existing filters */}
+                {Object.entries(sp).map(([k, v]) => k !== 'view' && <input key={k} type="hidden" name={k} value={v as string} />)}
+
+                <button
+                  name="view" value="list"
+                  className={`flex items-center gap-2 px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${viewMode === 'list' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-800'}`}
+                >
+                  <ListIcon className="w-3.5 h-3.5" />
+                  목록형
+                </button>
+                <button
+                  name="view" value="map"
+                  className={`flex items-center gap-2 px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${viewMode === 'map' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-800'}`}
+                >
+                  <MapIcon className="w-3.5 h-3.5" />
+                  지도형
+                </button>
+              </form>
+            </div>
+
+            <Suspense fallback={<div className="w-32 h-10 bg-slate-100 rounded-2xl" />}>
+              <SortBar currentSort={sp.sort || "latest_desc"} />
+            </Suspense>
+          </div>
+
+          <Suspense fallback={<ListSkeleton />}>
+            <CampaignList searchParams={sp} />
+          </Suspense>
+        </div>
       </div>
 
-      <div className="flex justify-end -mb-4">
-        <SortBar currentSort={sort} />
-      </div>
-
-      {/* Streamed Campaign Content */}
-      <Suspense key={JSON.stringify(params)} fallback={<ListSkeleton />}>
-        <CampaignList searchParams={params as any} />
-      </Suspense>
+      <footer className="py-12 border-t border-slate-100 text-center bg-white">
+        <p className="text-[10px] font-black text-slate-400 tracking-[0.3em] uppercase">
+          &copy; 2025 ReviewEverything All Rights Reserved.
+        </p>
+      </footer>
     </main>
   );
 }

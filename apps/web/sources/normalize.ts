@@ -3,9 +3,10 @@ import { ScrapedCampaign } from "./types";
 
 export function normalizeCampaignType(typeRaw: string): 'VST' | 'SHP' | 'PRS' {
     const norm = typeRaw.toLowerCase();
-    if (norm.includes('방문') || norm.includes('visit')) return 'VST';
-    if (norm.includes('배송') || norm.includes('delivery')) return 'SHP';
-    return 'PRS'; // Default to reporter/others
+    if (norm.includes('방문') || norm.includes('visit') || norm.includes('지역')) return 'VST';
+    if (norm.includes('배송') || norm.includes('delivery') || norm.includes('제품')) return 'SHP';
+    if (norm.includes('기자단') || norm.includes('reporter')) return 'PRS';
+    return 'PRS';
 }
 
 export function normalizeMediaType(mediaRaw: string): 'BP' | 'IP' | 'YP' | 'OTHER' {
@@ -17,6 +18,10 @@ export function normalizeMediaType(mediaRaw: string): 'BP' | 'IP' | 'YP' | 'OTHE
 }
 
 export async function processAndDedupeCampaign(platformId: number, item: ScrapedCampaign) {
+    // Standardize types before storing
+    const cType = normalizeCampaignType(item.campaign_type);
+    const mType = normalizeMediaType(item.media_type);
+
     // 1. Find existing
     const existing = await db.campaign.findUnique({
         where: {
@@ -35,8 +40,8 @@ export async function processAndDedupeCampaign(platformId: number, item: Scraped
                 platform_id: platformId,
                 original_id: item.original_id,
                 title: item.title,
-                campaign_type: item.campaign_type,
-                media_type: item.media_type,
+                campaign_type: cType,
+                media_type: mType,
                 location: item.location,
                 reward_text: item.reward_text,
                 thumbnail_url: item.thumbnail_url,
@@ -58,6 +63,11 @@ export async function processAndDedupeCampaign(platformId: number, item: Scraped
             where: { id: existing.id },
             data: {
                 title: item.title,
+                campaign_type: cType,
+                media_type: mType,
+                location: item.location,
+                reward_text: item.reward_text,
+                thumbnail_url: item.thumbnail_url,
                 apply_end_date: item.apply_end_date,
                 updated_at: new Date()
             }
@@ -65,7 +75,11 @@ export async function processAndDedupeCampaign(platformId: number, item: Scraped
 
         // Determine if snapshot needs updating
         const lastSnapshot = existing.snapshots[0];
-        if (!lastSnapshot || lastSnapshot.recruit_count !== item.recruit_count || lastSnapshot.applicant_count !== item.applicant_count) {
+        const hasDataChanged = !lastSnapshot ||
+            lastSnapshot.recruit_count !== item.recruit_count ||
+            lastSnapshot.applicant_count !== item.applicant_count;
+
+        if (hasDataChanged) {
             await db.campaignSnapshot.create({
                 data: {
                     campaign_id: existing.id,

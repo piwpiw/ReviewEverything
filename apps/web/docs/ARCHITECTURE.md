@@ -1,33 +1,46 @@
-# 🏗 System Architecture & Data Flow
+# System Architecture
 
-This document details the high-level architecture and data flow of the ReviewEverything project, specifically focusing on the Alpha-to-Beta advancements.
+## Scope
+This document is the source of truth for architecture-level decisions in `apps/web`.
 
-## 1. Core Data Ingestion Pipeline
+## Runtime Topology
+- `Next.js App Router` serves UI pages and API routes.
+- `Prisma + PostgreSQL (Supabase)` is the primary datastore.
+- `Adapter layer` under `sources/adapters` normalizes external campaign pages.
+- `Ingestion orchestrator` in `lib/ingest.ts` executes platform jobs and persists campaign snapshots.
 
-The scraping engine is designed for resilience and extensibility.
+## Data Flow
+1. Trigger paths:
+- Scheduled: `/api/cron`
+- Manual: `/api/admin/ingest`
+2. Ingest pipeline:
+- Select adapters by platform id.
+- Fetch via resilient HTTP client (`fetchWithRetry` behavior in adapters/lib).
+- Normalize to internal campaign schema.
+- Upsert campaign and snapshot rows.
+3. Read pipeline:
+- `/api/campaigns` provides list/search/filter responses.
+- `/api/analytics` computes trend-oriented views from snapshot history.
+- `/api/admin/runs` exposes run states for the admin dashboard.
 
-- **Trigger**: The process is triggered either via a Vercel Cron Job hitting `/api/cron` or manually via the Next.js Admin Panel POSTing to `/api/admin/ingest`.
-- **Ingest Manager (`lib/ingest.ts`)**: Handled by `executeIngestionTask()`. It utilizes `Promise.allSettled()` for concurrent campaign processing to maximize throughput.
-- **Adapters (`sources/adapters/*.ts`)**: Network requests are routed through `fetchWithRetry` (which features exponential backoff) and DOM parsing is delegated to 7 specialized adapter classes. All implement `IPlatformAdapter`.
-- **Normalization**: The raw scraped data often contains platform-specific strings. The system standardizes these into Enums:
-  - `campaign_type`: `VST` (Visit), `SHP` (Shipping), `PRS` (Press/Reporter).
-  - `media_type`: `BP` (Blog), `IP` (Instagram), `YP` (YouTube).
-- **Snapshot Upserting**: Instead of just overwriting campaigns, the system records `CampaignSnapshot` entities. This is critical for the Trend Engine. It logs `recruit_count` and `applicant_count` alongside a `scraped_at` timestamp.
+## Reliability Rules
+- Ingestion must not block on one failing platform; use per-platform isolation.
+- API responses must preserve stable shape for UI (`data`, `meta`, and error contract).
+- Pages may degrade to mock/fallback mode only when DB read paths are unavailable.
+- Health endpoint `/api/health` is the canonical liveness probe.
 
-## 2. Trend Engine (`lib/analytics.ts`)
+## Performance Rules
+- Keep read-heavy endpoints cache-aware (`s-maxage`, stale-while-revalidate when appropriate).
+- Avoid N+1 reads in list APIs; prefer include/select with bounded fields.
+- Snapshot writes should be append-oriented to support trend calculations.
 
-To avoid querying heavy calculations on the fly, the trend logic utilizes the `CampaignSnapshot` history.
+## Security and Ops
+- No secrets in client bundles.
+- Server-only env vars must be read only in server routes/libs.
+- CI gates (`lint`, `typecheck`, `test`, `smoke`) are required before merge.
 
-1. **Query**: Fetches the 2 most recent snapshots for active campaigns.
-2. **Velocity Calculation**: Calculates `((current_applicants - previous_applicants) / previous_applicants) * 100`.
-3. **Hotness Threshold**: If the velocity exceeds a set threshold (e.g., > 50%), the campaign is flagged `is_hot = true`.
-4. **API Delivery**: `/api/analytics` serves this data, bypassing the standard `/api/campaigns` route to allow customized caching strategies.
-
-## 3. Storage & Infrastructure (Supabase + Vercel)
-
-- **Database**: PostgreSQL hosted on Supabase.
-- **Prisma Schema**: `prisma/schema.prisma`. 
-  - To handle high-volume reads on the analytics engine, indexes (`@@index`) are placed on `scraped_at`, `applicant_count`, and `recruit_count`.
-- **Edge Caching**: 
-  - The core `/api/campaigns` API uses `NextResponse` headers: `Cache-Control: s-maxage=60, stale-while-revalidate=600`.
-  - This guarantees that repeated filters/searches respond in sub-100ms without hitting the Supabase DB directly, drastically reducing database read units.
+## Change Control
+When architecture changes, update this file in the same PR with:
+- Changed components/routes
+- New invariants
+- Migration impact

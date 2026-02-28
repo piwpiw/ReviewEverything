@@ -17,6 +17,7 @@
 - Updated `/api/health` to verify DB availability and return `db: ok/down` with 503 on DB failure.
 - Updated admin dashboard health check to consume `/api/health` response (`db` field) before rendering ONLINE status.
 - Added GitHub Actions CI workflow (`.github/workflows/ci.yml`) to run `apps/web` tests on `main` push/PR.
+- Extended CI to run `lint` before tests, persist test output, and create a failure issue automatically.
 
 ## What Is Implemented
 - Data model and indexing are defined in Prisma:
@@ -42,14 +43,17 @@
 ## Gaps And Risks
 - Security and operation hardening completed; remaining validation:
   - Regression coverage on adapter fixture expectations was completed in this cycle.
-  - CI workflow now exists but should still be verified on first real PR/merge.
+  - CI now includes lint + test checks and failure issue creation; behavior should be verified on first real PR/merge.
+- CI consistency note:
+  - `test_output.txt` artifact path was corrected to `test_output.txt` in workflow (relative to `apps/web` working directory).
+- Current hard blocker (pre-existing): 프로젝트 전체 ESLint `no-explicit-any` 규칙 위반 다수로 인해 lint가 현재 실패 상태입니다. 기존 스코프 범위의 일괄 정리가 필요합니다.
 - Product polish pending:
   - Minor UX copy and zero-state messaging can be aligned with final brand tone.
 - Data-source behavior:
   - Mock mode now has explicit semantics: DB unavailable -> mock fallback, DB empty -> clear empty state.
 
 ## Next Work (Prioritized)
-1. P2: Verify CI gate on first PR/MR run and add failure notifications if needed.
+1. P2: Monitor first real PR/MR CI run and adjust `ci-failure`/`automated` issue labels, if needed.
 
 ## Suggested Update Cadence
 - Revisit this document after each of:

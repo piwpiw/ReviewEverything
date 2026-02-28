@@ -1,120 +1,97 @@
-import { db } from "@/lib/db";
+ï»¿import { db } from "@/lib/db";
 import { buildCampaignsQuery } from "@/lib/queryBuilder";
 import { getTrendingCampaigns } from "@/lib/analytics";
 import CampaignCard from "./CampaignCard";
-
-const MOCK_CAMPAIGNS = [
-    { id: 1, title: "[¸®ºä] »ùÇÃ Ä·ÆäÀÎ 1", location: "¼­¿ï °­³²", media_type: "IP", campaign_type: "VST", platform: { name: "Revu", id: 1 }, thumbnail_url: "https://images.unsplash.com/photo-1544025162-831518f8887b?auto=format&fit=crop&q=80&w=600", snapshots: [{ recruit_count: 5, applicant_count: 2, competition_rate: 0.4 }] },
-    { id: 2, title: "»ùÇÃ ¸®ºä Æ÷ÀÎÆ® Ä·ÆäÀÎ", location: "¼­¿ï È«´ë", media_type: "BP", campaign_type: "SHP", platform: { name: "Reviewnote", id: 2 }, thumbnail_url: "https://images.unsplash.com/photo-1595225476474-87563907a212?auto=format&fit=crop&q=80&w=600", snapshots: [{ recruit_count: 10, applicant_count: 120, competition_rate: 12.0 }] },
-    { id: 3, title: "»ùÇÃ Á¦Ç° Ã¼Çè Ä·ÆäÀÎ", location: "ºÎ»ê ÇØ¿î´ë", media_type: "IP", campaign_type: "VST", platform: { name: "DinnerQueen", id: 3 }, thumbnail_url: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&q=80&w=600", snapshots: [{ recruit_count: 3, applicant_count: 1, competition_rate: 0.3 }] },
-    { id: 4, title: "»ùÇÃ ÇÖÇÑ ¸ğÁı °ø°í", location: "¼­¿ï ¸¶Æ÷", media_type: "YP", campaign_type: "SHP", platform: { name: "Seouloppa", id: 4 }, thumbnail_url: "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&q=80&w=600", snapshots: [{ recruit_count: 20, applicant_count: 15, competition_rate: 0.75 }] },
-    { id: 5, title: "»ùÇÃ ºê·£µå Ä·ÆäÀÎ", location: "¼­¿ï Á¾·Î", media_type: "BP", campaign_type: "PRS", platform: { name: "ReviewPlace", id: 4 }, thumbnail_url: "https://images.unsplash.com/photo-1603313011101-320f26a4f6f6?auto=format&fit=crop&q=80&w=600", snapshots: [{ recruit_count: 50, applicant_count: 10, competition_rate: 0.2 }] }
-];
+import MapView from "./MapView";
+import { Zap } from "lucide-react";
 
 export default async function CampaignList({ searchParams }: { searchParams: { [key: string]: string | undefined } }) {
-    const keyword = searchParams?.q?.toLowerCase() || '';
-    const platformId = searchParams?.platform_id;
-    const campaignType = searchParams?.campaign_type;
-    const mediaType = searchParams?.media_type;
-    const isFiltered = Boolean(keyword || platformId || campaignType || mediaType);
+    const isFiltered = Boolean(searchParams?.q || searchParams?.platform_id || searchParams?.campaign_type || searchParams?.media_type);
+    const viewMode = searchParams.view || "list";
 
     let filtered: any[] = [];
     let trending: any[] = [];
-    let dataMode: 'ok' | 'empty' | 'unavailable' = 'ok';
+    let dataMode: "ok" | "empty" | "unavailable" = "ok";
 
     try {
         const qb = buildCampaignsQuery(new URLSearchParams(searchParams as any));
-        const toCompetitionRate = (campaign: any) => {
-            const latest = campaign.snapshots?.[0];
-            if (!latest) return Number.POSITIVE_INFINITY;
-            const parsed = Number(latest.competition_rate);
-            if (Number.isFinite(parsed)) return parsed;
-            return latest.applicant_count / (latest.recruit_count || 1);
-        };
 
-        if (qb.sort === 'competition_asc') {
-            const [all, trendData] = await Promise.all([
-                db.campaign.findMany({
-                    where: qb.where,
-                    orderBy: { created_at: 'desc' },
-                    include: { platform: true, snapshots: { orderBy: { scraped_at: 'desc' }, take: 1 } }
-                }),
-                getTrendingCampaigns(4)
-            ]);
-            filtered = all.sort((a, b) => toCompetitionRate(a) - toCompetitionRate(b)).slice(qb.skip, qb.skip + qb.limit);
-            trending = trendData;
-        } else {
-            [filtered, trending] = await Promise.all([
-                db.campaign.findMany({
-                    where: qb.where,
-                    orderBy: qb.orderBy as any,
-                    skip: qb.skip,
-                    take: qb.take,
-                    include: { platform: true, snapshots: { orderBy: { scraped_at: 'desc' }, take: 1 } }
-                }),
-                getTrendingCampaigns(4)
-            ]);
-        }
+        // Parallel fetch for speed
+        const [all, trendData] = await Promise.all([
+            db.campaign.findMany({
+                where: qb.where,
+                orderBy: qb.sort === 'competition_asc' ? { created_at: 'desc' } : (qb.orderBy as any),
+                skip: viewMode === 'map' ? 0 : qb.skip,
+                take: viewMode === 'map' ? 100 : qb.take, // Take more for map view
+                include: { platform: true, snapshots: { orderBy: { scraped_at: "desc" }, take: 1 } },
+            }),
+            getTrendingCampaigns(5),
+        ]);
+
+        filtered = qb.sort === 'competition_asc'
+            ? all.sort((a: any, b: any) => {
+                const ra = a.snapshots[0]?.competition_rate || 999;
+                const rb = b.snapshots[0]?.competition_rate || 999;
+                return Number(ra) - Number(rb);
+            }).slice(0, 20)
+            : all;
+
+        trending = trendData;
     } catch (error) {
-        console.error("Database connection failed, falling back to mock data.", error);
-        dataMode = 'unavailable';
-        filtered = MOCK_CAMPAIGNS;
-        trending = MOCK_CAMPAIGNS.slice(0, 4);
+        console.error("Database connection failed", error);
+        dataMode = "unavailable";
     }
 
-    if (dataMode === 'ok' && !isFiltered && filtered.length === 0) {
-        dataMode = 'empty';
+    if (dataMode === "ok" && filtered.length === 0) {
+        dataMode = "empty";
+    }
+
+    if (viewMode === "map") {
+        return <MapView campaigns={filtered} />;
     }
 
     return (
-        <div className="flex flex-col gap-8">
-            {dataMode === 'unavailable' ? (
-                <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-amber-900 text-sm font-bold">
-                    DB ¿¬°áÀÌ ºÒ¾ÈÁ¤ÇØ Mock µ¥ÀÌÅÍ·Î Ç¥½Ã ÁßÀÔ´Ï´Ù.
+        <div className="flex flex-col gap-10">
+            {dataMode === "unavailable" && (
+                <div className="rounded-xl border border-rose-100 bg-rose-50 px-4 py-3 text-rose-700 text-xs font-bold">
+                    ë°ì´í„°ë² ì´ìŠ¤ ì—°ê²°ì— ì‹¤íŒ¨í–ˆìŠµë‹ˆë‹¤. ì ì‹œ í›„ ë‹¤ì‹œ ì‹œë„í•´ì£¼ì„¸ìš”.
                 </div>
-            ) : null}
+            )}
 
-            {dataMode === 'empty' ? (
-                <div className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-700 text-sm">
-                    ÇöÀç DB¿¡ ÀúÀåµÈ Ä·ÆäÀÎÀÌ ¾ø½À´Ï´Ù. ÃÖ±Ù ¼öÁı ÈÄ ´Ù½Ã È®ÀÎÇØ ÁÖ¼¼¿ä.
-                </div>
-            ) : null}
-
-            {/* Trending Section - Only show when no filters active */}
-            {!isFiltered && dataMode === 'ok' && (
-                <div className="flex flex-col gap-4">
-                    <div className="flex items-center gap-2">
-                        <span className="bg-rose-500 text-white text-xs font-black px-2 py-1 rounded-md animate-pulse">TRENDING</span>
-                        <h2 className="text-xl font-black text-slate-800">ÀÎ±â Ä·ÆäÀÎ</h2>
+            {/* Trending Section - Premium Horizontal Scroll */}
+            {!isFiltered && trending.length > 0 && (
+                <div className="flex flex-col gap-5">
+                    <div className="flex items-center gap-2 px-2">
+                        <div className="p-1 rounded-md bg-rose-500">
+                            <Zap className="w-3.5 h-3.5 text-white fill-current" />
+                        </div>
+                        <h2 className="text-lg font-black text-slate-900 tracking-tight">ì¸ê¸° ê¸‰ìƒìŠ¹ ìº í˜ì¸</h2>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                        {trending.map(c => (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                        {trending.map((c) => (
                             <CampaignCard key={`trend-${c.id}`} campaign={c} />
                         ))}
                     </div>
                 </div>
             )}
 
-            <div className="mt-4">
-                <div className="flex justify-between items-end mb-6">
-                    <div className="font-bold text-slate-700 text-lg">
-                        ÃÑ <span className="text-blue-600">{filtered.length}</span>°³ÀÇ Ä·ÆäÀÎ
+            {/* Main Grid - High Density (5 columns) */}
+            <div className="flex flex-col gap-6">
+                <div className="flex justify-between items-end px-2">
+                    <div className="font-black text-slate-800 text-sm tracking-tight uppercase px-3 py-1 bg-slate-100 rounded-lg">
+                        ì „ì²´ ì²´í—˜ë‹¨ <span className="text-blue-600">{filtered.length}</span>
                     </div>
                 </div>
 
-                {filtered.length > 0 ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                        {filtered.map(campaign => (
-                            <CampaignCard key={campaign.id} campaign={campaign} />
-                        ))}
+                {dataMode === "empty" ? (
+                    <div className="py-24 text-center bg-white rounded-[2rem] border border-dashed border-slate-200">
+                        <p className="text-slate-400 font-bold">ê²€ìƒ‰ ê²°ê³¼ê°€ ì—†ìŠµë‹ˆë‹¤.</p>
                     </div>
                 ) : (
-                    <div className="py-32 flex flex-col items-center justify-center text-center bg-white rounded-2xl border border-dashed border-slate-300">
-                        <div className="text-slate-400 mb-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                        </div>
-                        <h3 className="text-xl font-bold text-slate-700 mb-1">°Ë»ö °á°ú°¡ ¾ø½À´Ï´Ù</h3>
-                        <p className="text-slate-500">ÇÊÅÍ Á¶°ÇÀ» ¹Ù²Ù°Å³ª ³ªÁß¿¡ ´Ù½Ã ½ÃµµÇØ ÁÖ¼¼¿ä.</p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                        {filtered.map((campaign) => (
+                            <CampaignCard key={campaign.id} campaign={campaign} />
+                        ))}
                     </div>
                 )}
             </div>

@@ -1,28 +1,57 @@
 export default function ListSkeleton() {
     return (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
-                <div key={i} className="border border-slate-200 rounded-3xl overflow-hidden bg-white shadow-sm flex flex-col h-[480px]">
-                    <div className="h-60 bg-gradient-to-br from-slate-100 to-slate-200 animate-pulse relative overflow-hidden">
-                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12 -translate-x-full animate-[shimmer_2s_infinite]"></div>
-                    </div>
-                    <div className="p-6 flex flex-col flex-1 gap-4">
-                        <div className="h-7 bg-slate-100 rounded-full w-3/4 animate-pulse"></div>
-                        <div className="h-7 bg-slate-100 rounded-full w-1/2 animate-pulse"></div>
-                        <div className="flex gap-2 mt-4">
-                            <div className="h-6 bg-slate-50 rounded-md w-16 animate-pulse"></div>
-                            <div className="h-6 bg-slate-50 rounded-md w-20 animate-pulse"></div>
-                        </div>
-                        <div className="mt-auto flex justify-between items-center pt-5 border-t border-slate-50">
-                            <div className="flex flex-col gap-2">
-                                <div className="h-3 bg-slate-50 rounded-full w-12 animate-pulse"></div>
-                                <div className="h-5 bg-slate-100 rounded-full w-24 animate-pulse"></div>
-                            </div>
-                            <div className="h-10 bg-slate-100 rounded-xl w-28 animate-pulse"></div>
-                        </div>
-                    </div>
+        <div className="flex flex-col gap-12">
+            {/* Trending Skeleton Section */}
+            <div className="flex flex-col gap-6">
+                <div className="flex items-center gap-3">
+                    <div className="w-24 h-6 bg-slate-200 rounded-lg animate-pulse" />
+                    <div className="w-48 h-8 bg-slate-200 rounded-xl animate-pulse" />
                 </div>
-            ))}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    {[1, 2, 3, 4].map((i) => (
+                        <CardSkeleton key={`trend-skel-${i}`} />
+                    ))}
+                </div>
+            </div>
+
+            {/* Main List Skeleton Section */}
+            <div className="flex flex-col gap-8 mt-12">
+                <div className="flex justify-between items-end">
+                    <div className="w-40 h-8 bg-slate-200 rounded-xl animate-pulse" />
+                    <div className="w-32 h-10 bg-slate-200 rounded-xl animate-pulse" />
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                    {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+                        <CardSkeleton key={`main-skel-${i}`} />
+                    ))}
+                </div>
+            </div>
+        </div>
+    );
+}
+
+function CardSkeleton() {
+    return (
+        <div className="bg-white rounded-[2.5rem] border border-slate-100 overflow-hidden shadow-sm flex flex-col h-full">
+            <div className="h-64 bg-slate-200 animate-pulse relative">
+                <div className="absolute top-5 left-5 w-20 h-8 bg-slate-300 rounded-2xl" />
+            </div>
+            <div className="p-8 flex flex-col gap-4">
+                <div className="flex gap-2">
+                    <div className="w-8 h-8 bg-slate-200 rounded-xl animate-pulse" />
+                    <div className="w-20 h-4 bg-slate-100 rounded-md animate-pulse self-center" />
+                </div>
+                <div className="w-full h-8 bg-slate-200 rounded-xl animate-pulse" />
+                <div className="w-3/4 h-8 bg-slate-200 rounded-xl animate-pulse" />
+                <div className="mt-4 w-1/2 h-4 bg-slate-100 rounded-md animate-pulse" />
+                <div className="mt-8 pt-6 border-t border-slate-50 flex justify-between items-center">
+                    <div className="flex flex-col gap-2">
+                        <div className="w-16 h-3 bg-slate-100 rounded-md animate-pulse" />
+                        <div className="w-24 h-6 bg-slate-200 rounded-lg animate-pulse" />
+                    </div>
+                    <div className="w-28 h-12 bg-slate-900/10 rounded-2xl animate-pulse" />
+                </div>
+            </div>
         </div>
     );
 }

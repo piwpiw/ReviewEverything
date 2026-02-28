@@ -1,0 +1,369 @@
+{
+  "generatedAt": "2026-02-28T12:55:53.039Z",
+  "totalFindings": 60,
+  "byRule": {
+    "any-usage": 60
+  },
+  "findings": [
+    {
+      "file": "app/admin/page.tsx",
+      "line": 95,
+      "rule": "any-usage",
+      "text": "} catch (e: any) {"
+    },
+    {
+      "file": "app/api/admin/ingest/route.ts",
+      "line": 28,
+      "rule": "any-usage",
+      "text": "} catch (err: any) {"
+    },
+    {
+      "file": "app/api/admin/runs/route.ts",
+      "line": 33,
+      "rule": "any-usage",
+      "text": "} catch (error: any) {"
+    },
+    {
+      "file": "app/api/analytics/route.ts",
+      "line": 15,
+      "rule": "any-usage",
+      "text": "} catch (error: any) {"
+    },
+    {
+      "file": "app/api/campaigns/route.ts",
+      "line": 10,
+      "rule": "any-usage",
+      "text": "const toCompetitionRate = (campaign: any) => {"
+    },
+    {
+      "file": "app/api/campaigns/route.ts",
+      "line": 20,
+      "rule": "any-usage",
+      "text": "let data: any[] = [];"
+    },
+    {
+      "file": "app/api/campaigns/route.ts",
+      "line": 43,
+      "rule": "any-usage",
+      "text": "orderBy: qb.orderBy as any,"
+    },
+    {
+      "file": "app/api/campaigns/route.ts",
+      "line": 71,
+      "rule": "any-usage",
+      "text": "} catch (error: any) {"
+    },
+    {
+      "file": "app/api/cron/route.ts",
+      "line": 30,
+      "rule": "any-usage",
+      "text": "} catch (err: any) {"
+    },
+    {
+      "file": "app/api/health/route.ts",
+      "line": 13,
+      "rule": "any-usage",
+      "text": "} catch (error: any) {"
+    },
+    {
+      "file": "app/page.tsx",
+      "line": 8,
+      "rule": "any-usage",
+      "text": "export default function Home({ searchParams }: { searchParams: any }) {"
+    },
+    {
+      "file": "components/CampaignCard.tsx",
+      "line": 8,
+      "rule": "any-usage",
+      "text": "export default function CampaignCard({ campaign }: { campaign: any }) {"
+    },
+    {
+      "file": "components/CampaignList.tsx",
+      "line": 66,
+      "rule": "any-usage",
+      "text": "let filtered: any[] = [];"
+    },
+    {
+      "file": "components/CampaignList.tsx",
+      "line": 67,
+      "rule": "any-usage",
+      "text": "let trending: any[] = [];"
+    },
+    {
+      "file": "components/CampaignList.tsx",
+      "line": 71,
+      "rule": "any-usage",
+      "text": "const qb = buildCampaignsQuery(new URLSearchParams(searchParams as any));"
+    },
+    {
+      "file": "components/CampaignList.tsx",
+      "line": 72,
+      "rule": "any-usage",
+      "text": "const toCompetitionRate = (campaign: any) => {"
+    },
+    {
+      "file": "components/CampaignList.tsx",
+      "line": 95,
+      "rule": "any-usage",
+      "text": "orderBy: qb.orderBy as any,"
+    },
+    {
+      "file": "components/FilterBar.tsx",
+      "line": 58,
+      "rule": "any-usage",
+      "text": "const Section = ({ title, items, current, name }: any) => ("
+    },
+    {
+      "file": "components/FilterBar.tsx",
+      "line": 62,
+      "rule": "any-usage",
+      "text": "{items.map((item: any) => {"
+    },
+    {
+      "file": "components/ScraperStatusTable.tsx",
+      "line": 3,
+      "rule": "any-usage",
+      "text": "export default function ScraperStatusTable({ initialRuns }: { initialRuns: any[] }) {"
+    },
+    {
+      "file": "lib/fetcher.ts",
+      "line": 21,
+      "rule": "any-usage",
+      "text": "} catch (error: any) {"
+    },
+    {
+      "file": "lib/ingest.ts",
+      "line": 49,
+      "rule": "any-usage",
+      "text": "} catch (e: any) {"
+    },
+    {
+      "file": "sources/adapters/dinnerqueen.ts",
+      "line": 67,
+      "rule": "any-usage",
+      "text": "} catch (e: any) {"
+    },
+    {
+      "file": "sources/adapters/gangnamfood.ts",
+      "line": 59,
+      "rule": "any-usage",
+      "text": "} catch (e: any) {"
+    },
+    {
+      "file": "sources/adapters/mrblog.ts",
+      "line": 59,
+      "rule": "any-usage",
+      "text": "} catch (e: any) {"
+    },
+    {
+      "file": "sources/adapters/reviewnote.ts",
+      "line": 68,
+      "rule": "any-usage",
+      "text": "} catch (e: any) {"
+    },
+    {
+      "file": "sources/adapters/reviewplace.ts",
+      "line": 60,
+      "rule": "any-usage",
+      "text": "} catch (e: any) {"
+    },
+    {
+      "file": "sources/adapters/revu.ts",
+      "line": 80,
+      "rule": "any-usage",
+      "text": "} catch (e: any) {"
+    },
+    {
+      "file": "sources/adapters/seouloppa.ts",
+      "line": 60,
+      "rule": "any-usage",
+      "text": "} catch (e: any) {"
+    },
+    {
+      "file": "tests/dedupe.test.ts",
+      "line": 50,
+      "rule": "any-usage",
+      "text": "(db.campaign.findUnique as any).mockResolvedValue(null);"
+    },
+    {
+      "file": "tests/dedupe.test.ts",
+      "line": 51,
+      "rule": "any-usage",
+      "text": "(db.campaign.create as any).mockResolvedValue({ id: 42 });"
+    },
+    {
+      "file": "tests/dedupe.test.ts",
+      "line": 59,
+      "rule": "any-usage",
+      "text": "const createArgs = (db.campaign.create as any).mock.calls[0][0].data;"
+    },
+    {
+      "file": "tests/dedupe.test.ts",
+      "line": 71,
+      "rule": "any-usage",
+      "text": "(db.campaign.findUnique as any).mockResolvedValue(null);"
+    },
+    {
+      "file": "tests/dedupe.test.ts",
+      "line": 72,
+      "rule": "any-usage",
+      "text": "(db.campaign.create as any).mockResolvedValue({ id: 1 });"
+    },
+    {
+      "file": "tests/dedupe.test.ts",
+      "line": 77,
+      "rule": "any-usage",
+      "text": "const rate = (db.campaign.create as any).mock.calls[0][0].data.snapshots.create.competition_rate;"
+    },
+    {
+      "file": "tests/dedupe.test.ts",
+      "line": 82,
+      "rule": "any-usage",
+      "text": "(db.campaign.findUnique as any).mockResolvedValue(null);"
+    },
+    {
+      "file": "tests/dedupe.test.ts",
+      "line": 83,
+      "rule": "any-usage",
+      "text": "(db.campaign.create as any).mockResolvedValue({ id: 1 });"
+    },
+    {
+      "file": "tests/dedupe.test.ts",
+      "line": 88,
+      "rule": "any-usage",
+      "text": "const rate = (db.campaign.create as any).mock.calls[0][0].data.snapshots.create.competition_rate;"
+    },
+    {
+      "file": "tests/dedupe.test.ts",
+      "line": 106,
+      "rule": "any-usage",
+      "text": "(db.campaign.findUnique as any).mockResolvedValue(existingBase);"
+    },
+    {
+      "file": "tests/dedupe.test.ts",
+      "line": 107,
+      "rule": "any-usage",
+      "text": "(db.campaign.update as any).mockResolvedValue(existingBase);"
+    },
+    {
+      "file": "tests/dedupe.test.ts",
+      "line": 119,
+      "rule": "any-usage",
+      "text": "(db.campaign.findUnique as any).mockResolvedValue(existing);"
+    },
+    {
+      "file": "tests/dedupe.test.ts",
+      "line": 120,
+      "rule": "any-usage",
+      "text": "(db.campaign.update as any).mockResolvedValue(existing);"
+    },
+    {
+      "file": "tests/dedupe.test.ts",
+      "line": 121,
+      "rule": "any-usage",
+      "text": "(db.campaignSnapshot.create as any).mockResolvedValue({ id: 200 });"
+    },
+    {
+      "file": "tests/dedupe.test.ts",
+      "line": 134,
+      "rule": "any-usage",
+      "text": "(db.campaign.findUnique as any).mockResolvedValue(existing);"
+    },
+    {
+      "file": "tests/dedupe.test.ts",
+      "line": 135,
+      "rule": "any-usage",
+      "text": "(db.campaign.update as any).mockResolvedValue(existing);"
+    },
+    {
+      "file": "tests/dedupe.test.ts",
+      "line": 136,
+      "rule": "any-usage",
+      "text": "(db.campaignSnapshot.create as any).mockResolvedValue({ id: 201 });"
+    },
+    {
+      "file": "tests/dedupe.test.ts",
+      "line": 149,
+      "rule": "any-usage",
+      "text": "(db.campaign.findUnique as any).mockResolvedValue(existing);"
+    },
+    {
+      "file": "tests/dedupe.test.ts",
+      "line": 150,
+      "rule": "any-usage",
+      "text": "(db.campaign.update as any).mockResolvedValue(existing);"
+    },
+    {
+      "file": "tests/dedupe.test.ts",
+      "line": 151,
+      "rule": "any-usage",
+      "text": "(db.campaignSnapshot.create as any).mockResolvedValue({ id: 202 });"
+    },
+    {
+      "file": "tests/ingest.fixture.test.ts",
+      "line": 30,
+      "rule": "any-usage",
+      "text": "function assertValidScrapedCampaign(item: any) {"
+    },
+    {
+      "file": "tests/ingest.fixture.test.ts",
+      "line": 48,
+      "rule": "any-usage",
+      "text": "(axios.get as any).mockResolvedValue({ data: '<html><body></body></html>' });"
+    },
+    {
+      "file": "tests/ingest.fixture.test.ts",
+      "line": 64,
+      "rule": "any-usage",
+      "text": "const instance = new (Adapter as any)();"
+    },
+    {
+      "file": "tests/ingest.fixture.test.ts",
+      "line": 75,
+      "rule": "any-usage",
+      "text": "(axios.get as any).mockResolvedValue({ data: '<html><body></body></html>' });"
+    },
+    {
+      "file": "tests/ingest.fixture.test.ts",
+      "line": 85,
+      "rule": "any-usage",
+      "text": "(axios.get as any).mockRejectedValue(new Error('Network Error'));"
+    },
+    {
+      "file": "tests/queryBuilder.test.ts",
+      "line": 26,
+      "rule": "any-usage",
+      "text": "expect((result.where.OR as any[]).length).toBe(2);"
+    },
+    {
+      "file": "tests/queryBuilder.test.ts",
+      "line": 28,
+      "rule": "any-usage",
+      "text": "expect((result.where.OR as any[])[0].title.contains).toBe('강남');"
+    },
+    {
+      "file": "tests/queryBuilder.test.ts",
+      "line": 30,
+      "rule": "any-usage",
+      "text": "expect((result.where.OR as any[])[1].location.contains).toBe('강남');"
+    },
+    {
+      "file": "tests/queryBuilder.test.ts",
+      "line": 54,
+      "rule": "any-usage",
+      "text": "expect((result.orderBy as any).created_at).toBe('desc');"
+    },
+    {
+      "file": "tests/queryBuilder.test.ts",
+      "line": 60,
+      "rule": "any-usage",
+      "text": "expect((result.orderBy as any).apply_end_date.sort).toBe('asc');"
+    },
+    {
+      "file": "tests/queryBuilder.test.ts",
+      "line": 61,
+      "rule": "any-usage",
+      "text": "expect((result.orderBy as any).apply_end_date.nulls).toBe('last');"
+    }
+  ]
+}

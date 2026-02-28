@@ -2,8 +2,11 @@ import { db } from "./db";
 import { processAndDedupeCampaign } from "@/sources/normalize";
 import { IPlatformAdapter } from "@/sources/types";
 
+/**
+ * Enhanced task executor to handle more pages and better logging.
+ * In production, this would probably use a queue (BullMQ/SQS).
+ */
 export async function executeIngestionTask(adapter: IPlatformAdapter, platformId: number) {
-    // Creating initial IngestRun Tracking record
     const run = await db.ingestRun.create({
         data: {
             platform_id: platformId,
@@ -13,27 +16,41 @@ export async function executeIngestionTask(adapter: IPlatformAdapter, platformId
 
     let addedCount = 0;
     let updatedCount = 0;
+    let totalItems = 0;
 
     try {
-        // Fetch up to 5 pages for the MVP ingestion run
-        for (let page = 1; page <= 5; page++) {
+        // Broaden range for full implementation (up to 10 pages)
+        for (let page = 1; page <= 10; page++) {
+            console.log(`[Ingest] Processing platform ${platformId}, page ${page}...`);
             const results = await adapter.fetchList(page);
-            if (!results || results.length === 0) break;
 
-            const promises = results.map(async (item) => {
-                const res = await processAndDedupeCampaign(platformId, item);
-                if (res.status === 'created') addedCount++;
-                else updatedCount++;
-            });
-            const outcomes = await Promise.allSettled(promises);
-            outcomes.forEach((outcome, idx) => {
-                if (outcome.status === 'rejected') {
-                    console.error(`Error processing item ${results[idx].original_id}:`, outcome.reason);
-                }
-            });
+            if (!results || results.length === 0) {
+                console.log(`[Ingest] No more results for platform ${platformId} at page ${page}.`);
+                break;
+            }
 
-            // Optional: small delay between pages to avoid rate limiting
-            await new Promise(resolve => setTimeout(resolve, 500));
+            totalItems += results.length;
+
+            // Use chunked parallel processing to avoid DB connection exhaustion
+            const CHUNK_SIZE = 5;
+            for (let i = 0; i < results.length; i += CHUNK_SIZE) {
+                const chunk = results.slice(i, i + CHUNK_SIZE);
+                const outcomes = await Promise.allSettled(
+                    chunk.map(item => processAndDedupeCampaign(platformId, item))
+                );
+
+                outcomes.forEach((outcome) => {
+                    if (outcome.status === 'fulfilled') {
+                        if (outcome.value.status === 'created') addedCount++;
+                        else updatedCount++;
+                    } else {
+                        console.error(`[Ingest] Error processing item:`, outcome.reason);
+                    }
+                });
+            }
+
+            // Stagger page requests to avoid rate limiting
+            await new Promise(resolve => setTimeout(resolve, 1000));
         }
 
         await db.ingestRun.update({
@@ -42,11 +59,15 @@ export async function executeIngestionTask(adapter: IPlatformAdapter, platformId
                 status: 'SUCCESS',
                 end_time: new Date(),
                 records_added: addedCount,
-                records_updated: updatedCount
+                records_updated: updatedCount,
+                error_log: `Processed ${totalItems} items. ${addedCount} new, ${updatedCount} updated.`
             }
         });
+
+        console.log(`[Ingest] Finished platform ${platformId}. Added: ${addedCount}, Updated: ${updatedCount}`);
         return { success: true, run_id: run.id, added: addedCount, updated: updatedCount };
     } catch (e: any) {
+        console.error(`[Ingest] CRITICAL FAILURE for platform ${platformId}:`, e);
         await db.ingestRun.update({
             where: { id: run.id },
             data: {
