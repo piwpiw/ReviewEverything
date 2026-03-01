@@ -338,34 +338,53 @@ export default function FilterBar() {
         </AnimatePresence>
 
         {/* Quick Access Chips */}
-        <div className="flex items-center gap-3 pt-4 border-t border-slate-50 dark:border-slate-800">
-          <span className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest w-12 shrink-0">QUICK</span>
+        <div className="flex flex-col gap-3 pt-6 border-t border-slate-50 dark:border-slate-800">
+          <div className="flex items-center justify-between">
+            <span className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Quick Filters</span>
+            {recentFilters.length > 0 && (
+              <button
+                onClick={() => { setRecentFilters([]); localStorage.removeItem("re_recent_filters"); }}
+                className="text-[9px] font-bold text-slate-300 hover:text-rose-500"
+              >
+                Clear Recent
+              </button>
+            )}
+          </div>
+
           <div className="flex flex-wrap gap-2">
+            {/* Real Intelligent Filters */}
             <button
               onClick={() => handleQuickFilter('win')}
-              className="px-4 py-1.5 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 rounded-full text-[10px] font-black border border-emerald-100 dark:border-emerald-900/30 hover:bg-emerald-600 hover:text-white transition-all shadow-sm"
+              className="flex items-center gap-2 px-4 py-2 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 rounded-xl text-[10px] font-black border border-emerald-100 dark:border-emerald-900/30 hover:bg-emerald-600 hover:text-white transition-all shadow-sm"
             >
-              꿀! 당첨 확률 UP (1:1 이하)
+              <Sparkles className="w-3 h-3" /> 꿀! 당첨 확률 UP (1:1 이하)
             </button>
             <button
-              onClick={() => handleQuickFilter('urgent')}
-              className="px-4 py-1.5 bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400 rounded-full text-[10px] font-black border border-rose-100 dark:border-rose-900/30 hover:bg-rose-600 hover:text-white transition-all shadow-sm"
+              onClick={() => handleSelect("max_deadline_days", "3")}
+              className="flex items-center gap-2 px-4 py-2 bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400 rounded-xl text-[10px] font-black border border-rose-100 dark:border-rose-900/30 hover:bg-rose-600 hover:text-white transition-all shadow-sm"
             >
-              오늘/내일 마감인 것
+              <Clock className="w-3 h-3" /> 마감 가임박 (D-3)
             </button>
-            <button
-              onClick={() => handleQuickFilter('hot')}
-              className="px-4 py-1.5 bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 rounded-full text-[10px] font-black border border-amber-100 dark:border-amber-900/30 hover:bg-amber-600 hover:text-white transition-all shadow-sm"
-            >
-              지금 지원자 많은! 인기순
-            </button>
+
+            {/* Recent Search History */}
+            {recentFilters.map((f, i) => (
+              <button
+                key={i}
+                onClick={() => {
+                  Object.entries(f).forEach(([k, v]) => handleSelect(k, v as string));
+                }}
+                className="px-4 py-2 bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 rounded-xl text-[10px] font-bold border border-slate-100 dark:border-slate-700 hover:border-blue-500 transition-all"
+              >
+                #{f.region_depth1 || '전체'}_{f.category || '전체'}
+              </button>
+            ))}
           </div>
         </div>
       </div>
 
       {/* ── Layer 3: Filter Info & Reset ── */}
       <div className="flex items-center justify-between px-4">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 h-8">
           <AnimatePresence>
             {isPending && (
               <motion.div
@@ -374,7 +393,7 @@ export default function FilterBar() {
                 exit={{ opacity: 0, x: -8 }}
                 className="flex items-center gap-2 text-[10px] font-black text-blue-600 dark:text-blue-400"
               >
-                <div className="w-3 h-3 border-2 border-blue-600 dark:border-blue-400 border-t-transparent rounded-full animate-spin" />
+                <div className="w-2.5 h-2.5 border-2 border-blue-600 dark:border-blue-400 border-t-transparent rounded-full animate-spin" />
                 지능형 필터 분석 중...
               </motion.div>
             )}
@@ -384,7 +403,7 @@ export default function FilterBar() {
         {activeCount > 0 && (
           <button
             onClick={() => router.push("/", { scroll: false })}
-            className="text-[10px] font-black text-rose-500 bg-rose-50 dark:bg-rose-900/20 px-3 py-1.5 rounded-xl hover:bg-rose-500 hover:text-white transition-all flex items-center gap-2 shadow-sm border border-rose-100 dark:border-rose-900/30"
+            className="text-[10px] font-black text-rose-500 bg-rose-50 dark:bg-rose-900/20 px-3 py-1.5 rounded-xl hover:bg-rose-500 hover:text-white transition-all flex items-center gap-2 shadow-sm border border-rose-100 dark:border-rose-900/30 active:scale-95"
           >
             <X className="w-3 h-3" />
             모든 필터 초기화({activeCount})

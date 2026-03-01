@@ -39,5 +39,9 @@
 - 큐에 남은 좀비(ZOMBIE) 상태 잡 없음. 제한된 limit 내 배치 작업 완료.
 - 잡 처리 과정에서 예외가 크래시되지 않고 상태 업데이트로 정상 캡처됨.
 
+## 6. API 상태 (implemented / planned)
+- implemented: `GET /api/cron` (`runNow`, `limit`), `POST /api/admin/ingest`
+- planned: `POST /api/jobs` (내부 워커 실행 후보, 공개 API 아님)
+
 
 

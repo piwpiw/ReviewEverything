@@ -41,3 +41,14 @@
 - `TEAM_CONTEXT.md` 내 인덱스가 실제 Vercel/DB 현황(Health, Deploy)과 일치함. 판단 오차 < 1%.
 - 팀원이나 타 에이전트가 "현재 상황이 어떤가?" 물었을 때, 시스템 트래픽/잡 큐 길이를 1초 내로 대답 가능한 상태.
 
+## 6. API 상태 (implemented / planned)
+- implemented: `GET /api/health`
+- implemented: `GET /api/admin/runs`
+- implemented: `GET /api/admin/quality`, `GET /api/admin/alerts`, `POST /api/admin/alerts/actions`
+
+
+## 6. 화면/문구 운용 규칙
+
+- 운영 화면(`/admin`, `/system`)에 노출되는 상태 라벨은 UI 기본 문구 집합과 동기화한다.
+- `정상`, `주의`, `위험`, `중단` 4단계만 사용해 혼선을 막고, 상세 조치 버튼/링크를 항상 함께 제시한다.
+- UI 회귀가 발생한 경우, `TEAM_CONTEXT.md #screen_delivery`를 기준으로 상태 요약을 재공개한다.

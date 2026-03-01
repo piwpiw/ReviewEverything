@@ -5,10 +5,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles, X, Crown, Coffee, Zap, CheckCircle2 } from "lucide-react";
 
 const PRO_FEATURES = [
-    { icon: "🎯", title: "전국 단위 우선 매칭", desc: "경쟁률 낮은 캠페인을 먼저 받아보세요" },
-    { icon: "🔔", title: "실시간 알림 무제한", desc: "마감 전 D-1, D-3 자동 알림" },
-    { icon: "📅", title: "캘린더 자동 동기화", desc: "일정 관리가 3배 빨라집니다" },
-    { icon: "🤖", title: "AI 당첨 예측 엔진", desc: "당첨 확률 97% 정확도" },
+    { icon: "⚡", title: "수익/시급 자동 계산", desc: "물품 재판매 및 시급 ROI를 알아서 분석" },
+    { icon: "📅", title: "캘린더/알람 자동화", desc: "방문 일정, D-day 알림 등 귀찮은 관리 끝" },
+    { icon: "🎯", title: "전국 최적 매칭", desc: "시급 효율이 가장 높은 캠페인 우선 추천" },
+    { icon: "🤖", title: "AI 원클릭 지원", desc: "가장 귀찮은 신청서 작성을 AI가 대신 97% 완성" },
 ];
 
 export default function ProUpgradeSection() {
@@ -42,7 +42,7 @@ export default function ProUpgradeSection() {
                             <span className="text-[11px] font-black uppercase tracking-widest opacity-80">프리미엄 플랜</span>
                         </div>
                         <h3 className="text-2xl font-black mb-1">PRO Membership</h3>
-                        <p className="text-[13px] font-bold opacity-75 mb-5">전국 단위 매칭·캘린더·AI 예측 기능을<br />모두 잠금 해제하세요.</p>
+                        <p className="text-[13px] font-bold opacity-75 mb-5">투입 시간, 시급 계산, 재판매 내역 등<br />모든 자잘하고 귀찮은 관리를 AI가 자동화합니다.</p>
                         <div className="flex items-end gap-1 mb-5">
                             <span className="text-3xl font-black">₩19,900</span>
                             <span className="text-sm opacity-60 mb-1">/월</span>
@@ -59,20 +59,28 @@ export default function ProUpgradeSection() {
                 {/* Coffee Card */}
                 <div
                     onClick={() => setShowModal("coffee")}
-                    className="cursor-pointer p-6 rounded-3xl border-2 border-dashed border-amber-300/50 dark:border-amber-900/50 bg-amber-50/50 dark:bg-amber-900/10 flex flex-col items-center justify-center gap-3 group hover:border-amber-400 dark:hover:border-amber-700 transition-all hover:-translate-y-1 active:scale-[0.99]"
+                    className="cursor-pointer p-6 rounded-3xl border-2 border-dashed border-amber-300/50 dark:border-amber-900/50 bg-amber-50/50 dark:bg-amber-900/10 flex flex-col items-center justify-center gap-3 group hover:border-amber-400 dark:hover:border-amber-700 transition-all hover:-translate-y-1 active:scale-[0.99] relative"
                 >
+                    <div className="absolute top-4 right-4 flex -space-x-1.5 overflow-hidden">
+                        {[1, 2, 3].map(i => (
+                            <div key={i} className="inline-block h-5 w-5 rounded-full ring-2 ring-white dark:ring-slate-900 bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-[7px] font-bold">
+                                {i === 3 ? "+42" : ""}
+                            </div>
+                        ))}
+                    </div>
                     <div className="w-14 h-14 rounded-2xl bg-amber-500 flex items-center justify-center shadow-xl shadow-amber-500/30 group-hover:scale-110 transition-transform">
                         <Coffee className="w-7 h-7 text-white" />
                     </div>
                     <div className="text-center">
-                        <h3 className="text-sm font-black text-slate-900 dark:text-white">개발 후원하기</h3>
+                        <h3 className="text-sm font-black text-slate-900 dark:text-white">개발팀 응원하기</h3>
                         <p className="text-[11px] font-bold text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
-                            서비스 지속 운영을 위해<br />커피 한 잔 후원해주세요 ☕
+                            오늘만 <span className="text-amber-600 dark:text-amber-400 font-black">42명</span>이 커피를 쐈어요!<br />
+                            무료 배포 유지를 위해 응원해주세요 ☕
                         </p>
                     </div>
-                    <button className="mt-1 px-5 py-2 bg-amber-500 text-white rounded-xl text-[11px] font-black shadow-lg shadow-amber-500/20 hover:bg-amber-600 transition-all active:scale-95 flex items-center gap-2">
-                        <Coffee className="w-3.5 h-3.5" />
-                        토스페이 / 카카오페이
+                    <button className="mt-1 px-5 py-2 bg-amber-500 text-white rounded-xl text-[10px] font-black shadow-lg shadow-amber-500/20 hover:bg-amber-600 transition-all active:scale-95 flex items-center gap-2">
+                        <Coffee className="w-3 h-3" />
+                        Toss / Kakao Pay Support
                     </button>
                 </div>
             </div>

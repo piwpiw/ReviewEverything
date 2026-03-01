@@ -14,11 +14,11 @@ export class ReviewnoteAdapter implements IPlatformAdapter {
 
         try {
             const { data } = await fetchWithRetry(
-                `${this.baseUrl}/campaign/list?page=${page}`,
+                `${this.baseUrl}/campaigns?page=${page}`,
                 {
                     headers: {
                         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/121.0.0.0 Safari/537.36",
-                        "Accept": "text/html,*/*",
+                        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
                         "Referer": "https://www.reviewnote.co.kr/",
                     },
                 }
@@ -26,37 +26,60 @@ export class ReviewnoteAdapter implements IPlatformAdapter {
             const $ = cheerio.load(data);
             const campaigns: ScrapedCampaign[] = [];
 
-            $(".campaign-item, .card, .list-item, [class*='campaign']").each((i, el) => {
-                if (i >= 20) return;
+            // Updated selector based on live analysis
+            $("div.relative.pl-\\[2\\.5px\]").each((i, el) => {
+                if (i >= 24) return;
                 const $el = $(el);
-                const title = $el.find(".title, h3, h4, .subject").first().text().trim();
-                const href = $el.find("a").first().attr("href") || "";
-                const thumb = $el.find("img").first().attr("src") || $el.find("img").attr("data-src") || "";
-                const recruits = $el.find(".recruit-num, .limit, [class*='limit']").text().replace(/[^0-9]/g, "");
-                const apps = $el.find(".apply-num, .current, [class*='apply']").text().replace(/[^0-9]/g, "");
-                const loc = $el.find(".location, .addr, [class*='location']").text().trim();
-                const reward = $el.find(".reward, .benefit").text().trim();
-                const typeText = title.toLowerCase();
 
-                if (title.length > 3) {
+                // Title and Link
+                const $link = $el.find("a[href^='/campaigns/']").last();
+                const title = $link.text().trim();
+                const href = $link.attr("href") || "";
+
+                // Benefit / Reward
+                const reward = $el.find("div.mt-1.truncate.text-gray-600.text-14r").text().trim();
+
+                // Thumbnail (noscript handles lazy images)
+                let thumb = $el.find("noscript img").attr("src") || "";
+                if (!thumb) {
+                    const srcSet = $el.find("noscript img").attr("srcSet");
+                    if (srcSet) thumb = srcSet.split(" ").filter(s => s.startsWith("http")).shift() || "";
+                }
+
+                // Recruit / Applicant count
+                const recruitsText = $el.find("span.text-secondary-600.text-14b").last().text().trim();
+                const appsText = $el.find("span.text-secondary-600.text-14b").first().text().trim();
+
+                // D-Day
+                const dday = $el.find("div.text-gray-600").first().text().trim();
+
+                // Type (VST/SHP)
+                const typeText = $el.find("span.font-semibold.text-gray-600").text().trim();
+                const campaign_type = typeText.includes("방문") ? "VST" : "SHP";
+
+                if (title.length > 3 && href) {
                     campaigns.push({
-                        original_id: `rn_${href.split("/").filter(Boolean).pop() ?? Date.now()}_${i}`,
+                        original_id: `rn_${href.split("/").pop() ?? Date.now()}_${i}`,
                         title,
-                        campaign_type: typeText.includes("배송") || typeText.includes("제품") ? "SHP" : "VST",
-                        media_type: typeText.includes("인스타") ? "IP" : typeText.includes("유튜") ? "YP" : "BP",
-                        location: loc || "전국",
+                        campaign_type: campaign_type as any,
+                        media_type: title.includes("인스타") ? "IP" : "BP",
+                        location: title.match(/\[([^\]]+)\]/)?.[1] || "전국",
                         reward_text: reward || "상세 참조",
                         thumbnail_url: thumb.startsWith("http") ? thumb : (thumb ? `${this.baseUrl}${thumb}` : undefined),
-                        url: href.startsWith("http") ? href : `${this.baseUrl}${href || "/campaign/list"}`,
-                        apply_end_date: new Date(Date.now() + 86_400_000 * (5 + Math.floor(Math.random() * 10))),
-                        recruit_count: recruits ? parseInt(recruits, 10) : 10,
-                        applicant_count: apps ? parseInt(apps, 10) : Math.floor(Math.random() * 50),
+                        url: `${this.baseUrl}${href}`,
+                        apply_end_date: new Date(Date.now() + 86_400_000 * (parseInt(dday.replace(/[^0-9]/g, "")) || 7)),
+                        recruit_count: parseInt(recruitsText, 10) || 10,
+                        applicant_count: parseInt(appsText, 10) || 0,
                     });
                 }
             });
 
-            if (campaigns.length === 0) return this.getFallback(page);
+            if (campaigns.length === 0) {
+                console.warn("[Reviewnote] No campaigns found in HTML, falling back.");
+                return this.getFallback(page);
+            }
             return campaigns;
+
         } catch (e: any) {
             console.error(`[Reviewnote] Page ${page} failed:`, e.message);
             if (page === 1) return this.getFallback(page);

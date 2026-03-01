@@ -2,6 +2,9 @@
   "name": "web",
   "version": "0.1.0",
   "private": true,
+  "prisma": {
+    "seed": "tsx ./prisma/seed.ts"
+  },
   "scripts": {
     "postinstall": "prisma generate",
     "dev": "next dev",
@@ -21,6 +24,9 @@
     "test:ui": "vitest --ui",
     "agent:review": "node scripts/agent-gate.js review",
     "agent:qa": "node scripts/agent-gate.js qa",
+    "api:contract-audit": "node scripts/api-contract-audit.js",
+    "api:contract-sync-audit": "node scripts/api-contract-sync-audit.js",
+    "api:contract-check": "npm run api:contract-audit && npm run api:contract-sync-audit",
     "smoke:ci": "node scripts/smoke.js",
     "refactor:analyze": "node scripts/refactor/analyzer.js",
     "refactor:apply": "node scripts/refactor/refactor-safe.js",
@@ -54,6 +60,7 @@
     "jsdom": "^28.1.0",
     "prisma": "^6.19.2",
     "tailwindcss": "^4",
+    "tsx": "^4.21.0",
     "typescript": "^5",
     "vitest": "^4.0.18"
   },

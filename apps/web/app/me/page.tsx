@@ -1,6 +1,7 @@
 import ManagerDashboard from "@/components/ManagerDashboard";
 import Link from "next/link";
 import { CalendarDays, LayoutDashboard, TrendingUp } from "lucide-react";
+import AICuration from "@/components/AICuration";
 
 export default async function MePage({ searchParams }: { searchParams: Promise<{ userId?: string; tab?: string }> }) {
     const params = await searchParams;
@@ -70,7 +71,10 @@ export default async function MePage({ searchParams }: { searchParams: Promise<{
                         ))}
                     </div>
                 ) : (
-                    <ManagerDashboard userId={userId || 1} />
+                    <div className="space-y-12">
+                        <ManagerDashboard userId={userId || 1} />
+                        <AICuration />
+                    </div>
                 )}
             </div>
         </main>

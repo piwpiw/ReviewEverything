@@ -110,6 +110,7 @@
 - 신규 불변 조건
 - 마이그레이션 영향
 - 해당 팀 문서(`docs/teams/T*.md`) 동시 갱신
+- 코어 문서 동기 순서: `API.md` -> `ARCHITECTURE.md` -> `TEAM_CONTEXT.md` -> `AGENT_WORKFLOW.md` -> `PROJECT_STATUS.md`
 
 
 ## 7) API 정합성 표기 규칙
@@ -120,6 +121,9 @@
   - `GET /api/cron` (`runNow`, `limit`)
   - `POST /api/admin/ingest`
   - `GET /api/admin/runs`
+  - `GET /api/admin/quality`
+  - `GET /api/admin/alerts`
+  - `POST /api/admin/alerts/actions`
   - `GET /api/health`
   - `GET /api/me/revenue`
   - `GET /api/me/board`
@@ -130,7 +134,6 @@
   - `POST /api/jobs` (공개 라우트 없음, 큐 실행 연동은 `GET /api/cron`)
   - `GET /api/me/schedules*`
   - `GET /api/me/notifications*`
-  - `GET /api/admin/quality`, `GET /api/admin/alerts`
 
 - 운영 규칙
   - 구현 상태가 바뀌면 `API.md`, `TEAM` 문서, `PROJECT_STATUS.md`를 동시 갱신

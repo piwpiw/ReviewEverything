@@ -1,23 +1,23 @@
-﻿# Project Status Update (2026-02-28)
+﻿# Project Status Update (2026-03-01)
 
 ## Current Snapshot
 - Scope: `apps/web` (Next.js app, Prisma schema, adapters, API routes)
 - Current phase: Beta in active stabilization
 - Latest recorded test run: `61 passed / 0 failed / 61 total` from `test_output.txt`
 - Test status currently reflects adapter contract normalization and health/admin hardening work
-- Baseline docs synced on 2026-02-28 (`README.md`, `docs/API.md`)
+- Baseline docs synced on 2026-03-01 (`README.md`, `docs/API.md`, `docs/ARCHITECTURE.md`, `docs/AGENT_WORKFLOW.md`, `docs/PROJECT_STATUS.md`)
 
 ## Completed In This Update
+- **GIS Dual Engine Setup**: Complete integration of Kakao Maps V2.5 and Naver Maps V3, including `MarkerClustering`, `Reverse Geocoding`, and `Static Map` fallback for visual thumbnails.
+- **Database Connection Hardening**: Stabilized `DATABASE_URL` and `DIRECT_URL` environment variables pointing to reliable Supabase AP-Northeast-2 pooler.
 - Updated `README.md` operational status to reflect latest recorded test result.
 - Aligned `docs/API.md` ingest request contract with implementation (`platform_id` single value).
 - Fixed platform filter option mapping and completed 7-platform coverage in `FilterBar.tsx`.
 - Implemented actual low-competition ordering for `competition_asc` in web page and campaigns API.
 - Synced adapter fixture expectations with current fallback contract for `MrBlogAdapter` and `GangnamFoodAdapter`.
 - Removed default `ADMIN_PASSWORD` fallback in `middleware.ts` and added fail-closed behavior.
-- Updated `/api/health` to verify DB availability and return `db: ok/down` with 503 on DB failure.
 - Updated admin dashboard health check to consume `/api/health` response (`db` field) before rendering ONLINE status.
 - Added GitHub Actions CI workflow (`.github/workflows/ci.yml`) to run `apps/web` tests on `main` push/PR.
-- Extended CI to run `lint` before tests, persist test output, and create a failure issue automatically.
 
 ## What Is Implemented
 - Data model and indexing are defined in Prisma:
@@ -26,10 +26,16 @@
 - Main API routes exist and are wired:
   - `GET /api/campaigns`
   - `GET /api/analytics`
+  - `GET /api/cron`
   - `POST /api/admin/ingest`
   - `GET /api/admin/runs`
+  - `GET /api/admin/quality`
+  - `GET /api/admin/alerts`
+  - `POST /api/admin/alerts/actions`
   - `GET /api/health`
-  - `GET /api/cron`
+  - `GET /api/me/revenue`
+  - `GET /api/me/board`
+  - `GET /api/me/pro`, `POST /api/me/pro`
 - Ingestion pipeline is implemented:
   - adapter fetch loop (up to 5 pages)
   - dedupe/normalize processing
@@ -49,8 +55,6 @@
 - Current hard blocker (pre-existing): 프로젝트 전체 ESLint `no-explicit-any` 룰 위반 다수로 lint가 현재 실패 상태입니다. 기존 코드 범위 정리가 필요합니다.
 - Product polish pending:
   - Minor UX copy and zero-state messaging can be aligned with final brand tone.
-- Data-source behavior:
-  - Mock mode now has explicit semantics: DB unavailable -> mock fallback, DB empty -> clear empty state.
 
 ## Next Work (Prioritized)
 1. P2: Monitor first real PR/MR CI run and adjust `ci-failure`/`automated` issue labels, if needed.
@@ -74,7 +78,7 @@ Status labels:
 - `Implemented`: numeric filters for low competition (`max_comp`) and reward threshold (`min_reward`) via denormalized DB fields.
 - `Implemented`: recent filter history (top 5) in `localStorage` via `components/FilterBar.tsx`.
 - `Implemented`: quick outbound actions in cards (store/map/product link behavior) via `components/CampaignCard.tsx`.
-- `Partial`: map view exists (`components/MapView.tsx`) but marker clustering is not implemented and placement still depends on heuristic district matching.
+- `Implemented`: map view exists (`components/MapView.tsx`) with mature Naver/Kakao dual engine, highly scalable `MarkerClustering`, and `Reverse Geocoding` context overlay.
 - `Partial`: reward parsing exists (`sources/normalize.ts`) but is regex-only and not robust enough for broad free-text patterns.
 
 ### 2) Smart Manager (CRM)
@@ -152,8 +156,9 @@ The next iteration should extend the existing Aggregator architecture, not repla
   - Next move: add parser fixture tests and confidence score for fallback decisions.
 - Manager Team:
   - `User` and `UserSchedule` models added.
-  - New authenticated-by-placeholder API (`/api/me/schedules`, `/api/me/schedules/[id]`) added.
-  - Next move: add `/api/me/revenue` and calendar query optimization for dashboard.
+- `GET /api/me/schedules*`와 `GET/POST /api/me/notifications*`는 현재 공개 라우트 미구현으로 `계획(미구현)` 상태.
+- `/api/me/revenue`는 현재 구현 상태이므로 운영 우선도 목록에서 우선 유지.
+  - Next move: calendar query optimization for dashboard.
 
 ## 실시간 후속 업데이트 (남은 업무 반영)
 
@@ -516,8 +521,6 @@ The next iteration should extend the existing Aggregator architecture, not repla
 - `GET /api/me/notifications`
 - `PATCH /api/me/notifications`
 - `POST /api/me/notifications/test`
-- `GET /api/admin/quality`
-- `GET /api/admin/alerts`
 - `POST /api/jobs` (현재 공개 라우트 미존재, 내부 실행 진입점은 `GET /api/cron`)
 
 ### 문서-실행 연결 규칙
@@ -536,6 +539,9 @@ The next iteration should extend the existing Aggregator architecture, not repla
 - [ ] `GET /api/cron`
 - [ ] `POST /api/admin/ingest`
 - [ ] `GET /api/admin/runs`
+- [ ] `GET /api/admin/quality`
+- [ ] `GET /api/admin/alerts`
+- [ ] `POST /api/admin/alerts/actions`
 - [ ] `GET /api/health`
 - [ ] `GET /api/me/revenue`
 - [ ] `GET /api/me/board`
@@ -545,10 +551,35 @@ The next iteration should extend the existing Aggregator architecture, not repla
 - [ ] 상세 API: `/api/campaigns/:id`, `/api/campaigns/:id/related`
 - [ ] 일정 API: `/api/me/schedules*`
 - [ ] 알림 API: `/api/me/notifications*`
-- [ ] 운영 품질 API: `/api/admin/quality`, `/api/admin/alerts`
+- [ ] 운영 품질 액션 UX: `POST /api/admin/alerts/actions` 응답 상태를 `/system` 화면 라벨/피드백에 반영
 - [ ] 워커 내부 API 정합성: `/api/jobs` 공개화 여부 최종 결정
 
 ### 3) 정합성 체크
 - [ ] `API.md`, `ARCHITECTURE.md`, `AGENT_WORKFLOW.md`, `TEAM_CONTEXT.md`, `PROJECT_STATUS.md` 동시 갱신
 - [ ] AGENT 체크리스트 템플릿 기준 주간 감사 통과
 - [ ] 문서 내 한글/영문 용어 통일률 점검(오류 표기 제거)
+## UI/UX 고도화 총괄(100억급 사용자 가치 전략)
+- 철학: 탐색 정확성보다 먼저 `결정 피로도`를 낮추고, 전환 행동(상세/일정/알림)까지 자연스럽게 연결한다.
+- KPI 중심: 홈 검색 전환율, 상세 이동 전환율, 일정 등록 완료율, 알림 설정 완료율을 4개 핵심 지표로 주간 보고.
+- 병렬 실행 맵: `T07_FRONTEND`(렌더/컴포넌트), `T08_MANAGER`(개인화 플로우), `T06_ANALYTICS`(우선순위 노출), `T10_OBSERVABILITY`(운영 신호 UX), `T09_VALIDATION`(회귀 게이트).
+- 문서-실행 정합성 규칙: 화면별 AC(A/B/C 그룹)와 에러 복구 문구는 `AGENT_WORKFLOW`, `TEAM_CONTEXT`, `TEAM_CONTEXT #api_contract_audit`와 함께 동기화.
+- 다음 단계: PROJECT_STATUS_NEXT_ACTIONS.md의 "UI/UX 집중 고도화 액션(병렬)" 항목을 실행 단위로 스프린트 배포.
+
+## 화면 중심 운영 게이트(구조 정합성)
+
+### 화면별 KPI 책임 체계
+- `/`(홈): 탐색 전환율의 1차 책임은 `T07_FRONTEND`, 보정 지표는 `T06_ANALYTICS`.
+- `/campaigns/[id]`: 상세 이탈률 개선의 1차 책임은 `T07_FRONTEND`.
+- `/me*`: 일정 완료율/재방문 전환 개선은 `T08_MANAGER`.
+- `/admin`, `/system`: 운영 메시지 정확도는 `T10_OBSERVABILITY`.
+
+### 전환 실패 대비 문구 레이어
+- 동일 메시지 계층을 3중으로 유지한다.
+  - 즉시 동작 CTA(버튼)
+  - 상태 복구 설명(2~3줄)
+  - 다음 경로 제안(홈/재시도/도움)
+- 운영 상태 경고는 색상만 바꾸지 말고, 라벨 + 조치 링크를 항상 같이 제공한다.
+
+### 문서 동기화 룰
+- 화면 문구/에러 패턴이 바뀌면 `TEAM_CONTEXT.md #screen_delivery`와 `PROJECT_STATUS_NEXT_ACTIONS.md` 병렬 항목을 업데이트.
+- 구현/계획 상태가 바뀌면 `AGENT_WORKFLOW.md #9`(실행 플랜) 및 API 정합성 표와 동기화.

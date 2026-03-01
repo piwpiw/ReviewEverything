@@ -37,4 +37,8 @@
 - 오늘 날짜에 해당하는 D-3, D-1 타겟의 발송 누락 0건.
 - `NotificationDelivery` 테이블에 모든 시도(성공/실패 이력)가 타임스탬프와 함께 기록됨.
 
+## 6. API 상태 (implemented / planned)
+- implemented: 현재 직접 공개 API 미보유 (알림 엔진 연산 중심)
+- planned: `/api/me/notifications*`(응답/설정 API, 소유는 T08 API 명세)
+
 

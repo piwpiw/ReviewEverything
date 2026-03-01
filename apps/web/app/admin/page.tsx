@@ -42,6 +42,8 @@ export default function AdminDashboard() {
     const [ingestStatus, setIngestStatus] = useState<IngestStatus>('idle');
     const [logs, setLogs] = useState<string[]>(["[SYSTEM] Dashboard initialized.", "[READY] Waiting for user command."]);
     const [healthStatus, setHealthStatus] = useState<'ok' | 'error' | 'checking'>('checking');
+    const [qualityStatus, setQualityStatus] = useState<'ok' | 'warn' | 'critical' | 'checking'>('checking');
+    const [alertsCount, setAlertsCount] = useState<number>(0);
     const [totalCampaigns, setTotalCampaigns] = useState<number | null>(null);
     const logContainerRef = useRef<HTMLDivElement>(null);
 
@@ -71,9 +73,10 @@ export default function AdminDashboard() {
 
     const checkHealth = async () => {
         try {
-            const [healthRes, campRes] = await Promise.all([
+            const [healthRes, campRes, qualityRes] = await Promise.all([
                 fetch('/api/health'),
                 fetch('/api/campaigns?limit=1'),
+                fetch('/api/admin/quality'),
             ]);
             const healthData = await healthRes.json();
             setHealthStatus(healthRes.ok && healthData?.db === 'ok' ? 'ok' : 'error');
@@ -81,8 +84,16 @@ export default function AdminDashboard() {
                 const campData = await campRes.json();
                 setTotalCampaigns(campData?.meta?.total ?? 0);
             }
+            if (qualityRes.ok) {
+                const qualityData = await qualityRes.json();
+                setQualityStatus(qualityData?.status || 'warn');
+                setAlertsCount(qualityData?.alerts_count || 0);
+            } else {
+                setQualityStatus('warn');
+            }
         } catch {
             setHealthStatus('error');
+            setQualityStatus('critical');
         }
     };
 
@@ -162,15 +173,22 @@ export default function AdminDashboard() {
                                 <span className="text-[10px] font-black uppercase">DB_UPLINK</span>
                             </div>
                             <div className="flex items-center gap-2">
+                                <div className={`w-2 h-2 rounded-full ${qualityStatus === 'ok' ? 'bg-emerald-500' : qualityStatus === 'warn' ? 'bg-amber-500' : 'bg-rose-500'}`} />
+                                <span className="text-[10px] font-black uppercase">OPS_{qualityStatus.toUpperCase()}</span>
+                                <span className="text-[10px] font-black text-slate-500">ALERTS {alertsCount}</span>
+                            </div>
+                            <div className="flex items-center gap-2">
                                 <Globe className="w-3.5 h-3.5 text-blue-500" />
                                 <span className="text-[10px] font-black uppercase">{PLATFORM_LIST.length} Platforms Active</span>
                             </div>
                         </div>
                     </div>
                     <div className="flex items-center gap-4">
-                        <Link href="/" className="px-5 py-2 rounded-xl bg-slate-800 text-white text-[10px] font-black hover:bg-slate-700 transition-all border border-slate-700/50 shadow-inner">
-                            EXIT TO PUBLIC HOME →
+                        <Link href="/system" className="px-5 py-2 rounded-xl bg-blue-600 text-white text-[10px] font-black hover:bg-blue-500 transition-all border border-blue-500/50 shadow-inner">
+                            OPEN SYSTEM OPS
                         </Link>
+                        <Link href="/" className="px-5 py-2 rounded-xl bg-slate-800 text-white text-[10px] font-black hover:bg-slate-700 transition-all border border-slate-700/50 shadow-inner">
+                            EXIT TO PUBLIC HOME ??                        </Link>
                     </div>
                 </div>
             </div>
@@ -363,3 +381,4 @@ function zapIcon(props: any) {
         <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 14.71V21l5.97-5.97C12.19 13.9 14.5 12 17 12a5 5 0 0 0 0-10c-2.5 0-4.81 1.9-7.03 4.03L4 12.02V8" /><path d="M12 12c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2Z" /><path d="M4 14.71 12 12" /></svg>
     )
 }
+

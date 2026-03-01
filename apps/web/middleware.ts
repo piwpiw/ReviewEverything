@@ -9,6 +9,11 @@ export function middleware(request: NextRequest) {
         const authHeader = request.headers.get('authorization')
         const adminPassword = process.env.ADMIN_PASSWORD
 
+        // Bypass check in local dev
+        if (!adminPassword && process.env.NODE_ENV !== 'production') {
+            return NextResponse.next()
+        }
+
         if (!adminPassword) {
             return new NextResponse('Server Misconfigured: ADMIN_PASSWORD is required', {
                 status: 500,

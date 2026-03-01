@@ -96,6 +96,12 @@ export default function RootLayout({
 
                 <div className="flex items-center gap-2">
                   <Link
+                    href="/system"
+                    className="hidden md:flex items-center justify-center px-4 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all"
+                  >
+                    <span className="text-[10px] font-black uppercase tracking-widest">System</span>
+                  </Link>
+                  <Link
                     href="/me?userId=1"
                     className="flex items-center gap-2 pl-2 pr-4 py-1.5 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
                   >

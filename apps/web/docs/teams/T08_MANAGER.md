@@ -6,7 +6,8 @@
 ---
 
 ## 1. Domain Scope (책임 영역)
-- **라우팅/API**: `/api/me/schedules`, `/api/me/revenue` *(현재 `/api/me/schedules*`는 미구현 상태: `/api/me/schedule*` 라우트 보강 필요)*
+- **라우팅/API (implemented)**: `/api/me/revenue`, `/api/me/board`, `/api/me/pro`, `POST /api/me/pro`
+- **라우팅/API (planned / 미구현)**: `/api/me/schedules*`, `/api/me/notifications*`
 - **화면(UI 종속)**: `app/me/`, `ManagerDashboard.tsx`
 - **데이터 모델**: `User`, `UserSchedule`
 
@@ -35,14 +36,19 @@
 ---
 
 ## 5. Done Definition
-- 모든 `/api/me/*` 호출이 인증 가드(또는 임시 Auth)의 보호를 받음.
+- 구현된 `/api/me/*` 호출은 인증 가드(또는 임시 Auth)의 보호를 받음.
 - 어그리게이션 연산(월매출 계산 등)이 O(N)에서 벗어나 충분히 빠르거나 캐싱됨.
 - ManagerDashboard 페이지 진입 시 깜빡임이나 서버 에러(500) 없이 1초 내로 렌더링.
 
+## 6. API 상태 (implemented / planned)
+- implemented: `/api/me/revenue`, `/api/me/board`, `/api/me/pro`, `POST /api/me/pro`
+- planned: `/api/me/schedules*`, `/api/me/notifications*`
 
 
-## Status Note
-- /api/me/schedules*는 현재 미구현 항목입니다.
 
 
+## 7.7 화면 연동 규칙 (UI 공용)
 
+- 매니저 화면(`/me`, `/me/calendar`, `/me/stats`, `/me/revenue`)의 UX는 `T07_FRONTEND`와 라벨/문구 체계를 공유한다.
+- 새 CTA/에러 문구는 `T07_FRONTEND`에서 제안하고 T10의 운영 라벨 톤과 충돌하지 않도록 사전 동기화.
+- 계획 API(`/api/me/schedules*`, `/api/me/notifications*`) 기반 화면은 기능 비노출 정책(`planned` 배너)을 유지한다.

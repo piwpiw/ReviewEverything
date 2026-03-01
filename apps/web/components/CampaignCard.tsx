@@ -82,11 +82,15 @@ export default function CampaignCard({ campaign, rank }: { campaign: any; rank?:
             {/* ── Visual Section ── */}
             <div className="relative h-40 overflow-hidden bg-slate-50">
                 <Image
-                    src={campaign.thumbnail_url || "https://via.placeholder.com/400?text=No+Image"}
+                    src={campaign.thumbnail_url ||
+                        (campaign.lat && campaign.lng
+                            ? `https://naveropenapi.apigw.ntruss.com/map-static/v2/raster?w=400&h=300&center=${campaign.lng},${campaign.lat}&level=15&markers=type:d|size:small|pos:${campaign.lng}%20${campaign.lat}|color:red&ncpClientId=${process.env.NEXT_PUBLIC_NAVER_CLIENT_ID || 'xqc9tm6yw6'}`
+                            : "https://via.placeholder.com/400?text=ReviewEverything")
+                    }
                     alt={campaign.title}
                     fill
                     className="object-cover group-hover:scale-110 transition-transform duration-1000 ease-in-out"
-                    unoptimized={campaign.thumbnail_url?.includes("unsplash")}
+                    unoptimized={true}
                 />
 
                 {/* Outbound Link Overlay (Moaview Style) */}

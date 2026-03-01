@@ -37,3 +37,13 @@
 - `/api/analytics` 라우트의 99퍼센타일 지연 시간(p99 Latency)이 150ms 미만 보장.
 - 스냅샷이 누락된 버그 상황에서도 500 에러 대신 빈 배열 또는 폴백(이전 캐시) 응답.
 
+## 6. API 상태 (implemented / planned)
+- implemented: `GET /api/analytics`
+- planned: 없음 (`POST /api/admin/alerts/actions`는 구현되어 `T10_OBSERVABILITY`의 implemented로 이관).
+
+
+## 4. 화면 연동 규칙
+
+- 홈/상세 랭킹 관련 문구는 캠페인 목록(UI)와 `CampaignCard`/`SortBar`/`MapView`의 표현을 일치시킨다.
+- `/analytics` 기반 핵심 메시지는 `T07_FRONTEND` 상세 카드 텍스트와 충돌하지 않도록 공통 키워드 사전 사용.
+- 운영 라벨은 `T10_OBSERVABILITY`와 동일한 문구 사전(`정상/주의/주의 지속`, `위험` 레이블)을 우선 적용.

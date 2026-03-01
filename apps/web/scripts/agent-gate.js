@@ -17,6 +17,7 @@ const stepsByMode = {
     { name: "lint", cmd: ["run", "lint"] },
     { name: "typecheck", cmd: ["run", "typecheck"] },
     { name: "test", cmd: ["run", "test:ci"] },
+    { name: "api-contract-audit", cmd: ["run", "api:contract-audit"] },
     { name: "smoke", cmd: ["run", "smoke:ci"] },
     { name: "build", cmd: ["run", "build"] },
   ],

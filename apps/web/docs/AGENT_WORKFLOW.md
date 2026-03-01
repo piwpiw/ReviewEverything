@@ -1,80 +1,162 @@
-# AGENT_WORKFLOW — Advanced Orchestrator & Project Automation
+﻿# AGENT_WORKFLOW ? Advanced Orchestrator & Project Automation
 
-> **ORCHESTRATOR**는 단순 의존성 루프를 넘어, 사용자 요청(Request)의 의도를 파악하여 동적으로 팀을 라우팅하고, MCP와 Skill을 결합해 자율 협업 파이프라인(Project Automation)을 구동합니다.
+> **ORCHESTRATOR**: 요청 단위로 팀을 분해하고, 실행 순서/품질 게이트/회귀 조건을 자동 동기화한다.
 
 ---
 
-## 1. Dynamic Request Routing (요청 기반 동적 활성화)
+## 1. Dynamic Request Routing
 
-사용자의 프롬프트나 시스템 이벤트에 따라 필요한 팀 조합을 동적으로 구성하여 최단 경로로 실행합니다.
+요청 타입별 권장 경로:
 
-| Request / Event Type | Active Routing Path |
+| 요청/이벤트 | 처리 경로 |
 |---|---|
-| **"신규 리뷰 사이트 연동해줘"** | T01_SCRAPER (어댑터 생성) → T02_NORMALIZER (파싱 스펙) → T09_VALIDATION |
-| **"데이터 수집이 안 되는 것 같아"** | T10_OBSERVABILITY (로그 분석) → T01_SCRAPER (우회 전략 적용) |
-| **"사용자 매니저 화면 UI 개선"** | T07_FRONTEND (UI/UX) → T08_MANAGER (API 연동) → T09_VALIDATION |
-| **"캠페인 리스트 조회 성능 저하"** | T10_OBSERVABILITY (병목 감지) → T03_DATABASE (쿼리 튜닝) → T06_ANALYTICS |
-| **"주기적인 스케줄/알림 점검"** | T04_WORKER (잡 실행) → T05_NOTIFIER (알림 전달) → T10_OBSERVABILITY |
+| 수집 이슈 / 스크래핑 실패 | T01_SCRAPER -> T02_NORMALIZER -> T09_VALIDATION |
+| 알림/운영 이상 감지 | T10_OBSERVABILITY -> T01_SCRAPER |
+| UI/UX 개선 요청 | T07_FRONTEND -> T08_MANAGER -> T09_VALIDATION |
+| 장애 지표 / 모니터링 개선 | T10_OBSERVABILITY -> T03_DATABASE -> T06_ANALYTICS |
+| 스케줄/알림 워커 개선 | T04_WORKER -> T05_NOTIFIER -> T10_OBSERVABILITY |
 
 ---
 
-## 2. Advanced Collaboration Hooks (팀별 협업 자동화)
+## 2. Advanced Collaboration Hooks
 
-팀 간의 Handoff는 대기가 아닌 **이벤트 기반 Hook**으로 즉각 전환됩니다. 각 팀은 특정 작업 완료 시 하위 팀을 자동으로 트리거하는 메시지를 발생시킵니다.
-
-- **`[HOOK: DATA_READY]`**: T01 수집 완료 시 즉시 발송. T02가 원시 데이터를 넘겨받아 정규화 로직 자동 시작.
-- **`[HOOK: SCHEMA_CHANGED]`**: T03 마이그레이션 발생 시 발송. T07/T08/T09가 변경된 스키마에 맞춰 타입 점검(Typecheck) 자동 트리거.
-- **`[HOOK: QUALITY_WARN]`**: T02 파싱 신뢰도 저하 감지 시 발송. T10이 로그를 남기고 T01에 어댑터 룰셋 재검토 지시.
-- **`[HOOK: DEPLOY_GREEN]`**: T09 스모크 테스트 통과 및 배포 완료 시 발송. T10이 릴리즈 노트를 생성하고 Notion 인덱스를 동기화.
+- **[HOOK: DATA_READY]**
+  - 발행: T01 완료 직후
+  - 동작: T02 정규화 검사, T03 인덱스/쿼리 점검, T10 운영 알림 반영
+- **[HOOK: SCHEMA_CHANGED]**
+  - 발행: 스키마 또는 엔티티 변경
+  - 동작: T07/T08/T09는 화면·타입 영향도 점검과 Typecheck 전파
+- **[HOOK: QUALITY_WARN]**
+  - 발행: 정합성/품질 경보 트리거
+  - 동작: T10 경보 라벨 갱신, T01/02 임시 정지 가이드 제안
+- **[HOOK: DEPLOY_GREEN]**
+  - 발행: 배포 허가 조건 충족
+  - 동작: T10 상태 라벨 + 운영 공지 텍스트 갱신, 운영 티켓 자동 링크 생성
 
 ---
 
-## 3. Tool Calling Hierarchy
+## 3. Team-Tool Calling Hierarchy
 
-에이전트 팀은 문제를 해결하기 위해 다음 수준의 도구를 계층적으로 호출합니다.
-
-1. **Core Agent Logic**: 팀별 `.md`에 정의된 역할(Roles)과 프로토콜(Protocols).
-2. **Specialized Skills**: `scripts/` 내의 재사용 가능한 자동화 스크립트 (예: `SeedDataSkill`, `AutoRefactorSkill`).
-3. **MCP (Model Context Protocol)**:
-   - 팀 특화 권한 부여 (T03은 Postgres MCP, T09는 Snyk MCP 등).
-   - 에이전트가 외부 시스템에 안전하고 표준화된 방식으로 접근하여 데이터 검색 및 액션 수행.
+1. **Core Agent 규칙**: `TEAM_CONTEXT.md`, `AGENT_WORKFLOW.md`를 우선 로드.
+2. **전문 Team Skills**: 각 팀의 `docs/teams/T*.md` 실행 규약 우선 적용.
+3. **MCP / 외부 도구**: 필요한 경우 Postgres/보안/리스크 점검 MCP를 보조 도구로 사용.
+4. **자동 집행**: `scripts/` 기반 정합성 검사 도구 우선.
 
 ---
 
 ## 4. Standard Execution Order (Fallback)
 
-명시적인 라우팅 규칙이 없을 경우, 안전을 위해 기본 4-Tier 순차 실행 프로토콜을 따릅니다.
+4-Tier 실행 우선순위 (병렬/의존성 보장):
 
-1. **Tier 4 (Ops Plane)**: T09, T10 활성화 (모니터링 및 검증 준비).
-2. **Tier 1 (Data Plane)**: T01 → T02 → T03 순차 실행.
-3. **Tier 2 (Logic Plane)**: T04, T06 병렬 실행 → T04 완료 후 T05 실행.
-4. **Tier 3 (Product Plane)**: T07, T08 병렬 실행.
-5. **Final Validation**: T09의 모든 검증(Code, Test, Smoke) 통과 시 CI 리포트 발행.
+1. **Tier 4 (Ops Plane)**: T09, T10
+2. **Tier 1 (Data Plane)**: T01, T02, T03
+3. **Tier 2 (Logic Plane)**: T04, T06, T05
+4. **Tier 3 (Product Plane)**: T07, T08
+5. **최종 검증**: T09에서 lint/typecheck/smoke 또는 `agent:qa`를 통해 병합 가능 여부 판단
 
 ---
 
-## 5. API Drift Guard (문서-실행 정합성 규칙)
+## 5. API Drift Guard (구현/문서 정합성)
 
-### 적용 대상
-- `/api/cron`, `/api/campaigns`, `/api/analytics`, `/api/admin/*`, `/api/health`
-- `/api/me/*`(일정/정산/프로필 관련)
+### 현재 구현 기준
+- 구현 API(라우트 존재):
+  - `GET /api/campaigns`, `GET /api/analytics`, `GET /api/cron`, `POST /api/admin/ingest`, `GET /api/admin/runs`, `GET /api/health`
+  - `GET /api/admin/quality`, `GET /api/admin/alerts`, `POST /api/admin/alerts/actions`
+  - `GET /api/me/revenue`, `GET /api/me/board`, `GET /api/me/pro`, `POST /api/me/pro`
+- 계획/API 미구현:
+  - `GET /api/campaigns/:id`, `GET /api/campaigns/:id/related`
+  - `GET/POST /api/me/schedules*`, `GET /api/me/notifications*`
+  - `POST /api/jobs`는 공개 API가 아닌 내부 실행 후보(현재 진입점은 `GET /api/cron`)
 
-### 규칙
-- 문서(API.md/ARCHITECTURE/TEAM_CONTEXT/PROJECT_STATUS)에 `구현`으로 표기된 엔드포인트만 오퍼레이션/릴리즈 승인 대상.
-- `POST /api/jobs`는 공개 엔드포인트가 아니므로, 문서에서 **내부 실행 보조**로만 표기.
-- 라우트 미존재 항목은 `계획(미구현)` 라벨을 필수로 표기.
-- `/api/campaigns/:id`, `/api/me/schedules*`, `/api/me/notifications*`, `/api/admin/quality`, `/api/admin/alerts`는 구현 전까지 UI 경로에서 활성화 금지.
+### 정합성 규칙
+- 문서 라벨은 `implemented` 또는 `planned` 1개 값만 사용.
+- 구현 상태는 실제 라우트 존재성으로 판단하고, API 계약은 구현이 확인된 팀 문서만 배포 게이트로 포함.
+- 문서 갱신 순서는 `API.md` -> `ARCHITECTURE.md` -> `TEAM_CONTEXT.md` -> `AGENT_WORKFLOW.md` -> `PROJECT_STATUS.md`.
+- `/api/admin/quality`, `/api/admin/alerts`, `POST /api/admin/alerts/actions`는 **계획이 아닌 구현 상태**로 취급.
+- 문서 미동기 상태가 24시간 이상 유지되면 T09에서 조치 태스크 자동 생성.
 
-### Hook 연계
-- API Drift 검출 시 `[HOOK: QUALITY_WARN]` 호출.
-- Drift 2건 이상 누적 시 `[HOOK: DEPLOY_GREEN]` 차단 조건으로 상향 보고.
+### 즉시 점검 루틴 (오프라인/배포 전 고정)
+- `scope=docs` 변경 후 배포 전에는 `PROJECT_STATUS_NEXT_ACTIONS.md`의 `12.9 API 정합성 즉시 점검`이 최신인지 반드시 확인.
+- 동기화 근거는 핵심 3문서 병행 비교(`AGENT_WORKFLOW`/`TEAM_CONTEXT`/`PROJECT_STATUS_NEXT_ACTIONS`)로 잠금 후 PR 승인.
+- `implemented`와 `planned` 충돌이 동일 항목에서 발생하면 해당 항목은 즉시 BLOCK 상태로 두고 담당 팀이 재정의까지 머지 금지.
+
+### 드리프트 Hook
+- API Drift 탐지 시: `api:contract-audit` 실패로 인한 게이트 실패 + `HOOK: QUALITY_WARN` 발행.
+- 문서 업데이트 완료 시: `DEPLOY_GREEN` 직전 2중 검증(구현 라우트 + 화면 노출 AC).
+
+---
 
 ## 6. Escalation & Self-Healing Protocol
 
-문제가 발생했을 때 인간 엔지니어에게 의존하기 전 자율적으로 복구를 시도합니다.
+1. 모니터링 이상 징후 탐지 (T10)
+2. 원인 범위 제한(T04/T03/T01)
+3. 일시 우회 또는 잠금/재시도 적용(T04)
+4. 실패 케이스와 복구 절차 기록(T09)
+5. 반복 실패 시 배포 보호([BLOCKED]) 및 주간 보고
 
-1. **감지**: T10이 ELK/Log MCP를 통해 에러 스파이크를 감지.
-2. **할당**: 에러 스택트레이스를 분석하여 책임 팀(예: T04)에 복구 티켓(Issue) 자동 발행.
-3. **치유 시도**: 책임 팀이 관련 Skill을 활용하여 코드 및 데이터를 수정.
-4. **검증**: 수정한 내용을 T09가 컴파일, 테스트, 정적 분석으로 검증.
-5. **확정 또는 에스컬레이션**: T09 통과 시 자동 머지, 실패 시 인간 리뷰어(USER)에게 `[BLOCKED]` 신호 발송.
+### 통합 가드
+- 핵심 문서: `API.md`, `ARCHITECTURE.md`, `TEAM_CONTEXT.md`, `PROJECT_STATUS.md`, `PROJECT_STATUS_NEXT_ACTIONS.md`, `docs/teams/*.md`
+- API 검증: `npm run api:contract-audit` + `npm run api:contract-sync-audit` + `ci` 요약 리포트
+
+---
+
+## 7. API Contract Audit Automation
+
+- `npm run api:contract-audit`은 `app/api` 실제 경로와 문서의 `implemented/planned` 매칭 검증.
+- `npm run api:contract-sync-audit`은 `API.md` + 핵심 문서 집합(`ARCHITECTURE`, `TEAM_CONTEXT`, `PROJECT_STATUS`, `PROJECT_STATUS_NEXT_ACTIONS`, `SCRAPERS`, `docs/teams`)의 implemented/planned 교차 정합성까지 함께 검증해 12.9 리포트를 갱신.
+- 실패 사유는 `reports/api-contract-audit.md` 및 `reports/api-contract-sync-audit.md`로 남기고 CI/Pipeline을 실패 처리.
+- `agent:qa`는 `api:contract-audit`를 핵심 체크포인트로 유지.
+
+---
+
+## 8. Premium UI/UX Production Rules
+
+- 화면 도메인 단위로 관리
+  - T07: 핵심 화면 구조·컴포넌트
+  - T08: 사용자 여정/매니저 동선
+  - T06: 분석 라벨·인사이트 텍스트 가독성
+  - T10: 운영 상태 문구 톤(정상/주의/위험/중단)
+  - T09: 접근성·성능·회귀 패스 기준 강제
+- 실행 규칙
+  - 화면 PR은 AC와 `ui-qa-summary.md`를 반드시 첨부.
+  - 계획 화면은 CTA 비활성 + `계획(미구현)` 배너 필수.
+  - 회귀 지표는 전환율, 체류시간, 재진입율, 오류 복구 완료율을 필수 집계.
+- 배포 연동
+  - `agent:qa` 통과 전 화면 텍스트 변경은 금지.
+  - 스모크 실패는 UI/네비게이션 재검증까지 블록.
+
+---
+
+## 9. UI/UX Delivery Grid (BETA 2.0)
+
+### 9.1 화면별 담당
+- `/`: T07, T06, T10
+- `/campaigns/[id]`: T07, T06, T09
+- `/map`: T07, T10
+- `/me` / `/me/calendar` / `/me/stats`: T08, T07, T09
+- `/admin` / `/system`: T08, T10, T09
+
+### 9.2 검증 4단계
+1. 화면 AC 충족
+2. 에러/빈 상태 UX 검증
+3. 접근성(aria, 키보드 포커스, 토스트 닫힘 순서)
+4. `ui-qa-summary`, smoke, CI PASS
+
+### 9.3 KPI
+- T07: 핵심 화면 전환 가시성 100%
+- T08: 매니저 입장-행동 완료율 100%
+- T06: 인사이트 문구 정합성 100%
+- T10: 운영 라벨 정확도 100%
+- T09: 4경로 회귀 PASS 100%
+
+---
+
+## 10. 배포/게이트 속도 최적화 운영 원칙
+
+- 문서/마크다운 변경은 `scope=docs`로 분류해 문서만 정합성 확인.
+- 앱/컴포넌트/라이브러리 변경은 `scope=fast`로 분류해 `lint + typecheck + smoke` 우선 실행.
+- 그 외 변경은 `scope=full`으로 `lint + typecheck + test + api:contract-audit + smoke` 실행.
+- Vercel 배포는 `scope=docs`에서 빌드/배포를 스킵.
+- 동일 브랜치 병렬 실행은 이전 실행을 즉시 취소.
+
+

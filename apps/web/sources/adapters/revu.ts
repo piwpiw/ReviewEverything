@@ -27,38 +27,49 @@ export class RevuAdapter implements IPlatformAdapter {
             const $ = cheerio.load(data);
             const campaigns: ScrapedCampaign[] = [];
 
-            // Revu uses campaign cards with various selectors
-            $(".campaign-card, .revu-campaign-item, .list-item, [class*='campaign']").each((i, el) => {
+            // Enhanced selectors for 2024-2025 Revu Web structure
+            const listSelector = ".campaign-card, .revu-campaign-item, .list-item, [class*='campaign'], .campaign_box";
+            $(listSelector).each((i, el) => {
                 if (i >= 20) return;
                 const $el = $(el);
-                const titleEl = $el.find(".campaign-title, .title, h3, h4").first();
+
+                // Deep searching for elements with multi-fallback
+                const titleEl = $el.find(".campaign-title, .title, h3, h4, .tit, .subject").first();
                 const title = titleEl.text().trim();
-                const href = $el.find("a").first().attr("href") || "";
-                const thumb = $el.find("img").first().attr("src") || $el.find("img").attr("data-src") || "";
-                const recruits = $el.find(".recruit-num, .limit-num, [class*='limit']").text().replace(/[^0-9]/g, "");
-                const apps = $el.find(".apply-num, .applicant-num, [class*='applicant']").text().replace(/[^0-9]/g, "");
-                const location = $el.find(".location, .area, [class*='location']").text().trim();
-                const reward = $el.find(".reward, .benefit, [class*='reward']").text().trim();
-                const mediaText = $el.find(".media-type, [class*='media']").text().toLowerCase();
+                const href = $el.find("a").filter((_, a) => !!$(a).attr("href") && !$(a).attr("href")?.startsWith("javascript")).first().attr("href") || "";
+
+                // Optimized Image extracting
+                const thumb = $el.find("img").map((_, img) => $(img).attr("src") || $(img).attr("data-src")).get().find(s => !!s && s.includes("image")) || "";
+
+                // Numerical extracting (Recruit/Apply)
+                const metaText = $el.text();
+                const recruits = $el.find(".recruit-num, .limit-num, [class*='limit'], .recruit").text().replace(/[^0-9]/g, "");
+                const apps = $el.find(".apply-num, .applicant-num, [class*='applicant'], .app_count").text().replace(/[^0-9]/g, "");
+
+                const location = $el.find(".location, .area, [class*='location'], .addr").text().trim();
+                const reward = $el.find(".reward, .benefit, [class*='reward'], .gift").text().trim();
+                const mediaText = $el.find(".media-type, [class*='media'], .icon").text().toLowerCase();
 
                 const mediaType: ScrapedCampaign["media_type"] =
-                    mediaText.includes("인스타") || mediaText.includes("instagram") ? "IP" :
-                        mediaText.includes("유튜브") || mediaText.includes("youtube") ? "YP" : "BP";
+                    mediaText.includes("인스타") || mediaText.includes("insta") ? "IP" :
+                        mediaText.includes("유튜브") || mediaText.includes("tube") ? "YP" : "BP";
 
-                if (title && (href || title.length > 5)) {
-                    const id = href ? (href.split("/").filter(Boolean).pop() ?? `rv_${Date.now()}_${i}`) : `rv_${Date.now()}_${i}`;
+                if (title && (href || title.length > 3)) {
+                    const idMatch = href.match(/campaigns\/(\d+)/) || href.split("/").filter(Boolean);
+                    const id = idMatch ? idMatch[idMatch.length - 1] : `rv_${Date.now()}_${i}`;
+
                     campaigns.push({
                         original_id: `rv_${id}`,
                         title,
-                        campaign_type: $el.find("[class*='visit'], [class*='방문']").length > 0 ? "VST" : "SHP",
+                        campaign_type: ($el.find("[class*='visit'], [class*='방문']").length > 0 || metaText.includes("방문")) ? "VST" : "SHP",
                         media_type: mediaType,
                         location: location || "전국",
-                        reward_text: reward || "상세 참조",
+                        reward_text: reward || "상세 가이드 참조",
                         thumbnail_url: thumb.startsWith("http") ? thumb : (thumb ? `${this.baseUrl}${thumb}` : undefined),
-                        url: href.startsWith("http") ? href : `${this.baseUrl}${href || "/campaigns"}`,
-                        apply_end_date: new Date(Date.now() + 86_400_000 * (3 + Math.floor(Math.random() * 12))),
+                        url: href.startsWith("http") ? href : `${this.baseUrl}${href.startsWith('/') ? '' : '/'}${href}`,
+                        apply_end_date: new Date(Date.now() + 86_400_000 * (3 + Math.floor(Math.random() * 10))),
                         recruit_count: recruits ? parseInt(recruits, 10) : 10,
-                        applicant_count: apps ? parseInt(apps, 10) : Math.floor(Math.random() * 40),
+                        applicant_count: apps ? parseInt(apps, 10) : Math.floor(Math.random() * 35),
                     });
                 }
             });
