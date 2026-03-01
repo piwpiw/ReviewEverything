@@ -1,11 +1,48 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import ProUpgradeSection from "./ProUpgradeSection";
+import { TrendingUp, CalendarDays, Bell } from "lucide-react";
+
+interface ScheduleItem {
+    id: number;
+    custom_title?: string | null;
+    visit_date?: string | null;
+    deadline_date?: string | null;
+    campaign?: { title: string } | null;
+}
+
+interface MonthlyStat {
+    month: number;
+    sponsorship: number;
+    ad_fee: number;
+    total: number;
+    count: number;
+}
+
+interface RevenueSummary {
+    totalSponsorshipValue: number;
+    totalAdFee: number;
+    totalCampaigns: number;
+}
+
+interface RevenueMonthly {
+    summary?: RevenueSummary;
+    month?: string;
+    monthly?: MonthlyStat[];
+    total_revenue?: number;
+}
+
+interface NotificationItem {
+    id: number;
+    message?: string | null;
+    status: string;
+}
 
 type DashboardPayload = {
-    schedules: any[];
-    revenue: any;
-    notifications: any[];
+    schedules: ScheduleItem[];
+    revenue: RevenueMonthly | null;
+    notifications: NotificationItem[];
 };
 
 export default function ManagerDashboard({ userId }: { userId: number }) {
@@ -21,7 +58,6 @@ export default function ManagerDashboard({ userId }: { userId: number }) {
         const fetchAll = async () => {
             const boardRes = await fetch("/api/me/board", { headers });
             const board = boardRes.ok ? await boardRes.json() : null;
-
             setData({
                 schedules: board?.schedules || [],
                 revenue: board?.summary ? { summary: board.summary, month: board.month } : null,
@@ -29,7 +65,6 @@ export default function ManagerDashboard({ userId }: { userId: number }) {
             });
             setLoading(false);
         };
-
         fetchAll().catch(() => setLoading(false));
     }, [userId]);
 
@@ -77,11 +112,36 @@ export default function ManagerDashboard({ userId }: { userId: number }) {
                     </ul>
                 </section>
 
+                {/* Monthly Revenue Bar Chart */}
+                {(data.revenue?.monthly ?? []).some(m => m.total > 0) && (
+                    <section className="rounded-3xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm md:col-span-3">
+                        <h2 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-tight mb-4 flex items-center gap-2">
+                            <TrendingUp className="w-4 h-4 text-emerald-500" /> 월별 수익 현황
+                        </h2>
+                        <div className="flex items-end gap-1.5 h-24">
+                            {(data.revenue?.monthly ?? []).map((m) => {
+                                const allTotals = (data.revenue?.monthly ?? []).map(x => x.total);
+                                const maxTotal = Math.max(...allTotals, 1);
+                                const pct = Math.round((m.total / maxTotal) * 100);
+                                return (
+                                    <div key={m.month} className="flex-1 flex flex-col items-center gap-1" title={`${m.month}월: ${m.total.toLocaleString()}원`}>
+                                        <div
+                                            className="w-full bg-gradient-to-t from-blue-600 to-blue-400 dark:from-blue-500 dark:to-blue-300 rounded-t-lg transition-all duration-700"
+                                            style={{ height: `${Math.max(pct, m.total > 0 ? 6 : 0)}%` }}
+                                        />
+                                        <span className="text-[8px] font-black text-slate-400">{m.month}월</span>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </section>
+                )}
+
                 <section className="rounded-3xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm md:col-span-3">
-                    <h2 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-tight mb-4">최근 알림 피드</h2>
+                    <h2 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-tight mb-4 flex items-center gap-2"><Bell className="w-4 h-4 text-blue-500" /> 최근 알림 피드</h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                         {data.notifications.slice(0, 6).map((n) => (
-                            <div key={n.id} className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/30 border border-slate-100 dark:border-slate-700 md:col-span-1">
+                            <div key={n.id} className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/30 border border-slate-100 dark:border-slate-700">
                                 <p className="text-[11px] font-bold text-slate-800 dark:text-slate-200 line-clamp-2 mb-2">{n.message || "메시지 없음"}</p>
                                 <div className="flex justify-between items-center">
                                     <span className="text-[9px] font-black text-blue-500 uppercase tracking-widest">{n.status}</span>
@@ -94,23 +154,8 @@ export default function ManagerDashboard({ userId }: { userId: number }) {
                 </section>
             </div>
 
-            {/* Premium/Monetization Footer */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="p-6 rounded-3xl bg-gradient-to-r from-blue-600 to-indigo-700 text-white shadow-xl shadow-blue-500/20 relative overflow-hidden group">
-                    <div className="relative z-10">
-                        <h3 className="text-sm font-black uppercase tracking-widest mb-1">PRO Membership</h3>
-                        <p className="text-[11px] font-bold opacity-80 mb-4">전국 단위 캠페인 우선 매칭 및 캘린더 동기화 기능을 잠금 해제하세요.</p>
-                        <button className="px-5 py-2.5 bg-white text-blue-600 rounded-xl text-[10px] font-black shadow-lg hover:scale-105 active:scale-95 transition-all">업그레이드 하기</button>
-                    </div>
-                    <div className="absolute -right-4 -bottom-4 w-32 h-32 bg-white/10 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700" />
-                </div>
-
-                <div className="p-6 rounded-3xl border-2 border-dashed border-slate-200 dark:border-slate-800 flex flex-col items-center justify-center gap-2 group hover:border-slate-400 dark:hover:border-slate-600 transition-colors">
-                    <h3 className="text-xs font-black text-slate-900 dark:text-white">개발 후원하기 (Buy me a coffee)</h3>
-                    <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 text-center">서비스의 지속적인 고도화를 위해 소중한 커피 한 잔을 후원해주세요.</p>
-                    <button className="mt-2 px-5 py-2 bg-amber-500 text-white rounded-xl text-[10px] font-black shadow-lg shadow-amber-500/20 hover:bg-amber-600 transition-all active:scale-95">토스페이로 후원하기</button>
-                </div>
-            </div>
+            {/* PRO Membership & Donation Section */}
+            <ProUpgradeSection />
         </div>
     );
 }

@@ -1,8 +1,8 @@
-﻿# ReviewEverything (Beta)
+# ReviewEverything (Beta)
 
 AI-driven aggregator for multi-platform influencer campaigns. Consolidates data from 7 major Korean review platforms into a unified searchable hub with real-time competition analysis.
 
-## ?? System Architecture & Agent Index
+## 🚀 System Architecture & Agent Index
 
 ```mermaid
 graph TD
@@ -18,7 +18,7 @@ graph TD
     J --> K[Premium UI/UX & Trending]
 ```
 
-### ?쭬 Agent Quick Index (Fast Onboarding)
+### 📍 Agent Quick Index (Fast Onboarding)
 For future AI agents modifying this project, here are the core locations and their purposes:
 
 - **Main Configs**: 
@@ -43,14 +43,14 @@ For future AI agents modifying this project, here are the core locations and the
   - `app/admin/page.tsx` (Dashboard for triggering manual ingestion)
   - `app/loading.tsx` (Glassmorphism skeleton screens)
 
-### ?뱴 Detailed Documentation
+### 📚 Detailed Documentation
 For an in-depth understanding, see the specialized technical documents:
 1. **[ARCHITECTURE.md](./docs/ARCHITECTURE.md)**: Details on the data pipeline, the Trend Engine logic, and database snapshotting models.
 2. **[API.md](./docs/API.md)**: Complete guide to all endpoint parameters and Vercel Edge caching strategies.
 3. **[SCRAPERS.md](./docs/SCRAPERS.md)**: Extensibility guide for the `Cheerio` adapters, WAF resilience (delays, headers), and fallback mechanisms.
 4. **[PROJECT_STATUS.md](./docs/PROJECT_STATUS.md)**: Current implementation status, gaps, and prioritized next work.
 
-## ?썱 Tech Stack
+## 🛠️ Tech Stack
 
 | Layer | Technology | Role |
 | :--- | :--- | :--- |
@@ -62,7 +62,7 @@ For an in-depth understanding, see the specialized technical documents:
 | **Infrastructure**| Vercel Edge Cache | Sub-100ms API response times |
 | **Scraping** | Axios + Cheerio | DOM Parsing & HTTP Client |
 
-## ?? Key Technical Features (Beta)
+## 💎 Key Technical Features (Beta)
 
 ### 1. Unified Ingestion & Resilience
 - **Multi-Adapter Pattern**: Extensible `IPlatformAdapter` interface covering 7 distinct platforms.
@@ -80,13 +80,13 @@ For an in-depth understanding, see the specialized technical documents:
 - **Edge Caching**: `/api/campaigns` leverages `Cache-Control` headers for maximum CDN scalability.
 - **Security**: `/admin` operations are securely gated by JWT/Basic Auth middleware.
 
-## ?슗 Operational Status
+## 📡 Operational Status
 
 - **Phase**: Beta (Stabilization)
 - **Platforms Supported**: 7/7 (Real-time Scraping)
 - **Test Status (2026-02-28)**: `61 passed / 0 failed / 61 total` (see `test_output.txt`)
 
-## ?뱰 Developer Guide
+## 📖 Developer Guide
 
 ### Running Local Tasks
 ```bash
@@ -102,65 +102,8 @@ npx prisma studio   # Direct database management
 - GitHub Actions workflow: `.github/workflows/ci.yml` (`main` 브랜치 `push`/`pull_request` 기준)
 - CI 실행 명령: `apps/web` 디렉터리에서 `npm run test:ci`
 - 테스트 로그는 `apps/web/test_output.txt`로 남기고 워크플로우 아티팩트(`web-test-output`, 14일)로 보관됩니다.
-- [Campaigns](../app/page.tsx)
-- [Admin](../app/admin/page.tsx)
-+ [Campaigns](./app/page.tsx)
-+ [Admin](./app/admin/page.tsx)
-+
-+## Fast Release Command
-+
-+Use one command to run the full deployment flow:
-+
-+```bash
-+npm run release -- --auto-commit
-+```
-+
-+What it does:
-+- run lint
-+- run typecheck
-+- run full test suite
-+- run build
-+- commit local changes with a default message (or override with `--message="..."`)
-+- push current branch
-+- run `vercel --prod --yes`
-+- print the production deployment URL
-+
-+Recommended options:
-+- `npm run release -- --auto-commit --message="release: ..."`
-+- `npm run release -- --auto-commit --skip-tests`
-+- `npm run release -- --auto-commit --skip-build`
-+- `npm run release -- --auto-commit --no-push`
-+
-+Prerequisites:
-+- Vercel CLI installed (`npm i -g vercel`) or available in PATH
-+- `VERCEL_TOKEN` configured if your shell requires token-based deployment
-+- Working tree clean before release (or use `--auto-commit`)
-
-## Fast Release Command
-
-One command can run the whole flow now:
-
-```bash
-npm run release -- --message="release: production"
-```
-
-Flow:
-- run `lint`, `typecheck`, `test:ci`, `build`
-- auto-commit local changes when needed
-- push current branch
-- run `vercel --prod --yes`
-- print the production URL
-
-Optional flags:
-- `--skip-tests`: skip test run
-- `--skip-build`: skip build
-- `--no-push`: run locally without pushing
-- `--auto-commit` is enabled for `release`, can be replaced in `npm run release:dry-run`
-- `--message="..."` custom commit message
-
-Prerequisites:
-- Vercel CLI installed and available in PATH (`npm i -g vercel`)
-- `VERCEL_TOKEN` if required by your deployment environment
+- [Campaigns](./app/page.tsx)
+- [Admin](./app/admin/page.tsx)
 
 ## Fast Release Command
 

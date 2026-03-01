@@ -31,7 +31,7 @@ const DISTRICT_COORDS: Record<string, [number, number]> = {
 
 const WIN = [
   ["visit", "방문", "현장", "오프라인"],
-  ["delivery", "배송", "택배", "택배형", "퀵"],
+  ["delivery", "배송", "택배", "택배형", "퀵", "배달"],
   ["report", "기자단", "리포트", "보도", "취재"],
 ];
 
@@ -101,6 +101,33 @@ export function normalizeRewardValue(text: string): number {
 
   const fallback = raw.replace(/,/g, '').match(/(\d{3,})/);
   return fallback ? Number(fallback[1]) : 0;
+}
+
+export interface RewardParseResult {
+  value: number;
+  confidence: 'HIGH' | 'MEDIUM' | 'LOW';
+  method: 'unit_parse' | 'fallback_number' | 'zero';
+}
+
+export function normalizeRewardValueWithConfidence(text: string): RewardParseResult {
+  if (!text) return { value: 0, confidence: 'LOW', method: 'zero' };
+  const raw = String(text);
+  const values = pickNumbers(raw);
+
+  if (values.length > 0) {
+    return {
+      value: Math.max(...values),
+      confidence: values.length === 1 ? 'HIGH' : 'MEDIUM',
+      method: 'unit_parse',
+    };
+  }
+
+  const fallback = raw.replace(/,/g, '').match(/(\d{3,})/);
+  if (fallback) {
+    return { value: Number(fallback[1]), confidence: 'LOW', method: 'fallback_number' };
+  }
+
+  return { value: 0, confidence: 'LOW', method: 'zero' };
 }
 
 export function normalizeRegion(location: string): [string | null, string | null] {

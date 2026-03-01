@@ -53,11 +53,7 @@ function parseArgs() {
     parsed.noBuild = true;
   }
 
-  if (args.includes('--skip-lint')) {
-    parsed.includeLint = false;
-  } else {
-    parsed.includeLint = true;
-  }
+  parsed.includeLint = args.includes('--skip-lint') ? false : !parsed.fastMode;
 
   for (let i = 0; i < args.length; i++) {
     const a = args[i];

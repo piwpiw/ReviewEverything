@@ -7,6 +7,7 @@ import NavFavoritesBadge from "@/components/NavFavoritesBadge";
 import PWAPrompt from "@/components/PWAPrompt";
 import { CalendarDays } from "lucide-react";
 import { Menu, Map as MapIcon, Package, UserCheck, LayoutList } from "lucide-react";
+import ThemeToggle from "@/components/ThemeToggle";
 
 export const metadata: Metadata = {
   title: "체험단 모아 | 국내 7대 플랫폼 체험단 통합 탐색기",
@@ -90,7 +91,7 @@ export default function RootLayout({
                     <NavStats />
                   </Suspense>
                 </div>
-
+                <ThemeToggle />
                 <div className="w-px h-6 bg-slate-200 dark:bg-slate-700 hidden sm:block" />
 
                 <div className="flex items-center gap-2">

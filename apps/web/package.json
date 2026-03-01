@@ -12,6 +12,7 @@
     "lint:ci": "eslint . --format json --output-file reports/eslint.json",
     "typecheck": "tsc --noEmit",
     "release": "node scripts/release.js --auto-commit",
+    "predeploy:local": "npm run agent:review && npm run build",
     "release:dry-run": "node scripts/release.js --auto-commit --no-push",
     "release:fast": "node scripts/release.js --auto-commit --fast",
     "test": "vitest run",

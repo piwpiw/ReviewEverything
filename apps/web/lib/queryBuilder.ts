@@ -14,6 +14,7 @@ export function buildCampaignsQuery(searchParams: URLSearchParams) {
     const min_reward = searchParams.get('min_reward');
     const max_comp = searchParams.get('max_comp');
     const dday_limit = searchParams.get('dday'); // e.g., 3 for D-3
+    const max_deadline_days = searchParams.get('max_deadline_days'); // D-Day slider
 
     const sort = searchParams.get('sort') || 'latest_desc';
     const page = parseInt(searchParams.get('page') || '1', 10);
@@ -58,10 +59,20 @@ export function buildCampaignsQuery(searchParams: URLSearchParams) {
     if (max_comp) {
         where.competition_rate = { lte: parseFloat(max_comp) };
     }
-    if (dday_limit) {
+    // dday_limit: legacy param (exact days)
+    if (dday_limit && !max_deadline_days) {
         const targetDate = new Date();
         targetDate.setDate(targetDate.getDate() + parseInt(dday_limit, 10));
         where.apply_end_date = { gte: new Date(), lte: targetDate };
+    }
+    // max_deadline_days: D-Day slider param (overrides dday_limit if both present)
+    if (max_deadline_days) {
+        const days = parseInt(max_deadline_days, 10);
+        if (!isNaN(days) && days > 0) {
+            const cutoff = new Date();
+            cutoff.setDate(cutoff.getDate() + days);
+            where.apply_end_date = { gte: new Date(), lte: cutoff };
+        }
     }
 
     // ── Sorting (Ultra-Fast Denormalized Columns) ──
