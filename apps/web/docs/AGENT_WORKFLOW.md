@@ -53,7 +53,23 @@
 
 ---
 
-## 5. Escalation & Self-Healing Protocol
+## 5. API Drift Guard (문서-실행 정합성 규칙)
+
+### 적용 대상
+- `/api/cron`, `/api/campaigns`, `/api/analytics`, `/api/admin/*`, `/api/health`
+- `/api/me/*`(일정/정산/프로필 관련)
+
+### 규칙
+- 문서(API.md/ARCHITECTURE/TEAM_CONTEXT/PROJECT_STATUS)에 `구현`으로 표기된 엔드포인트만 오퍼레이션/릴리즈 승인 대상.
+- `POST /api/jobs`는 공개 엔드포인트가 아니므로, 문서에서 **내부 실행 보조**로만 표기.
+- 라우트 미존재 항목은 `계획(미구현)` 라벨을 필수로 표기.
+- `/api/campaigns/:id`, `/api/me/schedules*`, `/api/me/notifications*`, `/api/admin/quality`, `/api/admin/alerts`는 구현 전까지 UI 경로에서 활성화 금지.
+
+### Hook 연계
+- API Drift 검출 시 `[HOOK: QUALITY_WARN]` 호출.
+- Drift 2건 이상 누적 시 `[HOOK: DEPLOY_GREEN]` 차단 조건으로 상향 보고.
+
+## 6. Escalation & Self-Healing Protocol
 
 문제가 발생했을 때 인간 엔지니어에게 의존하기 전 자율적으로 복구를 시도합니다.
 

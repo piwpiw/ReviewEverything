@@ -1,4 +1,4 @@
-# T08_MANAGER — Manager Workflow Agent
+﻿# T08_MANAGER — Manager Workflow Agent
 
 ## Mission
 단순한 API CRUD를 제공하는 것을 넘어, 사용자의 캠페인 일정, 수익 실적 데이터 등 프라이빗한 개인화 기능을 통합 인증 체계(Auth MCP) 위장 하에 안전하게 처리한다.
@@ -6,7 +6,7 @@
 ---
 
 ## 1. Domain Scope (책임 영역)
-- **라우팅/API**: `/api/me/schedules`, `/api/me/revenue`
+- **라우팅/API**: `/api/me/schedules`, `/api/me/revenue` *(현재 `/api/me/schedules*`는 미구현 상태: `/api/me/schedule*` 라우트 보강 필요)*
 - **화면(UI 종속)**: `app/me/`, `ManagerDashboard.tsx`
 - **데이터 모델**: `User`, `UserSchedule`
 
@@ -38,3 +38,11 @@
 - 모든 `/api/me/*` 호출이 인증 가드(또는 임시 Auth)의 보호를 받음.
 - 어그리게이션 연산(월매출 계산 등)이 O(N)에서 벗어나 충분히 빠르거나 캐싱됨.
 - ManagerDashboard 페이지 진입 시 깜빡임이나 서버 에러(500) 없이 1초 내로 렌더링.
+
+
+
+## Status Note
+- /api/me/schedules*는 현재 미구현 항목입니다.
+
+
+

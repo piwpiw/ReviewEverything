@@ -1,4 +1,4 @@
-# System Architecture
+﻿# System Architecture
 
 > **Source of Truth**: 이 문서는 `apps/web`의 아키텍처 결정 사항을 정의합니다.  
 > 아키텍처 변경 시 동일 PR에서 이 문서를 반드시 갱신하세요.
@@ -56,7 +56,7 @@
 
 ### Background Job Pipeline (T03 → T04 → T05)
 1. Cron/Admin이 `BackgroundJob` 행 생성
-2. `POST /api/jobs`로 배치 실행 (limit=6)
+2. `GET /api/cron?runNow=true (runNow=true, limit=6)`로 배치 실행 (limit=6)
 3. `REMINDER_SCAN` 잡 → `NotificationDelivery` 행 생성 → T05_NOTIFIER 발송
 
 ### Read Pipeline (T03/T06 → T07/T08)
@@ -110,3 +110,28 @@
 - 신규 불변 조건
 - 마이그레이션 영향
 - 해당 팀 문서(`docs/teams/T*.md`) 동시 갱신
+
+
+## 7) API 정합성 표기 규칙
+
+- 구현된 API(라우트 존재)
+  - `GET /api/campaigns`
+  - `GET /api/analytics`
+  - `GET /api/cron` (`runNow`, `limit`)
+  - `POST /api/admin/ingest`
+  - `GET /api/admin/runs`
+  - `GET /api/health`
+  - `GET /api/me/revenue`
+  - `GET /api/me/board`
+  - `GET /api/me/pro`, `POST /api/me/pro`
+
+- 계획/API 미구현
+  - `GET /api/campaigns/:id`, `/api/campaigns/:id/related`
+  - `POST /api/jobs` (공개 라우트 없음, 큐 실행 연동은 `GET /api/cron`)
+  - `GET /api/me/schedules*`
+  - `GET /api/me/notifications*`
+  - `GET /api/admin/quality`, `GET /api/admin/alerts`
+
+- 운영 규칙
+  - 구현 상태가 바뀌면 `API.md`, `TEAM` 문서, `PROJECT_STATUS.md`를 동시 갱신
+  - `계획` 항목은 UI/알림 문구에서 "오퍼레이션 대상 아님" 라벨 처리

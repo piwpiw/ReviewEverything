@@ -61,11 +61,11 @@ export default function RootLayout({
                 </Link>
 
                 <nav className="hidden lg:flex items-center gap-1">
-                    <Link href="/me?userId=1" className="group flex items-center gap-2 px-4 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-all">
-                      <CalendarDays className="w-3.5 h-3.5 text-violet-500" />
-                      <span className="text-xs font-black text-slate-500 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white">내 매니저</span>
-                    </Link>
-                    <Link href="/?campaign_type=VST" className="group flex items-center gap-2 px-4 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-all">
+                  <Link href="/me?userId=1" className="group flex items-center gap-2 px-4 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-all">
+                    <CalendarDays className="w-3.5 h-3.5 text-violet-500" />
+                    <span className="text-xs font-black text-slate-500 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white">내 매니저</span>
+                  </Link>
+                  <Link href="/?campaign_type=VST" className="group flex items-center gap-2 px-4 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-all">
                     <span className="text-xs font-black text-slate-500 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white">방문형</span>
                   </Link>
                   <Link href="/?campaign_type=VST&view=map" className="group flex items-center gap-2 px-4 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-all">
@@ -96,11 +96,21 @@ export default function RootLayout({
 
                 <div className="flex items-center gap-2">
                   <Link
-                    href="/admin"
-                    className="flex items-center justify-center w-10 h-10 md:w-auto md:px-5 md:py-2 rounded-2xl bg-slate-900 dark:bg-blue-600 text-white hover:bg-blue-600 dark:hover:bg-blue-500 transition-all shadow-xl shadow-slate-900/10 active:scale-95"
+                    href="/me?userId=1"
+                    className="flex items-center gap-2 pl-2 pr-4 py-1.5 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
                   >
-                    <span className="hidden md:inline text-[11px] font-black uppercase tracking-widest">Console</span>
-                    <Menu className="w-5 h-5 md:hidden" />
+                    <div className="w-6 h-6 rounded-full bg-blue-500 text-white flex items-center justify-center text-[10px] font-black">
+                      P
+                    </div>
+                    <span className="text-[11px] font-black text-slate-700 dark:text-slate-300">piwpiw</span>
+                  </Link>
+
+                  <Link
+                    href="/admin"
+                    className="ml-2 flex items-center justify-center w-8 h-8 md:w-auto md:px-4 md:py-1.5 rounded-xl bg-slate-900 dark:bg-blue-600 text-white hover:bg-blue-600 dark:hover:bg-blue-500 transition-all shadow-md active:scale-95"
+                  >
+                    <span className="hidden md:inline text-[10px] font-black uppercase tracking-widest">Console</span>
+                    <Menu className="w-4 h-4 md:hidden" />
                   </Link>
                 </div>
               </div>

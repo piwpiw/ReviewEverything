@@ -1,416 +1,554 @@
-﻿‣牐橯捥⁴瑓瑡獵唠摰瑡⁥㈨㈰ⴶ㈰㈭⤸ਊ⌣䌠牵敲瑮匠慮獰潨ੴ‭捓灯㩥怠灡獰眯扥⁠丨硥⹴獪愠灰‬牐獩慭猠档浥ⱡ愠慤瑰牥ⱳ䄠䥐爠畯整⥳ⴊ䌠牵敲瑮瀠慨敳›敂慴椠⁮捡楴敶猠慴楢楬慺楴湯ⴊ䰠瑡獥⁴敲潣摲摥琠獥⁴畲㩮怠ㄶ瀠獡敳⁤ ‰慦汩摥⼠㘠‱潴慴恬映潲⁭瑠獥彴畯灴瑵琮瑸੠‭敔瑳猠慴畴⁳畣牲湥汴⁹敲汦捥獴愠慤瑰牥挠湯牴捡⁴潮浲污穩瑡潩⁮湡⁤敨污桴愯浤湩栠牡敤楮杮眠牯੫‭慂敳楬敮搠捯⁳祳据摥漠⁮〲㘲〭ⴲ㠲⠠剠䅅䵄⹅摭Ⱡ怠潤獣䄯䥐洮恤਩⌊‣潃灭敬整⁤湉吠楨⁳灕慤整ⴊ唠摰瑡摥怠䕒䑁䕍洮恤漠数慲楴湯污猠慴畴⁳潴爠晥敬瑣氠瑡獥⁴敲潣摲摥琠獥⁴敲畳瑬ਮ‭汁杩敮⁤摠捯⽳偁⹉摭⁠湩敧瑳爠煥敵瑳挠湯牴捡⁴楷桴椠灭敬敭瑮瑡潩⁮怨汰瑡潦浲楟恤猠湩汧⁥慶畬⥥ਮ‭楆數⁤汰瑡潦浲映汩整⁲灯楴湯洠灡楰杮愠摮挠浯汰瑥摥㜠瀭慬晴牯⁭潣敶慲敧椠⁮䙠汩整䉲牡琮硳⹠ⴊ䤠灭敬敭瑮摥愠瑣慵⁬潬⵷潣灭瑥瑩潩⁮牯敤楲杮映牯怠潣灭瑥瑩潩彮獡恣椠⁮敷⁢慰敧愠摮挠浡慰杩獮䄠䥐ਮ‭祓据摥愠慤瑰牥映硩畴敲攠灸捥慴楴湯⁳楷桴挠牵敲瑮映污扬捡⁫潣瑮慲瑣映牯怠牍求杯摁灡整恲愠摮怠慇杮慮䙭潯䅤慤瑰牥⹠ⴊ删浥癯摥搠晥畡瑬怠䑁䥍彎䅐卓佗䑒⁠慦汬慢正椠⁮浠摩汤睥牡⹥獴⁠湡⁤摡敤⁤慦汩挭潬敳⁤敢慨楶牯ਮ‭灕慤整⁤⽠灡⽩敨污桴⁠潴瘠牥晩⁹䉄愠慶汩扡汩瑩⁹湡⁤敲畴湲怠扤›歯搯睯恮眠瑩⁨〵″湯䐠⁂慦汩牵⹥ⴊ唠摰瑡摥愠浤湩搠獡扨慯摲栠慥瑬⁨档捥⁫潴挠湯畳敭怠愯楰栯慥瑬恨爠獥潰獮⁥怨扤⁠楦汥⥤戠晥牯⁥敲摮牥湩⁧乏䥌䕎猠慴畴⹳ⴊ䄠摤摥䜠瑩畈⁢捁楴湯⁳䥃眠牯晫潬⁷怨朮瑩畨⽢潷歲汦睯⽳楣礮汭⥠琠⁯畲⁮慠灰⽳敷恢琠獥獴漠⁮浠楡恮瀠獵⽨剐ਮ‭硅整摮摥䌠⁉潴爠湵怠楬瑮⁠敢潦敲琠獥獴‬数獲獩⁴整瑳漠瑵異ⱴ愠摮挠敲瑡⁥⁡慦汩牵⁥獩畳⁥畡潴慭楴慣汬⹹ਊ⌣圠慨⁴獉䤠灭敬敭瑮摥ⴊ䐠瑡⁡潭敤⁬湡⁤湩敤楸杮愠敲搠晥湩摥椠⁮牐獩慭਺†‭偠慬晴牯恭‬䍠浡慰杩恮‬䍠浡慰杩卮慮獰潨恴‬䥠杮獥剴湵੠†‭湳灡桳瑯焯敵祲椠摮硥獥映牯椠杮獥楴湯愠摮愠慮祬楴獣眠牯汫慯獤ⴊ䴠楡⁮偁⁉潲瑵獥攠楸瑳愠摮愠敲眠物摥਺†‭䝠呅⼠灡⽩慣灭楡湧恳 ⴠ怠䕇⁔愯楰愯慮祬楴獣੠†‭偠协⁔愯楰愯浤湩椯杮獥恴 ⴠ怠䕇⁔愯楰愯浤湩爯湵恳 ⴠ怠䕇⁔愯楰栯慥瑬恨 ⴠ怠䕇⁔愯楰振潲恮ⴊ䤠杮獥楴湯瀠灩汥湩⁥獩椠灭敬敭瑮摥਺†‭摡灡整⁲敦捴⁨潬灯⠠灵琠⁯‵慰敧⥳ ⴠ搠摥灵⽥潮浲污穩⁥牰捯獥楳杮 ⴠ椠杮獥⁴畲⁮牴捡楫杮⠠剠乕䥎䝎Ⱡ怠啓䍃卅恓‬䙠䥁䕌恄਩‭摁灡整⁲敲楧瑳祲挠湯慴湩⁳‷汰瑡潦浲⁳怨潳牵散⽳敲楧瑳祲琮恳਩‭摁業⁮慤桳潢牡⁤硥獩獴眠瑩㩨 ⴠ栠慥瑬⁨档捥੫†‭湩敧瑳琠楲杧牥瀠牥瀠慬晴牯⽭污੬†‭畲⁮潬⁧潰汬湩੧⌊‣慇獰䄠摮删獩獫ⴊ匠捥牵瑩⁹湡⁤灯牥瑡潩⁮慨摲湥湩⁧潣灭敬整㭤爠浥楡楮杮瘠污摩瑡潩㩮 ⴠ删来敲獳潩⁮潣敶慲敧漠⁮摡灡整⁲楦瑸牵⁥硥数瑣瑡潩獮眠獡挠浯汰瑥摥椠⁮桴獩挠捹敬ਮ†‭䥃渠睯椠据畬敤⁳楬瑮⬠琠獥⁴档捥獫愠摮映楡畬敲椠獳敵挠敲瑡潩㭮戠桥癡潩⁲桳畯摬戠⁥敶楲楦摥漠⁮楦獲⁴敲污倠⽒敭杲⹥ⴊ䌠⁉潣獮獩整据⁹潮整਺†‭瑠獥彴畯灴瑵琮瑸⁠牡楴慦瑣瀠瑡⁨慷⁳潣牲捥整⁤潴怠整瑳潟瑵異⹴硴恴椠⁮潷歲汦睯⠠敲慬楴敶琠⁯慠灰⽳敷恢眠牯楫杮搠物捥潴祲⸩ⴊ䌠牵敲瑮栠牡⁤汢捯敫⁲瀨敲攭楸瑳湩⥧›铭鲡ꃬ뢊蒠달₴卅楌瑮怠潮攭灸楬楣⵴湡恹鲷맬ₙ鳬颰ꒋ裬鲡뢝闭₴楬瑮냪₀飭겞ꒋ賭₨菬鲃黬袋诫⺤낸ꇬ₴諬钽铭₄닫蒜鷬ₘ鷬蒴閠ꛫ肰蒕髬ꦕ诫ꒋਮ‭牐摯捵⁴潰楬桳瀠湥楤杮਺†‭楍潮⁲塕挠灯⁹湡⁤敺潲猭慴整洠獥慳楧杮挠湡戠⁥污杩敮⁤楷桴映湩污戠慲摮琠湯⹥ⴊ䐠瑡ⵡ潳牵散戠桥癡潩㩲 ⴠ䴠捯⁫潭敤渠睯栠獡攠灸楬楣⁴敳慭瑮捩㩳䐠⁂湵癡楡慬汢⁥㸭洠捯⁫慦汬慢正‬䉄攠灭祴ⴠ‾汣慥⁲浥瑰⁹瑳瑡⹥ਊ⌣丠硥⁴潗歲⠠牐潩楲楴敺⥤ㄊ‮㉐›潍楮潴⁲楦獲⁴敲污倠⽒前䌠⁉畲⁮湡⁤摡番瑳怠楣昭楡畬敲⽠慠瑵浯瑡摥⁠獩畳⁥慬敢獬‬晩渠敥敤⹤ਊ⌣匠杵敧瑳摥唠摰瑡⁥慃敤据੥‭敒楶楳⁴桴獩搠捯浵湥⁴晡整⁲慥档漠㩦 ⴠ愠慤瑰牥挠湯牴捡⁴敤楣楳湯 ⴠ琠獥⁴畳瑩⁥瑳扡汩穩瑡潩੮†‭畡桴栠牡敤楮杮洠牥敧ਊ⌣倠䑒䘠瑩删癥敩⁷䄨汬椭⵮湏⁥灕牧摡ⱥ㈠㈰ⴶ㈰㈭⤸ਊ桔獩猠捥楴湯洠灡⁳桴⁥敲畱獥整⁤湩整牧瑡摥倠䑒琠⁯桴⁥畣牲湥⁴浩汰浥湥慴楴湯ਮ瑓瑡獵氠扡汥㩳ⴊ怠浉汰浥湥整恤›污敲摡⁹潷歲湩⁧湩瀠潲畤瑣潩⁮潣敤瀠瑡獨ⴊ怠慐瑲慩恬›癡楡慬汢⁥畢⁴楬業整Ɽ映慲楧敬‬牯渠瑯礠瑥瀠潲畤瑣潩⵮牧摡੥‭䵠獩楳杮㩠渠瑯椠灭敬敭瑮摥礠瑥ਊ⌣‣⤱䐠獩潣敶祲⼠䌠牵瑡潩੮‭䥠灭敬敭瑮摥㩠洠汵楴搭浩湥楳湯污映汩整楲杮⠠捠浡慰杩彮祴数Ⱡ怠敭楤彡祴数Ⱡ怠敲楧湯摟灥桴⼱怲‬捠瑡来牯恹 楶⁡池扩焯敵祲畂汩敤⹲獴⁠湡⁤捠浯潰敮瑮⽳楆瑬牥慂⹲獴恸ਮ‭䥠灭敬敭瑮摥㩠渠浵牥捩映汩整獲映牯氠睯挠浯数楴楴湯⠠浠硡损浯恰 湡⁤敲慷摲琠牨獥潨摬⠠浠湩牟睥牡恤 楶⁡敤潮浲污穩摥䐠⁂楦汥獤ਮ‭䥠灭敬敭瑮摥㩠爠捥湥⁴楦瑬牥栠獩潴祲⠠潴⁰⤵椠⁮池捯污瑓牯条恥瘠慩怠潣灭湯湥獴䘯汩整䉲牡琮硳⹠ⴊ怠浉汰浥湥整恤›畱捩⁫畯扴畯摮愠瑣潩獮椠⁮慣摲⁳猨潴敲洯灡瀯潲畤瑣氠湩⁫敢慨楶牯 楶⁡捠浯潰敮瑮⽳慃灭楡湧慃摲琮硳⹠ⴊ怠慐瑲慩恬›慭⁰楶睥攠楸瑳⁳怨潣灭湯湥獴䴯灡楖睥琮硳⥠戠瑵洠牡敫⁲汣獵整楲杮椠⁳潮⁴浩汰浥湥整⁤湡⁤汰捡浥湥⁴瑳汩⁬敤数摮⁳湯栠略楲瑳捩搠獩牴捩⁴慭捴楨杮ਮ‭偠牡楴污㩠爠睥牡⁤慰獲湩⁧硥獩獴⠠獠畯捲獥港牯慭楬敺琮恳 畢⁴獩爠来硥漭汮⁹湡⁤潮⁴潲畢瑳攠潮杵⁨潦⁲牢慯⁤牦敥琭硥⁴慰瑴牥獮ਮ⌊⌣㈠ 浓牡⁴慍慮敧⁲䌨䵒਩‭䵠獩楳杮㩠甠敳⁲畡桴愯捣畯瑮搠浯楡⁮怨獵牥恳琠扡敬愠摮愠瑵敨瑮捩瑡摥愠灰映潬獷⸩ⴊ怠楍獳湩恧›捳敨畤敬振污湥慤⁲潤慭湩⠠畠敳彲捳敨畤敬恳‬慣敬摮牡唠ⱉ洠湡慵⁬硥整湲污猠潰獮牯桳灩攠瑮祲⸩ⴊ怠楍獳湩恧›敲敶畮⁥慤桳潢牡⁤潤慭湩⠠潭瑮汨⽹敹牡祬猠潰獮牯桳灩愯ⵤ敦⁥湡污瑹捩⥳ਮ‭偠牡楴污㩠倠䅗瀠潲灭⁴潣灭湯湥⁴硥獩獴⠠捠浯潰敮瑮⽳坐偁潲灭⹴獴恸Ⱙ戠瑵洠湡晩獥⽴敳癲捩ⵥ潷歲牥愠獳瑥⁳牡⁥潮⁴牰獥湥ⱴ猠⁯湩瑳污⁬慰桴椠⁳湩潣灭敬整ਮ⌊⌣㌠ 慂正牧畯摮倠潲散獳湩⁧ 潗歲牥删汥慩楢楬祴ⴊ怠浉汰浥湥整恤›捳敨畤敬⁤湩敧瑳潩⁮牴杩敧⁲硥獩獴⠠癠牥散⹬獪湯⁠㸭怠愯楰振潲恮 湡⁤摡業⽮慭畮污琠楲杧牥攠楸瑳⁳怨愯楰愯浤湩椯杮獥恴⸩ⴊ怠慐瑲慩恬›牣湯愯浤湩栠湡汤牥渠睯愠潶摩⁳楦敲愭摮昭牯敧⁴湡⁤敲潣摲⁳数⵲汰瑡潦浲爠獥汵ⱴ戠瑵猠楴汬爠湵⁳湩楬敮椠⁮潲瑵⁥楬敦祣汣⁥渨瑯礠瑥搠牵扡敬焠敵敵眠牯敫⥲ਮ‭䵠獩楳杮㩠搠摥捩瑡摥渠瑯晩捩瑡潩⁮潷歲牥映牯搠慥汤湩⁥敲業摮牥⁳㌨搭祡⼠ㄠ搭祡挠摡湥散⸩ਊ⌣‣⤴䐠瑡⁡潍敤⁬汁杩浮湥ੴ‭䥠灭敬敭瑮摥㩠怠汰瑡潦浲恳‬捠浡慰杩獮Ⱡ怠慣灭楡湧獟慮獰潨獴Ⱡ怠湩敧瑳牟湵恳攠畱癩污湥獴攠楸瑳椠⁮牐獩慭猠档浥⹡ⴊ怠浉汰浥湥整恤›慣灭楡湧猠灵潰瑲⁳牠来潩彮敤瑰ㅨ㈯Ⱡ怠敲慷摲癟污敵Ⱡ怠潣灭瑥瑩潩彮慲整Ⱡ怠慬⽴湬恧‬畯扴畯摮唠䱒映敩摬⹳ⴊ怠慐瑲慩恬›湩敤⁸瑳慲整祧椠⁳瑳潲杮戠瑵渠瑯礠瑥愠楬湧摥琠⁯⁡楳杮敬挠浯潰楳整映汩整⁲湩敤⁸瑳慲整祧映潲⁭剐㭄挠牵敲瑮猠档浥⁡獵獥洠汵楴汰⁥潦畣敳⁤湩敤數⹳ⴊ怠楍獳湩恧›畠敳獲⁠湡⁤畠敳彲捳敨畤敬恳琠扡敬⁳湡⁤桴楥⁲湩敤數⹳ਊ⌣䐠獥杩⁮灕慤整䘠牯丠硥⁴灕牧摡⁥䐨⁯潮⁴敲牷瑩ⱥ攠瑸湥⥤ਊ桔⁥敮瑸椠整慲楴湯猠潨汵⁤硥整摮琠敨攠楸瑳湩⁧杁牧来瑡牯愠捲楨整瑣牵ⱥ渠瑯爠灥慬散椠⹴ਊ⌣‣慔杲瑥䄠捲楨整瑣牵⁥慌敮ੳ‭䱠湡⁥⁁‭杁牧来瑡牯䌠牯⁥攨楸瑳湩Ⱨ欠敥⁰湡⁤慨摲湥怩›捳慲楰杮‬潮浲污穩瑡潩Ɱ搠摥灵ⱥ挠浡慰杩⁮敳牡档洯灡‬湡污瑹捩⹳ⴊ怠慌敮䈠ⴠ䴠湡条牥䌠牯⁥渨睥怩›獵牥椠敤瑮瑩ⱹ猠档摥汵⁥楬敦祣汣ⱥ洠湡慵⁬湥牴敩ⱳ爠浥湩敤獲‬敲敶畮⁥条牧来瑡潩⹮ⴊ怠慌敮䌠ⴠ圠牯敫⁲潃敲⠠敮⥷㩠搠牵扡敬樠扯攠數畣楴湯映牯椠杮獥楴湯愠摮渠瑯晩捩瑡潩獮眠瑩⁨敲牴ⱹ氠捯Ⱬ愠摮漠獢牥慶楢楬祴ਮ⌊⌣倠慨敳倠慬⁮刨捥浯敭摮摥਩⌊⌣‣桐獡⁥㨱圠牯敫⁲慨摲湥湩⁧‫慰獲牥甠杰慲敤⠠楨桧獥⁴牰潩楲祴਩‭敒汰捡⁥牣湯映物ⵥ湡ⵤ潦杲瑥眠瑩⁨畤慲汢⁥硥捥瑵潩⁮瑳慲整祧਺†‭灯楴湯ㄠ›䉄戭捡敫⁤潪⁢慴汢⁥‫潷歲牥氠潯ੰ†‭灯楴湯㈠›慭慮敧⁤畱略⁥瀨敲敦牲摥椠⁦湩牦⁡污潬獷਩‭摁⁤畲⵮敬敶⁬潬正湩⁧潴愠潶摩漠敶汲灡楰杮映汵⵬汰瑡潦浲樠扯⹳ⴊ唠杰慲敤爠睥牡⁤慰獲湩⁧楰数楬敮琠⁯慬敹敲⁤瑳慲整祧਺†‭敤整浲湩獩楴⁣敲敧⁸畲敬ੳ†‭湵瑩搠捩楴湯牡⁹䬨⁒畣牲湥祣琯硥⁴慶楲湡獴਩†‭慦汬慢正瀠牡敳⁲捳牯⁥湡⁤潣普摩湥散氠杯楧杮ⴊ䄠摤爠汥慩楢楬祴洠瑥楲獣⠠牠湵瑟浩彥獭Ⱡ怠慦汩摥灟慬晴牯獭Ⱡ怠敲牴役潣湵恴 潴椠杮獥⁴整敬敭牴⹹ਊ⌣⌣倠慨敳㈠›慍慮敧⁲慤慴映畯摮瑡潩੮‭摁⁤牐獩慭洠摯汥⁳湡⁤業牧瑡潩獮਺†‭啠敳恲 ⴠ怠獕牥捓敨畤敬੠†‭灯楴湯污怠潎楴楦慣楴湯敄楬敶祲⁠畡楤⁴慴汢੥‭敄楦敮猠档摥汵⁥瑳瑡獵洠捡楨敮਺†‭䅠偐䥌䑅ⴠ‾䕓䕌呃䑅ⴠ‾䥖䥓彔䱐乁䕎⁄㸭删噅䕉彗佃偍䕌䕔恄ⴊ䄠摤䄠䥐㩳 ⴠ怠䕇⽔佐呓⼠灡⽩敭猯档摥汵獥੠†‭偠呁䡃⼠灡⽩敭猯档摥汵獥㨯摩੠†‭䝠呅⼠灡⽩敭爯癥湥敵洿湯桴⸽⸮੠⌊⌣‣桐獡⁥㨳䴠湡条牥唠⁘‫敲業摮牥ੳ‭浉汰浥湥⁴慣敬摮牡唠⁉湡⁤慭畮污攠瑮祲洠摯污ਮ‭浉汰浥湥⁴潭瑮汨⽹敹牡祬爠癥湥敵搠獡扨慯摲挠牡獤振慨瑲⹳ⴊ䄠摤㤠䵁搠楡祬爠浥湩敤⁲潷歲牥⠠敤摡楬敮䐠㌭‬ⵄ⤱眠瑩⁨牰癯摩牥愠獢牴捡楴湯਺†‭灠獵恨愠摮漯⁲歠歡潡⁠敳摮牥椠灭敬敭瑮瑡潩獮戠桥湩⁤湯⁥湩整晲捡⹥ਊ⌣⌣倠慨敳㐠›慍⽰坐⁁潣灭敬楴湯ⴊ䄠摤洠牡敫⁲汣獵整楲杮愠摮瘠敩灷牯⵴慢敳⁤慬祺洠牡敫⁲潬摡湩⁧湩洠灡洠摯⹥ⴊ䄠摤爠慥⁬浠湡晩獥⹴獪湯⁠‫敳癲捩⁥潷歲牥猠牴瑡来⁹湡⁤景汦湩ⵥ慳敦猠敨汬戠桥癡潩⹲ⴊ䄠摤洠扯汩⁥湩瑳污⁬畦湮汥琠慲正湩⁧潴洠慥畳敲倠䅗愠潤瑰潩⹮ਊ⌣䤠浭摥慩整䈠捡汫杯䘠牯丠硥⁴灓楲瑮ਊ⸱䌠敲瑡⁥業牧瑡潩⁮汰湡映牯怠獕牥⁠湡⁤啠敳卲档摥汵恥眠瑩⁨慢正慷摲挭浯慰楴汢⁥潲汬畯⹴㈊‮敒慦瑣牯怠愯楰振潲恮琠⁯畤慲汢⁥潪⁢楤灳瑡档⠠潮映物ⵥ湡ⵤ潦杲瑥爠畯整攠數畣楴湯⸩㌊‮湉牴摯捵⁥慰獲牥琠獥⁴楦瑸牵獥映牯爠睥牡⁤整瑸渠牯慭楬慺楴湯焠慵楬祴朠瑡獥ਮ⸴䐠晥湩⁥慭慮敧⁲偁⁉潣瑮慲瑣⁳湩怠潤獣䄯䥐洮恤戠晥牯⁥䥕椠灭敬敭瑮瑡潩⹮㔊‮摁⁤捡散瑰湡散琠獥⁴档捥汫獩⁴潦㩲 †‭潬⁷潣灭瑥瑩潩⁮楦瑬牥挠牯敲瑣敮獳 †‭敲慷摲琠牨獥潨摬映汩整楲杮挠牯敲瑣敮獳 †‭捳敨畤敬爠浥湩敤⁲牴杩敧⁲潣牲捥湴獥ੳ⌊‣慐慲汬汥䔠數畣楴湯唠摰瑡⁥㈨㈰ⴶ㈰㈭⤸ਊ‭杁牧来瑡潩⁮敔浡਺†‭湉敧瑳潩⁮畧牡⁤‫湩楬敮攠數畣楴湯挠浯汰瑥潩⁮湩怠愯楰振潲恮‬⽠灡⽩摡業⽮湩敧瑳⹠ ⴠ丠硥⁴潭敶›摡⁤畤慲汢⁥畱略⽥潪⁢瑳瑡⁥湡⁤硥汰捩瑩氠捯⁫敨牡扴慥⁴慴汢⹥ⴊ倠牡楳杮吠慥㩭 ⴠ怠潮浲污穩剥睥牡噤污敵⁠灵牧摡摥琠⁯湵瑩愭慷敲瀠牡敳⬠洠硡挭湡楤慤整攠瑸慲瑣潩⹮ ⴠ丠硥⁴潭敶›摡⁤慰獲牥映硩畴敲琠獥獴愠摮挠湯楦敤据⁥捳牯⁥潦⁲慦汬慢正搠捥獩潩獮ਮ‭慍慮敧⁲敔浡਺†‭啠敳恲愠摮怠獕牥捓敨畤敬⁠潭敤獬愠摤摥ਮ†‭敎⁷畡桴湥楴慣整ⵤ祢瀭慬散潨摬牥䄠䥐⠠⽠灡⽩敭猯档摥汵獥Ⱡ怠愯楰洯⽥捳敨畤敬⽳楛嵤⥠愠摤摥ਮ†‭敎瑸洠癯㩥愠摤怠愯楰洯⽥敲敶畮恥愠摮挠污湥慤⁲畱牥⁹灯楴業慺楴湯映牯搠獡扨慯摲ਮ⌊‣잽쎽ꎰ젠별⃓ꖵ쳀껆⠠늳뫀븠맷₫�떿਩ⴊ䄠杧敲慧楴湯儠敵敵吠慥㩭怠慂正牧畯摮潊恢렠뗰₨﯀뼠럏ⳡ挠潲⽮摡業쁮₺�씠₥﯀젠⃄慢捴⁨畲쁮랸⃎ﳀ꿈‮�뷀븠볗샇₺ꗅ뜠₱돃꺸ꚸ딠뢶₳몽진�꾷캷먠룐잮⃘꧅킷쀠듀⃤겿쌠볖죒⺭ⴊ倠牡楳杮吠慥㩭넠뻝⃗쓆궼뀠좭뒭⃂쾿‮�뷀븠볗샇₺�Ꟁ넠쓔⾢꓁풱쒽씠뷗욺₮쏇캷딠삵⃔쓈쀠냓냨₪룈춱씠뷗욺₮풰쳀껆쌠냟⺡ⴊ䴠湡条牥吠慥㩭怠獕牥捓敨畤敬⁠겿뾵선뮤⃪偁⡉䝠呅⼠灡⽩敭爯癥湥敵⥠춿븠룋₲몽뗄븠냋룭솮⣲剠䵅义䕄归䍓乁⁠‫习瑯晩捩瑡潩䑮汥癩牥恹 �ꆰ‮�뷀븠볗샇₺뛄낸唠⽉뾵쀠럔⃂塕뤠⃗쮾늸猠湥敤⁲摡灡整⡲畐桳䬯歡潡 헇മ
-## 향후 작업 목록 고도화 (화면/기능/필수 요소 확장)
+﻿# Project Status Update (2026-02-28)
 
-아래는 “앞으로 작업할 목록”을 화면 단위로 세분화하고, 각 페이지에서 반드시 보여야 하는 요소를 명시한 확장판입니다.
+## Current Snapshot
+- Scope: `apps/web` (Next.js app, Prisma schema, adapters, API routes)
+- Current phase: Beta in active stabilization
+- Latest recorded test run: `61 passed / 0 failed / 61 total` from `test_output.txt`
+- Test status currently reflects adapter contract normalization and health/admin hardening work
+- Baseline docs synced on 2026-02-28 (`README.md`, `docs/API.md`)
 
-### 1) 홈 / 캠페인 탐색 (`/`)
-- 기능
-  - 다차원 필터(카테고리/지역/매체/유형/보상/경쟁도)
-  - 리스트/지도 모드 전환
-  - 정렬(최신/낮은 경쟁/높은 보상)
-  - 검색 기록/최근 필터 5개 노출
-- 필수 화면 요소
-  - 상단 필터 바(칩/드롭다운)
-  - 검색 결과 요약(총 n개, 적용된 필터)
-  - 카드 리스트(썸네일/플랫폼/보상/경쟁도/마감일)
-  - 상태 배지(마감 임박, 신규, 인기)
-  - 빈 상태(필터 조건 안내 + 추천 완화 버튼)
+## Completed In This Update
+- Updated `README.md` operational status to reflect latest recorded test result.
+- Aligned `docs/API.md` ingest request contract with implementation (`platform_id` single value).
+- Fixed platform filter option mapping and completed 7-platform coverage in `FilterBar.tsx`.
+- Implemented actual low-competition ordering for `competition_asc` in web page and campaigns API.
+- Synced adapter fixture expectations with current fallback contract for `MrBlogAdapter` and `GangnamFoodAdapter`.
+- Removed default `ADMIN_PASSWORD` fallback in `middleware.ts` and added fail-closed behavior.
+- Updated `/api/health` to verify DB availability and return `db: ok/down` with 503 on DB failure.
+- Updated admin dashboard health check to consume `/api/health` response (`db` field) before rendering ONLINE status.
+- Added GitHub Actions CI workflow (`.github/workflows/ci.yml`) to run `apps/web` tests on `main` push/PR.
+- Extended CI to run `lint` before tests, persist test output, and create a failure issue automatically.
 
-### 2) 캠페인 상세 (`/campaigns/[id]`)
-- 기능
-  - 상세 정보(보상, 기간, 요구사항)
-  - 외부 링크(스토어/지도/상품/신청)
-  - 유사 캠페인 추천
-- 필수 화면 요소
-  - 핵심 요약 카드(보상, 경쟁도, 마감일)
-  - 위치/매장 정보 섹션
-  - 행동 버튼(신청, 저장, 공유)
-  - 신뢰 정보(최종 수집 시각, 원본 링크)
+## What Is Implemented
+- Data model and indexing are defined in Prisma:
+  - `Platform`, `Campaign`, `CampaignSnapshot`, `IngestRun`
+  - snapshot/query indexes for ingestion and analytics workloads
+- Main API routes exist and are wired:
+  - `GET /api/campaigns`
+  - `GET /api/analytics`
+  - `POST /api/admin/ingest`
+  - `GET /api/admin/runs`
+  - `GET /api/health`
+  - `GET /api/cron`
+- Ingestion pipeline is implemented:
+  - adapter fetch loop (up to 5 pages)
+  - dedupe/normalize processing
+  - ingest run tracking (`RUNNING`, `SUCCESS`, `FAILED`)
+- Adapter registry contains 7 platforms (`sources/registry.ts`)
+- Admin dashboard exists with:
+  - health check
+  - ingest trigger per platform/all
+  - run log polling
 
-### 3) 지도 모드 (`/map` 또는 홈 내 탭)
-- 기능
-  - 지도 기반 탐색, 클러스터링
-  - 현재 위치/재검색
-  - 뷰포트 기반 lazy 로딩
-- 필수 화면 요소
-  - 지도 캔버스 + 클러스터
-  - “이 영역 재검색” 버튼
-  - 카드 프리뷰 하단 시트
-  - 위치 권한 요청 배너
+## Gaps And Risks
+- Security and operation hardening completed; remaining validation:
+  - Regression coverage on adapter fixture expectations was completed in this cycle.
+  - CI now includes lint + test checks and failure issue creation; behavior should be verified on first real PR/merge.
+- CI consistency note:
+  - `test_output.txt` artifact path was corrected to `test_output.txt` in workflow (relative to `apps/web` working directory).
+- Current hard blocker (pre-existing): 프로젝트 전체 ESLint `no-explicit-any` 룰 위반 다수로 lint가 현재 실패 상태입니다. 기존 코드 범위 정리가 필요합니다.
+- Product polish pending:
+  - Minor UX copy and zero-state messaging can be aligned with final brand tone.
+- Data-source behavior:
+  - Mock mode now has explicit semantics: DB unavailable -> mock fallback, DB empty -> clear empty state.
 
-### 4) 매니저 대시보드 (`/me`)
-- 기능
-  - 탭(대시보드/캘린더/통계)
-  - 일정 상태별 요약
-  - 수동 일정 추가 진입
-- 필수 화면 요소
-  - 요약 KPI 카드(이번 달 총 일정/완료/진행)
-  - 다음 일정 타임라인
-  - “일정 추가” CTA
-  - 알림 상태 배너(푸시/카카오 연동 여부)
+## Next Work (Prioritized)
+1. P2: Monitor first real PR/MR CI run and adjust `ci-failure`/`automated` issue labels, if needed.
 
-### 5) 캘린더 (`/me/calendar`)
-- 기능
-  - 월/주/일 보기 전환
-  - 일정 추가/수정/삭제
-  - D-3/D-1 마감 배지
-- 필수 화면 요소
-  - 월간 그리드
-  - 선택 날짜 상세 패널
-  - 상태별 색상/아이콘 범례
-  - 수동 일정 추가 모달
+## Suggested Update Cadence
+- Revisit this document after each of:
+  - adapter contract decision
+  - test suite stabilization
+  - auth hardening merge
 
-### 6) 통계/정산 (`/me/stats`)
-- 기능
-  - 월간/연간 보상 합계
-  - 플랫폼/카테고리별 분포
-  - 목표 대비 달성률
-- 필수 화면 요소
-  - 기간 선택(월/분기/연간)
-  - 누적 보상 그래프
-  - Top 플랫폼 리스트
-  - 수익 변동 인사이트 카드
+## PRD Fit Review (All-in-One Upgrade, 2026-02-28)
 
-### 7) 알림 설정 (`/me/notifications`)
-- 기능
-  - 리마인더 스케줄(9AM, D-3/D-1)
-  - 채널 선택(푸시/카카오/이메일)
-  - 테스트 발송
-- 필수 화면 요소
-  - 채널 토글 + 권한 상태
-  - 알림 시간 선택
-  - 최근 발송 로그(성공/실패)
+This section maps the requested integrated PRD to the current implementation.
+Status labels:
+- `Implemented`: already working in production code paths
+- `Partial`: available but limited, fragile, or not yet production-grade
+- `Missing`: not implemented yet
 
-### 8) 인증/온보딩 (`/auth`, `/onboarding`)
-- 기능
-  - 소셜 로그인(우선) + 이메일 대체
-  - 기본 프로필/관심 카테고리 설정
-  - 알림 권한 온보딩
-- 필수 화면 요소
-  - 로그인 버튼 그룹
-  - 최초 설정 체크리스트
-  - 개인정보/약관 링크
+### 1) Discovery / Curation
+- `Implemented`: multi-dimensional filtering (`campaign_type`, `media_type`, `region_depth1/2`, `category`) via `lib/queryBuilder.ts` and `components/FilterBar.tsx`.
+- `Implemented`: numeric filters for low competition (`max_comp`) and reward threshold (`min_reward`) via denormalized DB fields.
+- `Implemented`: recent filter history (top 5) in `localStorage` via `components/FilterBar.tsx`.
+- `Implemented`: quick outbound actions in cards (store/map/product link behavior) via `components/CampaignCard.tsx`.
+- `Partial`: map view exists (`components/MapView.tsx`) but marker clustering is not implemented and placement still depends on heuristic district matching.
+- `Partial`: reward parsing exists (`sources/normalize.ts`) but is regex-only and not robust enough for broad free-text patterns.
 
-### 9) 관리자 대시보드 (`/admin`)
-- 기능
-  - 수집 실행/상태 모니터링
-  - 실패 플랫폼 재시도
-  - 헬스체크 표시
-- 필수 화면 요소
-  - 플랫폼별 상태 테이블(최근 성공/실패)
-  - 실행 버튼(전체/개별)
-  - 최근 런 로그 타임라인
-  - DB 상태/지연 시간 표시
+### 2) Smart Manager (CRM)
+- `Missing`: user auth/account domain (`users` table and authenticated app flows).
+- `Missing`: schedule/calendar domain (`user_schedules`, calendar UI, manual external sponsorship entry).
+- `Missing`: revenue dashboard domain (monthly/yearly sponsorship/ad-fee analytics).
+- `Partial`: PWA prompt component exists (`components/PWAPrompt.tsx`), but manifest/service-worker assets are not present, so install path is incomplete.
 
-### 10) 시스템 신뢰/품질 페이지 (`/system` 또는 관리자 탭)
-- 기능
-  - 파서 정확도 리포트
-  - 수집 품질 경고(누락/급감)
-  - SLA/업타임 지표
-- 필수 화면 요소
-  - 품질 지표 카드(정확도/누락률)
-  - 이상 감지 경고 리스트
-  - 최근 7일 트렌드 그래프
+### 3) Background Processing / Worker Reliability
+- `Implemented`: scheduled ingestion trigger exists (`vercel.json` -> `/api/cron`) and admin/manual trigger exists (`/api/admin/ingest`).
+- `Partial`: cron/admin handler now avoids fire-and-forget and records per-platform result, but still runs inline in route lifecycle (not yet durable queue worker).
+- `Missing`: dedicated notification worker for deadline reminders (3-day / 1-day cadence).
 
-## 개발 우선순위 (권장)
+### 4) Data Model Alignment
+- `Implemented`: `platforms`, `campaigns`, `campaign_snapshots`, `ingest_runs` equivalents exist in Prisma schema.
+- `Implemented`: campaign supports `region_depth1/2`, `reward_value`, `competition_rate`, `lat/lng`, outbound URL fields.
+- `Partial`: index strategy is strong but not yet aligned to a single composite filter index strategy from PRD; current schema uses multiple focused indexes.
+- `Missing`: `users` and `user_schedules` tables and their indexes.
 
-1. Worker 내구성 + 파서 품질 게이트
-2. Manager 핵심 데이터 모델 + 캘린더 UX
-3. 알림 채널 통합 + 리마인더 워커
-4. 지도 클러스터링 + PWA 완성
+## Design Update For Next Upgrade (Do not rewrite, extend)
 
-## Immediate Backlog 재정렬 (고도화 버전)
+The next iteration should extend the existing Aggregator architecture, not replace it.
 
-1. Worker 내구성 + 파서 품질 게이트 (Impact: High / Confidence: Med / Effort: Med)
-2. Manager 핵심 데이터 모델 + 캘린더 UX (Impact: High / Confidence: Med / Effort: High)
-3. 알림 채널 통합 + 리마인더 워커 (Impact: High / Confidence: Med / Effort: Med)
-4. 지도 클러스터링 + PWA 완성 (Impact: Med / Confidence: Med / Effort: Med)
-5. 홈/상세 UX 품질(빈 상태/상태 배지/신뢰 정보) (Impact: Med / Confidence: High / Effort: Low)
+### Target Architecture Lanes
+- `Lane A - Aggregator Core (existing, keep and harden)`: scraping, normalization, dedupe, campaign search/map, analytics.
+- `Lane B - Manager Core (new)`: user identity, schedule lifecycle, manual entries, reminders, revenue aggregation.
+- `Lane C - Worker Core (new)`: durable job execution for ingestion and notifications with retry, lock, and observability.
 
-## 화면별 수용 기준 (AC) 확장
+### Phase Plan (Recommended)
 
-### 홈 / 캠페인 탐색 (`/`)
-- AC1: 필터 적용 시 결과 요약과 적용된 필터 칩이 항상 동기화되어 표시된다.
-- AC2: 결과 0건일 때 빈 상태 문구와 “조건 완화” 버튼이 노출된다.
-- AC3: 카드에 보상/경쟁도/마감일/플랫폼 배지가 누락되지 않는다.
+#### Phase 1: Worker hardening + parser upgrade (highest priority)
+- Replace cron fire-and-forget with durable execution strategy:
+  - option 1: DB-backed job table + worker loop
+  - option 2: managed queue (preferred if infra allows)
+- Add run-level locking to avoid overlapping full-platform jobs.
+- Upgrade reward parsing pipeline to layered strategy:
+  - deterministic regex rules
+  - unit dictionary (KR currency/text variants)
+  - fallback parser score and confidence logging
+- Add reliability metrics (`run_time_ms`, `failed_platforms`, `retry_count`) to ingest telemetry.
 
-### 캠페인 상세 (`/campaigns/[id]`)
-- AC1: 보상/기간/요구사항/마감일이 모두 표시된다.
-- AC2: 외부 링크가 없을 경우 비활성 처리되고 안내 문구가 표시된다.
-- AC3: 최종 수집 시각과 원본 링크가 항상 노출된다.
-
-### 지도 모드
-- AC1: 뷰포트 변경 시 “이 영역 재검색” 버튼이 나타난다.
-- AC2: 클러스터는 확대 레벨에 따라 자동 해제된다.
-- AC3: 위치 권한 거부 시 대체 안내 문구가 표시된다.
-
-### 매니저 대시보드 (`/me`)
-- AC1: KPI 카드 3개가 항상 표시된다(총 일정/완료/진행).
-- AC2: 다음 일정이 없을 경우 빈 상태가 노출된다.
-- AC3: 알림 권한 상태가 상단 배너로 표시된다.
-
-### 캘린더 (`/me/calendar`)
-- AC1: 월간 그리드에서 D-3/D-1 배지가 식별 가능하다.
-- AC2: 일정 추가/수정/삭제 후 즉시 반영된다.
-- AC3: 상태별 색상/아이콘 범례가 항상 노출된다.
-
-### 통계/정산 (`/me/stats`)
-- AC1: 기간 선택 시 그래프와 목록이 동기화된다.
-- AC2: 누적 보상 그래프가 0원 구간도 표시한다.
-- AC3: Top 플랫폼 리스트는 최소 3개 항목을 보여준다.
-
-### 알림 설정 (`/me/notifications`)
-- AC1: 채널 권한 상태가 ON/OFF로 정확히 반영된다.
-- AC2: 테스트 발송 성공/실패 로그가 남는다.
-- AC3: 리마인더 시간 변경이 즉시 저장된다.
-
-### 인증/온보딩 (`/auth`, `/onboarding`)
-- AC1: 소셜 로그인/이메일 대체 옵션이 모두 표시된다.
-- AC2: 온보딩 체크리스트는 완료 상태를 저장한다.
-- AC3: 약관/개인정보 링크가 항상 하단에 노출된다.
-
-### 관리자 대시보드 (`/admin`)
-- AC1: 플랫폼 상태 테이블은 최근 성공/실패 시간을 표시한다.
-- AC2: 개별 실행/전체 실행 버튼이 구분되어 동작한다.
-- AC3: DB 상태 지표가 health API와 일치한다.
-
-### 시스템 신뢰/품질 (`/system`)
-- AC1: 정확도/누락률 지표가 최신 24시간 기준으로 갱신된다.
-- AC2: 이상 감지 항목이 리스트로 노출된다.
-- AC3: 최근 7일 트렌드 그래프가 로딩 실패 시 대체 문구가 표시된다.
-
-## 화면별 API/데이터 요구사항
-
-### 홈 / 캠페인 탐색 (`/`)
-- 데이터
-  - `Campaign` 리스트, 필터 메타(카테고리/지역/매체/유형)
-  - `competition_rate`, `reward_value`, `deadline_at` 필드
-- API
-  - `GET /api/campaigns` (필터/정렬/페이지네이션)
-  - `GET /api/analytics` (검색 요약, 인기 카테고리)
-
-### 캠페인 상세 (`/campaigns/[id]`)
-- 데이터
-  - `Campaign` 상세, `CampaignSnapshot` 최근 항목
-  - `outbound_store_url`, `outbound_map_url`, `outbound_product_url`
-- API
-  - `GET /api/campaigns/:id`
-  - `GET /api/campaigns/:id/related`
-
-### 지도 모드
-- 데이터
-  - `lat/lng` 필드, 클러스터 계산 대상
-- API
-  - `GET /api/campaigns` (bbox/viewport 파라미터)
-
-### 매니저 대시보드 (`/me`)
-- 데이터
-  - `UserSchedule` 요약 카운트
-  - `next_schedule` 항목
-- API
-  - `GET /api/me/schedules/summary`
-  - `GET /api/me/schedules?from=...&to=...`
-
-### 캘린더 (`/me/calendar`)
-- 데이터
-  - 월간 일정 리스트
-  - 일정 상태(`APPLIED/SELECTED/VISIT_PLANNED/REVIEW_COMPLETED`)
-- API
-  - `GET /api/me/schedules?month=...`
-  - `POST /api/me/schedules`
+#### Phase 2: Manager data foundation
+- Add Prisma models and migrations:
+  - `User`
+  - `UserSchedule`
+  - optional `NotificationDelivery` audit table
+- Define schedule status machine:
+  - `APPLIED -> SELECTED -> VISIT_PLANNED -> REVIEW_COMPLETED`
+- Add APIs:
+  - `GET/POST /api/me/schedules`
   - `PATCH /api/me/schedules/:id`
-  - `DELETE /api/me/schedules/:id`
-
-### 통계/정산 (`/me/stats`)
-- 데이터
-  - `monthly_revenue`, `yearly_revenue`
-  - `platform_breakdown`, `category_breakdown`
-- API
   - `GET /api/me/revenue?month=...`
 
+#### Phase 3: Manager UX + reminders
+- Implement calendar UI and manual entry modal.
+- Implement monthly/yearly revenue dashboard cards/charts.
+- Add 9AM daily reminder worker (deadline D-3, D-1) with provider abstraction:
+  - `push` and/or `kakao` sender implementations behind one interface.
+
+#### Phase 4: Map/PWA completion
+- Add marker clustering and viewport-based lazy marker loading in map mode.
+- Add real `manifest.json` + service worker strategy and offline-safe shell behavior.
+- Add mobile install funnel tracking to measure PWA adoption.
+
+## Immediate Backlog For Next Sprint
+- 현재 실행 항목은 작업 목록 고도화(구조 통합) 섹션의 백로그 통합 항목으로 관리합니다.
+
+## Parallel Execution Update (2026-02-28)
+
+- Aggregation Team:
+  - Ingestion guard + inline execution completion in `/api/cron`, `/api/admin/ingest`.
+  - Next move: add durable queue/job state and explicit lock heartbeat table.
+- Parsing Team:
+  - `normalizeRewardValue` upgraded to unit-aware parse + max-candidate extraction.
+  - Next move: add parser fixture tests and confidence score for fallback decisions.
+- Manager Team:
+  - `User` and `UserSchedule` models added.
+  - New authenticated-by-placeholder API (`/api/me/schedules`, `/api/me/schedules/[id]`) added.
+  - Next move: add `/api/me/revenue` and calendar query optimization for dashboard.
+
+## 실시간 후속 업데이트 (남은 업무 반영)
+
+- Aggregation Queue Team: `BackgroundJob` 모델 적용 완료, cron/admin은 작업 큐 적재 후 batch run으로 전환. 다음 액션은 큐 런 처리기를 독립 스케줄러로 분리해 크론 응답 지연 최소화.
+- Parsing Team: 금액 파서 강화는 완료. 다음 액션은 단위 규칙/정규식 테스트 플로우 도입 후 임계값 회귀 테스트 게이트 추가.
+- Manager Team: `UserSchedule` 연동 정산 API(`GET /api/me/revenue`)와 알림 스캔 알고리즘(`REMINDER_SCAN` + `NotificationDelivery`) 추가. 다음 액션은 캘린더 UI/수동 입력 UX 및 알림 sender adapter(Push/Kakao) 통합.
+
+---
+
+# 작업 목록 고도화(구조 통합)
+
+## 1) 백로그 통합 (중복 제거)
+
+즉시 적용: 
+- `P1` 스키마 정합성 점검(중복 컬럼/누락 컬럼)
+- `P1` `BackgroundJob` 락/재시도 가시성 보강
+- `P1` `/api/campaigns/:id` + `/api/cron` 관련 AC 우선 충족
+
+단기 Backlog(M0):
+- `P1` `/api/cron` 내구성 전환 (큐 디스패치 보강)
+- `P1` 기존 `Immediate Backlog` 항목 재정렬(중복 제거)
+  - User/UserSchedule 마이그레이션 계획 수립
+  - `/api/cron` 큐 적재 실패 상태 가시성 강화
+  - reward 파서 fixture 게이트 추가
+  - `/api/me` 계약 문서 정리
+
+추천 우선순위 (Impact/Confidence/Effort):
+1. Worker 내구성 + 파서 품질 게이트 (High/Med/Med)
+2. Manager 데이터 모델 + 캘린더 UX (High/Med/High)
+3. 알림 채널 통합 + 리마인더 워커 (High/Med/Med)
+4. 지도 클러스터링 + PWA 완성 (Med/Med/Med)
+5. 홈/상세 UX 완성 (Med/High/Low)
+
+## 2) PRD Fit Review 하위로 통합한 실행 기준
+
+아래 고도화 항목은 PRD의 `Lane A/B/C`에 맞춰 정렬합니다.
+
+- Lane A (Aggregator Core): 캠페인 탐색/지도/상세, 검색 정확도/정렬
+- Lane B (Manager Core): 일정/캘린더/정산, 알림 설정
+- Lane C (Worker Core): 큐, 리마인더 워커, 품질 지표, 운영 관측
+
+### PRD 연결 체크포인트
+
+- 검색/필터/지도는 Lane A와 연동되어 `/api/campaigns`와 `/api/analytics` 중심으로 검증.
+- 매니저/일정/캘린더는 Lane B로 통합해 `/api/me` 계열 API 일괄 정합성 보장.
+- 큐·알림·SLA는 Lane C에서 운영 품질 게이트로 분리 관리.
+
+## 3) 화면/기능/필수 요소 (단일 사전)
+
+### 홈 / 캠페인 탐색 (`/`)
+- 기능: 다차원 필터, 정렬, 리스트/지도 전환, 최근 필터 히스토리.
+- 필수 요소: 필터 바, 결과 요약, 카드 라벨(보상/경쟁도/마감일), 상태 배지, 빈 상태 대체 액션.
+
+### 캠페인 상세 (`/campaigns/[id]`)
+- 기능: 상세 데이터(보상·기간·요구사항), 링크 동작, 유사 캠페인 추천.
+- 필수 요소: 요약 카드, 위치 정보, 행동 버튼(신청/저장/공유), 수집 메타.
+
+### 지도 모드 (`/map` 또는 홈 탭)
+- 기능: 클러스터링, 위치 기반 재검색, 뷰포트 lazy 로딩.
+- 필수 요소: 지도 캔버스, 재검색 CTA, 하단 카드 시트, 위치 권한 배너.
+
+### 매니저 대시보드 (`/me`)
+- 기능: KPI 요약, 다음 일정, 캘린더/통계 진입.
+- 필수 요소: 일정 상태 요약 카드, 타임라인, 일정 추가 CTA, 알림 상태 배너.
+
+### 캘린더 (`/me/calendar`)
+- 기능: 월/주/일 보기, 일정 CRUD, 만료 경고 배지.
+- 필수 요소: 월간 그리드, 날짜 상세 패널, 범례, 수동 추가 모달.
+
+### 통계/정산 (`/me/stats`)
+- 기능: 월/연 보상 합계, 분포, 목표 대비 달성률.
+- 필수 요소: 기간 선택, 누적 그래프, Top 플랫폼, 인사이트 카드.
+
 ### 알림 설정 (`/me/notifications`)
-- 데이터
-  - 채널 권한 상태, 알림 스케줄 설정
-  - `NotificationDelivery` 최근 로그
-- API
-  - `GET /api/me/notifications`
-  - `PATCH /api/me/notifications`
-  - `POST /api/me/notifications/test`
+- 기능: D-3/D-1 스케줄, 채널 선택, 테스트 발송.
+- 필수 요소: 채널 토글/권한, 시간 스케줄, 최근 발송 로그.
 
 ### 인증/온보딩 (`/auth`, `/onboarding`)
-- 데이터
-  - `User` 기본 정보, 관심 카테고리
-- API
-  - `POST /api/auth/login`
-  - `POST /api/auth/signup`
-  - `PATCH /api/me/profile`
+- 기능: 로그인, 프로필/관심사 설정, 동의/권한.
+- 필수 요소: 로그인 카드, 체크리스트, 약관/개인정보 링크.
 
-### 관리자 대시보드 (`/admin`)
-- 데이터
-  - 플랫폼별 최근 런 상태, 실패 로그
-  - `db` 헬스 상태
-- API
-  - `GET /api/admin/runs`
-  - `POST /api/admin/ingest`
-  - `GET /api/health`
+### 관리자 (`/admin`)
+- 기능: 수집 실행·상태 모니터링, 실패 재실행.
+- 필수 요소: 플랫폼 상태 표, 실행 버튼, 런 로그, DB 상태.
 
 ### 시스템 신뢰/품질 (`/system`)
-- 데이터
-  - 파서 정확도, 누락률, 이상 탐지 결과
-- API
-  - `GET /api/admin/quality`
-  - `GET /api/admin/alerts`
+- 기능: 파서/수집 정확도 모니터링, 이상 경보.
+- 필수 요소: 품질 KPI 카드, 경보 리스트, 7일 트렌드.
 
-## 화면별 에러/예외 케이스
+## 4) 수용 기준(AC) 단일 테이블
 
-### 홈 / 캠페인 탐색
-- 필터 조건 과다(결과 0건) 처리
-- 네트워크 실패 시 재시도 CTA
-- reward/competition 값 누락 시 보조 라벨 처리
+### AC 그룹 A (핵심 탐색)
+- AC-S01: 필터 적용 시 요약값과 칩 동기화.
+- AC-S02: 0건일 때 빈 상태 및 조건 완화 액션 노출.
+- AC-S03: 카드 필수 속성 노출 누락 없음.
 
-### 캠페인 상세
-- 404 (캠페인 삭제/만료) 처리
-- outbound 링크 누락
-- 스냅샷 없음(최초 수집) 상태
+### AC 그룹 B (상세/지도)
+- AC-S04: 상세 정보(보상·기간·요구사항·마감일) 누락 없음.
+- AC-S05: 뷰포트 변경 시 재검색 CTA 노출.
+- AC-S06: 링크 미존재 시 비활성 + 안내.
 
-### 지도 모드
-- 위치 권한 거부
-- 지도 SDK 로딩 실패
-- 클러스터 계산 실패 시 단순 마커 폴백
+### AC 그룹 C (관리)
+- AC-S07: 일정 CRUD 즉시 반영과 충돌 없는 상태 갱신.
+- AC-S08: 관리자 상태 값과 `/api/health` 일치.
+- AC-S09: 최근 7일 지표 갱신 실패 시 폴백 메시지 노출.
 
-### 매니저 대시보드
-- 일정 데이터 없음
-- API 지연 시 스켈레톤 표시
-- 권한 만료(로그인 필요) 처리
+## 5) API/데이터/에러/테스트 정합성(중복 제거)
 
-### 캘린더
-- 월간 일정 로딩 실패
-- 일정 삭제 실패 시 롤백 안내
-- 중복 일정 등록 방지
+- API 세트, 데이터 요구사항, 에러 케이스는 페이지별로 동일한 항목 집합으로 통합 정의
+- 기존에 분산되던 스냅샷을 다음 규칙으로 정렬:
+  - API 문서: `GET /api/campaigns`, `GET /api/analytics`, `GET /api/me/*`, `GET /api/admin/*`
+  - 예외 처리: 404, 403, 네트워크 실패, 값 누락/지연 공통 처리 정책 1종 적용
+  - 테스트: 필터 정합성, 정렬 회귀, 큐 적재 실패 상태, health 503 케이스를 회귀 기준으로 고정
 
-### 통계/정산
-- 0원/0건 데이터 표시
-- 차트 데이터 불일치 경고
-- 기간 범위 제한
+## 6) 데이터 스키마(요청 집합) 통합
 
-### 알림 설정
-- 채널 권한 미승인
-- 테스트 발송 실패
-- 스케줄 중복 등록
+- `User`: 기본 인증 식별자 + 유니크 이메일
+- `UserSchedule`: 사용자 일정/상태/기한 중심
+- `NotificationDelivery`: 알림 발송 감사/재시도 트레이싱
+- `BackgroundJob`: 락/재시도/오류 메모 필수 인덱스
+- `Campaign`: 운영에 필요한 보상/경쟁률/기한 메타의 인덱싱 정리
 
-### 인증/온보딩
-- 로그인 실패/잠김 계정
-- 약관 미동의
-- 프로필 필수 정보 누락
+## 7) 관측/알람
 
-### 관리자 대시보드
-- 권한 없음(403)
-- DB 다운 시 상태 표시
-- 수집 실패 재시도 제한
+- SLO/SLA 및 알람 임계값은 단일 세트로 유지:
+  - API p95 < 800ms, 수집 성공률 > 98%, 알림 성공률 > 95%, DB 가용성 > 99.5%
+  - 임계 초과 시 `/system` 경보 대시보드에서 동일 기준으로 이슈화
 
-### 시스템 신뢰/품질
-- 지표 데이터 지연
-- 이상 감지 없음 상태
-- 알림 폭주 시 요약 표시
+## 8) 운영 IA/권한 규칙
 
-## 테스트 시나리오 체크리스트
+- IA는 글로벌: 홈/지도/매니저/통계/알림/관리자(권한)로 고정.
+- 권한은 `guest/user/admin` 3단 구성, 데이터 접근 범위는 도메인별로 단일 규칙 적용.
+- 관리자 전용: 수집/품질/헬스.
+- 사용자 전용: 본인 일정/알림 도메인.
 
-### 통합 시나리오
-- 필터 조합 적용 -> 결과/요약/카드가 일관성 유지
-- 상세 -> 외부 링크 클릭 정상 이동
-- 캘린더 일정 추가 -> 대시보드 KPI 반영
-- 알림 설정 변경 -> 테스트 발송 로그 기록
+## 9) 마일스톤 배분(M1~M5)
 
-### 회귀 시나리오
-- `competition_asc` 정렬 값 변경 시 리스트 순서 유지
-- reward 파서 변경 후 기존 fixture 통과
-- `/api/cron` 작업 큐 적재 실패 시 상태 보고
-- `/api/health` DB 다운 시 503 반환
+### M1 (0~4주)
+- Worker 내구성, 큐/락/재시도, 파서 품질 게이트 핵심.
+- 산출물: `/system` 신뢰지표 기본판, BackgroundJob 상태 트레이싱.
 
-## 데이터 스키마 변경안 (필드/인덱스)
+### M2 (5~10주)
+- Manager 핵심: `User`, `UserSchedule`, 캘린더/일정 상태 머신, `/me/calendar` 기본 UX.
 
-### 신규/확장 모델
+### M3 (11~14주)
+- 알림 채널/리마인더 워커 구축, `/me/notifications` 운영화.
 
-- `User`
-  - 필드: `id`, `email`, `name`, `provider`, `created_at`, `updated_at`
-  - 인덱스: `email` unique
+### M4 (15~17주)
+- 지도 클러스터링, PWA 매니페스트/서비스워커, 모바일 설치 퍼널.
 
-- `UserSchedule`
-  - 필드: `id`, `user_id`, `campaign_id`(nullable), `title`, `status`, `visit_date`, `deadline_at`, `reward_value`, `platform_name`, `created_at`, `updated_at`
-  - 인덱스: `user_id + visit_date`, `user_id + status`, `deadline_at`
+### M5 (18~19주)
+- 홈/상세/캘린더 예외 UX, 카피 고도화, 품질 리포트 일관화.
 
-- `NotificationDelivery`
-  - 필드: `id`, `user_id`, `channel`, `scheduled_at`, `sent_at`, `status`, `error_code`, `created_at`
-  - 인덱스: `user_id + scheduled_at`, `status`
+### 기능-마일스톤 연결(요약)
+- M1: 시스템/운영(`/system`) + 핵심 수집 안정성
+- M2: 매니저 도메인(`/me`, `/me/calendar`)
+- M3: 알림 도메인(`/me/notifications`)
+- M4: 지도, 사용자 경험 채널(`/map`, PWA)
+- M5: UX 마감(홈/상세/캘린더/통계)
 
-- `BackgroundJob` (강화)
-  - 필드 추가: `job_type`, `lock_owner`, `lock_expires_at`, `retry_count`, `last_error`
-  - 인덱스: `job_type + status`, `lock_expires_at`
 
-### 기존 모델 확장
+## 누락 항목 보완(삭제/대체 없이 정합 강화)
 
-- `Campaign`
-  - 필드 추가: `deadline_at`, `reward_value`, `competition_rate`, `outbound_store_url`, `outbound_map_url`, `outbound_product_url`
-  - 인덱스: `reward_value`, `competition_rate`, `deadline_at`, `region_depth1 + region_depth2`
+### A. 화면별 UX 카피(유지 보완)
 
-## 운영/관측 지표 (SLO/알람)
-
-### 핵심 SLO
-- `api_latency_p95` < 800ms (홈/캠페인 리스트)
-- `ingest_success_rate` > 98%
-- `notification_delivery_success` > 95%
-- `db_uptime` > 99.5%
-
-### 알람 조건
-- 연속 3회 수집 실패(동일 플랫폼)
-- reward 파서 실패율 > 10% (최근 1시간)
-- 알림 발송 실패율 > 5% (최근 24시간)
-- `/api/health` 2회 연속 503
-
-### 대시보드 지표
-- 수집 런타임(ms), 실패 플랫폼 수
-- 파서 정확도 추정(샘플링)
-- 알림 발송 성공/실패 추이
-
-## 화면별 UX 카피 초안
-
-### 홈 / 캠페인 탐색
+#### 홈 / 캠페인 탐색
 - 빈 상태: "조건을 조금 완화하면 더 많은 캠페인을 찾을 수 있어요."
-- 상태 배지: `마감 임박`, `신규`, `인기`
-- 요약: "총 {n}개 캠페인, {k}개 조건 적용됨"
+- 상태 배지 라벨: `마감 임박`, `신규`, `인기`
+- 요약 라벨: "총 {n}개 캠페인, {k}개 조건 적용됨"
 
-### 캠페인 상세
-- 신뢰 정보: "마지막 수집: {date}"
-- 링크 없음: "현재 연결된 외부 링크가 없습니다."
+#### 캠페인 상세
+- 신뢰 표기: "마지막 수집: {date}"
+- 링크 미존재: "현재 연결된 외부 링크가 없습니다."
 
-### 지도 모드
+#### 지도 모드
 - 위치 권한: "현재 위치를 허용하면 가까운 캠페인을 볼 수 있어요."
 - 재검색: "이 영역에서 다시 찾기"
 
-### 매니저 대시보드
-- 빈 일정: "예정된 일정이 없습니다. 새로운 일정을 추가해보세요."
+#### 매니저 대시보드
+- 일정 비어있음: "예정된 일정이 없습니다. 새로운 일정을 추가해보세요."
 - 알림 배너: "알림이 꺼져 있어요. 설정에서 켜주세요."
 
-### 캘린더
+#### 캘린더
 - 모달 제목: "일정 추가"
-- 상태 범례: `신청`, `선정`, `방문 예정`, `리뷰 완료`
+- 상태 라벨: `신청`, `선정`, `방문 예정`, `리뷰 완료`
 
-### 통계/정산
+#### 통계/정산
 - 0원 상태: "아직 정산 내역이 없습니다."
 - 인사이트: "이번 달은 지난달보다 {x}% 증가했어요."
 
-### 알림 설정
-- 테스트 성공: "테스트 알림이 전송되었습니다."
-- 테스트 실패: "전송에 실패했습니다. 잠시 후 다시 시도해주세요."
+#### 알림 설정
+- 테스트 발송 성공: "테스트 알림이 전송되었습니다."
+- 테스트 발송 실패: "전송에 실패했습니다. 잠시 후 다시 시도해주세요."
 
-### 인증/온보딩
+#### 인증/온보딩
 - 체크리스트: "3분이면 설정 완료"
-- 약관: "계속하면 서비스 약관과 개인정보 처리방침에 동의합니다."
+- 동의 문구: "계속하면 서비스 약관과 개인정보 처리방침에 동의합니다."
 
-### 관리자 대시보드
-- 상태: "최근 수집 성공: {date}"
-- 실패: "최근 수집 실패: {date}"
-
-### 시스템 신뢰/품질
+#### 관리자/시스템
+- 최근 수집 성공: "최근 수집 성공: {date}"
+- 최근 수집 실패: "최근 수집 실패: {date}"
 - 경고: "정확도 저하가 감지되었습니다."
 - 정상: "모든 지표가 안정적입니다."
+
+### B. 페이지별 에러·예외 케이스(구체 복구)
+
+#### 홈
+- 필터 조건 과다(결과 0건): 즉시 조건 완화 제안 CTA 표시.
+- API/네트워크 실패: 재시도 버튼 및 마지막 성공 상태 유지.
+- `reward_value`/`competition_rate` 누락: 라벨 fallback 표시.
+
+#### 캠페인 상세
+- 404(삭제/만료): 캠페인 삭제/만료 안내 및 홈 복귀 버튼.
+- 외부 링크 누락: 링크 비활성화 + 안내 문구.
+- 스냅샷 부재: "최신 데이터 수집 대기중" 배너.
+
+#### 지도 모드
+- 위치 권한 거부: 권한 유도 배너와 수동 지역 선택 모드.
+- 지도 SDK 로딩 실패: 텍스트 목록 모드 fallback.
+- 클러스터 계산 실패: 마커 단순 표기 fallback.
+
+#### 매니저 대시보드
+- 일정 없음: 빈 상태 가이드+캘린더 이동 CTA.
+- API 지연: 스켈레톤 + 마지막 동기화 시각 표시.
+- 로그인 만료: 로그인 안내 + 상태 보존 후 복귀.
+
+#### 캘린더
+- 월간 로딩 실패: 재시도 및 캐시된 이전 일정 표시.
+- 삭제 실패: 즉시 롤백 + 실패 토스트.
+- 중복 일정 충돌: 중복 경고 후 수동 확인 흐름.
+
+#### 통계/정산
+- 0원/0건: 영점 차트 + 안내 문구.
+- 기간 계산 오류: 범위 고정 및 사용자 선택 제한 피드백.
+- 차트 데이터 불일치: 경고 배지 + 로그 링크.
+
+#### 알림 설정
+- 권한 미승인: 채널별 켜기 가이드.
+- 테스트 발송 실패: 실패 코드 노출 + 재시도.
+- 스케줄 중복: 저장 차단 + 병합 제안.
+
+#### 관리자
+- 권한 없음(403): 접근 거부 메시지 + 지원 채널.
+- DB 다운: 헬스 지표와 수집 메뉴 비활성.
+- 수집 실패 재시도 제한: 남은 재시도 횟수 및 다음 시도 시각 표시.
+
+#### 시스템 신뢰
+- 지표 지연: 마지막 정상시각 표시.
+- 이상 탐지 없음: "탐지된 이상 없음" 상태 라벨.
+- 알림 폭주: 묶음 요약 알림 + 상세 접기/펼치기.
+
+### C. 화면별 API/데이터 요구사항(복원)
+
+#### 홈
+- 데이터: `Campaign`, 필터 메타, `competition_rate`, `reward_value`, `deadline_at`
+- API: `GET /api/campaigns`, `GET /api/analytics`
+
+#### 캠페인 상세
+- 데이터: `Campaign` 상세, `CampaignSnapshot` 최신 버전, `outbound_store_url`, `outbound_map_url`, `outbound_product_url`
+- API: `GET /api/campaigns/:id`, `GET /api/campaigns/:id/related`
+
+#### 지도
+- 데이터: `lat/lng`
+- API: `GET /api/campaigns` (bbox/viewport)
+
+#### 매니저/캘린더
+- 데이터: `UserSchedule`, `next_schedule`, `visit_date`, `status`
+- API: `GET /api/me/schedules`, `GET /api/me/schedules/summary`, `GET /api/me/schedules/:id`, `POST /api/me/schedules`, `PATCH /api/me/schedules/:id`, `DELETE /api/me/schedules/:id`
+
+#### 정산
+- 데이터: `monthly_revenue`, `yearly_revenue`, `platform_breakdown`, `category_breakdown`
+- API: `GET /api/me/revenue`
+
+#### 알림
+- 데이터: 채널 권한, 스케줄, `NotificationDelivery`
+- API: `GET /api/me/notifications`, `PATCH /api/me/notifications`, `POST /api/me/notifications/test`
+
+#### 관리자
+- 데이터: 플랫폼별 런 상태, 실패 로그, `db` 지표
+- API: `GET /api/admin/runs`, `POST /api/admin/ingest`, `GET /api/health`, `GET /api/admin/quality`, `GET /api/admin/alerts`
+
+### D. 테스트 시나리오(구체 체크리스트 복구)
+
+#### 통합
+- 필터 조합 후 결과 목록/요약/카드 일치.
+- 캠페인 상세에서 외부 링크 이동 정상.
+- 캘린더 일정 등록이 대시보드 KPI에 즉시 반영.
+- 알림 설정 변경 후 테스트 발송 로그 적재.
+
+#### 회귀
+- `competition_asc` 정렬 변경 시 순서 불변성.
+- reward 파서 변경 후 기존 fixture 회귀 통과.
+- `/api/cron` 큐 적재 실패 시 상태 보고.
+- `/api/health`에서 DB 다운 시 `503` + `db: down`.
+
+### E. 데이터 거버넌스(운영 보강)
+
+#### 규칙
+- `Campaign` 핵심 지표(`reward_value`, `competition_rate`, `deadline_at`)는 수집 정규화 파이프라인에서 최소값/최대값 경계 검증.
+- `UserSchedule`은 사용자 본인 ID 범위 제약 + 상태 값(enum 고정.
+- `NotificationDelivery`는 발송 이력 90일 보존, 실패 사유 코드는 표준 코드북 적용.
+- `BackgroundJob`은 락 유효 기간 만료 시 강제 해제 후 경고 알림.
+
+#### 정합성 점검
+- API 변경 시 `docs/API.md`와 스키마/라우팅 계약 동시 업데이트.
+- 수동 입력 일정은 `campaign_id` nullable 허용 + 중복 후보 감지.
+- 상태 전이 시 `updated_at` 갱신 + 감사 로그 저장.
+
+### F. 운영 런북(장애/롤백/모니터링)
+
+#### 장애 대응
+- ingest 실패 다발(동일 플랫폼 3회 연속): 해당 플랫폼 자동 정지, 수동 재실행 가이드 제시.
+- DB 장애: `/api/health` 기반 모드 강등(읽기 경량 모드) 유지 여부 판단 및 운영 알림.
+- 알림 발송 장애 급증(24h): 채널별 fallback 전환(푸시→카카오/이메일).
+
+#### 롤백
+- API 응답 오류율 급등 시 이전 안정 빌드로 라우트 단위 롤백.
+- 파서 버전 이슈 발생 시 파서 규칙 set을 이전 버전으로 롤백.
+- 스케줄 큐 과부하: 배치 크기 하향 + 수동 분배.
+
+#### 모니터링
+- 주기: 5분 수치 스냅샷(수집 성공률, 큐 적재/완료, API p95).
+- 일일: `/system` 지표 브리핑 + 알람 임계 초과 리스트.
+- 주간: 마일스톤 항목별 완료율 리뷰.
+
+### G. 역할/접근 권한(보완 버전)
+
+#### 권한 경계(명확화)
+- `guest`: 홈/지도/상세/검색만 읽기 가능.
+- `user`: 자기 일정/알림 도메인 및 매니저/통계 조회 가능.
+- `admin`: 관리자/품질/헬스 실행/조회 가능.
+
+#### 접근 테스트
+- `403` 발생 시 공통 메시지 + 1초 후 대체 화면 전환.
+- 토큰 만료: 토큰 갱신 후 이전 작업 재실행 큐 유지.
+
+## API 정합성 상태 보강 (PROJECT_STATUS 내부 반영)
+
+### 구현 완료 API
+- `GET /api/campaigns`
+- `GET /api/analytics`
+- `GET /api/cron` (`runNow`, `limit`)
+- `POST /api/admin/ingest`
+- `GET /api/admin/runs`
+- `GET /api/health`
+- `GET /api/me/revenue`
+- `GET /api/me/board`
+- `GET /api/me/pro`
+- `POST /api/me/pro`
+
+### 계획/API 미구현 상태
+- `GET /api/campaigns/:id`
+- `GET /api/campaigns/:id/related`
+- `GET /api/me/schedules`
+- `GET /api/me/schedules/summary`
+- `GET /api/me/schedules/:id`
+- `POST /api/me/schedules`
+- `PATCH /api/me/schedules/:id`
+- `DELETE /api/me/schedules/:id`
+- `GET /api/me/notifications`
+- `PATCH /api/me/notifications`
+- `POST /api/me/notifications/test`
+- `GET /api/admin/quality`
+- `GET /api/admin/alerts`
+- `POST /api/jobs` (현재 공개 라우트 미존재, 내부 실행 진입점은 `GET /api/cron`)
+
+### 문서-실행 연결 규칙
+- 구현 기준: 실제 앱 라우트 경로 존재 여부를 우선 적용
+- 문서 반영: 구현 전 항목은 항상 `계획/미구현` 라벨로 명시
+- 배포 승인 룰: 계획 항목은 별도 릴리즈 체크 후 문서 상태 전환
+
+## 고도화 단일 템플릿(운영용)
+
+- 범주: 인프라/기능/품질/운영
+- 규칙: 구현 항목은 라우트 존재 기반, 계획 항목은 `계획(미구현)` 라벨 필수
+
+### 1) 구현 항목 (Done)
+- [ ] `GET /api/campaigns`
+- [ ] `GET /api/analytics`
+- [ ] `GET /api/cron`
+- [ ] `POST /api/admin/ingest`
+- [ ] `GET /api/admin/runs`
+- [ ] `GET /api/health`
+- [ ] `GET /api/me/revenue`
+- [ ] `GET /api/me/board`
+- [ ] `GET/POST /api/me/pro`
+
+### 2) 고도화 항목 (Planned)
+- [ ] 상세 API: `/api/campaigns/:id`, `/api/campaigns/:id/related`
+- [ ] 일정 API: `/api/me/schedules*`
+- [ ] 알림 API: `/api/me/notifications*`
+- [ ] 운영 품질 API: `/api/admin/quality`, `/api/admin/alerts`
+- [ ] 워커 내부 API 정합성: `/api/jobs` 공개화 여부 최종 결정
+
+### 3) 정합성 체크
+- [ ] `API.md`, `ARCHITECTURE.md`, `AGENT_WORKFLOW.md`, `TEAM_CONTEXT.md`, `PROJECT_STATUS.md` 동시 갱신
+- [ ] AGENT 체크리스트 템플릿 기준 주간 감사 통과
+- [ ] 문서 내 한글/영문 용어 통일률 점검(오류 표기 제거)

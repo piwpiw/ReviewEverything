@@ -60,7 +60,7 @@ export default function ManagerDashboard({ userId }: { userId: number }) {
             const board = boardRes.ok ? await boardRes.json() : null;
             setData({
                 schedules: board?.schedules || [],
-                revenue: board?.summary ? { summary: board.summary, month: board.month } : null,
+                revenue: board?.summary ? { summary: board.summary, month: board.month, monthly: board.monthly } : null,
                 notifications: board?.notifications || [],
             });
             setLoading(false);

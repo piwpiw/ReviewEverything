@@ -1,4 +1,4 @@
-# T06_ANALYTICS — Data Analytics & Caching Agent
+﻿# T06_ANALYTICS — Data Analytics & Caching Agent
 
 ## Mission
 단순한 데이터 조회를 넘어, 캠페인 스냅샷 통계를 예측 모델(MCP)로 분석하여 `Hot/Trending` 랭킹을 똑똑하게 도출하고 캐싱 전략을 최적화한다.
@@ -36,3 +36,4 @@
 ## 5. Done Definition
 - `/api/analytics` 라우트의 99퍼센타일 지연 시간(p99 Latency)이 150ms 미만 보장.
 - 스냅샷이 누락된 버그 상황에서도 500 에러 대신 빈 배열 또는 폴백(이전 캐시) 응답.
+

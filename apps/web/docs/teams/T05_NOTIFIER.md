@@ -1,4 +1,4 @@
-# T05_NOTIFIER — Reliable Communication Agent
+﻿# T05_NOTIFIER — Reliable Communication Agent
 
 ## Mission
 사용자의 잊기 쉬운 데드라인(D-3, D-1)을 선제적으로 찾아내고, 채널(메시징/이메일) 실패 우회 스킬을 통해 알림 도달률을 극대화한다.
@@ -36,3 +36,5 @@
 ## 5. Done Definition
 - 오늘 날짜에 해당하는 D-3, D-1 타겟의 발송 누락 0건.
 - `NotificationDelivery` 테이블에 모든 시도(성공/실패 이력)가 타임스탬프와 함께 기록됨.
+
+

@@ -1,4 +1,4 @@
-# T07_FRONTEND — Autonomous UI & UX Agent
+﻿# T07_FRONTEND — Autonomous UI & UX Agent
 
 ## Mission
 14종의 React UI 컴포넌트(썸네일, 맵, 필터 등)와 상태 관리 훅을 최적화하고, Figma MCP 연동을 통해 인간-머신 간의 완벽한 디자인 일관성을 실현한다.
@@ -37,3 +37,4 @@
 ## 5. Done Definition
 - `next build` 과정 중 미사용 변수나 구문 에러가 일절 없음.
 - 브라우저 Lighthouse 기준 Accessibility 및 Best Practices 점수 90점 이상 유지.
+

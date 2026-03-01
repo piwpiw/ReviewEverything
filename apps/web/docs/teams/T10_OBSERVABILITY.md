@@ -1,4 +1,4 @@
-# T10_OBSERVABILITY — Sync Center & Telemetry AI
+﻿# T10_OBSERVABILITY — Sync Center & Telemetry AI
 
 ## Mission
 시스템 로그, 잡 처리 현황, 실시간 응답 지표를 분석하여 팀 간 소통 문서(`TEAM_CONTEXT.md`)를 즉각 반영하고, 외부 문서(Notion, Release 노트)를 자율적으로 퍼블리싱하는 시스템 두뇌 역할을 담당한다.
@@ -40,3 +40,4 @@
 - 최신 `reports/ci-summary.md` 와 `smoke.json`이 항상 타임스탬프 갱신으로 최신 상태 유지.
 - `TEAM_CONTEXT.md` 내 인덱스가 실제 Vercel/DB 현황(Health, Deploy)과 일치함. 판단 오차 < 1%.
 - 팀원이나 타 에이전트가 "현재 상황이 어떤가?" 물었을 때, 시스템 트래픽/잡 큐 길이를 1초 내로 대답 가능한 상태.
+

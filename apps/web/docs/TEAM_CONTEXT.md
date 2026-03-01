@@ -1,4 +1,4 @@
-# TEAM_CONTEXT — Programmable Source of Truth
+﻿# TEAM_CONTEXT — Programmable Source of Truth
 
 > **[READ_RULE]** 부분 로딩을 위해 전체 문서를 로드하지 말고, `grep_search`와 `#해시태그`를 결합하여 사용하십시오.
 
@@ -8,10 +8,10 @@
 <!--
 {
   "sprint": "Team-Agent Automation & Advanced Skills",
-  "system_status": "GREEN",
-  "priority_teams": ["T01", "T03", "T09", "T10"],
+  "system_status": "AMBER",
+  "priority_teams": ["T01", "T03", "T04", "T08", "T10"],
   "frozen_scopes": [],
-  "last_updated": "2026-03-01T01:45:00Z",
+  "last_updated": "2026-03-01T09:30:00Z",
   "automation_level": "AUTONOMOUS"
 }
 -->
@@ -53,3 +53,10 @@
 | 일시 | 팀 | 로직 |
 |---|---|---|
 | 2026-03-01 | ORCHESTRATOR | Hashtag indexing 및 `AGENT_PROTOCOLS`, `COST_RULES` 규격 동기화 완료 |
+
+## #api_contract_audit
+- POST /api/jobs는 공개 API가 아닌 내부 worker 실행 트리거 후보.
+- 구현된 API: GET /api/campaigns, GET /api/analytics, GET /api/cron, POST /api/admin/ingest, GET /api/admin/runs, GET /api/health, GET /api/me/revenue, GET /api/me/board, GET /api/me/pro, POST /api/me/pro.
+- 미구현(계획): GET /api/campaigns/:id, GET /api/campaigns/:id/related, /api/me/schedules*, /api/me/notifications*, /api/admin/quality, /api/admin/alerts.
+- 정기 점검: 항목 변경 시 TEAM_CONTEXT/API.md/ARCHITECTURE.md 동시 갱신.
+

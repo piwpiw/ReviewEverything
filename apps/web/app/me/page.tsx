@@ -9,8 +9,8 @@ export default async function MePage({ searchParams }: { searchParams: Promise<{
 
     const tabs = [
         { id: "dashboard", label: "대시보드", icon: LayoutDashboard, href: "/me" },
-        { id: "calendar", label: "캘린더", icon: CalendarDays, href: "/me/calendar" },
-        { id: "stats", label: "통계", icon: TrendingUp, href: "/me?tab=stats" },
+        { id: "calendar", label: "캘린더(일정 관리)", icon: CalendarDays, href: "/me/calendar" },
+        { id: "stats", label: "분석 리포트", icon: TrendingUp, href: "/me?tab=stats" },
     ];
 
     return (
@@ -20,8 +20,8 @@ export default async function MePage({ searchParams }: { searchParams: Promise<{
                 <div className="max-w-[1200px] mx-auto px-6 pt-8 pb-0">
                     <div className="flex items-end justify-between mb-6">
                         <div>
-                            <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tighter">내 매니저 보드</h1>
-                            <p className="text-sm text-slate-500 dark:text-slate-400 font-bold mt-1">일정, 정산, 알림을 한 화면에서 확인합니다.</p>
+                            <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tighter">마이 매니저</h1>
+                            <p className="text-sm text-slate-500 dark:text-slate-400 font-bold mt-1">체험단 일정, 정산, 알림을 중앙 컨트롤 패널에서 확인합니다.</p>
                         </div>
                         <Link
                             href="/me/calendar"
@@ -56,15 +56,15 @@ export default async function MePage({ searchParams }: { searchParams: Promise<{
                 {activeTab === "stats" ? (
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         {[
-                            { label: "이번 달 당첨", value: "7건", change: "+2", up: true },
-                            { label: "총 협찬 가치", value: "425만원", change: "+38만원", up: true },
-                            { label: "평균 경쟁률", value: "2.3:1", change: "-0.4", up: false },
+                            { label: "이번 주 신규 플랫폼", value: "7개", change: "+2", up: true },
+                            { label: "총 누적 협찬 가치", value: "425만 원", change: "+38만", up: true },
+                            { label: "평균 경쟁률 유지", value: "2.3:1", change: "-0.4", up: false },
                         ].map(stat => (
                             <div key={stat.label} className="bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-100 dark:border-slate-800 p-6 shadow-sm">
                                 <p className="text-[11px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-3">{stat.label}</p>
                                 <p className="text-3xl font-black text-slate-900 dark:text-white mb-2">{stat.value}</p>
                                 <span className={`text-[11px] font-black px-2 py-1 rounded-lg ${stat.up ? "bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400" : "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400"}`}>
-                                    {stat.change} 전월 대비
+                                    {stat.change} 변경됨
                                 </span>
                             </div>
                         ))}

@@ -18,7 +18,7 @@ export default function ProUpgradeSection() {
     const handleProUpgrade = async () => {
         setUpgrading(true);
         await new Promise(r => setTimeout(r, 800));
-        // 실 결제 링크 연동 (현재는 사용자의 토스미 링크로 임시 연결)
+        // 실 결제 링크 연동
         window.open("https://toss.me/piwpiw", "_blank");
         setUpgrading(false);
         setShowModal(null);
@@ -130,7 +130,7 @@ export default function ProUpgradeSection() {
                                 ) : (
                                     <Sparkles className="w-4 h-4" />
                                 )}
-                                {upgrading ? "처리 중..." : "토스페이로 구독 시작"}
+                                {upgrading ? "처리 중..." : "결제 수단 연동"}
                             </button>
                         </motion.div>
                     </motion.div>
@@ -157,23 +157,22 @@ export default function ProUpgradeSection() {
                             <div className="w-20 h-20 bg-amber-100 dark:bg-amber-900/20 rounded-[2rem] flex items-center justify-center mx-auto mb-6 text-4xl shadow-xl shadow-amber-500/10">
                                 ☕
                             </div>
-                            <h3 className="text-xl font-black text-slate-900 dark:text-white mb-2">고마워요!</h3>
+                            <h3 className="text-xl font-black text-slate-900 dark:text-white mb-2">응원 감사합니다!</h3>
                             <p className="text-sm font-bold text-slate-500 dark:text-slate-400 mb-8 leading-relaxed">
-                                여러분의 후원이 이 서비스를 계속 운영할 수 있게 해줍니다.<br />
-                                커피 한 잔 금액이면 충분합니다. ☺️
+                                후원해주신 금액 덕분에<br />이 서비스를 무상으로 제공할 수 있습니다.
                             </p>
                             <div className="grid grid-cols-2 gap-3">
                                 <button
                                     onClick={handleCoffee}
                                     className="py-3 bg-amber-500 text-white rounded-2xl text-[11px] font-black shadow-lg shadow-amber-500/20 hover:bg-amber-600 transition-all active:scale-95"
                                 >
-                                    ☕ 3,000원
+                                    ☕ 3,000원 후원
                                 </button>
                                 <button
                                     onClick={handleCoffee}
                                     className="py-3 bg-amber-500 text-white rounded-2xl text-[11px] font-black shadow-lg shadow-amber-500/20 hover:bg-amber-600 transition-all active:scale-95"
                                 >
-                                    🍕 10,000원
+                                    🍕 10,000원 후원
                                 </button>
                             </div>
                             <button
