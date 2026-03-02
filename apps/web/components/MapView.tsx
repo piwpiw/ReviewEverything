@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
@@ -448,6 +448,46 @@ export function MapView({ campaigns }: { campaigns: Campaign[] }) {
   const activeCampaign = activeGroup?.representative;
   const activeLocation = [activeCampaign?.region_depth1, activeCampaign?.region_depth2].filter(Boolean).join(" ");
 
+  const setMapCenter = useCallback(
+    (lat: number, lng: number) => {
+      const map = mapInstanceRef.current;
+      if (!map) return;
+      if (engine === "kakao" && window.kakao?.maps) {
+        map.panTo(new window.kakao.maps.LatLng(lat, lng));
+        return;
+      }
+      if (engine === "naver" && window.naver?.maps) {
+        map.setCenter(new window.naver.maps.LatLng(lat, lng));
+      }
+    },
+    [engine],
+  );
+
+  const moveToCurrentLocation = useCallback(
+    (showNoPermission = false) => {
+      if (!navigator.geolocation) {
+        if (showNoPermission) setLocationDenied(true);
+        return;
+      }
+
+      setIsSearchingArea(true);
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          setMapCenter(latitude, longitude);
+          setLocationDenied(false);
+          setIsSearchingArea(false);
+        },
+        () => {
+          setLocationDenied(true);
+          setIsSearchingArea(false);
+        },
+        { enableHighAccuracy: true, timeout: 8000, maximumAge: 15000 },
+      );
+    },
+    [setMapCenter],
+  );
+
   if (!hasMapKey) {
     return (
       <section className="relative h-[620px] overflow-hidden rounded-[2rem] border border-slate-200 bg-white dark:bg-slate-950">
@@ -540,10 +580,7 @@ export function MapView({ campaigns }: { campaigns: Campaign[] }) {
           className="absolute top-4 left-1/2 -translate-x-1/2 z-10"
         >
           <button
-            onClick={() => {
-              setIsSearchingArea(true);
-              setTimeout(() => setIsSearchingArea(false), 1200);
-            }}
+            onClick={() => moveToCurrentLocation(true)}
             className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-slate-900 text-white text-xs font-black shadow-2xl hover:bg-blue-600 transition-all active:scale-95"
           >
             <Search className={`w-3.5 h-3.5 ${isSearchingArea ? "animate-spin" : ""}`} />
@@ -557,13 +594,7 @@ export function MapView({ campaigns }: { campaigns: Campaign[] }) {
           <span className="text-blue-600 mr-1">{count}</span>개 군집 표시
         </div>
         <button
-          onClick={() => {
-            if (!("geolocation" in navigator)) return;
-            navigator.geolocation.getCurrentPosition(
-              () => {},
-              () => setLocationDenied(true),
-            );
-          }}
+          onClick={() => moveToCurrentLocation(true)}
           className="w-10 h-10 rounded-xl bg-white/95 border border-slate-100 flex items-center justify-center shadow-lg text-slate-600 hover:bg-slate-50 dark:bg-slate-900/90 dark:border-slate-800 dark:text-slate-300"
           aria-label="현재 위치로 이동"
         >
@@ -619,17 +650,7 @@ export function MapView({ campaigns }: { campaigns: Campaign[] }) {
       </div>
 
       <button
-        onClick={() => {
-          if (!mapInstanceRef.current || !navigator.geolocation) return;
-          navigator.geolocation.getCurrentPosition((position) => {
-            const { latitude, longitude } = position.coords;
-            if (engine === "kakao" && window.kakao?.maps) {
-              mapInstanceRef.current.panTo(new window.kakao.maps.LatLng(latitude, longitude));
-            } else if (engine === "naver" && window.naver?.maps) {
-              mapInstanceRef.current.setCenter(new window.naver.maps.LatLng(latitude, longitude));
-            }
-          });
-        }}
+        onClick={() => moveToCurrentLocation()}
         className="absolute top-16 right-4 z-10 rounded-xl bg-white/95 p-3 shadow"
         aria-label="지도 중심 이동"
       >

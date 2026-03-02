@@ -146,35 +146,44 @@ export default function CampaignList({
 
   return (
     <div className="flex flex-col gap-8">
-      <div className="flex flex-col gap-6 px-2">
-        <div className="flex flex-wrap items-center gap-2">
-          <div className="flex items-center gap-2 pr-4 border-r border-slate-100 dark:border-slate-800 mr-2">
-            <p className="text-base font-black text-slate-900 dark:text-white uppercase tracking-widest whitespace-nowrap">
-              총 <span className="text-blue-600 dark:text-blue-400 font-black px-1.5 py-0.5 bg-blue-50 dark:bg-blue-900/30 rounded-lg ml-1">{total.toLocaleString()}</span>개
-            </p>
-          </div>
-
-          <AnimatePresence>
-            {Object.entries(searchParams).map(([key, value]) => {
-              if (!value || ["view", "sort", "page"].includes(key)) return null;
-              const label = key === "q" ? `키워드: ${String(value)}` : `${key}: ${String(value)}`;
-              return (
-                <motion.button
-                  key={key}
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.8 }}
-                  onClick={() => removeFilter(key)}
-                  className="px-3 py-1.5 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-xl text-[11px] font-bold text-slate-500 hover:border-rose-500 hover:text-rose-500 flex items-center gap-1.5 transition-all shadow-sm"
-                >
-                  {label}
-                  <X className="w-3 h-3 opacity-50" />
-                </motion.button>
-              );
-            })}
-          </AnimatePresence>
+      {viewMode === "map" ? (
+        <div className="flex items-center justify-between px-2">
+          <p className="text-xs font-black text-slate-500 dark:text-slate-300">
+            조건 결과 <span className="text-slate-900 dark:text-white">{total.toLocaleString()}건</span>
+          </p>
+          <p className="text-[11px] text-slate-500">지도에서 캠페인 위치를 빠르게 확인할 수 있습니다.</p>
         </div>
-      </div>
+      ) : (
+        <div className="flex flex-col gap-6 px-2">
+          <div className="flex flex-wrap items-center gap-2">
+            <div className="flex items-center gap-2 pr-4 border-r border-slate-100 dark:border-slate-800 mr-2">
+              <p className="text-base font-black text-slate-900 dark:text-white uppercase tracking-widest whitespace-nowrap">
+                총 <span className="text-blue-600 dark:text-blue-400 font-black px-1.5 py-0.5 bg-blue-50 dark:bg-blue-900/30 rounded-lg ml-1">{total.toLocaleString()}</span>개
+              </p>
+            </div>
+
+            <AnimatePresence>
+              {Object.entries(searchParams).map(([key, value]) => {
+                if (!value || ["view", "sort", "page"].includes(key)) return null;
+                const label = key === "q" ? `키워드: ${String(value)}` : `${key}: ${String(value)}`;
+                return (
+                  <motion.button
+                    key={key}
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.8 }}
+                    onClick={() => removeFilter(key)}
+                    className="px-3 py-1.5 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-xl text-[11px] font-bold text-slate-500 hover:border-rose-500 hover:text-rose-500 flex items-center gap-1.5 transition-all shadow-sm"
+                  >
+                    {label}
+                    <X className="w-3 h-3 opacity-50" />
+                  </motion.button>
+                );
+              })}
+            </AnimatePresence>
+          </div>
+        </div>
+      )}
 
       <AnimatePresence mode="wait">
         {viewMode === "map" ? (

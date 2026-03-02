@@ -1,4 +1,4 @@
-﻿import Link from "next/link";
+import Link from "next/link";
 import { CalendarDays, ClipboardCheck, Cpu, LayoutDashboard, ShieldCheck, TrendingUp } from "lucide-react";
 
 type WorkspaceKey = "me" | "calendar" | "notifications" | "project" | "admin" | "system";
@@ -36,6 +36,9 @@ export default function WorkspaceHubNav({
   title: string;
   description: string;
 }) {
+  const quickTarget = current === "admin" ? "/system" : current === "system" ? "/admin" : "/admin";
+  const quickLabel = current === "admin" ? "운영 환경 이동" : "관리자 콘솔 이동";
+
   return (
     <section className="max-w-[1700px] mx-auto px-4 md:px-8 pt-8 pb-6 border-b border-slate-100 dark:border-slate-800">
       <div className="flex flex-col gap-4">
@@ -53,10 +56,10 @@ export default function WorkspaceHubNav({
               홈으로
             </Link>
             <Link
-              href="/me"
-              className="px-4 py-2 rounded-xl text-[11px] font-black border border-slate-200 dark:border-slate-700 bg-slate-900 text-white dark:bg-blue-600 hover:bg-slate-700 dark:hover:bg-blue-500 transition-colors"
+              href={quickTarget}
+              className="px-4 py-2 rounded-xl text-[11px] font-black border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
             >
-              사용자 이동
+              {quickLabel}
             </Link>
           </div>
         </div>

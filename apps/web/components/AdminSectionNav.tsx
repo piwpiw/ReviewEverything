@@ -16,11 +16,11 @@ type MenuItem = {
 };
 
 const MENU_ITEMS: MenuItem[] = [
-  { key: "overview", href: "/admin#overview", label: "운영 개요", icon: Activity, anchor: "#overview" },
+  { key: "overview", href: "/admin#overview", label: "관리 개요", icon: Activity, anchor: "#overview" },
   { key: "platforms", href: "/admin#platforms", label: "플랫폼", icon: Layers, anchor: "#platforms" },
   { key: "analysis", href: "/admin#analysis", label: "분석", icon: ChartLine, anchor: "#analysis" },
   { key: "history", href: "/admin#history", label: "실행 이력", icon: Play, anchor: "#history" },
-  { key: "system", href: "/system", label: "운영 시스템", icon: Server },
+  { key: "system", href: "/system", label: "시스템 점검", icon: Server },
 ];
 
 export default function AdminSectionNav() {
