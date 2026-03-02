@@ -8,7 +8,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 type RecentFilter = { key: string; label: string; savedAt: string };
 
 const RECENT_KEY = "re_recent_filters";
-const FILTER_VISIBILITY_KEY = "re_filter_panel_visible";
 
 const PLATFORMS = [
   { id: "", label: "전체" },
@@ -145,22 +144,12 @@ function saveRecents(value: RecentFilter[]) {
   localStorage.setItem(RECENT_KEY, JSON.stringify(value));
 }
 
-function parseVisibleDefault() {
-  if (typeof window === "undefined") return false;
-  const raw = localStorage.getItem(FILTER_VISIBILITY_KEY);
-  if (raw === null) return false;
-  return raw === "1";
-}
-
 export default function FilterBar() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const isMapMode = searchParams.get("view") === "map";
   const [isPending, startTransition] = useTransition();
-  const [filtersVisible, setFiltersVisible] = useState(() => {
-    const saved = parseVisibleDefault();
-    return saved;
-  });
+  const [filtersVisible, setFiltersVisible] = useState(false);
   const [recents, setRecents] = useState<RecentFilter[]>(() => loadRecents());
   const current = useMemo<FilterQuery>(() => {
     return {
@@ -223,11 +212,7 @@ export default function FilterBar() {
 
   const togglePanel = useCallback(() => {
     setFiltersVisible((prev) => {
-      const next = !prev;
-      if (typeof window !== "undefined") {
-        localStorage.setItem(FILTER_VISIBILITY_KEY, next ? "1" : "0");
-      }
-      return next;
+      return !prev;
     });
   }, []);
 

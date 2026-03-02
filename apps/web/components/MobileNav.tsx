@@ -2,26 +2,34 @@
 
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
-import { Flame, Home, LayoutDashboard, Map as MapIcon, ShieldCheck, UserCheck } from "lucide-react";
-
-const navItems = [
-  { label: "홈", href: "/", icon: Home },
-  { label: "지도", href: "/map", icon: MapIcon },
-  { label: "트렌드", href: "/trending", icon: Flame },
-  { label: "내 활동", href: "/me", icon: LayoutDashboard },
-  { label: "캘린더", href: "/me/calendar", icon: UserCheck },
-  { label: "운영", href: "/system", icon: ShieldCheck },
-];
+import { Flame, Home, LayoutDashboard, Map as MapIcon, Settings2, ShieldCheck, UserCheck } from "lucide-react";
+import { useMemo } from "react";
 
 export default function MobileNav() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const mapHref = useMemo(() => {
+    const params = new URLSearchParams(searchParams?.toString() || "");
+    params.set("view", "map");
+    const query = params.toString();
+    return query ? `/?${query}` : "/map";
+  }, [searchParams]);
 
   const isMapView = searchParams?.get("view") === "map";
+  const navItems = [
+    { label: "홈", href: "/", icon: Home },
+    { label: "지도", href: mapHref, icon: MapIcon },
+    { label: "트렌드", href: "/trending", icon: Flame },
+    { label: "운영", href: "/admin", icon: Settings2 },
+    { label: "시스템", href: "/system", icon: ShieldCheck },
+    { label: "내 활동", href: "/me", icon: LayoutDashboard },
+    { label: "캘린더", href: "/me/calendar", icon: UserCheck },
+  ];
 
   const isActive = (href: string) => {
     if (href === "/") return pathname === "/";
-    if (href === "/map") return pathname === "/map" || (pathname === "/" && isMapView);
+    if (href === mapHref || href === "/map") return pathname === "/map" || (pathname === "/" && isMapView);
+    if (href === "/admin") return pathname.startsWith("/admin");
     if (href.startsWith("/me")) return pathname.startsWith("/me");
     if (href === "/trending") return pathname.startsWith("/trending");
     if (href === "/system") return pathname.startsWith("/system");

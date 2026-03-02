@@ -38,6 +38,21 @@ const statusBadge = (status: HealthStatus | "warn" | "critical") => {
   return "text-rose-300 border-rose-500/40 bg-rose-500/10";
 };
 
+const readApiErrorMessage = async (res: Response) => {
+  try {
+    const payload = (await res.json()) as { error?: string; message?: string };
+    return payload.error || payload.message || `요청 실패 (${res.status})`;
+  } catch {
+    return `요청 실패 (${res.status})`;
+  }
+};
+
+const isSetupIssue = (status: number, message: string) => {
+  if (status === 401 || status === 403 || status === 503) return true;
+  if (!message) return false;
+  return /(admin_password|cron_secret|database_url|direct_url|env|database|connection|missing|required)/i.test(message);
+};
+
 export default function AdminDashboard() {
   const [runs, setRuns] = useState<IngestRun[]>([]);
   const [runMeta, setRunMeta] = useState<CampaignMeta | null>(null);
@@ -65,11 +80,11 @@ export default function AdminDashboard() {
   const fetchRuns = useCallback(async () => {
     try {
       const res = await fetch("/api/admin/runs?limit=30");
-      if (res.status === 503) {
-        setRequiresAdminConfig(true);
-        throw new Error("ADMIN API is temporarily unavailable.");
+      if (!res.ok) {
+        const message = await readApiErrorMessage(res);
+        if (isSetupIssue(res.status, message)) setRequiresAdminConfig(true);
+        throw new Error(message);
       }
-      if (!res.ok) throw new Error(`수집 이력 API 호출 실패 (${res.status})`);
       const data = (await res.json()) as { data: IngestRun[]; meta?: CampaignMeta };
       setRuns(data.data || []);
       setRunMeta(data.meta || null);
@@ -86,11 +101,11 @@ export default function AdminDashboard() {
   const fetchPlatforms = useCallback(async () => {
     try {
       const res = await fetch("/api/admin/platforms");
-      if (res.status === 503) {
-        setRequiresAdminConfig(true);
-        throw new Error("ADMIN API is temporarily unavailable.");
+      if (!res.ok) {
+        const message = await readApiErrorMessage(res);
+        if (isSetupIssue(res.status, message)) setRequiresAdminConfig(true);
+        return;
       }
-      if (!res.ok) return;
       const payload = (await res.json()) as PlatformInfo[];
       setDbPlatforms(Array.isArray(payload) ? payload.filter((platform) => platform.is_active !== false) : []);
       setRequiresAdminConfig(false);
@@ -123,9 +138,8 @@ export default function AdminDashboard() {
         setAlertsCount(toNumber(qualityData.alerts_count, 0));
         setRequiresAdminConfig(false);
       } else {
-        if (qualityRes.status === 503) {
-          setRequiresAdminConfig(true);
-        }
+        const qualityError = await readApiErrorMessage(qualityRes);
+        if (isSetupIssue(qualityRes.status, qualityError)) setRequiresAdminConfig(true);
         setQualityStatus("warn");
       }
     } catch (e: unknown) {
@@ -167,14 +181,10 @@ export default function AdminDashboard() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ platform_id: target.id }),
         });
-        if (res.status === 503) {
-          setRequiresAdminConfig(true);
-          throw new Error("ADMIN API is temporarily unavailable.");
-        }
-
         if (!res.ok) {
-          const payload = (await res.json().catch(() => null)) as { error?: string } | null;
-          throw new Error(payload?.error || `${target.name} 수집 시작 실패`);
+          const message = await readApiErrorMessage(res);
+          if (isSetupIssue(res.status, message)) setRequiresAdminConfig(true);
+          throw new Error(message);
         }
 
         addLog(`${target.name} 수집 요청 승인`);

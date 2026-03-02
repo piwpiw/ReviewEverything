@@ -20,6 +20,7 @@ import {
 import NavStats from "./NavStats";
 import NavFavoritesBadge from "./NavFavoritesBadge";
 import ThemeToggle from "./ThemeToggle";
+import { useMemo } from "react";
 
 type MenuItem = {
   href: string;
@@ -51,6 +52,13 @@ export default function Header() {
   const searchParams = useSearchParams();
   const currentType = searchParams.get("campaign_type") || "";
   const currentView = searchParams.get("view") || "list";
+
+  const mapHref = useMemo(() => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("view", "map");
+    const query = params.toString();
+    return query ? `/?${query}` : "/map";
+  }, [searchParams]);
 
   const isActive = (item: MenuItem) => {
     if (item.kind === "home") {
@@ -100,8 +108,9 @@ export default function Header() {
             {MAIN_MENU.map((item) => {
               const Icon = item.icon;
               const active = isActive(item);
+              const href = item.kind === "map" ? mapHref : item.href;
               return (
-                <Link key={item.href} href={item.href} className={menuClass(active)}>
+                <Link key={item.href} href={href} className={menuClass(active)}>
                   <Icon className="w-3.5 h-3.5" />
                   <span className="text-[11px] font-black">{item.label}</span>
                 </Link>
