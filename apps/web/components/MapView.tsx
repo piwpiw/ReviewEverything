@@ -235,7 +235,15 @@ const waitFor = (predicate: () => unknown, retries = 25, interval = 120) => {
   });
 };
 
-export function MapView({ campaigns }: { campaigns: Campaign[] }) {
+export function MapView({
+  campaigns,
+  fallbackActionHref,
+  fallbackActionLabel,
+}: {
+  campaigns: Campaign[];
+  fallbackActionHref?: string;
+  fallbackActionLabel?: string;
+}) {
   const mapElementRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<any>(null);
   const markersRef = useRef<any[]>([]);
@@ -507,6 +515,14 @@ export function MapView({ campaigns }: { campaigns: Campaign[] }) {
                 <p className="text-xs text-slate-500 mt-1">
                   필터를 조정하거나 캠페인 좌표 보정 후 다시 시도해 주세요. 지도 키가 없으면 후보 목록으로 표시됩니다.
                 </p>
+                {fallbackActionHref ? (
+                  <a
+                    href={fallbackActionHref}
+                    className="mt-3 inline-flex items-center gap-2 rounded-lg bg-slate-900 text-white px-3 py-2 text-xs font-black"
+                  >
+                    {fallbackActionLabel || "목록으로 이동"}
+                  </a>
+                ) : null}
               </div>
             </div>
           ) : (
@@ -628,7 +644,17 @@ export function MapView({ campaigns }: { campaigns: Campaign[] }) {
 
       {count === 0 ? (
         <div className="absolute inset-0 z-20 flex items-center justify-center bg-slate-900/70 text-white">
-          <p className="rounded-xl bg-black/30 px-5 py-3 text-sm">조건에 맞는 캠페인 좌표가 없습니다.</p>
+          <div className="text-center">
+            <p className="rounded-xl bg-black/30 px-5 py-3 text-sm">조건에 맞는 캠페인 좌표가 없습니다.</p>
+            {fallbackActionHref ? (
+              <a
+                href={fallbackActionHref}
+                className="mt-3 inline-flex items-center gap-2 rounded-xl bg-white/90 text-slate-900 px-4 py-2 text-xs font-black"
+              >
+                {fallbackActionLabel || "목록으로 이동"}
+              </a>
+            ) : null}
+          </div>
         </div>
       ) : null}
 

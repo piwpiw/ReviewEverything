@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server'
+﻿import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
 const missingAdminPasswordHtml = `<!doctype html>
@@ -6,7 +6,7 @@ const missingAdminPasswordHtml = `<!doctype html>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>운영 환경 준비 필요</title>
+    <title>Admin Page Access Blocked</title>
     <style>
       body { margin: 0; background: #020617; color: #e2e8f0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; }
       .wrap { max-width: 840px; margin: 8vh auto; padding: 24px; border: 1px solid rgba(148, 163, 184, 0.3); border-radius: 16px; background: rgba(15, 23, 42, 0.85); }
@@ -18,19 +18,18 @@ const missingAdminPasswordHtml = `<!doctype html>
   </head>
   <body>
     <div class="wrap">
-      <h1>운영 환경 준비 필요</h1>
-      <p><strong>Render 환경 변수</strong>에 <code>ADMIN_PASSWORD</code>가 등록되지 않아 관리자 전용 API가 차단되어 있습니다.</p>
+      <h1>Admin API access failed</h1>
+      <p><strong>Render environment variable</strong> has no ADMIN_PASSWORD, so admin APIs are blocked.</p>
       <ul>
         <li>ADMIN_PASSWORD</li>
         <li>DATABASE_URL / DIRECT_URL</li>
         <li>CRON_SECRET</li>
-        <li>NEXT_PUBLIC_KAKAO_JS_KEY 또는 NEXT_PUBLIC_NAVER_CLIENT_ID</li>
+        <li>NEXT_PUBLIC_KAKAO_JS_KEY or NEXT_PUBLIC_NAVER_CLIENT_ID</li>
       </ul>
-      <p>환경 변수 설정이 완료되면 Render 재배포 후 바로 정상 동작합니다.</p>
+      <p>If these values are set in Render Environment Variables, admin features work immediately.</p>
     </div>
   </body>
 </html>`;
-
 export function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl
 
@@ -109,3 +108,5 @@ export function middleware(request: NextRequest) {
 export const config = {
     matcher: ['/admin/:path*', '/api/admin/:path*'],
 }
+
+

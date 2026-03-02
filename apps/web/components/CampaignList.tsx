@@ -55,6 +55,24 @@ export default function CampaignList({
     return buildQueryString(next);
   }, [searchParamsEntries, viewMode]);
 
+  const mapViewSearchParams = useMemo(() => {
+    const next = new URLSearchParams();
+    searchParamsEntries.forEach(([key, value]) => {
+      if (value === undefined || value === null || value === "") return;
+      if (Array.isArray(value)) {
+        value.forEach((part) => {
+          if (part) {
+            next.set(key, String(part));
+          }
+        });
+        return;
+      }
+      next.set(key, String(value));
+    });
+    next.set("view", "list");
+    return `/?${next.toString()}`;
+  }, [searchParamsEntries]);
+
   useEffect(() => {
     let canceled = false;
 
@@ -117,6 +135,31 @@ export default function CampaignList({
   };
 
   if (campaigns.length === 0) {
+    if (viewMode === "map") {
+      return (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex flex-col gap-4"
+        >
+          <div className="flex items-center justify-between px-2">
+            <p className="text-xs font-black text-slate-500 dark:text-slate-300">조건에 맞는 캠페인이 없습니다.</p>
+            <button
+              onClick={() => router.push(mapViewSearchParams)}
+              className="px-3 py-2 rounded-xl bg-slate-900 dark:bg-blue-600 text-white text-xs font-black"
+            >
+              목록으로 이동
+            </button>
+          </div>
+          <MapView
+            campaigns={campaigns}
+            fallbackActionHref={mapViewSearchParams}
+            fallbackActionLabel="필터를 조정해 다시 검색"
+          />
+        </motion.div>
+      );
+    }
+
     return (
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -244,3 +287,4 @@ export default function CampaignList({
     </div>
   );
 }
+
