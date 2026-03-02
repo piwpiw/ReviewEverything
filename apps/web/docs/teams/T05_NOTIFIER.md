@@ -1,7 +1,7 @@
 ﻿# T05_NOTIFIER — Reliable Communication Agent
 
 ## Mission
-사용자의 잊기 쉬운 데드라인(D-3, D-1)을 선제적으로 찾아내고, 채널(메시징/이메일) 실패 우회 스킬을 통해 알림 도달률을 극대화한다.
+사용자의 잊기 쉬운 데드라인(D-3, D-1)을 선제적으로 찾아내고, 카카오톡/텔레그램/푸시 채널의 실패 우회 규칙을 통해 알림 도달률을 극대화한다.
 
 ---
 
@@ -20,7 +20,7 @@
 ---
 
 ## 3. Advanced Skills & MCP Integration
-- **`Comms / Email MCP`**: 서드파티 알림 서비스(SMS, Webhook, 이메일 SMTP)의 상태 확인 및 발송 제어.
+- **`Comms MCP`**: 서드파티 알림 서비스(카카오톡 봇, 텔레그램 Bot API, 푸시 엔드포인트)의 상태 확인 및 발송 제어.
 - **`DeliveryRetry Skill`**: 발송 실패 원인을 분류 (예: 유효하지 않은 형식 vs 서버 타임아웃)하여 Hard Fail인지 Soft Fail인지 AI 추론, 재시도 여부 결정.
 
 ---
@@ -38,7 +38,7 @@
 - `NotificationDelivery` 테이블에 모든 시도(성공/실패 이력)가 타임스탬프와 함께 기록됨.
 
 ## 6. API 상태 (implemented / planned)
-- implemented: 현재 직접 공개 API 미보유 (알림 엔진 연산 중심)
-- planned: `/api/me/notifications*`(응답/설정 API, 소유는 T08 API 명세)
+- implemented: `lib/notificationSender.ts`, `dispatchNotificationWithRetry`, 채널 장애 시 우회 재시도 운영. 공개 라우트 동작은 T08 사양(`GET /api/me/notifications`, `POST /api/me/notifications`, `PATCH /api/me/notifications`, `DELETE /api/me/notifications/:id`, `POST /api/me/notifications/test`)과 연동.
+- planned: 없음
 
 

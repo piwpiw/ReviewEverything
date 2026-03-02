@@ -2,22 +2,20 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import Link from "next/link";
 import { Suspense } from "react";
-import NavStats from "@/components/NavStats";
-import NavFavoritesBadge from "@/components/NavFavoritesBadge";
+import Header from "@/components/Header";
 import PWAPrompt from "@/components/PWAPrompt";
-import { CalendarDays } from "lucide-react";
-import { Menu, Map as MapIcon, Package, UserCheck, LayoutList } from "lucide-react";
 import ThemeToggle from "@/components/ThemeToggle";
+import MobileNav from "@/components/MobileNav";
+import { ThemeProvider } from "@/components/ThemeProvider";
 
 export const metadata: Metadata = {
-  title: "체험단 모아 | 국내 7대 플랫폼 체험단 통합 탐색기",
-  description:
-    "레뷰, 리뷰노트, 디너의여왕, 리뷰플레이스, 서울오빠, 미스터블로그, 강남맛집 — 국내 7대 체험단 플랫폼 캠페인을 한눈에 비교하고 신청하세요.",
-  keywords: "체험단, 리뷰단, 인플루언서, 레뷰, 리뷰노트, 디너의여왕, 블로그 체험단, 인스타 체험단",
+  title: "리뷰 캠페인 허브 | 한국인을 위한 리뷰 캠페인 플랫폼",
+  description: "검색, 필터, 지도, 일정까지 한 곳에서 관리하는 한국형 캠페인 허브입니다.",
+  keywords: "캠페인, 리뷰, 홍보, 블로그, 인스타그램, 유튜브, 쇼츠, 로컬캠페인",
   manifest: "/manifest.json",
   openGraph: {
-    title: "체험단 모아 — 체험단의 모든 것을 한눈에",
-    description: "국내 7대 체험단 플랫폼을 실시간으로 통합 수집합니다.",
+    title: "리뷰 캠페인 허브 | 실무형 검색 대시보드",
+    description: "국내 캠페인 운영을 더 빠르게 실행할 수 있는 대시보드",
     type: "website",
     locale: "ko_KR",
   },
@@ -31,102 +29,20 @@ export const viewport: Viewport = {
   userScalable: false,
 };
 
-import { ThemeProvider } from "@/components/ThemeProvider";
-
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="ko" suppressHydrationWarning>
       <body className="bg-background min-h-screen text-foreground flex flex-col selection:bg-blue-500 selection:text-white transition-colors duration-300">
-        <ThemeProvider
-          attribute="data-theme"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          {/* ── Sticky Premium Nav 2.0 (Moaview Style) ── */}
-          <header className="sticky top-0 z-[100] bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-b border-slate-100 dark:border-slate-800 shadow-sm">
-            <div className="max-w-[1700px] mx-auto px-4 md:px-8 h-[64px] flex items-center justify-between gap-4">
-              {/* Left: Logo & Core Tabs */}
-              <div className="flex items-center gap-8">
-                <Link href="/" className="shrink-0 flex items-center gap-2.5 group">
-                  <div className="w-9 h-9 rounded-2xl bg-slate-900 dark:bg-blue-600 flex items-center justify-center shadow-xl group-hover:bg-blue-600 dark:group-hover:bg-blue-500 transition-all duration-500">
-                    <LayoutList className="w-5 h-5 text-white" />
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="font-black text-sm tracking-tighter text-slate-900 dark:text-white leading-none">체험단 모아</span>
-                    <span className="text-[8px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest leading-none mt-1">Beta 2.0</span>
-                  </div>
-                </Link>
-
-                <nav className="hidden lg:flex items-center gap-1">
-                  <Link href="/me?userId=1" className="group flex items-center gap-2 px-4 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-all">
-                    <CalendarDays className="w-3.5 h-3.5 text-violet-500" />
-                    <span className="text-xs font-black text-slate-500 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white">내 매니저</span>
-                  </Link>
-                  <Link href="/?campaign_type=VST" className="group flex items-center gap-2 px-4 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-all">
-                    <span className="text-xs font-black text-slate-500 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white">방문형</span>
-                  </Link>
-                  <Link href="/?campaign_type=VST&view=map" className="group flex items-center gap-2 px-4 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-all">
-                    <MapIcon className="w-3.5 h-3.5 text-blue-500" />
-                    <span className="text-xs font-black text-slate-500 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white">방문(지도)</span>
-                  </Link>
-                  <Link href="/?campaign_type=SHP" className="group flex items-center gap-2 px-4 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-all">
-                    <Package className="w-3.5 h-3.5 text-amber-500" />
-                    <span className="text-xs font-black text-slate-500 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white">배송형</span>
-                  </Link>
-                  <Link href="/?campaign_type=PRS" className="group flex items-center gap-2 px-4 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-all">
-                    <UserCheck className="w-3.5 h-3.5 text-emerald-500" />
-                    <span className="text-xs font-black text-slate-500 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white">기자단</span>
-                  </Link>
-                </nav>
-              </div>
-
-              {/* Right: Actions */}
-              <div className="flex items-center gap-2 md:gap-4 shrink-0">
-                <div className="flex items-center gap-1 md:gap-3 bg-slate-50 dark:bg-slate-800 p-1 rounded-2xl border border-slate-100 dark:border-slate-700">
-                  <NavFavoritesBadge />
-                  <Suspense fallback={<div className="w-20 h-8 skeleton rounded-xl" />}>
-                    <NavStats />
-                  </Suspense>
-                </div>
-                <ThemeToggle />
-                <div className="w-px h-6 bg-slate-200 dark:bg-slate-700 hidden sm:block" />
-
-                <div className="flex items-center gap-2">
-                  <Link
-                    href="/system"
-                    className="hidden md:flex items-center justify-center px-4 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all"
-                  >
-                    <span className="text-[10px] font-black uppercase tracking-widest">System</span>
-                  </Link>
-                  <Link
-                    href="/me?userId=1"
-                    className="flex items-center gap-2 pl-2 pr-4 py-1.5 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
-                  >
-                    <div className="w-6 h-6 rounded-full bg-blue-500 text-white flex items-center justify-center text-[10px] font-black">
-                      P
-                    </div>
-                    <span className="text-[11px] font-black text-slate-700 dark:text-slate-300">piwpiw</span>
-                  </Link>
-
-                  <Link
-                    href="/admin"
-                    className="ml-2 flex items-center justify-center w-8 h-8 md:w-auto md:px-4 md:py-1.5 rounded-xl bg-slate-900 dark:bg-blue-600 text-white hover:bg-blue-600 dark:hover:bg-blue-500 transition-all shadow-md active:scale-95"
-                  >
-                    <span className="hidden md:inline text-[10px] font-black uppercase tracking-widest">Console</span>
-                    <Menu className="w-4 h-4 md:hidden" />
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </header>
-
+        <ThemeProvider attribute="data-theme" defaultTheme="system" enableSystem disableTransitionOnChange>
+          <Header />
           <main className="flex-1 relative">
-            {children}
+            <div className="max-w-[1700px] mx-auto min-h-[calc(100vh-72px)]">
+              {children}
+            </div>
           </main>
-
+          <MobileNav />
           <PWAPrompt />
         </ThemeProvider>
       </body>

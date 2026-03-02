@@ -119,6 +119,7 @@
   - `GET /api/campaigns`
   - `GET /api/analytics`
   - `GET /api/cron` (`runNow`, `limit`)
+  - `GET /api/campaigns/:id`, `GET /api/campaigns/:id/related`
   - `POST /api/admin/ingest`
   - `GET /api/admin/runs`
   - `GET /api/admin/quality`
@@ -128,12 +129,14 @@
   - `GET /api/me/revenue`
   - `GET /api/me/board`
   - `GET /api/me/pro`, `POST /api/me/pro`
+- `GET /api/me/schedules`
+- `GET /api/me/notifications`, `POST /api/me/notifications`, `PATCH /api/me/notifications`, `DELETE /api/me/notifications/:id`
+- `GET /api/me/notification-channels`
+- `GET /api/me/notification-preferences`, `PUT /api/me/notification-preferences`
+- `GET /api/me/curation`
+- `POST /api/jobs` (내부 실행 엔드포인트)
 
 - 계획/API 미구현
-  - `GET /api/campaigns/:id`, `/api/campaigns/:id/related`
-  - `POST /api/jobs` (공개 라우트 없음, 큐 실행 연동은 `GET /api/cron`)
-  - `GET /api/me/schedules*`
-  - `GET /api/me/notifications*`
 
 - 운영 규칙
   - 구현 상태가 바뀌면 `API.md`, `TEAM` 문서, `PROJECT_STATUS.md`를 동시 갱신

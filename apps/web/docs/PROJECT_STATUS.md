@@ -28,6 +28,7 @@
   - `GET /api/analytics`
   - `GET /api/cron`
   - `POST /api/admin/ingest`
+  - `POST /api/jobs` (internal)
   - `GET /api/admin/runs`
   - `GET /api/admin/quality`
   - `GET /api/admin/alerts`
@@ -36,6 +37,8 @@
   - `GET /api/me/revenue`
   - `GET /api/me/board`
   - `GET /api/me/pro`, `POST /api/me/pro`
+  - `GET /api/campaigns/:id`, `GET /api/campaigns/:id/related`
+- `GET /api/me/schedules`, `POST /api/me/schedules`, `PATCH /api/me/schedules/:id`, `DELETE /api/me/schedules/:id`, `GET /api/me/notifications`, `POST /api/me/notifications`, `PATCH /api/me/notifications`, `DELETE /api/me/notifications/:id`, `POST /api/me/notifications/test`, `GET /api/me/notification-channels`, `GET /api/me/notification-preferences`, `GET /api/me/curation`
 - Ingestion pipeline is implemented:
   - adapter fetch loop (up to 5 pages)
   - dedupe/normalize processing
@@ -90,7 +93,8 @@ Status labels:
 ### 3) Background Processing / Worker Reliability
 - `Implemented`: scheduled ingestion trigger exists (`vercel.json` -> `/api/cron`) and admin/manual trigger exists (`/api/admin/ingest`).
 - `Partial`: cron/admin handler now avoids fire-and-forget and records per-platform result, but still runs inline in route lifecycle (not yet durable queue worker).
-- `Missing`: dedicated notification worker for deadline reminders (3-day / 1-day cadence).
+- `Implemented`: cron-aware notification worker integration for reminder dispatch runs (`/api/cron`, `backgroundWorker`), with retry/fallback behavior.  
+  (`POST /api/jobs` is now an internal execution endpoint (`CRON_SECRET`), while durability hardening is still in progress.)
 
 ### 4) Data Model Alignment
 - `Implemented`: `platforms`, `campaigns`, `campaign_snapshots`, `ingest_runs` equivalents exist in Prisma schema.
@@ -136,7 +140,7 @@ The next iteration should extend the existing Aggregator architecture, not repla
 - Implement calendar UI and manual entry modal.
 - Implement monthly/yearly revenue dashboard cards/charts.
 - Add 9AM daily reminder worker (deadline D-3, D-1) with provider abstraction:
-  - `push` and/or `kakao` sender implementations behind one interface.
+  - `push`, `kakao`, and `telegram` sender implementations behind one interface.
 
 #### Phase 4: Map/PWA completion
 - Add marker clustering and viewport-based lazy marker loading in map mode.
@@ -156,15 +160,14 @@ The next iteration should extend the existing Aggregator architecture, not repla
   - Next move: add parser fixture tests and confidence score for fallback decisions.
 - Manager Team:
   - `User` and `UserSchedule` models added.
-- `GET /api/me/schedules*`와 `GET/POST /api/me/notifications*`는 현재 공개 라우트 미구현으로 `계획(미구현)` 상태.
+- `GET /api/me/schedules`, `POST /api/me/schedules`, `PATCH /api/me/schedules/:id`, `DELETE /api/me/schedules/:id`, `GET /api/me/notifications`, `POST /api/me/notifications`, `PATCH /api/me/notifications`, `DELETE /api/me/notifications/:id`, `POST /api/me/notifications/test`, `GET /api/me/notification-channels`, `GET /api/me/notification-preferences`, `PUT /api/me/notification-preferences`, `GET /api/me/curation`는 공개 라우트로 구현되어 있습니다.
 - `/api/me/revenue`는 현재 구현 상태이므로 운영 우선도 목록에서 우선 유지.
   - Next move: calendar query optimization for dashboard.
 
-## 실시간 후속 업데이트 (남은 업무 반영)
-
-- Aggregation Queue Team: `BackgroundJob` 모델 적용 완료, cron/admin은 작업 큐 적재 후 batch run으로 전환. 다음 액션은 큐 런 처리기를 독립 스케줄러로 분리해 크론 응답 지연 최소화.
-- Parsing Team: 금액 파서 강화는 완료. 다음 액션은 단위 규칙/정규식 테스트 플로우 도입 후 임계값 회귀 테스트 게이트 추가.
-- Manager Team: `UserSchedule` 연동 정산 API(`GET /api/me/revenue`)와 알림 스캔 알고리즘(`REMINDER_SCAN` + `NotificationDelivery`) 추가. 다음 액션은 캘린더 UI/수동 입력 UX 및 알림 sender adapter(Push/Kakao) 통합.
+## 실시간 후속 업데이트 (2026-03-01)
+- Aggregation Queue Team: `cleanupStaleRuns` 도입으로 hung process 방지 로직 강화.
+- Parsing Team: 금액 파서에 '억', '만(원)', 'usd' 등 다양한 단위 대응 및 layered regex 전략 적용 완료.
+- Manager Team: `UserSchedule` CRUD API(`/api/me/schedules`, `/api/me/schedules/:id`) 구현 완료.
 
 ---
 
@@ -434,7 +437,7 @@ The next iteration should extend the existing Aggregator architecture, not repla
 
 #### 알림
 - 데이터: 채널 권한, 스케줄, `NotificationDelivery`
-- API: `GET /api/me/notifications`, `PATCH /api/me/notifications`, `POST /api/me/notifications/test`
+- API: `GET /api/me/notifications`, `POST /api/me/notifications`, `PATCH /api/me/notifications`, `DELETE /api/me/notifications/:id`, `POST /api/me/notifications/test`, `GET /api/me/notification-channels`, `GET /api/me/notification-preferences`, `PUT /api/me/notification-preferences`
 
 #### 관리자
 - 데이터: 플랫폼별 런 상태, 실패 로그, `db` 지표
@@ -499,6 +502,8 @@ The next iteration should extend the existing Aggregator architecture, not repla
 
 ### 구현 완료 API
 - `GET /api/campaigns`
+- `GET /api/campaigns/:id`
+- `GET /api/campaigns/:id/related`
 - `GET /api/analytics`
 - `GET /api/cron` (`runNow`, `limit`)
 - `POST /api/admin/ingest`
@@ -508,20 +513,15 @@ The next iteration should extend the existing Aggregator architecture, not repla
 - `GET /api/me/board`
 - `GET /api/me/pro`
 - `POST /api/me/pro`
+- `GET/POST /api/me/schedules`
+- `PATCH/DELETE /api/me/schedules/:id`
+- `GET /api/me/notifications`
+- `DELETE /api/me/notifications/:id`
+- `POST /api/me/notifications/test`
+- `GET /api/me/notification-channels`
 
 ### 계획/API 미구현 상태
-- `GET /api/campaigns/:id`
-- `GET /api/campaigns/:id/related`
-- `GET /api/me/schedules`
 - `GET /api/me/schedules/summary`
-- `GET /api/me/schedules/:id`
-- `POST /api/me/schedules`
-- `PATCH /api/me/schedules/:id`
-- `DELETE /api/me/schedules/:id`
-- `GET /api/me/notifications`
-- `PATCH /api/me/notifications`
-- `POST /api/me/notifications/test`
-- `POST /api/jobs` (현재 공개 라우트 미존재, 내부 실행 진입점은 `GET /api/cron`)
 
 ### 문서-실행 연결 규칙
 - 구현 기준: 실제 앱 라우트 경로 존재 여부를 우선 적용
@@ -534,25 +534,35 @@ The next iteration should extend the existing Aggregator architecture, not repla
 - 규칙: 구현 항목은 라우트 존재 기반, 계획 항목은 `계획(미구현)` 라벨 필수
 
 ### 1) 구현 항목 (Done)
-- [ ] `GET /api/campaigns`
-- [ ] `GET /api/analytics`
-- [ ] `GET /api/cron`
-- [ ] `POST /api/admin/ingest`
-- [ ] `GET /api/admin/runs`
-- [ ] `GET /api/admin/quality`
-- [ ] `GET /api/admin/alerts`
-- [ ] `POST /api/admin/alerts/actions`
-- [ ] `GET /api/health`
-- [ ] `GET /api/me/revenue`
-- [ ] `GET /api/me/board`
-- [ ] `GET/POST /api/me/pro`
+- [x] `GET /api/campaigns`
+- [x] `GET /api/campaigns/:id`
+- [x] `GET /api/campaigns/:id/related`
+- [x] `GET /api/analytics`
+- [x] `GET /api/cron`
+- [x] `POST /api/admin/ingest`
+- [x] `GET /api/admin/runs`
+- [x] `GET /api/admin/quality`
+- [x] `GET /api/admin/alerts`
+- [x] `POST /api/admin/alerts/actions`
+- [x] `GET /api/health`
+- [x] `GET /api/me/revenue`
+- [x] `GET /api/me/board`
+- [x] `GET/POST /api/me/pro`
+- [x] `GET/POST /api/me/schedules`
+- [x] `PATCH/DELETE /api/me/schedules/:id`
+- [x] `GET /api/me/notifications`
+- [x] `POST /api/me/notifications`
+- [x] `PATCH /api/me/notifications`
+- [x] `DELETE /api/me/notifications/:id`
+- [x] `POST /api/me/notifications/test`
+- [x] `GET /api/me/notification-channels`
+- [x] `GET /api/me/notification-preferences`
+- [x] `PUT /api/me/notification-preferences`
+- [x] `GET /api/me/curation`
 
 ### 2) 고도화 항목 (Planned)
-- [ ] 상세 API: `/api/campaigns/:id`, `/api/campaigns/:id/related`
-- [ ] 일정 API: `/api/me/schedules*`
-- [ ] 알림 API: `/api/me/notifications*`
 - [ ] 운영 품질 액션 UX: `POST /api/admin/alerts/actions` 응답 상태를 `/system` 화면 라벨/피드백에 반영
-- [ ] 워커 내부 API 정합성: `/api/jobs` 공개화 여부 최종 결정
+- [x] 워커 내부 API 정합성: `/api/jobs`는 `CRON_SECRET` 기반 내부 실행 엔드포인트로 반영
 
 ### 3) 정합성 체크
 - [ ] `API.md`, `ARCHITECTURE.md`, `AGENT_WORKFLOW.md`, `TEAM_CONTEXT.md`, `PROJECT_STATUS.md` 동시 갱신

@@ -40,8 +40,7 @@
 - 잡 처리 과정에서 예외가 크래시되지 않고 상태 업데이트로 정상 캡처됨.
 
 ## 6. API 상태 (implemented / planned)
-- implemented: `GET /api/cron` (`runNow`, `limit`), `POST /api/admin/ingest`
-- planned: `POST /api/jobs` (내부 워커 실행 후보, 공개 API 아님)
+- implemented: `GET /api/cron` (`runNow`, `limit`), `POST /api/admin/ingest`, `POST /api/jobs` (`CRON_SECRET`, 내부 실행)
 
 
 

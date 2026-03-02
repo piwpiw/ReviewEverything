@@ -6,8 +6,8 @@
 ---
 
 ## 1. Domain Scope (책임 영역)
-- **라우팅/API (implemented)**: `/api/me/revenue`, `/api/me/board`, `/api/me/pro`, `POST /api/me/pro`
-- **라우팅/API (planned / 미구현)**: `/api/me/schedules*`, `/api/me/notifications*`
+- **라우팅/API (implemented)**: `/api/me/revenue`, `/api/me/board`, `/api/me/pro`, `POST /api/me/pro`, `/api/me/curation`, `GET /api/me/schedules`, `POST /api/me/schedules`, `PATCH /api/me/schedules/:id`, `DELETE /api/me/schedules/:id`, `GET /api/me/notifications`, `POST /api/me/notifications`, `PATCH /api/me/notifications`, `DELETE /api/me/notifications/:id`, `POST /api/me/notifications/test`, `/api/me/notification-channels`, `/api/me/notification-preferences`
+- **라우팅/API (planned / 미구현)**: 없음
 - **화면(UI 종속)**: `app/me/`, `ManagerDashboard.tsx`
 - **데이터 모델**: `User`, `UserSchedule`
 
@@ -41,8 +41,8 @@
 - ManagerDashboard 페이지 진입 시 깜빡임이나 서버 에러(500) 없이 1초 내로 렌더링.
 
 ## 6. API 상태 (implemented / planned)
-- implemented: `/api/me/revenue`, `/api/me/board`, `/api/me/pro`, `POST /api/me/pro`
-- planned: `/api/me/schedules*`, `/api/me/notifications*`
+- implemented: `/api/me/revenue`, `/api/me/board`, `/api/me/pro`, `POST /api/me/pro`, `/api/me/curation`, `GET /api/me/schedules`, `POST /api/me/schedules`, `PATCH /api/me/schedules/:id`, `DELETE /api/me/schedules/:id`, `GET /api/me/notifications`, `POST /api/me/notifications`, `PATCH /api/me/notifications`, `DELETE /api/me/notifications/:id`, `POST /api/me/notifications/test`, `/api/me/notification-channels`, `/api/me/notification-preferences`
+- planned: 없음
 
 
 
@@ -51,4 +51,6 @@
 
 - 매니저 화면(`/me`, `/me/calendar`, `/me/stats`, `/me/revenue`)의 UX는 `T07_FRONTEND`와 라벨/문구 체계를 공유한다.
 - 새 CTA/에러 문구는 `T07_FRONTEND`에서 제안하고 T10의 운영 라벨 톤과 충돌하지 않도록 사전 동기화.
-- 계획 API(`/api/me/schedules*`, `/api/me/notifications*`) 기반 화면은 기능 비노출 정책(`planned` 배너)을 유지한다.
+- `/me`/`/me/calendar`/`/me/notifications` 화면은 구현된 알림/일정 API를 우선 사용하고, 미구현 API 진입은 차단한다.
+
+

@@ -1,5 +1,9 @@
 name: CI
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 on:
   push:
     branches: [main]
@@ -19,6 +23,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -27,19 +33,86 @@ jobs:
           cache: "npm"
           cache-dependency-path: apps/web/package-lock.json
 
+      - name: Detect change scope
+        id: scope
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          BASE_SHA="${{ github.event.before }}"
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            BASE_SHA="${{ github.event.pull_request.base.sha }}"
+          fi
+
+          if [ -z "${BASE_SHA}" ] || [ "${BASE_SHA}" = "0000000000000000000000000000000000000000" ]; then
+            BASE_SHA=$(git rev-parse HEAD~1)
+          fi
+
+          git fetch --depth=1 origin "${BASE_SHA}"
+
+          CHANGED_FILES=$(git diff --name-only "${BASE_SHA}" "${GITHUB_SHA}")
+          if [ -z "${CHANGED_FILES}" ]; then
+            echo "has_non_docs=true" >> "${GITHUB_OUTPUT}"
+            echo "is_fast_path=false" >> "${GITHUB_OUTPUT}"
+            echo "scope=full" >> "${GITHUB_OUTPUT}"
+            exit 0
+          fi
+
+          HAS_NON_DOCS=false
+          DOCS_ONLY=true
+
+          while IFS= read -r file; do
+            if [ -z "${file}" ]; then
+              continue
+            fi
+            case "${file}" in
+              apps/web/docs/* | *.md)
+                ;;
+              apps/web/app/* | apps/web/components/* | apps/web/styles/* | apps/web/public/* | apps/web/lib/*)
+                DOCS_ONLY=false
+                ;;
+              *)
+                HAS_NON_DOCS=true
+                DOCS_ONLY=false
+                ;;
+            esac
+
+            if [ "${HAS_NON_DOCS}" = "true" ]; then
+              break
+            fi
+          done <<< "${CHANGED_FILES}"
+
+          if [ "${DOCS_ONLY}" = "true" ]; then
+            echo "has_non_docs=false" >> "${GITHUB_OUTPUT}"
+            echo "is_fast_path=false" >> "${GITHUB_OUTPUT}"
+            echo "scope=docs" >> "${GITHUB_OUTPUT}"
+          elif [ "${HAS_NON_DOCS}" = "true" ]; then
+            echo "has_non_docs=true" >> "${GITHUB_OUTPUT}"
+            echo "is_fast_path=false" >> "${GITHUB_OUTPUT}"
+            echo "scope=full" >> "${GITHUB_OUTPUT}"
+          else
+            echo "has_non_docs=true" >> "${GITHUB_OUTPUT}"
+            echo "is_fast_path=true" >> "${GITHUB_OUTPUT}"
+            echo "scope=fast" >> "${GITHUB_OUTPUT}"
+          fi
+
       - name: Install dependencies
+        if: steps.scope.outputs.has_non_docs == 'true'
         run: npm ci
 
       - name: Prepare reports directory
+        if: steps.scope.outputs.has_non_docs == 'true'
         run: mkdir -p reports
 
       - name: Lint gate
         id: lint
+        if: steps.scope.outputs.has_non_docs == 'true'
         continue-on-error: true
         run: npm run lint:ci
 
       - name: Typecheck gate
         id: typecheck
+        if: steps.scope.outputs.has_non_docs == 'true'
         continue-on-error: true
         run: |
           set -o pipefail
@@ -47,23 +120,67 @@ jobs:
 
       - name: Test gate
         id: test
+        if: steps.scope.outputs.has_non_docs == 'true' && steps.scope.outputs.is_fast_path == 'false'
         continue-on-error: true
         run: |
           set -o pipefail
           npm run test:ci | tee reports/test_output.txt
 
+      - name: API contract audit gate
+        id: apiContract
+        if: steps.scope.outputs.has_non_docs == 'true' && steps.scope.outputs.is_fast_path == 'false'
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          npm run api:contract-audit
+
+      - name: API sync drift audit gate
+        id: apiSyncAudit
+        if: steps.scope.outputs.has_non_docs == 'true'
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          npm run api:contract-sync-audit
+
       - name: Smoke gate
         id: smoke
+        if: steps.scope.outputs.has_non_docs == 'true'
         continue-on-error: true
         run: |
           set -o pipefail
           npm run smoke:ci 2>&1 | tee reports/smoke_output.txt
 
       - name: Build CI summary
-        if: always()
+        if: always() && steps.scope.outputs.has_non_docs == 'true'
         run: |
           node scripts/ci/summarize-failures.js
-          cat reports/ci-summary.md >> $GITHUB_STEP_SUMMARY
+          if [ -f reports/ci-summary.md ]; then
+            cat reports/ci-summary.md >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Docs-only check only
+        if: steps.scope.outputs.has_non_docs == 'false'
+        run: |
+          node scripts/api-contract-sync-audit.js
+          if grep -q "Result: FAIL" reports/api-contract-sync-audit.md; then
+            echo "API sync drift audit failed. Please check reports/api-contract-sync-audit.md." 
+            exit 1
+          fi
+          API_SYNC_RESULT="PASS"
+          if [ -f reports/api-contract-sync-audit.md ]; then
+            API_SYNC_RESULT=$(node -e "const fs=require('fs');const text=fs.readFileSync('reports/api-contract-sync-audit.md','utf8');process.stdout.write(/Result:\\s*(PASS|FAIL)/i.test(text)?RegExp.$1:'UNKNOWN')")
+          else
+            API_SYNC_RESULT="MISSING"
+          fi
+          mkdir -p reports
+          echo "Docs-only changes detected. Lint/typecheck/test/api-smoke gates are skipped for faster deployment cycle." >> "$GITHUB_STEP_SUMMARY"
+          echo "- API sync drift: ${API_SYNC_RESULT}" >> "$GITHUB_STEP_SUMMARY"
+          cat <<EOF > reports/ci-summary.md
+          # CI Summary
+          - Scope: docs-only
+          - Gates skipped: lint, typecheck, test, api:contract-audit, smoke
+          - API sync drift: ${API_SYNC_RESULT}
+          EOF
 
       - name: Comment PR with failures
         if: always() && github.event_name == 'pull_request'
@@ -108,8 +225,27 @@ jobs:
       - name: Enforce gate outcomes
         if: always()
         run: |
-          if [[ "${{ steps.lint.outcome }}" != "success" || "${{ steps.typecheck.outcome }}" != "success" || "${{ steps.test.outcome }}" != "success" || "${{ steps.smoke.outcome }}" != "success" ]]; then
+          if [ "${{ steps.scope.outputs.has_non_docs }}" != "true" ]; then
+            echo "Docs-only scope: no hard gate enforcement."
+            exit 0
+          fi
+          if [ "${{ steps.scope.outputs.is_fast_path }}" == "true" ]; then
+            if [[ "${{ steps.lint.outcome }}" != "success" || "${{ steps.typecheck.outcome }}" != "success" || "${{ steps.smoke.outcome }}" != "success" ]]; then
+              echo "Fast path gates failed."
+              exit 1
+            fi
+            if [[ "${{ steps.apiSyncAudit.outcome }}" != "success" ]]; then
+              echo "API sync audit failed."
+              exit 1
+            fi
+            exit 0
+          fi
+          if [[ "${{ steps.lint.outcome }}" != "success" || "${{ steps.typecheck.outcome }}" != "success" || "${{ steps.test.outcome }}" != "success" || "${{ steps.apiContract.outcome }}" != "success" || "${{ steps.smoke.outcome }}" != "success" ]]; then
             echo "One or more quality gates failed."
+            exit 1
+          fi
+          if [[ "${{ steps.apiSyncAudit.outcome }}" != "success" ]]; then
+            echo "API sync drift audit failed."
             exit 1
           fi
 

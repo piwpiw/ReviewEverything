@@ -97,42 +97,51 @@ describe('normalizeRewardValue', () => {
     it('parses 10만원 → 100000', () => {
         expect(normalizeRewardValue('10만원')).toBe(100000);
     });
+    it('parses 10만 원 (with space) → 100000', () => {
+        expect(normalizeRewardValue('10만 원')).toBe(100000);
+    });
+    it('parses 5만 (without won) → 50000', () => {
+        expect(normalizeRewardValue('5만')).toBe(50000);
+    });
     it('parses 2.5만원 → 25000', () => {
         expect(normalizeRewardValue('2.5만원')).toBe(25000);
+    });
+
+    // 억 단위
+    it('parses 1억 → 100000000', () => {
+        expect(normalizeRewardValue('1억')).toBe(100000000);
+    });
+    it('parses 1.5억 → 150000000', () => {
+        expect(normalizeRewardValue('1.5억')).toBe(150000000);
     });
 
     // 천원 단위
     it('parses 500천원 → 500000', () => {
         expect(normalizeRewardValue('500천원')).toBe(500000);
     });
-    it('parses 3천원 → 3000', () => {
-        expect(normalizeRewardValue('3천원')).toBe(3000);
-    });
 
-    // 원 단위
-    it('parses 50000원 → 50000', () => {
-        expect(normalizeRewardValue('50000원')).toBe(50000);
+    // 외화
+    it('parses 100달러 → 130000', () => {
+        expect(normalizeRewardValue('100달러')).toBe(130000);
     });
-    it('parses 150,000원 (with comma) → 150000', () => {
-        expect(normalizeRewardValue('150,000원')).toBe(150000);
-    });
-
-    // 달러 단위 (달러 → KRW 1300 환산)
-    it('parses 10달러 → 13000', () => {
-        expect(normalizeRewardValue('10달러')).toBe(13000);
+    it('parses 50usd → 65000', () => {
+        expect(normalizeRewardValue('50usd')).toBe(65000);
     });
 
     // 복합 텍스트 (최댓값 선택)
-    it('parses "최대 10만원 상당 제품" → 100000', () => {
-        expect(normalizeRewardValue('최대 10만원 상당 제품')).toBe(100000);
+    it('parses "원고료 10만 + 제품 5만" → 100000', () => {
+        expect(normalizeRewardValue('원고료 10만 + 제품 5만')).toBe(100000);
     });
     it('picks max from "3만원~5만원" → 50000', () => {
         expect(normalizeRewardValue('3만원~5만원')).toBe(50000);
     });
 
-    // fallback: 숫자만 있는 경우
-    it('fallback: bare number 50000 → 50000', () => {
-        expect(normalizeRewardValue('50000')).toBe(50000);
+    // fallback: 4자리 이상 숫자
+    it('fallback: bare number 15000 → 15000', () => {
+        expect(normalizeRewardValue('15000')).toBe(15000);
+    });
+    it('does not fallback for 3 digits: 500 → 0', () => {
+        expect(normalizeRewardValue('500')).toBe(0);
     });
 
     // edge cases

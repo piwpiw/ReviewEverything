@@ -2,7 +2,7 @@
 
 - Canonical update order: API.md -> ARCHITECTURE.md -> TEAM_CONTEXT.md -> AGENT_WORKFLOW.md -> PROJECT_STATUS.md -> PROJECT_STATUS_NEXT_ACTIONS.md
 - Implemented status rule: route exists under apps/web/app/api.
-- Current implemented API set: /api/campaigns, /api/analytics, /api/cron, /api/admin/ingest, /api/admin/runs, /api/admin/quality, /api/admin/alerts, /api/admin/alerts/actions, /api/health, /api/me/revenue, /api/me/board, /api/me/pro.
+- Current implemented API set: `GET /api/campaigns`, `GET /api/campaigns/:id`, `GET /api/campaigns/:id/related`, `GET /api/analytics`, `GET /api/cron`, `POST /api/admin/ingest`, `GET /api/admin/runs`, `GET /api/admin/quality`, `GET /api/admin/alerts`, `POST /api/admin/alerts/actions`, `POST /api/jobs`, `GET /api/health`, `GET /api/me/revenue`, `GET /api/me/board`, `GET /api/me/pro`, `POST /api/me/pro`, `GET /api/me/curation`, `GET /api/me/schedules`, `POST /api/me/schedules`, `PATCH /api/me/schedules/:id`, `DELETE /api/me/schedules/:id`, `GET /api/me/notifications`, `POST /api/me/notifications`, `PATCH /api/me/notifications`, `DELETE /api/me/notifications/:id`, `POST /api/me/notifications/test`, `GET /api/me/notification-channels`, `GET /api/me/notification-preferences`
 
 # NEXT ACTIONS & SPRINT DIRECTIVES (2026-03-01)
 > 핵심 문서 동기화는 `API.md`, `ARCHITECTURE.md`, `TEAM_CONTEXT.md`, `AGENT_WORKFLOW.md`, `PROJECT_STATUS.md`를 기준으로 수행합니다.
@@ -15,12 +15,13 @@
   - Job execution path moved to shared worker runner with lock + retry.
 
 - Notification Track:
-  - Added `lib/notificationSender.ts` with channel adapters (`push`, `kakao`).
+  - Added `lib/notificationSender.ts` with channel adapters (`push`, `kakao`, `telegram`).
   - Reminder scan now creates `NotificationDelivery` rows and dispatch pass marks SEND/FAILED.
 
 - Parser Track:
   - Added regression tests for `normalizeRewardValue` covering KRW unit cases + fallback.
-  - Next: harden by adding mixed-unit fixtures in a dedicated parser fixture file if needed.
+  - Implemented Layered Regex strategy for '억', '만(원)', 'usd' and space-separated units.
+  - Next: scale up fixture tests covering 100+ variations for BETA 2.0 stability.
 
 - Execution Efficiency Track:
   - Added claude.md with token policy, MCP search policy, and naming requirements.
@@ -33,8 +34,8 @@
 ## API 정합성 추적 (추가)
 
 - 공개 라우트 검증 기준 확장
-  - `POST /api/jobs`는 현재 공개 라우트 미존재, `GET /api/cron` 기반 큐 실행으로 통일.
-  - `GET /api/campaigns/:id` 및 일정/알림 상세 API는 계획 항목으로 분리 관리.
+- `POST /api/jobs`는 현재 `CRON_SECRET`가 필요한 내부 실행 엔드포인트이며, `GET /api/cron`은 큐 실행 트리거입니다.
+- 구현 항목은 `API.md` 기준으로 분류하고, 계획 항목은 별도 섹션에서 관리.
 - API 문서 동기화
   - `apps/web/docs/API.md`를 구현 기준/계획 기준으로 재분리 완료.
   - `T04/T10/ARCH/NOTES`에 `/api/jobs` 표기를 런타임 실행 트리거 문구로 교체.
@@ -43,9 +44,9 @@
 
 ## 정합성 감사 체크리스트 (문서-실행 일치)
 
-- [ ] 실제 라우트 존재성 점검: `app/api` 경로와 `API.md`의 구현 항목 일치 확인
-- [ ] 계획 항목은 `PROJECT_STATUS.md`와 `TEAM` 문서에서 `미구현(계획)`로 표시
-- [ ] `POST /api/jobs` 문구를 공개 API 대신 내부 실행 후보로 통일
+- [x] 실제 라우트 존재성 점검: `app/api` 경로와 `API.md`의 구현 항목 일치 확인
+- [x] 계획 항목은 `PROJECT_STATUS.md`와 `TEAM` 문서에서 `미구현(계획)`로 표시
+- [x] `POST /api/jobs` 문구를 공개 API 대신 내부 실행 엔드포인트로 통일
 - [ ] worker 실행 경로(`GET /api/cron`)와 스케줄러(`limit`, `runNow`) 동작 확인
 - [ ] `/api/admin/quality`, `/api/admin/alerts`, `/api/admin/alerts/actions` 노출 상태는 라우트 존재성과 문서 상태를 일치해야 함
 
@@ -53,8 +54,8 @@
 
 - [ ] 라우트 스캔: `app/api` 내 실제 라우트와 `apps/web/docs/API.md`의 구현 항목 일치
 - [ ] T08/T04/T10 문서의 상태 플래그가 동일한지 교차 검증
-- [ ] `/api/jobs`가 공개 문서에서 독립 엔드포인트로 노출되지 않았는지 확인
-- [ ] 계획 항목(`GET /api/campaigns/:id` 등)에 `계획(미구현)` 표기 존재
+- [x] `/api/jobs`가 공개 문서에서 독립 엔드포인트로 오해되지 않도록 내부 실행 표기만 유지
+- [ ] 계획 항목이 존재할 경우 `계획(미구현)` 표기 유지
 - [ ] `/api/admin/quality`, `/api/admin/alerts`, `/api/admin/alerts/actions`의 노출/차단 상태를 라우트 상태와 동기화
 - [ ] 배포 전 `TEAM_CONTEXT.md` `#api_contract_audit` 기준 점검 완료
 
@@ -64,7 +65,7 @@
 - [ ] 팀 문서의 API 책임 범위가 `API.md` 구현 목록과 일치
 - [ ] 구현된 엔드포인트만 `Deployment`/`Smoke` 대상에 포함
 - [ ] 계획 항목은 `계획(미구현)` 라벨과 출시 조건이 명시
-- [ ] `POST /api/jobs` 관련 표기가 공개 API로 오해되지 않음
+- [x] `POST /api/jobs` 관련 표기가 공개 API로 오해되지 않음
 - [ ] PR 생성 전 TEAM_CONTEXT `#api_contract_audit` 갱신 여부 확인
 
 ## 문서 운영 원칙(기존 문서 우선)
@@ -146,13 +147,14 @@
 - [ ] 사용자 확인 포인트: 필터 적용 후 결과 수치와 카드 목록이 일치.
 
 ### T04_WORKER
-- [ ] `/api/cron` 큐 적재, `runNow`, `limit` 동작이 실제 배치 처리와 일치.
-- [ ] 락/재시도 정책으로 중복 실행이 방지된다.
+- [x] `/api/cron` 큐 적재, `runNow`, `limit` 동작이 실제 배치 처리와 일치.
+- [x] 락/재시도 정책으로 중복 실행이 방지된다.
+- [x] `cleanupStaleRuns` 도입으로 멈춤 현상(stale run) 자동 복구.
 - [ ] 사용자 확인 포인트: 관리자에서 실행 이력 상태 변화(RUNNING -> SUCCESS/FAILED) 확인.
 
 ### T05_NOTIFIER
 - [ ] D-3/D-1 스캔이 `NotificationDelivery`를 생성하고 상태(SEND/FAILED)를 기록.
-- [ ] 채널 장애 시 fallback 정책(push/kakao)이 동작한다.
+- [ ] 채널 장애 시 fallback 정책(push/kakao/telegram)이 동작한다.
 - [ ] 사용자 확인 포인트: 알림 설정/테스트 후 최근 발송 로그 확인 가능.
 
 ### T06_ANALYTICS
@@ -166,8 +168,7 @@
 - [ ] 사용자 확인 포인트: 주요 흐름에서 클릭 후 다음 행동으로 자연스럽게 이동.
 
 ### T08_MANAGER
-- [ ] 구현 API(`/api/me/revenue`, `/api/me/board`, `/api/me/pro`)가 화면과 1:1 연결.
-- [ ] 미구현 API(`/api/me/schedules*`, `/api/me/notifications*`)는 비노출/계획 라벨 처리.
+- [x] 구현 API(`GET /api/me/revenue`, `GET /api/me/board`, `GET /api/me/pro`, `POST /api/me/pro`, `GET /api/me/curation`, `GET /api/me/schedules`, `POST /api/me/schedules`, `PATCH /api/me/schedules/:id`, `DELETE /api/me/schedules/:id`, `GET /api/me/notifications`, `POST /api/me/notifications`, `PATCH /api/me/notifications`, `DELETE /api/me/notifications/:id`, `POST /api/me/notifications/test`, `GET /api/me/notification-channels`, `GET /api/me/notification-preferences`)가 화면과 1:1 연결.
 - [ ] 사용자 확인 포인트: `/me` 대시보드 진입-조회-액션이 오류 없이 완료.
 
 ### T09_VALIDATION
@@ -270,21 +271,20 @@
 ## 12.9 API 정합성 즉시 점검 리포트 (2026-03-01)
 
 - 점검 범위: `app/api` + 핵심 문서(`API.md`, `ARCHITECTURE.md`, `TEAM_CONTEXT.md`, `AGENT_WORKFLOW.md`, `PROJECT_STATUS.md`, `PROJECT_STATUS_NEXT_ACTIONS.md`, `docs/teams/*.md`, `SCRAPERS.md`)
-- 구현 라우트(코드 기준): `GET /api/campaigns`, `GET /api/analytics`, `GET /api/cron`, `POST /api/admin/ingest`, `GET /api/admin/runs`, `GET /api/admin/quality`, `GET /api/admin/alerts`, `POST /api/admin/alerts/actions`, `GET /api/health`, `GET /api/me/revenue`, `GET /api/me/board`, `GET /api/me/pro`, `POST /api/me/pro`.
+- 구현 라우트(코드 기준): `GET /api/campaigns`, `GET /api/campaigns/:id`, `GET /api/campaigns/:id/related`, `GET /api/analytics`, `GET /api/cron`, `POST /api/admin/ingest`, `GET /api/admin/runs`, `GET /api/admin/quality`, `GET /api/admin/alerts`, `POST /api/admin/alerts/actions`, `POST /api/jobs`, `GET /api/health`, `GET /api/me/revenue`, `GET /api/me/board`, `GET /api/me/pro`, `POST /api/me/pro`, `GET /api/me/curation`, `GET /api/me/schedules`, `POST /api/me/schedules`, `PATCH/DELETE /api/me/schedules/:id`, `GET /api/me/notifications`, `POST /api/me/notifications`, `PATCH /api/me/notifications`, `DELETE /api/me/notifications/:id`, `GET /api/me/notification-channels`, `GET /api/me/notification-preferences`, `PUT /api/me/notification-preferences`, `POST /api/me/notifications/test`.
 
 ### 1) Drift 판정
 - 구현 라우트 미기재: 블로커 없음 (`API.md`와 `TEAM_CONTEXT.md`에서 누락 없음 확인)
-- 문서군에서 구현 미존재 경로 노출: 블로커 없음 (예: `/api/jobs`는 내부 후보로 계획 항목에 명시).
+- 문서군에서 구현 미존재 경로 노출: 블로커 없음 (예: `/api/jobs`는 내부 실행 엔드포인트로 반영).
 - 계획 유지 필요 항목:
-  - `GET /api/campaigns/:id`, `GET /api/campaigns/:id/related`
-  - `GET /api/me/schedules*`, `GET /api/me/notifications*`
+  - 없음
 - 상호교차 정합성:
   - `POST /api/admin/alerts/actions`는 `T10_OBSERVABILITY` implemented 상태로 일치.
   - `/api/admin/runs`는 `T10_OBSERVABILITY` implemented 상태로 일치.
   - `GET /api/admin/runs`, `GET /api/admin/quality`, `GET /api/admin/alerts`의 운영 노출은 문서/화면 라벨 정책 일치.
 
 ### 2) 즉시 액션
-- [ ]  `12.9` 항목 확인 후 docs-only 동기화 라인 정합성 잠금(동일 PR에서 이 라벨 변경 freeze).
+- [x] `12.9` 항목 확인 후 docs-only 동기화 라인 정합성 잠금(동일 PR에서 이 라벨 변경 freeze).
 - [ ] `api:contract-audit` 요약 스냅샷을 `scope` 라벨 로그에 1회 이상 남기기.
 - [ ] `T06_ANALYTICS`의 `planned` 오해 가능 문구 제거 상태 유지(현재 `implemented` 연계팀 변경 반영 유지).
 

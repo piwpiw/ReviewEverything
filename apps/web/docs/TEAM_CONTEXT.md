@@ -59,9 +59,8 @@
 
 ## #api_contract_audit
 - 기준 문서 우선순위: `API.md` -> `ARCHITECTURE.md` -> `TEAM_CONTEXT.md` -> `AGENT_WORKFLOW.md` -> `PROJECT_STATUS.md`
-- POST /api/jobs는 공개 API가 아닌 내부 worker 실행 트리거 후보.
-- 구현된 API: GET /api/campaigns, GET /api/analytics, GET /api/cron, POST /api/admin/ingest, GET /api/admin/runs, GET /api/admin/quality, GET /api/admin/alerts, POST /api/admin/alerts/actions, GET /api/health, GET /api/me/revenue, GET /api/me/board, GET /api/me/pro, POST /api/me/pro
-- 미구현(계획): GET /api/campaigns/:id, GET /api/campaigns/:id/related, /api/me/schedules*, /api/me/notifications*.
+- 구현된 API: GET /api/campaigns, GET /api/analytics, GET /api/campaigns/:id, GET /api/campaigns/:id/related, GET /api/cron, POST /api/admin/ingest, GET /api/admin/runs, GET /api/admin/quality, GET /api/admin/alerts, POST /api/admin/alerts/actions, POST /api/jobs (`CRON_SECRET`), GET /api/health, GET /api/me/revenue, GET /api/me/board, GET /api/me/pro, POST /api/me/pro, GET /api/me/curation, GET /api/me/schedules, POST /api/me/schedules, PATCH/DELETE /api/me/schedules/:id, GET /api/me/notifications, POST /api/me/notifications, PATCH /api/me/notifications, DELETE /api/me/notifications/:id, POST /api/me/notifications/test, GET /api/me/notification-channels, GET /api/me/notification-preferences, PUT /api/me/notification-preferences
+- 미구현(계획): 없음
 - 정기 점검: 항목 변경 시 API.md/ARCHITECTURE.md/TEAM_CONTEXT.md/AGENT_WORKFLOW.md/PROJECT_STATUS.md 동시 갱신.
 - 운영 규정: 배포 전 `PROJECT_STATUS_NEXT_ACTIONS.md` `12.9 API 정합성 즉시 점검`이 최신 상태여야 한다.
 
@@ -128,5 +127,4 @@
   - Ops lane: 1시간 주기 업데이트.
 - 문서 동기화:
   - 상태 변경 발생 시 `PROJECT_STATUS_NEXT_ACTIONS.md` 11/12 섹션과 동시 갱신.
-
 

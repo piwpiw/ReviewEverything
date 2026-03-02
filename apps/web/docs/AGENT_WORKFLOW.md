@@ -61,12 +61,10 @@
 ### 현재 구현 기준
 - 구현 API(라우트 존재):
   - `GET /api/campaigns`, `GET /api/analytics`, `GET /api/cron`, `POST /api/admin/ingest`, `GET /api/admin/runs`, `GET /api/health`
-  - `GET /api/admin/quality`, `GET /api/admin/alerts`, `POST /api/admin/alerts/actions`
-  - `GET /api/me/revenue`, `GET /api/me/board`, `GET /api/me/pro`, `POST /api/me/pro`
-- 계획/API 미구현:
   - `GET /api/campaigns/:id`, `GET /api/campaigns/:id/related`
-  - `GET/POST /api/me/schedules*`, `GET /api/me/notifications*`
-  - `POST /api/jobs`는 공개 API가 아닌 내부 실행 후보(현재 진입점은 `GET /api/cron`)
+  - `GET /api/admin/quality`, `GET /api/admin/alerts`, `POST /api/admin/alerts/actions`, `POST /api/jobs` (`CRON_SECRET`)
+  - `GET /api/me/revenue`, `GET /api/me/board`, `GET /api/me/pro`, `POST /api/me/pro`, `GET /api/me/curation`, `GET /api/me/schedules`, `POST /api/me/schedules`, `PATCH /api/me/schedules/:id`, `DELETE /api/me/schedules/:id`, `GET /api/me/notifications`, `POST /api/me/notifications`, `PATCH /api/me/notifications`, `DELETE /api/me/notifications/:id`, `POST /api/me/notifications/test`, `GET /api/me/notification-channels`, `GET /api/me/notification-preferences`, `PUT /api/me/notification-preferences`
+- 계획/API 미구현:
 
 ### 정합성 규칙
 - 문서 라벨은 `implemented` 또는 `planned` 1개 값만 사용.
@@ -159,4 +157,26 @@
 - Vercel 배포는 `scope=docs`에서 빌드/배포를 스킵.
 - 동일 브랜치 병렬 실행은 이전 실행을 즉시 취소.
 
+---
 
+## 11. Post-Task Closing Protocol (Closing Routine)
+
+하나의 큰 기능 구현이나 오류 수정을 마친 후에는 반드시 다음 **'마무리 루틴'**을 수행하여 프로젝트의 정합성과 품질을 유지한다.
+
+### 11.1 문서 동기화 (Doc Sync)
+작업 내용이 반영되도록 다음 문서들을 최신 상태로 갱신한다.
+- `API.md`: 엔드포인트 구현 상태 (`implemented`/`planned`) 업데이트.
+- `TEAM_CONTEXT.md`: `#api_contract_audit`, `#metadata` 및 진행 중인 스트림 상태 업데이트.
+- `PROJECT_STATUS.md`: 완료된 마일스톤 체크 및 실제 구현된 기능 목록 업데이트.
+- `PROJECT_STATUS_NEXT_ACTIONS.md`: 백로그 항목 체크오프 및 다음 우선순위 액션 정의.
+
+### 11.2 고도화 (Premium Sophistication)
+결과물이 '단순 동작'을 넘어 '프리미엄' 수준이 되도록 고도화 작업을 병행한다.
+- **안정성 고도화**: 핵심 로직에 대한 단위 테스트(Vitest) 및 엣지 케이스 처리 추가.
+- **UI/UX 고도화**: 데이터 로딩 스켈레톤, 마이크로 애니메이션(Framer Motion), 빈 상태(Empty State) 디자인 강화.
+- **성능 고도화**: 과도한 DB 요청 최적화(Batching), 프론트엔드 메모이제이션(`useMemo`, `useCallback`) 적용.
+- **타입 고도화**: `any` 타입을 구체적인 인터페이스로 교체하여 빌드 안정성 확보.
+
+### 11.3 최종 검증 (Final QA)
+- `npm run agent:review` 또는 `npm run agent:qa`를 실행하여 린트, 타입, 테스트 통과 확인.
+- `reports/` 내의 정합성 리포트가 모두 녹색 상태인지 확인.

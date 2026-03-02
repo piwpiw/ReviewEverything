@@ -93,10 +93,28 @@ For an in-depth understanding, see the specialized technical documents:
 npm install     # Install dependencies
 npm run dev     # Start development server
 npx prisma generate # Generate Prisma client
+npx prisma migrate deploy # Applies all SQL migrations (required on fresh DB)
+npx prisma db seed # Seed sample data after migrations
 npx prisma db push  # Sync schema to your Postgres DB
 npm test        # Run Vitest suite
 npx prisma studio   # Direct database management
 ```
+
+### Fresh Supabase DB bootstrap (first time)
+If the Supabase `Table Editor` shows no tables, it means the migration set has not been applied.
+
+1. Add the environment variables to `.env.local` (or Vercel environment variables) in this order:
+   - `DATABASE_URL=postgresql://postgres:[PASSWORD]@db.jhvanyvkgvprttrjvzgz.supabase.co:5432/postgres?sslmode=require`
+   - `DIRECT_URL=postgresql://postgres:[PASSWORD]@db.jhvanyvkgvprttrjvzgz.supabase.co:5432/postgres?sslmode=require`
+2. Run migration + seed:
+```bash
+npx prisma migrate deploy
+npx prisma db seed
+```
+3. Verify in table editor:
+   - `Platform`, `Campaign`, `CampaignSnapshot`, `IngestRun`, `BackgroundJob`, `User`, `UserSchedule`, `NotificationDelivery`
+
+Note: if you run with Prisma through Supabase pooler endpoint, use the password and username format from Supabase dashboard for that endpoint. If `tenant or user not found` appears, switch back to the direct DB endpoint first.
 
 ### CI / Deployment
 - GitHub Actions workflow: `.github/workflows/ci.yml` (`main` 브랜치 `push`/`pull_request` 기준)

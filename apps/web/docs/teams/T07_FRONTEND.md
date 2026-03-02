@@ -39,8 +39,8 @@
 - 브라우저 Lighthouse 기준 Accessibility 및 Best Practices 점수 90점 이상 유지.
 
 ## 6. API 상태 (implemented / planned)
-- implemented: 소비 API = `GET /api/campaigns`, `GET /api/analytics`, `GET /api/me/revenue`
-- planned: `/api/campaigns/:id`, `/api/me/schedules*`, `/api/me/notifications*` (공개되지 않은 API 전개 대기)
+- implemented: 소비 API = `GET /api/campaigns`, `GET /api/campaigns/:id`, `GET /api/analytics`, `GET /api/me/revenue`, `GET /api/me/schedules`, `POST /api/me/schedules`, `GET /api/me/notifications`, `PATCH /api/me/notifications`, `DELETE /api/me/notifications/:id`, `POST /api/me/notifications/test`, `GET /api/me/notification-channels`, `GET /api/me/notification-preferences`, `GET /api/me/curation`
+- planned: 없음
 
 
 ## 7. UI/UX Premiumization Blueprint (100억 기준)
@@ -121,3 +121,4 @@
 - T06: 랭킹/인사이트 문구, 우선순위/경고 톤 정렬.
 - T10: 운영 라벨(정상/주의/위험), 관리자/시스템 메시지 톤 정리.
 - T09: Lighthouse/접근성/스냅샷 회귀와 `ui-qa-summary` 자동 연동.
+

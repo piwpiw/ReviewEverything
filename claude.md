@@ -67,3 +67,31 @@ Scope: Project execution for `d:\BohemianStudio\ReviewEverything`
 - This file must stay under 500 lines.
 - Edit only this file + related scripts in one patch when policy changes.
 - Keep instructions action-oriented and machine-readable.
+
+## 8) Single-doc and fast-response protocol
+- Do not create or maintain multiple `claude.md` files. This file is the canonical policy document.
+- For speed-oriented tasks, keep this order:
+  1. validate: `npm run agent:review`
+  2. fix blockers only (compile/runtime blockers, not warning cleanup first)
+  3. rerun `npm run agent:review` for hard-stop confirmation
+  4. if requested for deploy: perform commit/push/redeploy path immediately
+- Deployment policy:
+  - if release flow is requested, keep command path explicit and fast:
+    - `npm run release -- --auto-commit --skip-tests --skip-build --message=...` for local verification
+    - then `git push origin HEAD`
+    - then `vercel --prod --yes` (or rely on GitHub→Vercel webhook if configured)
+- Failure policy:
+  - On first environment-blocking error (`DB`, `Vercel`, network, auth), stop implementation changes and report exact root cause + required credential fix.
+ 
+## 9) Error checkpoint for pre-deploy (mandatory)
+- Run `npm run predeploy:local` before any requested deploy and record result.
+- If parser errors appear, stop immediately and fix only syntax blockers first:
+  - JSX/TSX unclosed tags
+  - broken string literals/backticks
+  - missing/duplicated closing JSX fragments
+- Keep `npm run build` output if it fails:
+  - save the first file/line from `Parsing ecmascript source code failed`
+  - do not proceed to push until that error is 0.
+- Recurrence prevention:
+  - one file changed => compile-check that file directly via `node -e "import('./')"` equivalent not needed; use full `npm run build` when edits touch shared components/layout.
+  - if edit involves large text conversions, avoid command-line raw replacement; prefer direct patch.

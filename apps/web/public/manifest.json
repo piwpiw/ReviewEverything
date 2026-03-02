@@ -1,0 +1,17 @@
+{
+  "name": "체험단 모아",
+  "short_name": "체험단모아",
+  "description": "국내 7대 플랫폼 체험단 통합 탐색기",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#020617",
+  "theme_color": "#020617",
+  "icons": [
+    {
+      "src": "/globe.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

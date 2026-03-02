@@ -15,7 +15,15 @@ async function testRevuApi() {
                 }
             });
             console.log(`Success with X-App-Key: ${key}! Status: ${response.status}`);
-            console.log("Snippet:", JSON.stringify(response.data).slice(0, 1000));
+            console.log("Keys:", Object.keys(response.data));
+            if (response.data.data) {
+                console.log("Data length:", Array.isArray(response.data.data) ? response.data.data.length : "Not an array");
+                if (Array.isArray(response.data.data) && response.data.data.length > 0) {
+                    console.log("First item sample:", JSON.stringify(response.data.data[0]).slice(0, 500));
+                }
+            } else {
+                console.log("Snippet:", JSON.stringify(response.data).slice(0, 1000));
+            }
             return;
         } catch (e: any) {
             console.error(`Fail X-App-Key ${key}: ${e.response?.status}`);

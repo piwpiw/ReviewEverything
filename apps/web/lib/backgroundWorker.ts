@@ -1,7 +1,11 @@
 ﻿import { executeIngestionTask } from '@/lib/ingest';
 import { InitializedAdapters } from '@/sources/registry';
 import { db } from '@/lib/db';
-import { dispatchNotification, normalizeDeliveryChannel } from '@/lib/notificationSender';
+import {
+  normalizeDeliveryChannel,
+  pickDeliveryChannelWithPreferences,
+  dispatchNotificationWithRetry,
+} from '@/lib/notificationSender';
 
 type JobType = 'INGEST_PLATFORM' | 'REMINDER_SCAN';
 
@@ -106,15 +110,13 @@ export async function runJobs(limit = DEFAULT_RUN_LIMIT) {
         status: 'PENDING',
         OR: [{ locked_until: null }, { locked_until: { lte: now } }],
       },
-      data: {
-        status: 'RUNNING',
-        attempts: job.attempts + 1,
-        started_at: now,
-        locked_until: nowWithBuffer(JOB_STALE_MINUTES),
-        locked_by: `worker-${process.pid}`,
-        updated_at: now,
-      },
-    });
+        data: {
+          status: 'RUNNING',
+          attempts: job.attempts + 1,
+          started_at: now,
+          locked_until: nowWithBuffer(JOB_STALE_MINUTES),
+        },
+      });
 
     if (claimed.count !== 1) {
       results.push(`job:${job.id}:skipped`);
@@ -148,7 +150,6 @@ export async function runJobs(limit = DEFAULT_RUN_LIMIT) {
           status: 'COMPLETED',
           finished_at: new Date(),
           locked_until: null,
-          updated_at: new Date(),
           error_log: null,
         },
       });
@@ -169,7 +170,6 @@ export async function runJobs(limit = DEFAULT_RUN_LIMIT) {
           error_log: error.message || String(error),
           next_run_at: hasRetry ? nowWithBuffer(15) : now,
           locked_until: null,
-          updated_at: new Date(),
         },
       });
       results.push(`job:${job.id}:error:${error.message || 'unknown'}`);
@@ -199,6 +199,13 @@ async function createReminderDeliveries() {
       id: true,
       user_id: true,
       deadline_date: true,
+      user: {
+        select: {
+          notify_kakao_enabled: true,
+          notify_telegram_enabled: true,
+          notify_push_enabled: true,
+        },
+      },
     },
   });
 
@@ -207,6 +214,12 @@ async function createReminderDeliveries() {
 
     const distanceDays = Math.floor((+new Date(schedule.deadline_date) - +now) / (1000 * 60 * 60 * 24));
     if (![1, 3].includes(distanceDays)) continue;
+    const channel = pickDeliveryChannelWithPreferences({
+      kakao: schedule.user.notify_kakao_enabled,
+      telegram: schedule.user.notify_telegram_enabled,
+      push: schedule.user.notify_push_enabled,
+    });
+    if (!channel) continue;
 
     const exists = await db.notificationDelivery.findFirst({
       where: {
@@ -223,7 +236,7 @@ async function createReminderDeliveries() {
       data: {
         user_id: schedule.user_id,
         user_schedule_id: schedule.id,
-        channel: 'push',
+        channel,
         due_days: distanceDays,
         status: 'PENDING',
         message: `D-day reminder: ${distanceDays} day(s) before.`,
@@ -239,30 +252,38 @@ async function dispatchPendingNotifications() {
   });
 
   for (const delivery of deliveries) {
+    const channel = normalizeDeliveryChannel(delivery.channel) || 'push';
+    let attemptedChannels: string | null = null;
     try {
-      const channel = normalizeDeliveryChannel(delivery.channel) || 'push';
-      const result = await dispatchNotification(channel, {
+      const dispatchResult = await dispatchNotificationWithRetry(channel, {
         userId: delivery.user_id,
         scheduleId: delivery.user_schedule_id,
         message: delivery.message || '',
       });
+      attemptedChannels = JSON.stringify(dispatchResult.attemptedChannels);
 
-      if (!result.ok) throw new Error(result.detail || 'notification send failed');
+      if (dispatchResult.ok) {
+        await db.notificationDelivery.update({
+          where: { id: delivery.id },
+          data: {
+            status: 'SENT',
+            sent_at: new Date(),
+            error_message: null,
+            channel: dispatchResult.finalChannel,
+            attempted_channels: attemptedChannels,
+          },
+        });
+        continue;
+      }
 
-      await db.notificationDelivery.update({
-        where: { id: delivery.id },
-        data: {
-          status: 'SENT',
-          sent_at: new Date(),
-          error_message: null,
-        },
-      });
+      throw new Error(dispatchResult.detail || 'notification send failed');
     } catch (error: any) {
       await db.notificationDelivery.update({
         where: { id: delivery.id },
         data: {
           status: 'FAILED',
           error_message: error.message || String(error),
+          attempted_channels: attemptedChannels,
         },
       });
     }

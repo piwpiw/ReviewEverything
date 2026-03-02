@@ -11,25 +11,41 @@ function withHttps(value) {
   return `https://${value}`;
 }
 
-async function probe(baseUrl, endpoint) {
+async function probe(baseUrl, { endpoint, method = "GET", body, headers = {}, expect }) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 12000);
   const url = `${baseUrl}${endpoint}`;
+  let responseBodyJson = null;
 
   try {
     const response = await fetch(url, {
-      method: "GET",
+      method,
       redirect: "follow",
       signal: controller.signal,
-      headers: { "user-agent": "revieweverything-smoke/1.0" },
+      headers: {
+        "user-agent": "revieweverything-smoke/1.0",
+        ...headers,
+      },
+      body,
     });
 
     const status = response.status;
-    const ok = endpoint === "/api/health"
-      ? status === 200 || status === 503
-      : status >= 200 && status < 400;
+    const responseBody = await response.text().catch(() => "");
+    if (response.headers.get("content-type")?.includes("application/json")) {
+      try {
+        responseBodyJson = responseBody ? JSON.parse(responseBody) : null;
+      } catch {
+        responseBodyJson = null;
+      }
+    }
 
-    return { endpoint, status, ok };
+    const isDefaultOk =
+      endpoint === "/api/health"
+        ? status === 200 || status === 503
+        : status >= 200 && status < 400;
+    const ok = typeof expect === "function" ? expect(status, responseBodyJson) : isDefaultOk;
+
+    return { endpoint, status, ok, responseBody: responseBody ? responseBody.slice(0, 400) : undefined };
   } catch (error) {
     return { endpoint, status: 0, ok: false, error: error instanceof Error ? error.message : "unknown-error" };
   } finally {
@@ -53,11 +69,97 @@ async function main() {
     return;
   }
 
-  const endpoints = ["/", "/campaigns", "/admin", "/api/health"];
+  const endpoints = [
+    "/",
+    "/campaigns",
+    "/admin",
+    "/api/health",
+    "/api/me/notifications?userId=1",
+    "/api/me/notification-channels",
+    {
+      endpoint: "/api/me/notifications/test",
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        userId: 1,
+        channel: "push",
+        dryRun: true,
+        message: "smoke test notification",
+      }),
+      expect: (status) => status === 200 || status === 400,
+    },
+    {
+      endpoint: "/api/me/notifications/test",
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        userId: 1,
+        channel: "kakao",
+        dryRun: true,
+        message: "smoke test notification",
+      }),
+      expect: (status) => status === 200 || status === 400,
+    },
+    {
+      endpoint: "/api/me/notifications/test",
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        userId: 1,
+        channel: "telegram",
+        dryRun: true,
+        message: "smoke test notification",
+      }),
+      expect: (status) => status === 200 || status === 400,
+    },
+    {
+      endpoint: "/api/me/notification-channels",
+      expect: (_, payload) => {
+        const channels = Array.isArray(payload?.channels) ? payload.channels : null;
+        return Boolean(channels) && typeof payload.meta?.hasAnyChannel === "boolean";
+      },
+    },
+    {
+      endpoint: "/api/me/notification-preferences?userId=1",
+      expect: (status, payload) => {
+        if (status === 404 || status === 400) return true;
+        if (status !== 200 || !payload) return false;
+        return ["notify_kakao_enabled", "notify_telegram_enabled", "notify_push_enabled"].every((k) =>
+          Object.prototype.hasOwnProperty.call(payload, k),
+        );
+      },
+    },
+    {
+      endpoint: "/api/me/curation?limit=1",
+      expect: (_, payload) => {
+        return Array.isArray(payload?.picks);
+      },
+    },
+    {
+      endpoint: "/api/me/notifications?userId=1&take=15&status=success&channel=push&days=30",
+      expect: (status) => status >= 200 && status < 400,
+    },
+    {
+      endpoint: "/api/me/notifications?userId=1&status=failed&channel=kakao",
+      expect: (status) => status >= 200 && status < 400,
+    },
+    {
+      endpoint: "/api/me/notifications?userId=1&channel=all",
+      expect: (status) => status >= 200 && status < 400,
+    },
+    {
+      endpoint: "/api/me/notifications?userId=1&status=wrong",
+      expect: (status) => status === 400,
+    },
+  ];
   const checks = [];
 
   for (const endpoint of endpoints) {
-    checks.push(await probe(baseUrl, endpoint));
+    if (typeof endpoint === "string") {
+      checks.push(await probe(baseUrl, { endpoint }));
+    } else {
+      checks.push(await probe(baseUrl, endpoint));
+    }
   }
 
   const failed = checks.filter((item) => !item.ok);

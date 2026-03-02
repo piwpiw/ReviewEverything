@@ -1,415 +1,373 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useTransition, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import {
-  ChevronDown,
-  MapPin,
-  TrendingUp,
-  Clock,
-  Target,
-  X,
-  Search,
-  Filter,
-  Sparkles,
-  CalendarClock
-} from "lucide-react";
+import { useCallback, useMemo, useState, useTransition } from "react";
+import { motion } from "framer-motion";
+import { Filter, X, Sparkles, Clock, TrendingDown } from "lucide-react";
 
-/* ── Constants ── */
+type RecentFilter = {
+  key: string;
+  label: string;
+  savedAt: string;
+};
+
+const RECENT_KEY = "re_recent_filters";
+
 const PLATFORMS = [
   { id: "", label: "전체" },
-  { id: "1", label: "revu" },
-  { id: "2", label: "reviewnote" },
-  { id: "3", label: "dinnerqueen" },
-  { id: "4", label: "reviewplace" },
-  { id: "5", label: "mrblog" },
-  { id: "6", label: "seouloppa" },
-  { id: "7", label: "gangnamfood" },
+  { id: "1", label: "리뷰형" },
+  { id: "2", label: "리뷰노트" },
+  { id: "3", label: "DinnerQueen" },
+  { id: "4", label: "리뷰플레이스" },
+  { id: "5", label: "블로그형" },
+  { id: "6", label: "서울옵파" },
+  { id: "7", label: "강남푸드" },
 ];
 
-const CAMPAIGN_TABS = [
+const TYPES = [
   { id: "VST", label: "방문형" },
-  { id: "SHP", label: "배송형" },
-  { id: "PRS", label: "프레스" },
-];
+  { id: "SHP", label: "구매형" },
+  { id: "PRS", label: "홍보형" },
+] as const;
 
 const MEDIAS = [
+  { id: "", label: "전체" },
   { id: "BP", label: "블로그" },
   { id: "IP", label: "인스타" },
   { id: "RS", label: "릴스" },
   { id: "YP", label: "유튜브" },
-  { id: "SH", label: "쇼츠" },
+  { id: "SH", label: "숏폼" },
   { id: "TK", label: "틱톡" },
   { id: "CL", label: "클립" },
 ];
 
 const REGIONS: Record<string, string[]> = {
-  "서울": ["전체", "강남", "홍대", "마포", "성수", "신촌"],
-  "경기": ["전체", "수원", "성남", "고양", "용인", "부천"],
-  "부산": ["전체", "해운대", "서면", "남포"],
-  "대구": ["전체", "동성로", "수성"],
-  "기타": ["전체", "전국", "온라인"],
+  "": ["전체"],
+  Seoul: ["전체", "강남", "홍대", "마포", "성수", "종로"],
+  Gyeonggi: ["전체", "수원", "성남", "고양", "용인", "부천"],
+  Busan: ["전체", "해운대", "서면", "영도"],
+  Daegu: ["전체", "동성로", "수성"],
+  Other: ["전체", "원격", "온라인"],
 };
 
-const CATEGORIES = {
-  VST: ["전체", "카페", "음식", "뷰티", "체험", "플레이스", "기타"],
-  SHP: ["전체", "식품", "건강", "패션", "리빙", "디지털", "기타"],
+const CATEGORIES: Record<string, string[]> = {
+  VST: ["전체", "카페", "식당", "뷰티", "체험", "여가", "기타"],
+  SHP: ["전체", "푸드", "건강", "패션", "리빙", "디지털", "기타"],
+  PRS: ["전체", "상품", "서비스", "브랜드", "기타"],
 };
 
-/* ── Components ── */
-
-function Pill({ active, label, onClick }: { active: boolean; label: string; onClick: () => void }) {
+function Pill({ active, label, onClick, groupId }: { active: boolean; label: string; onClick: () => void; groupId: string }) {
   return (
     <button
       onClick={onClick}
-      className={`relative px-4 py-2 rounded-xl text-[11px] font-black transition-all ${active ? "text-white shadow-lg shadow-slate-900/10" : "text-slate-500 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700"
+      className={`relative px-3.5 py-2 rounded-xl text-[11px] font-black transition-all ${active
+        ? "text-white shadow-lg shadow-blue-900/10 dark:shadow-blue-900/20"
+        : "text-slate-500 hover:text-slate-800 bg-slate-50 dark:bg-slate-800/60 hover:bg-slate-200 dark:hover:bg-slate-700/80"
         }`}
     >
-      {active && (
+      {active ? (
         <motion.span
-          layoutId="pill-bg"
-          className="absolute inset-0 bg-slate-900 dark:bg-blue-600 rounded-xl -z-10"
+          layoutId={`pill-bg-${groupId}`}
+          className="absolute inset-0 bg-slate-900 dark:bg-blue-600 rounded-xl -z-10 shadow-inner"
+          transition={{ type: "spring", stiffness: 300, damping: 24 }}
         />
-      )}
-      {label}
+      ) : null}
+      <span className="relative z-10">{label}</span>
     </button>
   );
+}
+
+function loadRecents(): RecentFilter[] {
+  if (typeof window === "undefined") return [];
+  const raw = localStorage.getItem(RECENT_KEY);
+  if (!raw) return [];
+  try {
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? (parsed as RecentFilter[]) : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveRecents(value: RecentFilter[]) {
+  if (typeof window === "undefined") return;
+  localStorage.setItem(RECENT_KEY, JSON.stringify(value));
 }
 
 export default function FilterBar() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
-  const [isAdvancedOpen, setIsAdvancedOpen] = useState(false);
-  const [recentFilters, setRecentFilters] = useState<any[]>(() => {
-    if (typeof window === "undefined") return [];
-    const saved = localStorage.getItem("re_recent_filters");
-    if (!saved) return [];
-    try {
-      const parsed = JSON.parse(saved);
-      return Array.isArray(parsed) ? parsed : [];
-    } catch {
-      return [];
-    }
-  });
-  const [ddayValue, setDdayValue] = useState<number>(
-    Number(searchParams.get("max_deadline_days") || 30)
-  );
-  const cur = {
-    platform: searchParams.get("platform_id") || "",
-    type: searchParams.get("campaign_type") || "VST",
-    media: searchParams.get("media_type") || "",
-    depth1: searchParams.get("region_depth1") || "",
-    depth2: searchParams.get("region_depth2") || "",
-    category: searchParams.get("category") || "",
-    minReward: searchParams.get("min_reward") || "",
-    maxComp: searchParams.get("max_comp") || "",
-    maxDeadlineDays: searchParams.get("max_deadline_days") || "",
-  };
 
-  const saveToRecent = useCallback(() => {
-    const params = new URLSearchParams(searchParams.toString());
-    const filterKey = params.toString();
-    if (!filterKey) return;
+  const [recents, setRecents] = useState<RecentFilter[]>(() => loadRecents());
 
-    setRecentFilters(prev => {
-      const filtered = prev.filter(f => f.key !== filterKey);
-      const next = [{ key: filterKey, label: `필터: ${params.get("q") || "검색"}` }, ...filtered].slice(0, 5);
-      localStorage.setItem("re_recent_filters", JSON.stringify(next));
-      return next;
-    });
+  const current = useMemo(() => {
+    return {
+      q: searchParams.get("q") || "",
+      platformId: searchParams.get("platform_id") || "",
+      type: searchParams.get("campaign_type") || "VST",
+      media: searchParams.get("media_type") || "",
+      region1: searchParams.get("region_depth1") || "",
+      region2: searchParams.get("region_depth2") || "",
+      category: searchParams.get("category") || "",
+      minReward: searchParams.get("min_reward") || "",
+      maxComp: searchParams.get("max_comp") || "",
+      maxDeadlineDays: searchParams.get("max_deadline_days") || "",
+    };
   }, [searchParams]);
 
-  const handleSelect = (name: string, val: string) => {
-    const p = new URLSearchParams(searchParams.toString());
-    if (val && val !== "전체") p.set(name, val);
-    else p.delete(name);
+  const setParam = useCallback(
+    (key: string, value: string) => {
+      const next = new URLSearchParams(searchParams.toString());
+      if (!value || value === "All") next.delete(key);
+      else next.set(key, value);
 
-    if (name === "region_depth1") p.delete("region_depth2");
+      if (key === "region_depth1") next.delete("region_depth2");
 
-    startTransition(() => {
-      router.push("/?" + p.toString(), { scroll: false });
+      startTransition(() => router.push("/?" + next.toString(), { scroll: false }));
+    },
+    [router, searchParams],
+  );
+
+  const resetAll = useCallback(() => {
+    startTransition(() => router.push("/", { scroll: false }));
+  }, [router]);
+
+  const saveCurrent = useCallback(() => {
+    const key = searchParams.toString();
+    if (!key) return;
+
+    const labelPieces = [
+      current.q ? `q:${current.q}` : null,
+      current.type ? `type:${current.type}` : null,
+      current.platformId ? `p:${current.platformId}` : null,
+      current.category ? `cat:${current.category}` : null,
+      current.region1 ? `r:${current.region1}` : null,
+    ].filter(Boolean);
+
+    const label = labelPieces.length ? labelPieces.join(" ") : "저장된 필터";
+
+    setRecents((prev) => {
+      const filtered = prev.filter((item) => item.key !== key);
+      const next: RecentFilter[] = [{ key, label, savedAt: new Date().toISOString() }, ...filtered].slice(0, 6);
+      saveRecents(next);
+      return next;
     });
-  };
+  }, [current, searchParams]);
 
-  const handleQuickFilter = (type: 'win' | 'urgent' | 'hot') => {
-    const p = new URLSearchParams(searchParams.toString());
-    if (type === 'win') { p.set("max_comp", "1.0"); p.set("sort", "competition_asc"); }
-    if (type === 'urgent') { p.set("sort", "deadline_asc"); }
-    if (type === 'hot') { p.set("sort", "applicant_desc"); }
-    router.push("/?" + p.toString(), { scroll: false });
-  };
-
-  const activeCount = Array.from(searchParams.keys()).filter(k => k !== 'view').length;
+  const activeCount = Array.from(searchParams.keys()).filter((k) => k !== "view").length;
 
   return (
-    <div className="flex flex-col gap-4">
-      {/* ── Layer 1: Global Tabs & Search Count ── */}
-      <div className="flex items-center justify-between px-2">
-        <div className="flex items-center gap-1.5 bg-white dark:bg-slate-900 p-1.5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
-          {CAMPAIGN_TABS.map(tab => (
+    <section className="relative overflow-hidden group rounded-[2.5rem] border border-white/60 dark:border-slate-800/80 shadow-[0_16px_40px_-16px_rgba(0,0,0,0.1)] dark:shadow-[0_16px_40px_-16px_rgba(0,0,0,0.5)] p-6 md:p-8 bg-white/90 dark:bg-slate-900/90 backdrop-blur-2xl flex flex-col gap-6">
+      <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-blue-500/5 dark:bg-indigo-500/10 rounded-full blur-[100px] pointer-events-none" />
+      <header className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 relative z-10">
+        <div className="flex items-center gap-4">
+          <div className="w-10 h-10 rounded-[1rem] bg-slate-900 text-white dark:bg-blue-600 flex items-center justify-center shadow-lg shadow-slate-900/10">
+            <Filter className="w-4 h-4" />
+          </div>
+          <div>
+            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">필터</p>
+            <p className="text-sm font-black text-slate-900 dark:text-white">
+              {isPending ? "적용 중..." : "필터를 조정해 보세요"}
+            </p>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={saveCurrent}
+            className="px-4 py-2 rounded-xl bg-slate-900 text-white dark:bg-blue-600 text-xs font-black inline-flex items-center gap-2"
+          >
+            <Sparkles className="w-4 h-4" />
+            저장
+          </button>
+          {activeCount > 0 ? (
             <button
-              key={tab.id}
-              onClick={() => handleSelect("campaign_type", tab.id)}
-              className={`px-5 py-2 rounded-xl text-xs font-black transition-all ${cur.type === tab.id ? "bg-slate-900 dark:bg-blue-600 text-white shadow-lg" : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
-                }`}
+              onClick={resetAll}
+              className="px-4 py-2 rounded-xl bg-rose-50 text-rose-600 dark:bg-rose-900/20 dark:text-rose-300 text-xs font-black inline-flex items-center gap-2"
             >
-              {tab.id === 'VST' && (cur.depth1 ? `📍 ${cur.depth1} 체험단` : tab.label)}
-              {tab.id !== 'VST' && tab.label}
+              <X className="w-4 h-4" />
+              초기화 ({activeCount})
+            </button>
+          ) : null}
+        </div>
+      </header>
+
+      {recents.length > 0 ? (
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mr-2">최근 필터</span>
+          {recents.map((item) => (
+            <button
+              key={item.key}
+              onClick={() => router.push("/?" + item.key, { scroll: false })}
+              className="px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 text-[10px] font-black text-slate-600 dark:text-slate-300 border border-slate-100 dark:border-slate-700 hover:border-blue-400"
+            >
+              {item.label}
             </button>
           ))}
+          <button
+            onClick={() => {
+              setRecents([]);
+              saveRecents([]);
+            }}
+            className="px-3 py-2 rounded-xl text-[10px] font-black text-slate-400 hover:text-rose-500"
+          >
+            전체 삭제
+          </button>
         </div>
-        <div className="hidden md:flex items-center gap-2">
-          <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Recent:</span>
-          <div className="flex gap-2">
-            {recentFilters.map((f, i) => (
-              <button
-                key={i}
-                onClick={() => router.push("/?" + f.key)}
-                className="px-3 py-1.5 bg-slate-50 dark:bg-slate-800 text-[10px] font-black text-slate-500 rounded-lg hover:bg-slate-900 dark:hover:bg-blue-600 hover:text-white transition-all border border-slate-100 dark:border-slate-700"
-              >
-                {f.label}
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
+      ) : null}
 
-      {/* ── Layer 2: Main Filter Box ── */}
-      <div className="glass-card rounded-[2.5rem] border border-white/60 dark:border-slate-800 shadow-xl shadow-slate-900/5 p-6 flex flex-col gap-6 relative overflow-hidden bg-white dark:bg-slate-900">
-        {/* Platform Selection */}
-        <div className="flex items-start gap-4">
-          <span className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mt-2 w-12 shrink-0">플랫폼</span>
-          <div className="flex flex-wrap gap-1.5">
-            {PLATFORMS.map(p => (
-              <Pill key={p.id} active={cur.platform === p.id} label={p.label} onClick={() => handleSelect("platform_id", p.id)} />
-            ))}
-          </div>
+      <div className="flex flex-col gap-5">
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest w-20">유형</span>
+          {TYPES.map((t) => (
+            <Pill key={t.id} groupId="type" active={current.type === t.id} label={t.label} onClick={() => setParam("campaign_type", t.id)} />
+          ))}
         </div>
 
-        {/* Media (Channel) Selection */}
-        <div className="flex items-start gap-4">
-          <span className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mt-2 w-12 shrink-0">채널</span>
-          <div className="flex flex-wrap gap-1.5">
-            <Pill active={cur.media === ""} label="전체" onClick={() => handleSelect("media_type", "")} />
-            {MEDIAS.map(m => (
-              <Pill key={m.id} active={cur.media === m.id} label={m.label} onClick={() => handleSelect("media_type", m.id)} />
-            ))}
-          </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest w-20">플랫폼</span>
+          {PLATFORMS.map((p) => (
+            <Pill key={p.id || "all"} groupId="platform" active={current.platformId === p.id} label={p.label} onClick={() => setParam("platform_id", p.id)} />
+          ))}
         </div>
 
-        {/* Region Hierarchy (Visit Only) */}
-        {cur.type === 'VST' && (
-          <div className="flex flex-col gap-4 pt-4 border-t border-slate-50 dark:border-slate-800">
-            <div className="flex items-start gap-4 text-slate-400">
-              <span className="text-[9px] font-black uppercase tracking-widest mt-2 w-12 shrink-0">지역</span>
-              <div className="flex flex-wrap gap-1.5">
-                <Pill active={cur.depth1 === ""} label="전체" onClick={() => handleSelect("region_depth1", "")} />
-                {Object.keys(REGIONS).map(reg => (
-                  <Pill key={reg} active={cur.depth1 === reg} label={reg} onClick={() => handleSelect("region_depth1", reg)} />
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest w-20">매체</span>
+          {MEDIAS.map((m) => (
+            <Pill key={m.id || "all"} groupId="media" active={current.media === m.id} label={m.label} onClick={() => setParam("media_type", m.id)} />
+          ))}
+        </div>
+
+        {current.type === "VST" ? (
+          <>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest w-20">시/도</span>
+              {Object.keys(REGIONS)
+                .filter((k) => k !== "")
+                .map((region) => (
+                  <Pill key={region} groupId="region1" active={current.region1 === region} label={region} onClick={() => setParam("region_depth1", region)} />
+                ))}
+              <Pill groupId="region1" active={!current.region1} label="All" onClick={() => setParam("region_depth1", "")} />
+            </div>
+
+            {current.region1 ? (
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest w-20">구/군</span>
+                {(REGIONS[current.region1] || ["All"]).map((area) => (
+                  <Pill
+                    key={area}
+                    groupId="region2"
+                    active={current.region2 === (area === "All" ? "" : area)}
+                    label={area}
+                    onClick={() => setParam("region_depth2", area === "All" ? "" : area)}
+                  />
                 ))}
               </div>
+            ) : null}
+          </>
+        ) : null}
+
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest w-20">카테고리</span>
+          {(CATEGORIES[current.type] || CATEGORIES.VST).map((cat) => (
+            <Pill
+              key={cat}
+              groupId="category"
+              active={current.category === (cat === "All" ? "" : cat)}
+              label={cat}
+              onClick={() => setParam("category", cat === "All" ? "" : cat)}
+            />
+          ))}
+        </div>
+
+        {/* 고급 필터: 슬라이더 컨트롤 */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-2 pt-6 border-t border-slate-100 dark:border-slate-800">
+          <div className="p-5 rounded-[1.5rem] bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 flex flex-col justify-between">
+            <div className="flex justify-between items-center mb-6">
+              <label className="text-[11px] font-black text-slate-500 uppercase flex items-center gap-1.5 tracking-widest">
+                최소 보상 가치
+              </label>
+              <span className="text-[11px] font-black text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/30 px-2 py-0.5 rounded-lg border border-amber-200/50">
+                {current.minReward ? `${(Number(current.minReward) / 10000).toFixed(0)}만원 이상` : "전체"}
+              </span>
             </div>
-            <AnimatePresence>
-              {cur.depth1 && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  className="flex items-start gap-4 pl-16"
-                >
-                  <div className="flex flex-wrap gap-1">
-                    {REGIONS[cur.depth1]?.map(sub => (
-                      <button
-                        key={sub}
-                        onClick={() => handleSelect("region_depth2", sub)}
-                        className={`px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all ${(cur.depth2 === sub || (sub === '전체' && !cur.depth2))
-                          ? "bg-blue-600 text-white shadow-md shadow-blue-500/20"
-                          : "text-slate-400 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700"
-                          }`}
-                      >
-                        {sub}
-                      </button>
-                    ))}
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
+            <div className="relative flex items-center mb-2">
+              <span className="absolute left-4 text-slate-400 text-sm font-bold">₩</span>
+              <input
+                value={current.minReward}
+                onChange={(e) => setParam("min_reward", e.target.value)}
+                placeholder="0"
+                className="w-full pl-9 pr-4 py-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm font-black text-slate-900 dark:text-white focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 outline-none transition-all shadow-inner"
+                inputMode="numeric"
+              />
+            </div>
           </div>
-        )}
 
-        {/* Category Selection */}
-        <div className="flex items-start gap-4">
-          <span className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mt-2 w-12 shrink-0">카테고리</span>
-          <div className="flex flex-wrap gap-1.5">
-            {CATEGORIES[cur.type as keyof typeof CATEGORIES]?.map(cat => (
-              <Pill key={cat} active={cur.category === (cat === '전체' ? '' : cat)} label={cat} onClick={() => handleSelect("category", cat === '전체' ? '' : cat)} />
-            ))}
-          </div>
-        </div>
-
-        {/* Advanced Filters Toggle */}
-        <button
-          onClick={() => setIsAdvancedOpen(!isAdvancedOpen)}
-          className="flex items-center gap-2 text-[10px] font-black text-blue-600 dark:text-blue-400 hover:text-blue-800 transition-colors mt-2"
-        >
-          <Filter className="w-3.5 h-3.5" />
-          {isAdvancedOpen ? "상세 필터 닫기" : "수치형 상세 필터 열기 (보상액, 경쟁률 등)"}
-          <ChevronDown className={`w-3.5 h-3.5 transition-transform ${isAdvancedOpen ? 'rotate-180' : ''}`} />
-        </button>
-
-        <AnimatePresence>
-          {isAdvancedOpen && (
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className="flex flex-col gap-5 p-6 bg-slate-50 dark:bg-slate-800/50 rounded-[2rem] border border-slate-100 dark:border-slate-700"
-            >
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="flex flex-col gap-2">
-                  <label className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest flex items-center gap-2">
-                    <Target className="w-3 h-3 text-blue-500" /> 제안금액 (원 이상)
-                  </label>
-                  <input
-                    type="number"
-                    placeholder="예: 50000"
-                    defaultValue={cur.minReward}
-                    onBlur={(e) => handleSelect("min_reward", e.target.value)}
-                    className="w-full px-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-900 dark:text-white"
-                  />
-                </div>
-                <div className="flex flex-col gap-2">
-                  <label className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest flex items-center gap-2">
-                    <TrendingUp className="w-3 h-3 text-rose-500" /> 경쟁률 (~:1 이하)
-                  </label>
-                  <input
-                    type="number"
-                    step="0.1"
-                    placeholder="예: 1.0"
-                    defaultValue={cur.maxComp}
-                    onBlur={(e) => handleSelect("max_comp", e.target.value)}
-                    className="w-full px-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all text-slate-900 dark:text-white"
-                  />
-                </div>
-                <div className="flex flex-col gap-2">
-                  <label className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest flex items-center gap-2">
-                    <CalendarClock className="w-3 h-3 text-amber-500" />
-                    마감 D-Day
-                    <span className="ml-auto px-2 py-0.5 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 rounded-lg text-[10px] font-black">
-                      {ddayValue === 30 ? "무제한" : `D-${ddayValue}`}
-                    </span>
-                  </label>
-                  <input
-                    id="dday-slider"
-                    type="range"
-                    min={1}
-                    max={30}
-                    step={1}
-                    value={ddayValue}
-                    onChange={(e) => setDdayValue(Number(e.target.value))}
-                    onMouseUp={(e) => {
-                      const v = (e.target as HTMLInputElement).value;
-                      handleSelect("max_deadline_days", v === "30" ? "" : v);
-                    }}
-                    onTouchEnd={(e) => {
-                      const v = (e.target as HTMLInputElement).value;
-                      handleSelect("max_deadline_days", v === "30" ? "" : v);
-                    }}
-                    className="w-full h-2 bg-amber-100 dark:bg-amber-900/30 rounded-full appearance-none cursor-pointer accent-amber-500 mt-1"
-                  />
-                  <div className="flex justify-between text-[9px] font-bold text-slate-400">
-                    <span>D-1</span>
-                    <span>D-15</span>
-                    <span>무제한</span>
-                  </div>
-                </div>
+          <div className="p-5 rounded-[1.5rem] bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 flex flex-col justify-between group hover:border-blue-200 transition-colors">
+            <div className="flex justify-between items-center mb-6">
+              <label className="text-[11px] font-black text-slate-500 uppercase flex items-center gap-1.5 tracking-widest">
+                <Clock className="w-3.5 h-3.5 text-blue-500" />
+                마감 기한 (D-Day)
+              </label>
+              <span className="text-[11px] font-black text-blue-600 dark:text-blue-400 bg-white dark:bg-slate-900 px-2 py-1 rounded-lg border border-blue-200 shadow-sm">
+                {current.maxDeadlineDays ? `D-${current.maxDeadlineDays} 이내` : "상관없음"}
+              </span>
+            </div>
+            <div className="relative pt-2">
+              <input
+                type="range"
+                min="0"
+                max="30"
+                step="1"
+                value={current.maxDeadlineDays || "30"}
+                onChange={(e) => setParam("max_deadline_days", e.target.value === "30" ? "" : e.target.value)}
+                className="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-blue-600 dark:accent-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+              />
+              <div className="flex justify-between mt-2 text-[9px] font-black text-slate-400">
+                <span>오늘마감</span>
+                <span>15일</span>
+                <span>전체</span>
               </div>
-              <div className="flex justify-end">
-                <button
-                  onClick={saveToRecent}
-                  className="px-6 py-2.5 bg-slate-900 dark:bg-blue-600 text-white rounded-xl text-xs font-black flex items-center gap-2 shadow-lg active:scale-95 transition-all hover:bg-blue-600 dark:hover:bg-blue-500"
-                >
-                  <Sparkles className="w-3.5 h-3.5" /> 현재 필터 조합 저장
-                </button>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Quick Access Chips */}
-        <div className="flex flex-col gap-3 pt-6 border-t border-slate-50 dark:border-slate-800">
-          <div className="flex items-center justify-between">
-            <span className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Quick Filters</span>
-            {recentFilters.length > 0 && (
-              <button
-                onClick={() => { setRecentFilters([]); localStorage.removeItem("re_recent_filters"); }}
-                className="text-[9px] font-bold text-slate-300 hover:text-rose-500"
-              >
-                Clear Recent
-              </button>
-            )}
+            </div>
+            <div className="mt-4 flex gap-1.5">
+              <button onClick={() => setParam("max_deadline_days", "1")} className="flex-1 py-1.5 rounded-lg border border-rose-200 bg-rose-50 text-rose-600 text-[10px] font-black hover:bg-rose-100 transition-colors">긴급 (D-1)</button>
+              <button onClick={() => setParam("max_deadline_days", "7")} className="flex-1 py-1.5 rounded-lg border border-blue-200 bg-blue-50 text-blue-600 text-[10px] font-black hover:bg-blue-100 transition-colors">여유 (D-7)</button>
+            </div>
           </div>
 
-          <div className="flex flex-wrap gap-2">
-            {/* Real Intelligent Filters */}
-            <button
-              onClick={() => handleQuickFilter('win')}
-              className="flex items-center gap-2 px-4 py-2 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 rounded-xl text-[10px] font-black border border-emerald-100 dark:border-emerald-900/30 hover:bg-emerald-600 hover:text-white transition-all shadow-sm"
-            >
-              <Sparkles className="w-3 h-3" /> 꿀! 당첨 확률 UP (1:1 이하)
-            </button>
-            <button
-              onClick={() => handleSelect("max_deadline_days", "3")}
-              className="flex items-center gap-2 px-4 py-2 bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400 rounded-xl text-[10px] font-black border border-rose-100 dark:border-rose-900/30 hover:bg-rose-600 hover:text-white transition-all shadow-sm"
-            >
-              <Clock className="w-3 h-3" /> 마감 가임박 (D-3)
-            </button>
-
-            {/* Recent Search History */}
-            {recentFilters.map((f, i) => (
-              <button
-                key={i}
-                onClick={() => {
-                  Object.entries(f).forEach(([k, v]) => handleSelect(k, v as string));
-                }}
-                className="px-4 py-2 bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 rounded-xl text-[10px] font-bold border border-slate-100 dark:border-slate-700 hover:border-blue-500 transition-all"
-              >
-                #{f.region_depth1 || '전체'}_{f.category || '전체'}
-              </button>
-            ))}
+          <div className="p-5 rounded-[1.5rem] bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 flex flex-col justify-between group hover:border-emerald-200 transition-colors">
+            <div className="flex justify-between items-center mb-6">
+              <label className="text-[11px] font-black text-slate-500 uppercase flex items-center gap-1.5 tracking-widest">
+                <TrendingDown className="w-3.5 h-3.5 text-emerald-500" />
+                최대 경쟁률 컷
+              </label>
+              <span className="text-[11px] font-black text-emerald-600 dark:text-emerald-400 bg-white dark:bg-slate-900 px-2 py-1 rounded-lg border border-emerald-200 shadow-sm">
+                {current.maxComp ? `${current.maxComp}:1 이하` : "상관없음"}
+              </span>
+            </div>
+            <div className="relative pt-2">
+              <input
+                type="range"
+                min="1"
+                max="100"
+                step="1"
+                value={current.maxComp || "100"}
+                onChange={(e) => setParam("max_comp", e.target.value === "100" ? "" : e.target.value)}
+                className="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-emerald-500 dark:accent-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
+              />
+              <div className="flex justify-between mt-2 text-[9px] font-black text-slate-400">
+                <span>1:1</span>
+                <span>50:1</span>
+                <span>전체</span>
+              </div>
+            </div>
+            <div className="mt-4 flex gap-1.5">
+              <button onClick={() => setParam("max_comp", "1.5")} className="flex-1 py-1.5 rounded-lg border border-emerald-200 bg-emerald-50 text-emerald-600 text-[10px] font-black hover:bg-emerald-100 transition-colors">당첨확률↑</button>
+              <button onClick={() => setParam("max_comp", "10")} className="flex-1 py-1.5 rounded-lg border border-indigo-200 bg-indigo-50 text-indigo-600 text-[10px] font-black hover:bg-indigo-100 transition-colors">일반 (10:1)</button>
+            </div>
           </div>
         </div>
       </div>
-
-      {/* ── Layer 3: Filter Info & Reset ── */}
-      <div className="flex items-center justify-between px-4">
-        <div className="flex items-center gap-3 h-8">
-          <AnimatePresence>
-            {isPending && (
-              <motion.div
-                initial={{ opacity: 0, x: -8 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -8 }}
-                className="flex items-center gap-2 text-[10px] font-black text-blue-600 dark:text-blue-400"
-              >
-                <div className="w-2.5 h-2.5 border-2 border-blue-600 dark:border-blue-400 border-t-transparent rounded-full animate-spin" />
-                지능형 필터 분석 중...
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-
-        {activeCount > 0 && (
-          <button
-            onClick={() => router.push("/", { scroll: false })}
-            className="text-[10px] font-black text-rose-500 bg-rose-50 dark:bg-rose-900/20 px-3 py-1.5 rounded-xl hover:bg-rose-500 hover:text-white transition-all flex items-center gap-2 shadow-sm border border-rose-100 dark:border-rose-900/30 active:scale-95"
-          >
-            <X className="w-3 h-3" />
-            모든 필터 초기화({activeCount})
-          </button>
-        )}
-      </div>
-    </div>
+    </section>
   );
 }

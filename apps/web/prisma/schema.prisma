@@ -14,42 +14,46 @@ model Platform {
   base_url   String
   is_active  Boolean     @default(true)
   created_at DateTime    @default(now()) @db.Timestamptz(6)
+  
   campaigns  Campaign[]
   ingestRuns IngestRun[]
   backgroundJobs BackgroundJob[]
+  platformStats  PlatformStats[]
 }
 
 model Campaign {
   id             Int       @id @default(autoincrement())
   platform_id    Int
-  original_id    String
-  title          String
-  campaign_type  String? // VST (방문), SHP (배송), PRS (기자단)
-  media_type     String? // BP, IP, YP, RS (Reels), SH (Shorts), TK (TikTok), CL (Clip)
+  original_id    String    // 플랫폼별 고유 번호
   
-  // Category & Region
+  // Basic Info
+  title          String
+  brand_name     String?   // 분석용 브랜드명 (추후 AI/Regex로 추출)
+  campaign_type  String?   // VST, SHP, PRS
+  media_type     String?   // BP, IP, YP, RS, SH, TK, CL
+  
+  // Classification
   category       String?
   sub_category   String?
   region_depth1  String?
   region_depth2  String?
-  
-  location       String?
+  location       String?   // 검색용 전체 주소
   lat            Float?
   lng            Float?
   
-  // Rewards & Links
+  // Financial & Conversion
   reward_text    String?
-  reward_value   Int?      @default(0) // 정규화된 보상 가치 (정수)
-  shop_url       String?   // 외부 사이트 (네이버 지도, 쇼핑몰 등) 연결 링크
-  
+  reward_value   Int?      @default(0) // 정규화된 가치
+  shop_url       String?   
   thumbnail_url  String?
-  url            String    // 원본 상세 페이지 링크
+  url            String    @unique
   
-  // Stats for sorting
+  // Real-time Stats (Denormalized for fast reading)
   recruit_count   Int      @default(0)
   applicant_count Int      @default(0)
   competition_rate Decimal @default(0.0) @db.Decimal(10, 2)
   
+  // Life-cycle
   apply_end_date DateTime? @db.Timestamptz(6)
   created_at     DateTime  @default(now()) @db.Timestamptz(6)
   updated_at     DateTime  @default(now()) @db.Timestamptz(6)
@@ -57,38 +61,122 @@ model Campaign {
   platform  Platform           @relation(fields: [platform_id], references: [id], onDelete: Cascade)
   snapshots CampaignSnapshot[]
   userSchedules UserSchedule[]
+  actionLogs    UserActionLog[]
 
   @@unique([platform_id, original_id])
-  @@index([platform_id])
-  @@index([campaign_type])
-  @@index([media_type])
-  @@index([category])
-  @@index([region_depth1, region_depth2])
-  @@index([reward_value])
-  @@index([competition_rate])
-  @@index([apply_end_date])
+  @@index([platform_id, campaign_type, media_type])
+  @@index([category, region_depth1])
+  @@index([competition_rate, apply_end_date])
   @@index([created_at])
 }
 
+// [BIG DATA] Time-series stats for trend analysis
 model CampaignSnapshot {
-  id               Int      @id @default(autoincrement())
+  id               BigInt   @id @default(autoincrement())
   campaign_id      Int
-  recruit_count    Int      @default(0)
-  applicant_count  Int      @default(0)
-  competition_rate Decimal  @default(0.0) @db.Decimal(10, 2)
+  recruit_count    Int
+  applicant_count  Int
+  competition_rate Decimal  @db.Decimal(10, 2)
   scraped_at       DateTime @default(now()) @db.Timestamptz(6)
 
   campaign Campaign @relation(fields: [campaign_id], references: [id], onDelete: Cascade)
 
-  @@index([campaign_id])
-  @@index([scraped_at])
-  @@index([applicant_count, recruit_count])
+  @@index([campaign_id, scraped_at])
+}
+
+// [MARKETING] Daily aggregate for business intelligence
+model PlatformStats {
+  id             Int      @id @default(autoincrement())
+  platform_id    Int
+  date           DateTime @db.Date
+  total_campaigns Int
+  total_recruits   Int
+  total_applicants Int
+  avg_competition  Decimal @db.Decimal(10, 2)
+
+  platform Platform @relation(fields: [platform_id], references: [id], onDelete: Cascade)
+
+  @@unique([platform_id, date])
+}
+
+// [MARKETING] User behavior tracking for personalized targeting
+model UserActionLog {
+  id          BigInt   @id @default(autoincrement())
+  user_id     Int?
+  campaign_id Int?
+  action      String   // 'VIEW', 'CLICK', 'FAVORITE', 'SHARE'
+  platform    String?  // 'WEB', 'APP', 'IOS', 'ANDROID'
+  created_at  DateTime @default(now()) @db.Timestamptz(6)
+
+  user     User?     @relation(fields: [user_id], references: [id], onDelete: SetNull)
+  campaign Campaign? @relation(fields: [campaign_id], references: [id], onDelete: SetNull)
+
+  @@index([user_id, action])
+  @@index([campaign_id, action])
+  @@index([created_at])
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  nickname  String?
+  notify_kakao_enabled Boolean @default(true)
+  notify_telegram_enabled Boolean @default(false)
+  notify_push_enabled Boolean @default(true)
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+
+  schedules      UserSchedule[]
+  actionLogs     UserActionLog[]
+  deliveries     NotificationDelivery[]
+}
+
+model UserSchedule {
+  id                Int      @id @default(autoincrement())
+  user_id           Int
+  campaign_id       Int?
+  custom_title      String?
+  status            String    @default("APPLIED") // 'APPLIED', 'SELECTED', 'COMPLETED'
+  visit_date        DateTime? @db.Timestamptz(6)
+  deadline_date     DateTime? @db.Timestamptz(6)
+  sponsorship_value Int       @default(0)
+  ad_fee            Int       @default(0)
+  alarm_enabled     Boolean   @default(true)
+  memo              String?
+  created_at        DateTime  @default(now()) @db.Timestamptz(6)
+
+  user              User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  campaign          Campaign? @relation(fields: [campaign_id], references: [id], onDelete: SetNull)
+  deliveries        NotificationDelivery[]
+
+  @@index([user_id, status])
+  @@index([deadline_date])
+}
+
+model NotificationDelivery {
+  id               Int      @id @default(autoincrement())
+  user_id          Int
+  user_schedule_id Int
+  channel          String   @default("push")
+  status           String   @default("PENDING")
+  due_days         Int
+  sent_at            DateTime? @db.Timestamptz(6)
+  created_at         DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at         DateTime  @default(now()) @updatedAt @db.Timestamptz(6)
+  message            String?   @db.Text
+  error_message      String?   @db.Text
+  attempted_channels String?   @db.Text
+
+  user         User         @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  userSchedule UserSchedule @relation(fields: [user_schedule_id], references: [id], onDelete: Cascade)
+
+  @@index([status])
+  @@index([created_at])
 }
 
 model IngestRun {
   id              Int       @id @default(autoincrement())
   platform_id     Int
-  status          String // 'RUNNING', 'SUCCESS', 'FAILED'
+  status          String 
   records_added   Int       @default(0)
   records_updated Int       @default(0)
   error_log       String?
@@ -103,75 +191,15 @@ model BackgroundJob {
   type        String
   platform_id Int?
   payload     String?
-  status      String    @default("PENDING")
-  attempts    Int       @default(0)
-  max_attempts Int      @default(3)
-  error_log   String?
-  locked_by   String?
-  locked_until DateTime?
+  status       String    @default("PENDING")
+  attempts     Int       @default(0)
+  max_attempts Int       @default(3)
   next_run_at  DateTime? @default(now()) @db.Timestamptz(6)
+  locked_until DateTime? @db.Timestamptz(6)
   started_at   DateTime? @db.Timestamptz(6)
   finished_at  DateTime? @db.Timestamptz(6)
+  error_log    String?   @db.Text
   created_at   DateTime  @default(now()) @db.Timestamptz(6)
-  updated_at   DateTime  @default(now()) @db.Timestamptz(6)
 
   platform Platform? @relation(fields: [platform_id], references: [id], onDelete: Cascade)
-
-  @@index([status])
-  @@index([type, status])
-  @@index([next_run_at])
-  @@index([platform_id, status])
-}
-
-model User {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
-  nickname  String?
-  created_at DateTime @default(now()) @db.Timestamptz(6)
-
-  schedules UserSchedule[]
-  notificationDeliveries NotificationDelivery[]
-}
-
-model UserSchedule {
-  id                Int      @id @default(autoincrement())
-  user_id           Int
-  campaign_id       Int?
-  custom_title      String?
-  status            String    @default("APPLIED")
-  visit_date        DateTime? @db.Timestamptz(6)
-  deadline_date     DateTime? @db.Timestamptz(6)
-  sponsorship_value Int       @default(0)
-  ad_fee            Int       @default(0)
-  alarm_enabled     Boolean   @default(true)
-  memo              String?
-  created_at        DateTime  @default(now()) @db.Timestamptz(6)
-
-  user              User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  campaign          Campaign? @relation(fields: [campaign_id], references: [id], onDelete: SetNull)
-  notificationDeliveries NotificationDelivery[]
-
-  @@index([user_id, deadline_date])
-  @@index([status])
-}
-
-model NotificationDelivery {
-  id               Int      @id @default(autoincrement())
-  user_id          Int
-  user_schedule_id Int
-  channel          String   @default("push")
-  due_days         Int
-  status           String   @default("PENDING")
-  message          String?
-  error_message    String?
-  sent_at          DateTime? @db.Timestamptz(6)
-  created_at       DateTime  @default(now()) @db.Timestamptz(6)
-  updated_at       DateTime  @default(now()) @db.Timestamptz(6)
-
-  user         User        @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  userSchedule UserSchedule @relation(fields: [user_schedule_id], references: [id], onDelete: Cascade)
-
-  @@index([user_id, status])
-  @@index([status])
-  @@index([created_at])
 }

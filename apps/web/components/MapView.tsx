@@ -3,7 +3,7 @@
 import { useMemo, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { Map as MapIcon, Compass, Globe, Info, Zap } from "lucide-react";
+import { Map as MapIcon, Compass, Globe, Zap, X } from "lucide-react";
 
 // Types for Global Windows
 declare global {
@@ -44,10 +44,9 @@ export default function MapView({ campaigns }: { campaigns: any[] }) {
       mapInstance.current = null;
       if (mapRef.current) mapRef.current.innerHTML = "";
     }
-    setIsLoaded(false);
 
     const loadKakao = () => {
-      const KAKAO_KEY = process.env.NEXT_PUBLIC_KAKAO_JS_KEY || "3d5f7ad7a080c5ea3f9b1f632f6ecadb";
+    const KAKAO_KEY = process.env.NEXT_PUBLIC_KAKAO_JS_KEY || "3d5f7ad7a080c5ea3f9b1f632f6ecadb";
       const script = document.createElement("script");
       script.src = `//dapi.kakao.com/v2/maps/sdk.js?appkey=${KAKAO_KEY}&autoload=false&libraries=clusterer`;
       script.async = true;
@@ -219,13 +218,15 @@ export default function MapView({ campaigns }: { campaigns: any[] }) {
         <div className="absolute inset-0 flex items-center justify-center bg-slate-50 dark:bg-slate-900 z-50">
           <div className="flex flex-col items-center gap-4">
             <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
-            <p className="text-xs font-black text-slate-400 tracking-widest uppercase">Initializing {engine.toUpperCase()} Engine...</p>
+            <p className="text-xs font-black text-slate-400 tracking-widest uppercase">
+              {engine === "kakao" ? "카카오맵" : "네이버맵"} 지도 로딩 중...
+            </p>
           </div>
         </div>
       )}
 
       {/* Map Content */}
-      <div ref={mapRef} className="w-full h-full z-0" />
+      <div key={`${engine}-${pinnedCampaigns.length}`} ref={mapRef} className="w-full h-full z-0" />
 
       {/* Engine Switcher (Premium UI) */}
       <div className="absolute top-6 right-6 z-10 flex flex-col items-end gap-3">
@@ -234,19 +235,19 @@ export default function MapView({ campaigns }: { campaigns: any[] }) {
             onClick={() => setEngine("kakao")}
             className={`px-4 py-2 rounded-2xl text-[10px] font-black transition-all ${engine === "kakao" ? "bg-amber-400 text-slate-900 shadow-lg" : "text-slate-400 hover:text-slate-600 dark:hover:text-white"}`}
           >
-            KAKAO
+            카카오맵
           </button>
           <button
             onClick={() => setEngine("naver")}
             className={`px-4 py-2 rounded-2xl text-[10px] font-black transition-all ${engine === "naver" ? "bg-emerald-500 text-white shadow-lg" : "text-slate-400 hover:text-slate-600 dark:hover:text-white"}`}
           >
-            NAVER
+            네이버맵
           </button>
         </div>
 
         <div className={`px-4 py-2.5 rounded-2xl text-[10px] font-black backdrop-blur-md shadow-2xl flex items-center gap-3 border border-white/10 ${engine === 'kakao' ? 'bg-slate-900/90 text-white' : 'bg-emerald-600/90 text-white'}`}>
           <div className={`w-2 h-2 rounded-full animate-pulse ${engine === 'kakao' ? 'bg-amber-400' : 'bg-white'}`} />
-          {engine.toUpperCase()} ENGINE ACTIVE
+          현재 {engine === "kakao" ? "카카오맵" : "네이버맵"} 엔진 사용
         </div>
 
         {/* My Location Button */}
@@ -279,7 +280,7 @@ export default function MapView({ campaigns }: { campaigns: any[] }) {
               className="flex items-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-full text-[11px] font-black shadow-2xl border border-white/20 active:scale-95 transition-all"
             >
               <Zap className="w-3.5 h-3.5 fill-current text-blue-400" />
-              지역 재검색 (Intelligence Grid)
+              이 지역에서 다시 조회
             </button>
           </motion.div>
         )}
@@ -289,24 +290,24 @@ export default function MapView({ campaigns }: { campaigns: any[] }) {
       <div className="absolute top-6 left-6 z-10 hidden md:block">
         <div className="glass-card bg-white/70 dark:bg-slate-900/80 rounded-[2rem] p-6 shadow-2xl border border-white/60 dark:border-slate-700/50">
           <h3 className="text-xs font-black text-slate-900 dark:text-white mb-4 tracking-widest uppercase flex items-center gap-2">
-            <Globe className="w-4 h-4 text-blue-500" /> GIS Layer Control
+            <Globe className="w-4 h-4 text-blue-500" /> 지도 레이어 제어
           </h3>
           <div className="space-y-3">
             <div className="flex items-center justify-between gap-8">
-              <span className="text-[10px] font-bold text-slate-500 uppercase">Visible Area</span>
+              <span className="text-[10px] font-bold text-slate-500 uppercase">현재 지역</span>
               <span className="text-[10px] font-black text-blue-500 uppercase tracking-tighter truncate max-w-[120px]">{currentAddress}</span>
             </div>
             <div className="flex items-center justify-between gap-8">
-              <span className="text-[10px] font-bold text-slate-500 uppercase">Live Markers</span>
-              <span className="text-[10px] font-black text-slate-900 dark:text-white">{pinnedCampaigns.length} Units</span>
+              <span className="text-[10px] font-bold text-slate-500 uppercase">표시 캠페인</span>
+              <span className="text-[10px] font-black text-slate-900 dark:text-white">{pinnedCampaigns.length}개</span>
             </div>
           </div>
           <div className="mt-6 pt-6 border-t border-slate-200 dark:border-slate-800 flex flex-col gap-2">
             <div className="flex items-center gap-2 text-[10px] font-bold text-slate-400">
-              <div className="w-2 h-2 rounded-full bg-blue-500" /> Visit Type 캠페인
+              <div className="w-2 h-2 rounded-full bg-blue-500" /> 방문형 캠페인
             </div>
             <div className="flex items-center gap-2 text-[10px] font-bold text-slate-400">
-              <div className="w-2 h-2 rounded-full bg-emerald-500" /> Delivery Type 캠페인
+              <div className="w-2 h-2 rounded-full bg-emerald-500" /> 배송형 캠페인
             </div>
           </div>
         </div>
@@ -316,7 +317,12 @@ export default function MapView({ campaigns }: { campaigns: any[] }) {
       <AnimatePresence>
         {activeCampaign && (
           <motion.div initial={{ opacity: 0, scale: 0.9, y: 30 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 30 }} className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 w-[360px] glass-card bg-white/95 dark:bg-slate-900/95 rounded-[2.5rem] p-6 shadow-2xl border border-white dark:border-slate-700">
-            <button onClick={() => setActiveCampaign(null)} className="absolute top-4 right-4 w-8 h-8 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all">×</button>
+            <button
+              onClick={() => setActiveCampaign(null)}
+              className="absolute top-4 right-4 w-8 h-8 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all"
+            >
+              <X className="w-4 h-4" />
+            </button>
             <div className="flex gap-5">
               <div className="relative w-28 h-28 rounded-2xl overflow-hidden shrink-0 shadow-lg">
                 <img src={activeCampaign.thumbnail_url || 'https://via.placeholder.com/150'} className="object-cover w-full h-full" alt="" />
@@ -324,11 +330,15 @@ export default function MapView({ campaigns }: { campaigns: any[] }) {
               <div className="flex flex-col justify-center gap-1.5 overflow-hidden">
                 <div className="flex items-center gap-2">
                   <span className="text-[9px] font-black text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-2 py-0.5 rounded-lg">{activeCampaign.platform?.name}</span>
-                  <span className="text-[9px] font-black text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-lg">{activeCampaign.campaign_type}</span>
+                <span className="text-[9px] font-black text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-lg">
+                  {activeCampaign.campaign_type === "VST" ? "방문형" : activeCampaign.campaign_type === "SHP" ? "배송형" : "기타"}
+                </span>
                 </div>
                 <h4 className="text-sm font-black text-slate-900 dark:text-white line-clamp-2 leading-tight">{activeCampaign.title}</h4>
                 <p className="text-[10px] text-slate-400 font-bold flex items-center gap-1"><MapIcon className="w-3 h-3" /> {activeCampaign.location}</p>
-                <Link href={`/campaigns/${activeCampaign.id}`} className="mt-3 text-[10px] font-black text-white bg-slate-900 dark:bg-blue-600 px-5 py-2.5 rounded-2xl text-center hover:shadow-xl transition-all shadow-md">상세보기 &rarr;</Link>
+                <Link href={`/campaigns/${activeCampaign.id}`} className="mt-3 text-[10px] font-black text-white bg-slate-900 dark:bg-blue-600 px-5 py-2.5 rounded-2xl text-center hover:shadow-xl transition-all shadow-md">
+                  자세히 보기 &rarr;
+                </Link>
               </div>
             </div>
           </motion.div>

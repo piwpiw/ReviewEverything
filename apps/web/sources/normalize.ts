@@ -78,18 +78,27 @@ function pickNumbers(text: string) {
   const add = (re: RegExp, factor: number) => {
     let m: RegExpExecArray | null;
     while ((m = re.exec(normalized)) !== null) {
-      const value = Number(m[1]);
-      if (!Number.isNaN(value)) all.push(Math.floor(value * factor));
+      const value = parseFloat(m[1]);
+      if (!Number.isNaN(value)) {
+        all.push(Math.floor(value * factor));
+      }
     }
   };
 
+  // Layered regex strategy for Korean currency
+  add(/(\d+(?:\.\d+)?)\s*억/g, 100000000);
   add(/(\d+(?:\.\d+)?)\s*만원/g, 10000);
+  add(/(\d+(?:\.\d+)?)\s*만\s*원/g, 10000);
   add(/(\d+(?:\.\d+)?)\s*천원/g, 1000);
   add(/(\d+(?:\.\d+)?)\s*백만원/g, 1000000);
   add(/(\d+(?:\.\d+)?)\s*원/g, 1);
   add(/(\d+(?:\.\d+)?)\s*달러/g, 1300);
+  add(/(\d+(?:\.\d+)?)\s*usd/g, 1300);
 
-  return all;
+  // Handling cases like "10만" (without "원")
+  add(/(\d+(?:\.\d+)?)\s*만(?!\s*원|\s*배|\s*개)/g, 10000);
+
+  return Array.from(new Set(all));
 }
 
 export function normalizeRewardValue(text: string): number {
@@ -97,9 +106,13 @@ export function normalizeRewardValue(text: string): number {
   const raw = String(text);
   const values = pickNumbers(raw);
 
-  if (values.length > 0) return Math.max(...values);
+  if (values.length > 0) {
+    // Return the maximum found value as likely primary reward
+    return Math.max(...values);
+  }
 
-  const fallback = raw.replace(/,/g, '').match(/(\d{3,})/);
+  // Fallback: look for 4+ consecutive digits which likely represent a KRW amount
+  const fallback = raw.replace(/,/g, '').match(/(\d{4,})/);
   return fallback ? Number(fallback[1]) : 0;
 }
 
@@ -113,11 +126,12 @@ export function normalizeRewardValueWithConfidence(text: string): RewardParseRes
   if (!text) return { value: 0, confidence: 'LOW', method: 'zero' };
   const raw = String(text);
   const values = pickNumbers(raw);
+  const hasMultipleSignals = /[~\\-]|\\+|,/.test(raw);
 
   if (values.length > 0) {
     return {
       value: Math.max(...values),
-      confidence: values.length === 1 ? 'HIGH' : 'MEDIUM',
+      confidence: values.length === 1 || !hasMultipleSignals ? 'HIGH' : 'MEDIUM',
       method: 'unit_parse',
     };
   }
@@ -148,21 +162,44 @@ export function normalizeGeocode(location: string, d2: string | null): [number |
   return [null, null];
 }
 
+export function extractBrandName(title: string): string | null {
+  if (!title) return null;
+  // Common patterns for brand names in Korean campaigns:
+  // 1. [BrandName] Title
+  // 2. (BrandName) Title
+  // 3. BrandName - Title
+  const matches = [
+    title.match(/^\[([^\]]+)\]/),
+    title.match(/^\(([^)]+)\)/),
+    title.match(/^([^-\|]+)\s*[-\|]/),
+  ];
+
+  for (const m of matches) {
+    if (m && m[1]) return m[1].trim();
+  }
+
+  // Fallback: take first 2-3 words if short
+  const words = title.split(/\s+/);
+  if (words.length > 0 && words[0].length >= 2) return words[0];
+
+  return null;
+}
+
 export function normalizeCategory(title: string, type: string, reward: string): [string | null, string | null] {
   const combined = `${title || ''} ${reward || ''}`.toLowerCase();
 
-  if (type === 'VST') {
-    if (combined.includes('맛집') || combined.includes('카페') || combined.includes('음식')) return ['식음료', '식사'];
-    if (combined.includes('미용') || combined.includes('뷰티') || combined.includes('헤어')) return ['뷰티', '미용'];
-    if (combined.includes('쇼핑') || combined.includes('상품') || combined.includes('구매')) return ['쇼핑', '상품'];
-    if (combined.includes('숙박') || combined.includes('호텔')) return ['여행', '숙박'];
-    return ['라이프', '라이프스타일'];
-  }
-
-  if (combined.includes('교육') || combined.includes('교육체험')) return ['교육', '리뷰'];
-  if (combined.includes('뷰티') || combined.includes('메이크업')) return ['뷰티', '케어'];
-  if (combined.includes('펫') || combined.includes('반려') || combined.includes('동물')) return ['반려동물', '체험'];
-  return ['기타', '기타'];
+  // Enhanced categorization for analytics
+  if (combined.includes('맛집') || combined.includes('카페') || combined.includes('음식') || combined.includes('술집')) return ['식음료', '식사/안주'];
+  if (combined.includes('화장품') || combined.includes('앰플') || combined.includes('기초') || combined.includes('메이크업')) return ['뷰티', '코스메틱'];
+  if (combined.includes('헤어') || combined.includes('미용실') || combined.includes('네일')) return ['뷰티', '헤어/네일'];
+  if (combined.includes('호텔') || combined.includes('펜션') || combined.includes('숙박') || combined.includes('여행')) return ['여행/숙박', '국내여행'];
+  if (combined.includes('패션') || combined.includes('의류') || combined.includes('잡화')) return ['패션', '의류/잡화'];
+  if (combined.includes('펫') || combined.includes('반려') || combined.includes('강아지') || combined.includes('고양이')) return ['반려동물', '펫용품'];
+  if (combined.includes('육아') || combined.includes('키즈') || combined.includes('베이비')) return ['출산/육아', '영유아'];
+  if (combined.includes('가전') || combined.includes('전자기기') || combined.includes('it')) return ['디지털/가전', 'it제품'];
+  
+  if (type === 'VST') return ['라이프', '공간체험'];
+  return ['기타', '일반리뷰'];
 }
 
 export async function processAndDedupeCampaign(platformId: number, item: ScrapedCampaign) {
@@ -176,11 +213,12 @@ export async function processAndDedupeCampaign(platformId: number, item: Scraped
   const [depth1, depth2] = normalizeRegion(sanitizedLocation);
   const [lat, lng] = normalizeGeocode(sanitizedLocation, depth2);
   const [cat, subCat] = normalizeCategory(sanitizedTitle, cType, sanitizedReward);
-
+  const bName = extractBrandName(sanitizedTitle);
   const compRate = item.recruit_count > 0 ? item.applicant_count / item.recruit_count : 0;
 
   const commonData = {
     title: sanitizedTitle,
+    brand_name: bName,
     campaign_type: cType,
     media_type: mType,
     location: sanitizedLocation || null,

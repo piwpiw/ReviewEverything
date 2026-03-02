@@ -1,62 +1,113 @@
-import { IPlatformAdapter, ScrapedCampaign } from "../types";
+﻿import { IPlatformAdapter, ScrapedCampaign } from "../types";
 import { fetchWithRetry } from "../../lib/fetcher";
 import * as cheerio from "cheerio";
 
 const delay = (ms: number) => new Promise(r => setTimeout(r, ms));
 
+/**
+ * MrBlog adapter - scrapes mrblog.net
+ */
 export class MrBlogAdapter implements IPlatformAdapter {
     platformId = 6;
     baseUrl = "https://mrblog.net";
 
     async fetchList(page: number): Promise<ScrapedCampaign[]> {
-        console.log(`[MrBlog] Page ${page}`);
-        await delay(2000 + Math.random() * 800);
+        // Only page 1 is supported for homepage scraping
+        if (page > 1) return [];
+
+        console.log(`[MrBlog] Page ${page} (Homepage Scraping)`);
+        await delay(1000 + Math.random() * 500);
+
         try {
-            const { data } = await fetchWithRetry(`${this.baseUrl}/campaign/list?page=${page}`, {
-                headers: { "User-Agent": "Mozilla/5.0 Chrome/121.0.0.0 Safari/537.36" },
+            const { data } = await fetchWithRetry(this.baseUrl, {
+                headers: {
+                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/121.0.0.0 Safari/537.36",
+                    "Accept": "text/html,*/*;q=0.9",
+                },
             });
             const $ = cheerio.load(data);
             const campaigns: ScrapedCampaign[] = [];
-            $(".campaign-item, .list-box, [class*='list']").each((i, el) => {
-                if (i >= 20) return;
+
+            $('a[href*="/campaigns/"]').each((i, el) => {
                 const $el = $(el);
-                const title = $el.find(".title, h4").first().text().trim();
-                const href = $el.find("a").first().attr("href") || "";
-                if (title.length > 3) {
-                    campaigns.push({
-                        original_id: `mb_${href.split("/").pop() ?? Date.now()}_${i}`,
-                        title, campaign_type: "VST", media_type: "BP",
-                        location: $el.find(".local, .area").text().trim() || "전국",
-                        reward_text: "상세 참조",
-                        thumbnail_url: $el.find("img").attr("src") || undefined,
-                        url: href.startsWith("http") ? href : `${this.baseUrl}${href || "/campaign/list"}`,
-                        apply_end_date: new Date(Date.now() + 86_400_000 * (7 + Math.floor(Math.random() * 7))),
-                        recruit_count: 3, applicant_count: Math.floor(Math.random() * 50),
-                    });
-                }
+                const href = $el.attr("href") || "";
+                if (!href.match(/\/campaigns\/\d+$/)) return;
+
+                const $container = $el.closest(".campaign_item, li, div.item, .card");
+                const text = $container.text().replace(/\s+/g, " ").trim();
+                if (!text.includes("D-") && !text.includes("D-Day") && !text.includes("Dday")) return;
+
+                const titleMatch = text.match(/^(.*?)(?:D-\d+|D-Day|D\s*-\s*\d+)/);
+                const title = titleMatch ? titleMatch[1].trim() : text.substring(0, 50);
+
+                const rewardMatch = text.match(/(\d[\d,]*\s*(?:만원|천원|원|usd|USD)?)/);
+                const reward = rewardMatch ? rewardMatch[1].trim() : "보상 정보 없음";
+
+                const ddayMatch = text.match(/D-Day|D-(\d+)/);
+                const dday = ddayMatch ? (ddayMatch[1] ? parseInt(ddayMatch[1], 10) : 0) : 7;
+
+                const countsMatch = text.match(/모집\s*(\d+)\s*\|\s*신청\s*(\d+)/);
+                const applicantCount = countsMatch ? parseInt(countsMatch[1], 10) : 0;
+                const recruitCount = countsMatch ? parseInt(countsMatch[2], 10) : 5;
+
+                const img = $container.find("img").attr("src") || $container.find("img").attr("data-src") || "";
+                const id = href.split("/").pop();
+                if (!id || campaigns.some(c => c.original_id === `mb_${id}`)) return;
+
+                campaigns.push({
+                    original_id: `mb_${id}`,
+                    title,
+                    campaign_type: text.includes("쇼핑") ? "SHP" : "VST",
+                    media_type: text.includes("인스타") || text.includes("instagram") || text.includes("insta") ? "IP" : "BP",
+                    location: text.split(" ").slice(0, 2).join(" "),
+                    reward_text: reward,
+                    thumbnail_url: img.startsWith("http") ? img : (img ? `${this.baseUrl}${img}` : undefined),
+                    url: href.startsWith("http") ? href : `${this.baseUrl}${href}`,
+                    apply_end_date: new Date(Date.now() + 86_400_000 * Math.max(dday, 1)),
+                    recruit_count: recruitCount,
+                    applicant_count: applicantCount,
+                });
             });
-            if (campaigns.length === 0) return this.getFallback(page);
-            return campaigns;
-        } catch { return page === 1 ? this.getFallback(page) : []; }
+
+            console.log(`[MrBlog] Found ${campaigns.length} campaigns on homepage.`);
+            return campaigns.length > 0 ? campaigns : this.getFallback(page);
+        } catch (e: any) {
+            console.error(`[MrBlog] Failed: ${e.message}`);
+            return this.getFallback(page);
+        }
     }
 
     private getFallback(page: number): ScrapedCampaign[] {
-        const SAMPLES = [
-            { title: "[미스터블로그] 부산 해운대 호텔 스테이 블로그 체험", loc: "부산 해운대구", reward: "2인 1박 (20만원 상당)", recruits: 3, apps: 52 },
-            { title: "[미스터블로그] 전국 맛집 탐방 앰버서더 모집", loc: "전국", reward: "30만원 활동 지원금 + 식사권", recruits: 5, apps: 78 },
-            { title: "[미스터블로그] 제주 렌터카 여행 블로그 협찬", loc: "제주", reward: "3일 렌터카 무료 이용", recruits: 4, apps: 29 },
-            { title: "[미스터블로그] 공주 한옥 스테이 체험단", loc: "충남 공주시", reward: "2인 1박 한옥 숙박권", recruits: 5, apps: 17 },
-            { title: "[미스터블로그] 경주 전통 발효 식품 체험단", loc: "경북 경주시", reward: "전통 발효 세트 (8만원 상당)", recruits: 10, apps: 33 },
+        const samples = [
+            {
+                title: "mrblog 체험단 - 뷰티",
+                loc: "서울 종로구",
+                reward: "3만원",
+                recruit: 10,
+                applicants: 2,
+            },
+            {
+                title: "mrblog 체험단 - 디저트",
+                loc: "서울 영등포구",
+                reward: "2만원",
+                recruit: 6,
+                applicants: 5,
+            },
         ];
-        const offset = (page - 1) % SAMPLES.length;
-        return SAMPLES.slice(offset).concat(SAMPLES).slice(0, 5).map((s, i) => ({
+
+        const start = (page - 1) % samples.length;
+        return samples.slice(start).concat(samples).slice(0, 2).map((item, i) => ({
             original_id: `mb_sample_p${page}_${i}`,
-            title: s.title, campaign_type: "VST" as const, media_type: "BP" as const,
-            location: s.loc, reward_text: s.reward,
-            thumbnail_url: "https://images.unsplash.com/photo-1556909172-54557c7e4fb7?w=400",
-            url: `${this.baseUrl}/campaign/list`,
-            apply_end_date: new Date(Date.now() + 86_400_000 * (7 + i)),
-            recruit_count: s.recruits, applicant_count: s.apps,
+            title: item.title,
+            campaign_type: "SHP",
+            media_type: "BP",
+            location: item.loc,
+            reward_text: item.reward,
+            thumbnail_url: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=600",
+            url: `${this.baseUrl}/campaigns`,
+            apply_end_date: new Date(Date.now() + 86_400_000 * (2 + i)),
+            recruit_count: item.recruit,
+            applicant_count: item.applicants,
         }));
     }
 }

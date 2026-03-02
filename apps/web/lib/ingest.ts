@@ -19,11 +19,37 @@ export async function isPlatformCurrentlyInProgress(platformId: number): Promise
     return Boolean(running);
 }
 
+export async function cleanupStaleRuns() {
+    const cutoff = new Date(Date.now() - ACTIVE_RUN_STALE_MINUTES * 60 * 1000);
+
+    try {
+        const result = await db.ingestRun.updateMany({
+            where: {
+                status: 'RUNNING',
+                start_time: { lt: cutoff }
+            },
+            data: {
+                status: 'FAILED',
+                end_time: new Date(),
+                error_log: `Force terminated: Stale run detected (exceeded ${ACTIVE_RUN_STALE_MINUTES}m)`
+            }
+        });
+        if (result.count > 0) {
+            console.log(`[Ingest] Cleaned up ${result.count} stale runs.`);
+        }
+    } catch (error) {
+        console.error("[Ingest] Failed to cleanup stale runs:", error);
+    }
+}
+
 /**
  * Enhanced task executor to handle more pages and better logging.
  * In production, this would probably use a queue (BullMQ/SQS).
  */
 export async function executeIngestionTask(adapter: IPlatformAdapter, platformId: number) {
+    // Maintenance first
+    await cleanupStaleRuns();
+
     if (await isPlatformCurrentlyInProgress(platformId)) {
         console.log(`[Ingest] Skip platform ${platformId}: already running`);
         return { success: false, reason: "already_running", platformId };
@@ -88,16 +114,17 @@ export async function executeIngestionTask(adapter: IPlatformAdapter, platformId
 
         console.log(`[Ingest] Finished platform ${platformId}. Added: ${addedCount}, Updated: ${updatedCount}`);
         return { success: true, run_id: run.id, added: addedCount, updated: updatedCount };
-    } catch (e: any) {
-        console.error(`[Ingest] CRITICAL FAILURE for platform ${platformId}:`, e);
+    } catch (e: unknown) {
+        const error = e as Error;
+        console.error(`[Ingest] CRITICAL FAILURE for platform ${platformId}:`, error);
         await db.ingestRun.update({
             where: { id: run.id },
             data: {
                 status: 'FAILED',
                 end_time: new Date(),
-                error_log: e.message || String(e)
+                error_log: error.message || String(error)
             }
         });
-        return { success: false, run_id: run.id, error: e.message };
+        return { success: false, run_id: run.id, error: error.message };
     }
 }

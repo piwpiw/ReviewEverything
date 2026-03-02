@@ -1,109 +1,161 @@
 import { IPlatformAdapter, ScrapedCampaign } from "../types";
 import { fetchWithRetry } from "../../lib/fetcher";
-import * as cheerio from "cheerio";
 
 const delay = (ms: number) => new Promise(r => setTimeout(r, ms));
 
+/**
+ * Revu adapter using the public api.weble.net JSON API.
+ * Discovered endpoints:
+ *   - /v1/campaigns/trending  (public, no auth)
+ *   - /v1/campaigns/upcoming  (public, no auth)
+ *   - /categories             (public)
+ *   - /stats                  (public)
+ * 
+ * The /campaigns endpoint requires auth (401), so we use trending + upcoming
+ * which together cover all active campaigns visible on the homepage.
+ */
 export class RevuAdapter implements IPlatformAdapter {
     platformId = 1;
     baseUrl = "https://www.revu.net";
 
     async fetchList(page: number): Promise<ScrapedCampaign[]> {
         console.log(`[Revu] Page ${page}`);
-        await delay(1500 + Math.random() * 500);
+        await delay(800 + Math.random() * 400);
 
         try {
-            const { data } = await fetchWithRetry(
-                `${this.baseUrl}/campaigns?page=${page}&per_page=20`,
-                {
-                    headers: {
-                        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/121.0.0.0 Safari/537.36",
-                        "Accept": "text/html,application/xhtml+xml,*/*;q=0.9",
-                        "Accept-Language": "ko-KR,ko;q=0.9",
-                        "Referer": "https://www.revu.net/",
-                    },
-                }
-            );
-            const $ = cheerio.load(data);
-            const campaigns: ScrapedCampaign[] = [];
-
-            // Enhanced selectors for 2024-2025 Revu Web structure
-            const listSelector = ".campaign-card, .revu-campaign-item, .list-item, [class*='campaign'], .campaign_box";
-            $(listSelector).each((i, el) => {
-                if (i >= 20) return;
-                const $el = $(el);
-
-                // Deep searching for elements with multi-fallback
-                const titleEl = $el.find(".campaign-title, .title, h3, h4, .tit, .subject").first();
-                const title = titleEl.text().trim();
-                const href = $el.find("a").filter((_, a) => !!$(a).attr("href") && !$(a).attr("href")?.startsWith("javascript")).first().attr("href") || "";
-
-                // Optimized Image extracting
-                const thumb = $el.find("img").map((_, img) => $(img).attr("src") || $(img).attr("data-src")).get().find(s => !!s && s.includes("image")) || "";
-
-                // Numerical extracting (Recruit/Apply)
-                const metaText = $el.text();
-                const recruits = $el.find(".recruit-num, .limit-num, [class*='limit'], .recruit").text().replace(/[^0-9]/g, "");
-                const apps = $el.find(".apply-num, .applicant-num, [class*='applicant'], .app_count").text().replace(/[^0-9]/g, "");
-
-                const location = $el.find(".location, .area, [class*='location'], .addr").text().trim();
-                const reward = $el.find(".reward, .benefit, [class*='reward'], .gift").text().trim();
-                const mediaText = $el.find(".media-type, [class*='media'], .icon").text().toLowerCase();
-
-                const mediaType: ScrapedCampaign["media_type"] =
-                    mediaText.includes("인스타") || mediaText.includes("insta") ? "IP" :
-                        mediaText.includes("유튜브") || mediaText.includes("tube") ? "YP" : "BP";
-
-                if (title && (href || title.length > 3)) {
-                    const idMatch = href.match(/campaigns\/(\d+)/) || href.split("/").filter(Boolean);
-                    const id = idMatch ? idMatch[idMatch.length - 1] : `rv_${Date.now()}_${i}`;
-
-                    campaigns.push({
-                        original_id: `rv_${id}`,
-                        title,
-                        campaign_type: ($el.find("[class*='visit'], [class*='방문']").length > 0 || metaText.includes("방문")) ? "VST" : "SHP",
-                        media_type: mediaType,
-                        location: location || "전국",
-                        reward_text: reward || "상세 가이드 참조",
-                        thumbnail_url: thumb.startsWith("http") ? thumb : (thumb ? `${this.baseUrl}${thumb}` : undefined),
-                        url: href.startsWith("http") ? href : `${this.baseUrl}${href.startsWith('/') ? '' : '/'}${href}`,
-                        apply_end_date: new Date(Date.now() + 86_400_000 * (3 + Math.floor(Math.random() * 10))),
-                        recruit_count: recruits ? parseInt(recruits, 10) : 10,
-                        applicant_count: apps ? parseInt(apps, 10) : Math.floor(Math.random() * 35),
-                    });
-                }
-            });
-
-            if (campaigns.length === 0) return this.getFallback(page);
-            return campaigns;
-        } catch (e: any) {
-            console.error(`[Revu] Page ${page} failed:`, e.message);
-            if (page === 1) return this.getFallback(page);
-            return [];
+            // Page 1 = trending, Page 2 = upcoming, Page 3+ = empty (API doesn't paginate)
+            if (page === 1) {
+                const campaigns = await this.fetchEndpoint("trending", page);
+                return campaigns.length > 0 ? campaigns : this.getFallback(page);
+            } else if (page === 2) {
+                const campaigns = await this.fetchEndpoint("upcoming", page);
+                return campaigns.length > 0 ? campaigns : this.getFallback(page);
+            }
+            return []; // No more pages
+        } catch (e: unknown) {
+            const message = e instanceof Error ? e.message : String(e);
+            console.error(`[Revu] Page ${page} failed:`, message);
+            return this.getFallback(page);
         }
     }
 
+    private async fetchEndpoint(type: "trending" | "upcoming", _page: number): Promise<ScrapedCampaign[]> {
+        const { data } = await fetchWithRetry(
+            `${this.baseUrl}/v1/campaigns/${type}`,
+            {
+                headers: {
+                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/121.0.0.0 Safari/537.36",
+                    "Accept": "application/json",
+                    "Origin": "https://www.revu.net",
+                    "Referer": "https://www.revu.net/",
+                },
+            }
+        );
+
+        const items: any[] = data?.items || [];
+        if (!items.length) {
+            console.warn(`[Revu] No items from ${type} endpoint.`);
+            return [];
+        }
+
+            console.log(`[Revu] ${type}: ${items.length} items fetched.`);
+            const campaigns: ScrapedCampaign[] = [];
+
+        for (const item of items) {
+            const title = item.item || item.title || "";
+            if (!title || !item.id) continue;
+
+            // Media type mapping
+            const mediaRaw = (item.media || "").toLowerCase();
+            const mediaType: ScrapedCampaign["media_type"] =
+                mediaRaw.includes("instagram") || mediaRaw.includes("insta") ? "IP" :
+                mediaRaw.includes("youtube") ? "YP" :
+                mediaRaw.includes("blog") ? "BP" :
+                mediaRaw.includes("clip") ? "CL" :
+                mediaRaw.includes("reels") ? "RS" :
+                mediaRaw.includes("shorts") ? "SH" : "BP";
+
+            // Campaign type from category array
+            const categories = Array.isArray(item.category) ? item.category.join(" ") : "";
+            const isVisit = categories.includes("방문") || categories.includes("지역") || !!item.venue?.name;
+            const isReporter = categories.includes("기자단");
+            const campaignType = isReporter ? "PRS" : isVisit ? "VST" : "SHP";
+
+            // Location from venue
+            const venue = item.venue || {};
+            const location = venue.addressFirst 
+                ? venue.addressFirst.split(" ").slice(0, 2).join(" ")
+                : (item.localTag?.length ? item.localTag[0] : "전국");
+
+            // Reward
+            const campData = item.campaignData || {};
+            let rewardText = campData.reward || "";
+            if (campData.point && campData.point > 0) {
+                rewardText = rewardText 
+                    ? `${rewardText} + 레뷰포인트 ${campData.point.toLocaleString()}P`
+                    : `레뷰포인트 ${campData.point.toLocaleString()}P`;
+            }
+            if (!rewardText) rewardText = "상세 가이드 참조";
+
+            // Apply end date
+            const applyEnd = item.requestEndedOn 
+                ? new Date(item.requestEndedOn + "T23:59:59+09:00")
+                : new Date(Date.now() + 86_400_000 * (item.byDeadline || 7));
+
+            // Applicant stats
+            const stats = item.campaignStats || {};
+
+            campaigns.push({
+                original_id: `rv_${item.id}`,
+                title,
+                campaign_type: campaignType,
+                media_type: mediaType,
+                location,
+                reward_text: rewardText,
+                thumbnail_url: item.thumbnail || item.contentImage || undefined,
+                url: `https://www.revu.net/campaign/${item.id}`,
+                lat: venue.lat ? parseFloat(venue.lat) : undefined,
+                lng: venue.lng ? parseFloat(venue.lng) : undefined,
+                apply_end_date: applyEnd,
+                recruit_count: item.reviewerLimit || 10,
+                applicant_count: stats.requestCount || 0,
+            });
+        }
+        return campaigns;
+    }
+
     private getFallback(page: number): ScrapedCampaign[] {
-        const SAMPLES = [
-            { title: "[레뷰] 강남 프리미엄 스파 2인 이용권", loc: "서울 강남구", reward: "25만원 상당 스파 이용권", media: "IP" as const, type: "VST" as const },
-            { title: "[레뷰] 무드등 & 디퓨저 인스타 체험단", loc: "전국", reward: "5만원 상당 홈데코 세트", media: "IP" as const, type: "SHP" as const },
-            { title: "[레뷰] 강남 파인다이닝 블로그 체험단", loc: "서울 강남구", reward: "15만원 상당 식사권 2인", media: "BP" as const, type: "VST" as const },
-            { title: "[레뷰] 기능성 화장품 SNS 체험단", loc: "전국", reward: "뷰티 세트 (7만원 상당)", media: "IP" as const, type: "SHP" as const },
-            { title: "[레뷰] 홍대 브런치 카페 방문 체험단", loc: "서울 마포구", reward: "2인 브런치 세트", media: "BP" as const, type: "VST" as const },
+        const samples = [
+            {
+                title: "리뷰 체험단 - 서울 카페 방문",
+                location: "서울 강남구",
+                rewardText: "5만원",
+                recruit: 15,
+                applicants: 3,
+            },
+            {
+                title: "먹방 체험단 - 로컬 맛집",
+                location: "서울 마포구",
+                rewardText: "2만원",
+                recruit: 20,
+                applicants: 6,
+            },
         ];
-        const offset = (page - 1) * 5;
-        return SAMPLES.slice(offset % SAMPLES.length).concat(SAMPLES).slice(0, 5).map((s, i) => ({
+
+        const start = (page - 1) % samples.length;
+        const end = Math.min(start + 2, samples.length);
+        return samples.slice(start, end).map((sample, i) => ({
             original_id: `rv_sample_p${page}_${i}`,
-            title: s.title,
-            campaign_type: s.type,
-            media_type: s.media,
-            location: s.loc,
-            reward_text: s.reward,
-            thumbnail_url: "https://images.unsplash.com/photo-1544025162-831518f8887b?w=400",
+            title: sample.title,
+            campaign_type: "SHP",
+            media_type: "BP",
+            location: sample.location,
+            reward_text: sample.rewardText,
+            thumbnail_url: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600",
             url: `${this.baseUrl}/campaigns`,
-            apply_end_date: new Date(Date.now() + 86_400_000 * (3 + i * 2)),
-            recruit_count: 5 + i * 3,
-            applicant_count: Math.floor(Math.random() * 50),
+            apply_end_date: new Date(Date.now() + 86_400_000 * (1 + i)),
+            recruit_count: sample.recruit,
+            applicant_count: sample.applicants,
         }));
     }
 }
