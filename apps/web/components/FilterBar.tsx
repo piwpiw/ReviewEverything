@@ -1,8 +1,8 @@
 ﻿"use client";
 
 import { motion } from "framer-motion";
-import { Clock, Filter, Sparkles, TrendingDown, X } from "lucide-react";
-import { useCallback, useEffect, useMemo, useState, useTransition } from "react";
+import { Clock, Filter, Sparkles, X } from "lucide-react";
+import { useCallback, useMemo, useState, useTransition } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 type RecentFilter = { key: string; label: string; savedAt: string };
@@ -157,10 +157,8 @@ export default function FilterBar() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
-  const [filtersVisible, setFiltersVisible] = useState(true);
+  const [filtersVisible, setFiltersVisible] = useState(() => parseVisibleDefault());
   const [recents, setRecents] = useState<RecentFilter[]>(() => loadRecents());
-  const [pendingRegionDepth1, setPendingRegionDepth1] = useState("");
-  const [pendingRegionDepth2, setPendingRegionDepth2] = useState("");
   const current = useMemo<FilterQuery>(() => {
     return {
       q: searchParams.get("q") || "",
@@ -177,15 +175,6 @@ export default function FilterBar() {
   }, [searchParams]);
 
   const regionDepth1Options = useMemo(() => Object.keys(REGIONS).filter((region) => region !== ""), []);
-
-  useEffect(() => {
-    setFiltersVisible(parseVisibleDefault());
-  }, []);
-
-  useEffect(() => {
-    setPendingRegionDepth1(current.region1 || "");
-    setPendingRegionDepth2(current.region2 || "");
-  }, [current.region1, current.region2]); 
 
   const setParam = useCallback(
     (key: string, value: string) => {
@@ -352,18 +341,16 @@ export default function FilterBar() {
           </div>
 
           <div className="grid gap-2 md:grid-cols-2">
-            <div className="rounded-2xl border border-slate-200 p-3 dark:border-slate-700">
-              <label className="mb-2 block text-xs font-black text-slate-500">지역 1단계</label>
-              <select
-                value={pendingRegionDepth1}
-                onChange={(e) => {
-                  const next = e.target.value;
-                  setPendingRegionDepth1(next);
-                  setPendingRegionDepth2("");
-                  setParam("region_depth1", next);
-                }}
-                className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-white"
-              >
+              <div className="rounded-2xl border border-slate-200 p-3 dark:border-slate-700">
+                <label className="mb-2 block text-xs font-black text-slate-500">지역 1단계</label>
+                <select
+                  value={current.region1}
+                  onChange={(e) => {
+                    const next = e.target.value;
+                    setParam("region_depth1", next);
+                  }}
+                  className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-white"
+                >
                 <option value="">전체</option>
                 {regionDepth1Options.map((region) => (
                   <option key={region} value={region}>
@@ -375,10 +362,9 @@ export default function FilterBar() {
             <div className="rounded-2xl border border-slate-200 p-3 dark:border-slate-700">
               <label className="mb-2 block text-xs font-black text-slate-500">지역 2단계(시군구)</label>
               <select
-                value={pendingRegionDepth2}
+                value={current.region2}
                 onChange={(e) => {
                   const next = e.target.value;
-                  setPendingRegionDepth2(next);
                   setParam("region_depth2", next);
                 }}
                 className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-white"

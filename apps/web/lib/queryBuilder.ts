@@ -36,7 +36,7 @@ export function buildCampaignsQuery(searchParams: URLSearchParams) {
     if (categoryClauses.length > 0) {
       andClauses.push({ OR: categoryClauses });
     }
-    if (!parsed.hasOnlyRegion && queryTerms) {
+    if (queryTerms) {
       where.OR = [
         { title: { contains: queryTerms, mode: "insensitive" } },
         { location: { contains: queryTerms, mode: "insensitive" } },

@@ -20,16 +20,14 @@ describe('buildCampaignsQuery', () => {
     });
 
     it('builds full-text search OR clause for q param', () => {
-        const sp = new URLSearchParams({ q: '강남' });
+        const keyword = '\uac15\ucc9c';
+        const sp = new URLSearchParams({ q: keyword });
         const result = buildCampaignsQuery(sp);
         expect(result.where.OR).toBeDefined();
         const orClauses: any = result.where.OR;
         expect(Array.isArray(orClauses)).toBe(true);
-        console.log('QUERY BUILDER OR CLAUSES:', JSON.stringify(orClauses, null, 2));
-
-        // Let's explicitly check clauses instead of exact lengths to bypass potential strict matchers
-        expect(orClauses.some((clause: any) => clause.title?.contains === '강남')).toBe(true);
-        expect(orClauses.some((clause: any) => clause.location?.contains === '강남')).toBe(true);
+        expect(orClauses.some((clause: any) => clause.title?.contains === keyword)).toBe(true);
+        expect(orClauses.some((clause: any) => clause.location?.contains === keyword)).toBe(true);
     });
 
     it('applies platform_id filter as integer', () => {
@@ -66,7 +64,11 @@ describe('buildCampaignsQuery', () => {
     });
 
     it('combines q + campaign_type + platform_id filters simultaneously', () => {
-        const sp = new URLSearchParams({ q: '신제품', campaign_type: 'SHP', platform_id: '2' });
+        const sp = new URLSearchParams({
+            q: '\uac15\ucc9c',
+            campaign_type: 'SHP',
+            platform_id: '2',
+        });
         const result = buildCampaignsQuery(sp);
         expect(result.where.OR).toBeDefined();
         expect(result.where.campaign_type).toBe('SHP');

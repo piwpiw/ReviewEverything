@@ -227,7 +227,6 @@ export function MapView({ campaigns }: { campaigns: Campaign[] }) {
   const [engine, setEngine] = useState<MapEngine>("kakao");
   const [activeGroup, setActiveGroup] = useState<CampaignGroup | null>(null);
   const [loaded, setLoaded] = useState(false);
-  const [isClient, setIsClient] = useState(false);
 
   const pinnedCampaigns = useMemo(() => {
     const grouped = new Map<string, CampaignGroup[]>();
@@ -292,11 +291,7 @@ export function MapView({ campaigns }: { campaigns: Campaign[] }) {
   }, [campaigns]);
 
   useEffect(() => {
-    setIsClient(true);
-  }, []);
-
-  useEffect(() => {
-    if (!isClient || !mapRef.current) return;
+    if (!mapRef.current) return;
 
     const clearMap = () => {
       markersRef.current.forEach((m) => m?.setMap?.(null));
@@ -445,11 +440,7 @@ export function MapView({ campaigns }: { campaigns: Campaign[] }) {
     return () => {
       clearMap();
     };
-  }, [engine, pinnedCampaigns, isClient]);
-
-  if (!isClient) {
-    return <div className="h-[560px] rounded-[2rem] bg-slate-100" />;
-  }
+  }, [engine, pinnedCampaigns]);
 
   const count = pinnedCampaigns.length;
   const activeCampaign = activeGroup?.representative;
