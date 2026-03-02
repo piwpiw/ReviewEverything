@@ -53,6 +53,24 @@ async function probe(baseUrl, { endpoint, method = "GET", body, headers = {}, ex
   }
 }
 
+async function runWithConcurrency(items, limit, worker) {
+  const safeLimit = Math.max(1, Math.min(limit, items.length || 1));
+  const results = new Array(items.length);
+  let nextIndex = 0;
+
+  async function consume() {
+    while (true) {
+      const currentIndex = nextIndex;
+      nextIndex += 1;
+      if (currentIndex >= items.length) return;
+      results[currentIndex] = await worker(items[currentIndex], currentIndex);
+    }
+  }
+
+  await Promise.all(Array.from({ length: safeLimit }, () => consume()));
+  return results;
+}
+
 async function main() {
   fs.mkdirSync(REPORT_DIR, { recursive: true });
 
@@ -152,21 +170,24 @@ async function main() {
       expect: (status) => status === 400,
     },
   ];
-  const checks = [];
+  const requestedConcurrency = Number(process.env.SMOKE_CONCURRENCY || "4");
+  const concurrency = Number.isFinite(requestedConcurrency) && requestedConcurrency > 0
+    ? Math.floor(requestedConcurrency)
+    : 4;
 
-  for (const endpoint of endpoints) {
+  const checks = await runWithConcurrency(endpoints, concurrency, async (endpoint) => {
     if (typeof endpoint === "string") {
-      checks.push(await probe(baseUrl, { endpoint }));
-    } else {
-      checks.push(await probe(baseUrl, endpoint));
+      return probe(baseUrl, { endpoint });
     }
-  }
+    return probe(baseUrl, endpoint);
+  });
 
   const failed = checks.filter((item) => !item.ok);
   const report = {
     generatedAt: new Date().toISOString(),
     skipped: false,
     baseUrl,
+    concurrency,
     checks,
     failedCount: failed.length,
   };

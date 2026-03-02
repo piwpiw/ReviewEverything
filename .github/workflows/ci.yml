@@ -10,28 +10,21 @@ on:
   pull_request:
     branches: [main]
 
+env:
+  NODE_VERSION: "22"
+
 jobs:
-  quality:
-    permissions:
-      contents: read
-      issues: write
-      pull-requests: write
+  scope:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: apps/web
+    outputs:
+      has_non_docs: ${{ steps.scope.outputs.has_non_docs }}
+      is_fast_path: ${{ steps.scope.outputs.is_fast_path }}
+      scope: ${{ steps.scope.outputs.scope }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 2
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-          cache: "npm"
-          cache-dependency-path: apps/web/package-lock.json
 
       - name: Detect change scope
         id: scope
@@ -48,7 +41,7 @@ jobs:
             BASE_SHA=$(git rev-parse HEAD~1)
           fi
 
-          git fetch --depth=1 origin "${BASE_SHA}"
+          git fetch --depth=1 origin "${BASE_SHA}" || true
 
           CHANGED_FILES=$(git diff --name-only "${BASE_SHA}" "${GITHUB_SHA}")
           if [ -z "${CHANGED_FILES}" ]; then
@@ -96,83 +89,249 @@ jobs:
             echo "scope=fast" >> "${GITHUB_OUTPUT}"
           fi
 
+  lint:
+    needs: scope
+    if: needs.scope.outputs.has_non_docs == 'true'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+          cache-dependency-path: apps/web/package-lock.json
+
       - name: Install dependencies
-        if: steps.scope.outputs.has_non_docs == 'true'
         run: npm ci
 
-      - name: Prepare reports directory
-        if: steps.scope.outputs.has_non_docs == 'true'
-        run: mkdir -p reports
-
       - name: Lint gate
-        id: lint
-        if: steps.scope.outputs.has_non_docs == 'true'
-        continue-on-error: true
-        run: npm run lint:ci
+        run: |
+          mkdir -p reports
+          npm run lint:ci
+
+      - name: Upload gate report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ci-reports-lint
+          path: apps/web/reports/eslint.json
+          if-no-files-found: ignore
+          retention-days: 14
+
+  typecheck:
+    needs: scope
+    if: needs.scope.outputs.has_non_docs == 'true'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+          cache-dependency-path: apps/web/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
 
       - name: Typecheck gate
-        id: typecheck
-        if: steps.scope.outputs.has_non_docs == 'true'
-        continue-on-error: true
         run: |
+          mkdir -p reports
           set -o pipefail
           npm run typecheck 2>&1 | tee reports/typecheck.txt
 
-      - name: Test gate
-        id: test
-        if: steps.scope.outputs.has_non_docs == 'true' && steps.scope.outputs.is_fast_path == 'false'
-        continue-on-error: true
-        run: |
-          set -o pipefail
-          npm run test:ci | tee reports/test_output.txt
+      - name: Upload gate report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ci-reports-typecheck
+          path: apps/web/reports/typecheck.txt
+          if-no-files-found: ignore
+          retention-days: 14
 
-      - name: API contract audit gate
-        id: apiContract
-        if: steps.scope.outputs.has_non_docs == 'true' && steps.scope.outputs.is_fast_path == 'false'
-        continue-on-error: true
-        run: |
-          set -o pipefail
-          npm run api:contract-audit
+  smoke:
+    needs: scope
+    if: needs.scope.outputs.has_non_docs == 'true'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - name: API sync drift audit gate
-        id: apiSyncAudit
-        if: steps.scope.outputs.has_non_docs == 'true'
-        continue-on-error: true
-        run: |
-          set -o pipefail
-          npm run api:contract-sync-audit
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+          cache-dependency-path: apps/web/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
 
       - name: Smoke gate
-        id: smoke
-        if: steps.scope.outputs.has_non_docs == 'true'
-        continue-on-error: true
         run: |
+          mkdir -p reports
           set -o pipefail
           npm run smoke:ci 2>&1 | tee reports/smoke_output.txt
 
-      - name: Build CI summary
-        if: always() && steps.scope.outputs.has_non_docs == 'true'
+      - name: Upload gate report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ci-reports-smoke
+          path: |
+            apps/web/reports/smoke.json
+            apps/web/reports/smoke_output.txt
+          if-no-files-found: ignore
+          retention-days: 14
+
+  test:
+    needs: scope
+    if: needs.scope.outputs.has_non_docs == 'true' && needs.scope.outputs.is_fast_path == 'false'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+          cache-dependency-path: apps/web/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Test gate
         run: |
+          mkdir -p reports
+          set -o pipefail
+          npm run test:ci | tee reports/test_output.txt
+
+      - name: Upload gate report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ci-reports-test
+          path: apps/web/reports/test_output.txt
+          if-no-files-found: ignore
+          retention-days: 14
+
+  api_contract:
+    needs: scope
+    if: needs.scope.outputs.has_non_docs == 'true' && needs.scope.outputs.is_fast_path == 'false'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: API contract audit gate
+        run: |
+          mkdir -p reports
+          node scripts/api-contract-audit.js
+
+      - name: Upload gate report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ci-reports-api-contract
+          path: apps/web/reports/api-contract-audit.md
+          if-no-files-found: ignore
+          retention-days: 14
+
+  api_sync:
+    needs: scope
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: API sync drift audit gate
+        run: |
+          mkdir -p reports
+          node scripts/api-contract-sync-audit.js
+
+      - name: Upload gate report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ci-reports-api-sync
+          path: apps/web/reports/api-contract-sync-audit.md
+          if-no-files-found: ignore
+          retention-days: 14
+
+  summary:
+    needs: [scope, lint, typecheck, smoke, test, api_contract, api_sync]
+    if: always()
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download gate reports
+        uses: actions/download-artifact@v4
+        with:
+          pattern: ci-reports-*
+          path: apps/web/reports
+          merge-multiple: true
+
+      - name: Build CI summary
+        if: needs.scope.outputs.has_non_docs == 'true'
+        run: |
+          mkdir -p reports
           node scripts/ci/summarize-failures.js
           if [ -f reports/ci-summary.md ]; then
-            cat reports/ci-summary.md >> $GITHUB_STEP_SUMMARY
+            cat reports/ci-summary.md >> "$GITHUB_STEP_SUMMARY"
           fi
 
-      - name: Docs-only check only
-        if: steps.scope.outputs.has_non_docs == 'false'
+      - name: Docs-only summary
+        if: needs.scope.outputs.has_non_docs != 'true'
         run: |
-          node scripts/api-contract-sync-audit.js
-          if grep -q "Result: FAIL" reports/api-contract-sync-audit.md; then
-            echo "API sync drift audit failed. Please check reports/api-contract-sync-audit.md." 
-            exit 1
-          fi
-          API_SYNC_RESULT="PASS"
-          if [ -f reports/api-contract-sync-audit.md ]; then
-            API_SYNC_RESULT=$(node -e "const fs=require('fs');const text=fs.readFileSync('reports/api-contract-sync-audit.md','utf8');process.stdout.write(/Result:\\s*(PASS|FAIL)/i.test(text)?RegExp.$1:'UNKNOWN')")
-          else
-            API_SYNC_RESULT="MISSING"
-          fi
           mkdir -p reports
+          API_SYNC_RESULT="MISSING"
+          if [ -f reports/api-contract-sync-audit.md ]; then
+            API_SYNC_RESULT=$(node -e "const fs=require('fs');const text=fs.readFileSync('reports/api-contract-sync-audit.md','utf8');const m=text.match(/Result:\\s*(PASS|FAIL)/i);process.stdout.write(m?m[1].toUpperCase():'UNKNOWN')")
+          fi
           echo "Docs-only changes detected. Lint/typecheck/test/api-smoke gates are skipped for faster deployment cycle." >> "$GITHUB_STEP_SUMMARY"
           echo "- API sync drift: ${API_SYNC_RESULT}" >> "$GITHUB_STEP_SUMMARY"
           cat <<EOF > reports/ci-summary.md
@@ -183,7 +342,7 @@ jobs:
           EOF
 
       - name: Comment PR with failures
-        if: always() && github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request'
         uses: actions/github-script@v7
         with:
           script: |
@@ -222,35 +381,66 @@ jobs:
               });
             }
 
-      - name: Enforce gate outcomes
+      - name: Upload merged CI reports
         if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-ci-reports
+          path: apps/web/reports
+          retention-days: 14
+
+  enforce:
+    needs: [scope, lint, typecheck, smoke, test, api_contract, api_sync, summary]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Enforce gate outcomes
+        shell: bash
         run: |
-          if [ "${{ steps.scope.outputs.has_non_docs }}" != "true" ]; then
-            echo "Docs-only scope: no hard gate enforcement."
+          set -euo pipefail
+
+          if [ "${{ needs.scope.outputs.has_non_docs }}" != "true" ]; then
+            if [ "${{ needs.api_sync.result }}" != "success" ]; then
+              echo "Docs-only scope but API sync audit failed."
+              exit 1
+            fi
+            echo "Docs-only scope: API sync audit passed."
             exit 0
           fi
-          if [ "${{ steps.scope.outputs.is_fast_path }}" == "true" ]; then
-            if [[ "${{ steps.lint.outcome }}" != "success" || "${{ steps.typecheck.outcome }}" != "success" || "${{ steps.smoke.outcome }}" != "success" ]]; then
+
+          if [ "${{ needs.scope.outputs.is_fast_path }}" == "true" ]; then
+            if [ "${{ needs.lint.result }}" != "success" ] || \
+               [ "${{ needs.typecheck.result }}" != "success" ] || \
+               [ "${{ needs.smoke.result }}" != "success" ] || \
+               [ "${{ needs.api_sync.result }}" != "success" ]; then
               echo "Fast path gates failed."
               exit 1
             fi
-            if [[ "${{ steps.apiSyncAudit.outcome }}" != "success" ]]; then
-              echo "API sync audit failed."
-              exit 1
-            fi
+            echo "Fast path gates passed."
             exit 0
           fi
-          if [[ "${{ steps.lint.outcome }}" != "success" || "${{ steps.typecheck.outcome }}" != "success" || "${{ steps.test.outcome }}" != "success" || "${{ steps.apiContract.outcome }}" != "success" || "${{ steps.smoke.outcome }}" != "success" ]]; then
-            echo "One or more quality gates failed."
-            exit 1
-          fi
-          if [[ "${{ steps.apiSyncAudit.outcome }}" != "success" ]]; then
-            echo "API sync drift audit failed."
+
+          if [ "${{ needs.lint.result }}" != "success" ] || \
+             [ "${{ needs.typecheck.result }}" != "success" ] || \
+             [ "${{ needs.test.result }}" != "success" ] || \
+             [ "${{ needs.api_contract.result }}" != "success" ] || \
+             [ "${{ needs.smoke.result }}" != "success" ] || \
+             [ "${{ needs.api_sync.result }}" != "success" ]; then
+            echo "One or more full-path quality gates failed."
             exit 1
           fi
 
-      - name: Open issue on failure (push only)
-        if: failure() && github.event_name != 'pull_request'
+          echo "Full-path quality gates passed."
+
+  open_issue:
+    needs: enforce
+    if: needs.enforce.result == 'failure' && github.event_name != 'pull_request'
+    permissions:
+      contents: read
+      issues: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Open issue on CI failure
         uses: actions/github-script@v7
         with:
           script: |
@@ -271,11 +461,3 @@ jobs:
               body: `CI gates failed on commit ${context.sha}.\n\nSee artifact: \`web-ci-reports\``,
               labels: ['ci-failure', 'automated'],
             });
-
-      - name: Upload CI reports
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: web-ci-reports
-          path: apps/web/reports
-          retention-days: 14

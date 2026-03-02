@@ -6,7 +6,7 @@ services:
     region: singapore
     branch: main
     rootDir: apps/web
-    buildCommand: npm ci && npm run build
+    buildCommand: npm ci --no-audit && npm run build
     startCommand: npm run start
     envVars:
       - key: DATABASE_URL
