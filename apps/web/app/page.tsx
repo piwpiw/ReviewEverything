@@ -79,9 +79,9 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
             </span>
           </h1>
           <p className="max-w-2xl text-slate-500 dark:text-slate-400 text-lg md:text-xl font-bold leading-relaxed mb-12">
-            플랫폼·매체·유형·지역·카테고리별로 캠페인을 빠르게 찾고, 정확한 링크를 그대로 따라가 바로 실행할 수 있습니다.
+            플랫폼·매체·유형·지역·카테고리로 캠페인을 빠르게 찾고, 링크를 바로 열어 실행까지 이어줍니다.
             <br className="hidden md:block" />
-            필요할 때는 지도에서 위치를 확인하고 핵심 수치로 우선순위를 판단해 캠페인 운영 효율을 높입니다.
+            지도에서 위치를 확인하고 핵심 수치로 우선순위를 판단해 운영 효율을 높이세요.
           </p>
 
           <div className="w-full max-w-2xl mx-auto mb-16 relative z-50">

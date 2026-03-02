@@ -215,6 +215,11 @@ export default function FilterBar() {
       return !prev;
     });
   }, []);
+  const openListModeWithFilters = useCallback(() => {
+    const next = new URLSearchParams(searchParams.toString());
+    next.set("view", "list");
+    startTransition(() => router.push(`/?${next.toString()}`, { scroll: false }));
+  }, [router, searchParams, startTransition]);
 
   const isPanelVisible = isMapMode ? false : filtersVisible;
   const activeCount = Array.from(searchParams.keys()).filter((k) => k !== "view").length;
@@ -253,10 +258,10 @@ export default function FilterBar() {
 
         <div className="flex flex-wrap items-center gap-2">
           <button
-            onClick={togglePanel}
+            onClick={isMapMode ? openListModeWithFilters : togglePanel}
             className="rounded-xl bg-slate-900 px-5 py-2 text-sm font-black text-white dark:bg-blue-600"
           >
-            {isPanelVisible ? "필터 닫기" : isMapMode ? "지도에서 필터 열기" : "필터 펼치기"}
+            {isPanelVisible ? "필터 닫기" : isMapMode ? "목록에서 필터 편집" : "필터 펼치기"}
           </button>
 
           {!isMapMode && (

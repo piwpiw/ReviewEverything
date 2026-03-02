@@ -241,8 +241,10 @@ export function MapView({ campaigns }: { campaigns: Campaign[] }) {
   const markersRef = useRef<any[]>([]);
   const failedEnginesRef = useRef<Set<MapEngine>>(new Set());
 
-  const hasKakaoKey = Boolean(process.env.NEXT_PUBLIC_KAKAO_JS_KEY?.trim());
-  const hasNaverKey = Boolean(process.env.NEXT_PUBLIC_NAVER_CLIENT_ID?.trim());
+  const kakaoClientKey = process.env.NEXT_PUBLIC_KAKAO_JS_KEY?.trim() || undefined;
+  const naverClientKey = process.env.NEXT_PUBLIC_NAVER_CLIENT_ID?.trim() || process.env.NEXT_PUBLIC_NAVER_MAP_CLIENT_ID?.trim();
+  const hasKakaoKey = Boolean(kakaoClientKey);
+  const hasNaverKey = Boolean(naverClientKey);
   const hasMapKey = hasKakaoKey || hasNaverKey;
 
   const [engine, setEngine] = useState<MapEngine>(() => {
@@ -331,7 +333,7 @@ export function MapView({ campaigns }: { campaigns: Campaign[] }) {
     };
 
     const buildKakaoMap = async () => {
-      const key = process.env.NEXT_PUBLIC_KAKAO_JS_KEY?.trim();
+      const key = kakaoClientKey;
       if (!key) throw new Error("카카오 지도 앱키가 등록되지 않았습니다.");
 
       await loadScript("kakao-map-sdk", `//dapi.kakao.com/v2/maps/sdk.js?appkey=${key}&autoload=false&libraries=services`);
@@ -373,7 +375,7 @@ export function MapView({ campaigns }: { campaigns: Campaign[] }) {
     };
 
     const buildNaverMap = async () => {
-      const key = process.env.NEXT_PUBLIC_NAVER_CLIENT_ID?.trim();
+      const key = naverClientKey;
       if (!key) throw new Error("네이버 지도 클라이언트 ID가 등록되지 않았습니다.");
 
       await loadScript("naver-map-sdk", `https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=${key}&submodules=geocoder`);
@@ -442,7 +444,7 @@ export function MapView({ campaigns }: { campaigns: Campaign[] }) {
 
     void render();
     return () => clearMarkers();
-  }, [engine, hasKakaoKey, hasNaverKey, hasMapKey, pinnedCampaigns]);
+  }, [engine, hasKakaoKey, hasNaverKey, hasMapKey, pinnedCampaigns, kakaoClientKey, naverClientKey]);
 
   const count = pinnedCampaigns.length;
   const activeCampaign = activeGroup?.representative;

@@ -131,7 +131,7 @@ export default function SystemPage() {
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
             <p className="text-xs uppercase tracking-[0.2em] text-blue-300 font-black">운영 인프라</p>
-            <h1 className="text-3xl md:text-4xl font-black tracking-tight text-white">시스템 운영 대시보드</h1>
+            <h1 className="text-3xl md:text-4xl font-black tracking-tight text-white">시스템 점검 센터</h1>
             <p className="text-sm text-slate-400 mt-2">실시간 상태, 수집 품질, 알림을 한 화면에서 점검하고 조치할 수 있습니다.</p>
           </div>
           <div className="flex flex-wrap items-center gap-2 justify-end">

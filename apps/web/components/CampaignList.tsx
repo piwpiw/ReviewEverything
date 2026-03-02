@@ -16,7 +16,7 @@ type CampaignsResponse = {
 
 type SearchParamsInput = Record<string, string | string[] | undefined>;
 
-const MAP_VIEW_LIMIT = 320;
+const MAP_VIEW_LIMIT = 1200;
 
 const buildQueryString = (input: SearchParamsInput) => {
   const params = new URLSearchParams();
