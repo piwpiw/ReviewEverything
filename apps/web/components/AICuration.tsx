@@ -98,7 +98,7 @@ export default function AICuration() {
             >
               <div className="absolute top-6 right-6 z-10">
                 <div className="flex flex-col items-center justify-center w-14 h-14 bg-blue-600 rounded-full border-4 border-white dark:border-slate-900 shadow-xl group-hover:scale-110 transition-transform">
-                  <span className="text-[10px] font-black text-blue-100 leading-none">MATCH</span>
+                  <span className="text-[10px] font-black text-blue-100 leading-none">매칭</span>
                   <span className="text-base font-black text-white leading-none">{pick.match_score}%</span>
                 </div>
               </div>

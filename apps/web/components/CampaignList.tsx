@@ -1,12 +1,12 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import CampaignCard from "./CampaignCard";
 import MapView from "./MapView";
 import ListSkeleton from "./ListSkeleton";
-import { FilterX, X, ChevronLeft, ChevronRight } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { X, ChevronLeft, ChevronRight, FilterX } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
 
 type CampaignsResponse = {
   campaigns: any[];
@@ -43,7 +43,14 @@ export default function CampaignList({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const query = useMemo(() => buildQueryString(searchParams), [JSON.stringify(searchParams)]);
+  const query = useMemo(() => {
+    const next: SearchParamsInput = { ...searchParams };
+    if (viewMode === "map") {
+      next.page = "1";
+      next.limit = "5000";
+    }
+    return buildQueryString(next);
+  }, [JSON.stringify(searchParams), viewMode]);
 
   useEffect(() => {
     let canceled = false;
@@ -52,12 +59,12 @@ export default function CampaignList({
       setError(null);
       try {
         const res = await fetch(`/api/campaigns?${query}`);
-        if (!res.ok) throw new Error(`캠페인 목록 로드 실패 (${res.status})`);
+        if (!res.ok) throw new Error(`목록 조회 실패 (${res.status})`);
         const json = (await res.json()) as CampaignsResponse;
         if (!canceled) setData(json);
       } catch (err: unknown) {
         if (canceled) return;
-        setError(err instanceof Error ? err.message : "캠페인 목록을 불러오지 못했습니다.");
+        setError(err instanceof Error ? err.message : "목록 조회 중 오류가 발생했습니다.");
         setData(null);
       } finally {
         if (!canceled) setLoading(false);
@@ -74,8 +81,8 @@ export default function CampaignList({
   if (error) {
     return (
       <div className="rounded-[2rem] border border-rose-200 bg-rose-50 p-8 text-rose-700">
-        <p className="text-sm font-black">캠페인 목록을 가져오는 데 문제가 발생했습니다.</p>
-        <p className="text-xs font-bold opacity-80 mt-2">{error}</p>
+        <p className="text-sm font-black">목록 조회 실패</p>
+        <p className="text-sm font-bold opacity-80 mt-2">{error}</p>
       </div>
     );
   }
@@ -110,16 +117,16 @@ export default function CampaignList({
             <span className="text-xs font-black">0</span>
           </div>
         </div>
-        <h3 className="text-2xl font-black text-slate-900 mb-3 tracking-tighter">검색 결과가 없습니다</h3>
-        <p className="text-slate-400 font-bold mb-10 max-w-md text-center leading-relaxed">
-          조건을 바꿔서 다시 검색해 주세요.
+        <h3 className="text-2xl font-black text-slate-900 mb-3 tracking-tighter">결과가 없습니다</h3>
+        <p className="text-lg text-slate-400 font-bold mb-10 max-w-md text-center leading-relaxed">
+          필터를 바꿔서 다시 검색해보세요.
         </p>
         <button
           onClick={() => router.push("/")}
           className="px-8 py-4 bg-slate-900 text-white rounded-[1.5rem] text-[13px] font-black hover:bg-blue-600 transition-all shadow-2xl active:scale-95 flex items-center gap-3"
         >
           <FilterX className="w-5 h-5" />
-          필터 초기화
+          조건 초기화
         </button>
       </motion.div>
     );
@@ -130,17 +137,15 @@ export default function CampaignList({
       <div className="flex flex-col gap-6 px-2">
         <div className="flex flex-wrap items-center gap-2">
           <div className="flex items-center gap-2 pr-4 border-r border-slate-100 dark:border-slate-800 mr-2">
-            <p className="text-[11px] font-black text-slate-900 dark:text-white uppercase tracking-widest whitespace-nowrap">
-              총 <span className="text-blue-600 dark:text-blue-400 font-black px-1.5 py-0.5 bg-blue-50 dark:bg-blue-900/30 rounded-lg ml-1">
-                {total.toLocaleString()}
-              </span>
+            <p className="text-base font-black text-slate-900 dark:text-white uppercase tracking-widest whitespace-nowrap">
+              총 <span className="text-blue-600 dark:text-blue-400 font-black px-1.5 py-0.5 bg-blue-50 dark:bg-blue-900/30 rounded-lg ml-1">{total.toLocaleString()}</span>건
             </p>
           </div>
 
           <AnimatePresence>
             {Object.entries(searchParams).map(([key, value]) => {
               if (!value || ["view", "sort", "page"].includes(key)) return null;
-              const label = key === "q" ? `검색: ${String(value)}` : `${key}: ${String(value)}`;
+              const label = key === "q" ? `키워드: ${String(value)}` : `${key}: ${String(value)}`;
               return (
                 <motion.button
                   key={key}
@@ -148,7 +153,7 @@ export default function CampaignList({
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.8 }}
                   onClick={() => removeFilter(key)}
-                  className="px-3 py-1.5 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-xl text-[10px] font-bold text-slate-500 hover:border-rose-500 hover:text-rose-500 flex items-center gap-1.5 transition-all shadow-sm"
+                  className="px-3 py-1.5 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-xl text-[11px] font-bold text-slate-500 hover:border-rose-500 hover:text-rose-500 flex items-center gap-1.5 transition-all shadow-sm"
                 >
                   {label}
                   <X className="w-3 h-3 opacity-50" />
@@ -175,7 +180,7 @@ export default function CampaignList({
             key="grid-view"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6 gap-6"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 2xl:grid-cols-7 gap-3"
           >
             {campaigns.map((campaign: any, i: number) => (
               <CampaignCard
@@ -188,7 +193,7 @@ export default function CampaignList({
         )}
       </AnimatePresence>
 
-      {meta && meta.totalPages > 1 ? (
+      {meta && meta.totalPages > 1 && viewMode !== "map" ? (
         <div className="mt-20 flex justify-center pb-12">
           <div className="flex items-center gap-1.5 p-1.5 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-white/60 dark:border-slate-800/80 rounded-[1.25rem] shadow-[0_12px_32px_-8px_rgba(0,0,0,0.1)] dark:shadow-[0_12px_32px_-8px_rgba(0,0,0,0.4)]">
             <button
@@ -199,8 +204,8 @@ export default function CampaignList({
               <ChevronLeft className="w-4 h-4" />
             </button>
             <div className="flex items-center px-4">
-              <span className="text-[11px] font-black tracking-widest text-slate-900 dark:text-white uppercase flex items-center gap-3">
-                <span className="opacity-40">페이지</span>
+              <span className="text-[13px] font-black tracking-widest text-slate-900 dark:text-white uppercase flex items-center gap-3">
+                <span className="opacity-40">현재</span>
                 <span className="bg-slate-900 dark:bg-blue-600 text-white px-2.5 py-1 rounded-lg shadow-lg shadow-blue-500/20">{meta.page}</span>
                 <span className="opacity-40">/ {meta.totalPages}</span>
               </span>

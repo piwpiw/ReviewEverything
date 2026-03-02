@@ -480,7 +480,7 @@ export default function CalendarPage({ searchParams }: { searchParams?: SearchPa
                           })}
                           {daySchedules.length > 3 ? (
                             <p className="text-[9px] font-black text-slate-400 dark:text-slate-500 pl-1 mt-0.5 opacity-60 group-hover:opacity-100 transition-opacity">
-                              + {daySchedules.length - 3} more
+                              + {daySchedules.length - 3}개 더보기
                             </p>
                           ) : null}
                         </div>

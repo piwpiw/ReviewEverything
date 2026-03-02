@@ -19,7 +19,7 @@ type BackgroundJobWithPayload = {
   max_attempts: number;
 };
 
-const DEFAULT_RUN_LIMIT = 6;
+const DEFAULT_RUN_LIMIT = 12;
 
 function nowWithBuffer(minutes: number) {
   return new Date(Date.now() + minutes * 60 * 1000);

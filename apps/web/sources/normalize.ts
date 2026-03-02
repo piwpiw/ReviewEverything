@@ -1,5 +1,7 @@
+import { Prisma } from "@prisma/client";
 import { db } from "../lib/db";
 import { ScrapedCampaign } from "./types";
+import { resolveCampaignCoordinates } from "../lib/geo/campaignGeo";
 
 const DISTRICT_COORDS: Record<string, [number, number]> = {
   서울: [37.5665, 126.978],
@@ -153,13 +155,8 @@ export function normalizeRegion(location: string): [string | null, string | null
 }
 
 export function normalizeGeocode(location: string, d2: string | null): [number | null, number | null] {
-  if (!location) return [null, null];
-  const key = Object.keys(DISTRICT_COORDS).find((district) => location.includes(district) || (d2 && d2.includes(district)));
-  if (key) {
-    const [lat, lng] = DISTRICT_COORDS[key];
-    return [lat + (Math.random() - 0.5) * 0.01, lng + (Math.random() - 0.5) * 0.01];
-  }
-  return [null, null];
+  const resolved = resolveCampaignCoordinates({ location, regionDepth2: d2 });
+  return [resolved.lat, resolved.lng];
 }
 
 export function extractBrandName(title: string): string | null {
@@ -211,7 +208,16 @@ export async function processAndDedupeCampaign(platformId: number, item: Scraped
   const mType = normalizeMediaType(item.media_type);
   const rewardVal = normalizeRewardValue(sanitizedReward);
   const [depth1, depth2] = normalizeRegion(sanitizedLocation);
-  const [lat, lng] = normalizeGeocode(sanitizedLocation, depth2);
+  const geo = resolveCampaignCoordinates({
+    existingLat: item.lat,
+    existingLng: item.lng,
+    location: sanitizedLocation,
+    regionDepth1: depth1,
+    regionDepth2: depth2,
+    title: sanitizedTitle,
+    url: item.url,
+    shopUrl: item.shop_url,
+  });
   const [cat, subCat] = normalizeCategory(sanitizedTitle, cType, sanitizedReward);
   const bName = extractBrandName(sanitizedTitle);
   const compRate = item.recruit_count > 0 ? item.applicant_count / item.recruit_count : 0;
@@ -222,8 +228,8 @@ export async function processAndDedupeCampaign(platformId: number, item: Scraped
     campaign_type: cType,
     media_type: mType,
     location: sanitizedLocation || null,
-    lat: item.lat || lat,
-    lng: item.lng || lng,
+    lat: geo.lat,
+    lng: geo.lng,
     region_depth1: depth1,
     region_depth2: depth2,
     category: cat,
@@ -251,21 +257,56 @@ export async function processAndDedupeCampaign(platformId: number, item: Scraped
   });
 
   if (!existing) {
-    const newCampaign = await db.campaign.create({
-      data: {
-        platform_id: platformId,
-        original_id: item.original_id,
-        ...commonData,
-        snapshots: {
-          create: {
-            recruit_count: item.recruit_count,
-            applicant_count: item.applicant_count,
-            competition_rate: compRate,
+    try {
+      const newCampaign = await db.campaign.create({
+        data: {
+          platform_id: platformId,
+          original_id: item.original_id,
+          ...commonData,
+          snapshots: {
+            create: {
+              recruit_count: item.recruit_count,
+              applicant_count: item.applicant_count,
+              competition_rate: compRate,
+            },
           },
         },
-      },
-    });
-    return { status: 'created', id: newCampaign.id };
+      });
+      return { status: "created", id: newCampaign.id };
+    } catch (error: unknown) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
+        const duplicateByUrl = await db.campaign.findFirst({
+          where: {
+            platform_id: platformId,
+            url: item.url,
+          },
+          include: { snapshots: { orderBy: { scraped_at: "desc" }, take: 1 } },
+        });
+        if (duplicateByUrl) {
+          const previousRecruit = duplicateByUrl.recruit_count;
+          const previousApplicant = duplicateByUrl.applicant_count;
+          await db.campaign.update({
+            where: { id: duplicateByUrl.id },
+            data: commonData,
+          });
+
+          if (previousRecruit !== item.recruit_count || previousApplicant !== item.applicant_count) {
+            await db.campaignSnapshot.create({
+              data: {
+                campaign_id: duplicateByUrl.id,
+                recruit_count: item.recruit_count,
+                applicant_count: item.applicant_count,
+                competition_rate: compRate,
+              },
+            });
+            return { status: "updated_with_snapshot", id: duplicateByUrl.id };
+          }
+          return { status: "updated", id: duplicateByUrl.id };
+        }
+      }
+
+      throw error;
+    }
   }
 
   await db.campaign.update({

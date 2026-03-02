@@ -105,7 +105,7 @@ export default function MeConsolePage() {
       return {
         id: platform.id,
         name: platform.name,
-        status: latest?.status ?? "IDLE",
+        status: latest?.status === "SUCCESS" ? "성공" : latest?.status === "FAILED" ? "실패" : "대기",
         lastRun: latest ? formatDateTime(latest.start_time) : "데이터 없음",
         count: latest ? latest.records_added + latest.records_updated : 0,
       };
@@ -237,9 +237,8 @@ export default function MeConsolePage() {
             <button
               disabled={isRunning}
               onClick={triggerIngest}
-              className={`flex items-center gap-2 px-6 py-4 rounded-[1.5rem] text-[13px] font-black transition-all shadow-xl active:scale-95 ${
-                isRunning ? "bg-slate-100 text-slate-400" : "bg-slate-900 dark:bg-blue-600 text-white hover:shadow-blue-500/20"
-              }`}
+              className={`flex items-center gap-2 px-6 py-4 rounded-[1.5rem] text-[13px] font-black transition-all shadow-xl active:scale-95 ${isRunning ? "bg-slate-100 text-slate-400" : "bg-slate-900 dark:bg-blue-600 text-white hover:shadow-blue-500/20"
+                }`}
             >
               <Play className="w-4 h-4" />
               {isRunning ? "실행 중..." : "전체 수집 실행"}
@@ -302,17 +301,16 @@ export default function MeConsolePage() {
                     <div key={log.id} className="flex gap-4">
                       <span className="text-slate-600 shrink-0">[{log.time}]</span>
                       <span
-                        className={`font-bold ${
-                          log.type === "success"
+                        className={`font-bold ${log.type === "success"
                             ? "text-emerald-400"
                             : log.type === "error"
-                            ? "text-rose-400"
-                            : log.type === "warn"
-                            ? "text-amber-400"
-                            : "text-blue-400"
-                        }`}
+                              ? "text-rose-400"
+                              : log.type === "warn"
+                                ? "text-amber-400"
+                                : "text-blue-400"
+                          }`}
                       >
-                        {log.type.toUpperCase()}:
+                        {log.type === "success" ? "성공" : log.type === "error" ? "오류" : log.type === "warn" ? "경고" : "정보"}:
                       </span>
                       <span className="text-slate-300">{log.msg}</span>
                     </div>
@@ -373,7 +371,7 @@ export default function MeConsolePage() {
                   <div key={platform.id} className="p-5 rounded-3xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
                     <div className="flex items-center justify-between mb-3">
                       <span className="text-xs font-black">{platform.name}</span>
-                      <span className={`text-[10px] font-black px-2 py-0.5 rounded-full ${qualityChip(platform.status === "SUCCESS" ? "ok" : platform.status === "FAILED" ? "critical" : "warn")}`}>
+                      <span className={`text-[10px] font-black px-2 py-0.5 rounded-full ${qualityChip(platform.status === "성공" ? "ok" : platform.status === "실패" ? "critical" : "warn")}`}>
                         {platform.status}
                       </span>
                     </div>

@@ -24,7 +24,10 @@ async function main() {
         { id: 1, name: 'Revu', base_url: 'https://revu.net' },
         { id: 2, name: 'Reviewnote', base_url: 'https://reviewnote.co.kr' },
         { id: 3, name: 'DinnerQueen', base_url: 'https://dinnerqueen.net' },
-        { id: 4, name: 'ReviewPlace', base_url: 'https://reviewplace.co.kr' }
+        { id: 4, name: 'ReviewPlace', base_url: 'https://reviewplace.co.kr' },
+        { id: 5, name: 'Seouloppa', base_url: 'https://www.seouloppa.com' },
+        { id: 6, name: 'MrBlog', base_url: 'https://mrblog.net' },
+        { id: 7, name: 'GangnamFood', base_url: 'https://gangnamfood.com' }
     ];
 
     for (const p of platforms) {

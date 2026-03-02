@@ -1,11 +1,10 @@
 "use client";
 
-import { useMemo, useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
-import { Map as MapIcon, Compass, Globe, Zap, X } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+import { Compass, MapPin, X } from "lucide-react";
 
-// Types for Global Windows
 declare global {
   interface Window {
     kakao: any;
@@ -13,337 +12,553 @@ declare global {
   }
 }
 
-const TYPE_COLOR: Record<string, string> = {
-  VST: "#3b82f6",
-  SHP: "#10b981",
-  PRS: "#f59e0b",
+type Campaign = {
+  id: string;
+  title?: string;
+  campaign_type?: string;
+  lat?: number | string;
+  lng?: number | string;
+  thumbnail_url?: string;
+  region_depth1?: string;
+  region_depth2?: string;
+  url?: string;
+  shop_url?: string;
+  geo_match_source?: string;
+  geo_match_score?: number;
+  geo_match_label?: string;
+  geo_store_key?: string;
+};
+
+type CampaignGroup = {
+  key: string;
+  lat: number;
+  lng: number;
+  storeKey: string;
+  source: string;
+  score: number;
+  campaigns: Campaign[];
+  representative: Campaign;
 };
 
 type MapEngine = "kakao" | "naver";
 
-export default function MapView({ campaigns }: { campaigns: any[] }) {
-  const mapRef = useRef<HTMLDivElement>(null);
-  const mapInstance = useRef<any>(null);
-  const [engine, setEngine] = useState<MapEngine>("kakao");
-  const [isLoaded, setIsLoaded] = useState(false);
-  const [activeCampaign, setActiveCampaign] = useState<any>(null);
-  const [showSearchBtn, setShowSearchBtn] = useState(false);
-  const [currentAddress, setCurrentAddress] = useState<string>("탐색 중...");
+const TYPE_LABEL: Record<string, string> = {
+  VST: "방문형",
+  SHP: "쇼핑형",
+  PRS: "구매형",
+  SNS: "SNS",
+  EVT: "이벤트",
+  APP: "앱",
+  PRM: "홍보형",
+  ETC: "기타",
+};
 
-  // Filter campaigns with location data
-  const pinnedCampaigns = useMemo(() => {
-    return (campaigns || []).filter(c => c.lat && c.lng).slice(0, 100);
-  }, [campaigns]);
+const parseCoord = (value: unknown) => {
+  const num = Number(value);
+  return Number.isFinite(num) ? num : null;
+};
 
-  // Handle Script Loading & Map Init
-  useEffect(() => {
-    if (typeof window === "undefined") return;
+const matchGrade = (score?: number) => {
+  if (!score) return "낮음";
+  if (score >= 0.9) return "높음";
+  if (score >= 0.7) return "보통";
+  return "낮음";
+};
 
-    // Cleanup previous map instance if switch
-    if (mapInstance.current) {
-      mapInstance.current = null;
-      if (mapRef.current) mapRef.current.innerHTML = "";
-    }
+const STORE_KEY_STOP_WORDS = [
+  "리뷰",
+  "체험단",
+  "캠페인",
+  "신청",
+  "모집",
+  "리워드",
+  "방문형",
+  "배송형",
+  "이벤트",
+  "블로그",
+  "인스타",
+  "인스타그램",
+  "네이버",
+];
 
-    const loadKakao = () => {
-    const KAKAO_KEY = process.env.NEXT_PUBLIC_KAKAO_JS_KEY || "3d5f7ad7a080c5ea3f9b1f632f6ecadb";
-      const script = document.createElement("script");
-      script.src = `//dapi.kakao.com/v2/maps/sdk.js?appkey=${KAKAO_KEY}&autoload=false&libraries=clusterer`;
-      script.async = true;
-      script.onload = () => {
-        window.kakao.maps.load(() => {
-          if (!mapRef.current) return;
-          const map = new window.kakao.maps.Map(mapRef.current, {
-            center: new window.kakao.maps.LatLng(37.5665, 126.978),
-            level: 8,
-            maxLevel: 13
-          });
-          mapInstance.current = map;
+const STORE_KEY_STOP_WORD_SET = new Set(STORE_KEY_STOP_WORDS);
 
-          // Add Markers
-          pinnedCampaigns.forEach((c) => {
-            const color = TYPE_COLOR[c.campaign_type] ?? "#475569";
-            const content = document.createElement('div');
-            content.innerHTML = `
-                <div class="kakao-pin" style="position: relative; cursor: pointer;">
-                  <div style="position: absolute; width: 34px; height: 34px; background: ${color}20; border-radius: 50%; top: -17px; left: -17px; animation: pulse 2s infinite;"></div>
-                  <div style="background: ${color}; width: 30px; height: 30px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg) translate(0, -50%); border: 3px solid white; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 15px rgba(0,0,0,0.2);">
-                    <span style="transform: rotate(45deg); font-size: 14px; margin-top: -2px; margin-left: -2px;">
-                      ${c.campaign_type === 'VST' ? '🍽️' : c.campaign_type === 'SHP' ? '📦' : '📰'}
-                    </span>
-                  </div>
-                </div>
-              `;
-            const overlay = new window.kakao.maps.CustomOverlay({
-              position: new window.kakao.maps.LatLng(c.lat, c.lng),
-              content,
-              yAnchor: 1
-            });
-            content.onclick = (e) => { e.stopPropagation(); setActiveCampaign(c); map.panTo(new window.kakao.maps.LatLng(c.lat, c.lng)); };
-            overlay.setMap(map);
-          });
+const mapLabel = (group: CampaignGroup) => {
+  const source = group.source === "explicit" ? "정확" : group.source === "url_coords" ? "URL" : group.source === "region_center" ? "지역" : "추정";
+  return `${source} (${matchGrade(group.score)})`;
+};
 
-          window.kakao.maps.event.addListener(map, 'dragend', () => setShowSearchBtn(true));
-          setIsLoaded(true);
-        });
-      };
-      document.head.appendChild(script);
-    };
+const toDisplayLocation = (group: CampaignGroup) => {
+  const first = group.representative;
+  return `${first.region_depth1 || ""}${first.region_depth2 ? ` ${first.region_depth2}` : ""}`.trim() || "위치 없음";
+};
 
-    const loadNaver = () => {
-      let NAVER_ID = process.env.NEXT_PUBLIC_NAVER_CLIENT_ID || "xqc9tm6yw6";
-      if (NAVER_ID === "your_naver_client_id_here") NAVER_ID = "xqc9tm6yw6"; // Next.js Env 캐시 방어
-
-      const initNaverMap = () => {
-        if (!mapRef.current || !window.naver || !window.naver.maps) return;
-
-        const map = new window.naver.maps.Map(mapRef.current, {
-          center: new window.naver.maps.LatLng(37.5665, 126.978),
-          zoom: 14,
-          zoomControl: true,
-          zoomControlOptions: { position: window.naver.maps.Position.TOP_LEFT }
-        });
-        mapInstance.current = map;
-
-        const markers = pinnedCampaigns.map((c) => {
-          const color = TYPE_COLOR[c.campaign_type] ?? "#475569";
-          const marker = new window.naver.maps.Marker({
-            position: new window.naver.maps.LatLng(c.lat, c.lng),
-            map: map,
-            icon: {
-              content: `
-                <div style="position: relative; cursor: pointer;">
-                  <div style="position: absolute; width: 34px; height: 34px; background: ${color}20; border-radius: 50%; top: -17px; left: -17px; animation: pulse 2s infinite;"></div>
-                  <div style="background: ${color}; width: 32px; height: 32px; border-radius: 50%; border: 3px solid white; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 15px rgba(0,0,0,0.2);">
-                    <span style="font-size: 14px;">${c.campaign_type === 'VST' ? '🍽️' : c.campaign_type === 'SHP' ? '📦' : '📰'}</span>
-                  </div>
-                </div>
-              `,
-              anchor: new window.naver.maps.Point(16, 16)
-            }
-          });
-
-          window.naver.maps.Event.addListener(marker, 'click', () => {
-            setActiveCampaign(c);
-            map.panTo(new window.naver.maps.LatLng(c.lat, c.lng));
-          });
-          return marker;
-        });
-
-        if (!document.getElementById("naver-cluster-script")) {
-          const clusterScript = document.createElement("script");
-          clusterScript.id = "naver-cluster-script";
-          clusterScript.src = "https://navermaps.github.io/maps.js.ncp/docs/js/MarkerClustering.js";
-          clusterScript.onload = () => {
-            if (window.naver && (window as any).MarkerClustering) {
-              new (window as any).MarkerClustering({
-                minClusterSize: 2, maxZoom: 13, map: map, markers: markers,
-                disableClickZoom: false, gridSize: 100,
-                icons: [{
-                  content: `<div style="cursor:pointer;width:50px;height:50px;line-height:52px;font-size:14px;color:white;text-align:center;font-weight:900;background:rgba(16, 185, 129, 0.9);border-radius:25px;border:3px solid rgba(255,255,255,0.3);box-shadow:0 10px 20px rgba(0,0,0,0.2);"></div>`,
-                  size: new window.naver.maps.Size(50, 50),
-                  anchor: new window.naver.maps.Point(25, 25)
-                }],
-                indexGenerator: [10, 100, 200, 500, 1000],
-                stylingFunction: (clusterMarker: any, count: number) => {
-                  clusterMarker.getElement().querySelector('div').textContent = count;
-                }
-              });
-            }
-          };
-          document.head.appendChild(clusterScript);
-        }
-
-        window.naver.maps.Event.addListener(map, 'dragend', () => {
-          setShowSearchBtn(true);
-          const center = map.getCenter();
-          updateAddress(center.lat(), center.lng());
-        });
-        setIsLoaded(true);
-      };
-
-      if (window.naver && window.naver.maps) {
-        initNaverMap();
+const waitFor = <T>(predicate: () => T | undefined, retries = 25, interval = 120): Promise<T> =>
+  new Promise((resolve, reject) => {
+    let attempt = 0;
+    const loop = () => {
+      const value = predicate();
+      if (value) {
+        resolve(value);
         return;
       }
+      if (++attempt >= retries) {
+        reject(new Error("SDK load timeout"));
+        return;
+      }
+      setTimeout(loop, interval);
+    };
+    loop();
+  });
 
-      const scriptId = "naver-map-script-v3";
-      let script = document.getElementById(scriptId) as HTMLScriptElement;
-      if (!script) {
-        script = document.createElement("script");
+const normalizeStoreToken = (value: string) => {
+  const asciiToken = value
+    .replace(/https?:\/\/(www\.)?/, "")
+    .replace(/[/?#].*$/, "")
+    .replace(/[\[\]\(\)]/g, " ")
+    .replace(/[|·<>*'"!?:;,.\-_/]+/g, " ")
+    .toLowerCase()
+    .trim();
+
+  return asciiToken
+    .replace(/[^a-z0-9가-힣\s]/g, " ")
+    .split(/\s+/)
+    .map((part) => (STORE_KEY_STOP_WORD_SET.has(part) ? "" : part))
+    .filter(Boolean)
+    .join("");
+};
+
+const normalizeStoreKey = (campaign: Campaign) => {
+  const brandFromTitle =
+    campaign.title?.match(/^[\(\[\{]([^)\]\}]+)[\)\]\}]/)?.[1] || campaign.title?.match(/^([^-|·\s][^-|·]*)\s*[-–|]/)?.[1];
+  const keys = [brandFromTitle, campaign.geo_store_key, campaign.shop_url, campaign.url, campaign.title, campaign.region_depth1, campaign.region_depth2]
+    .filter(Boolean)
+    .map((value) => normalizeStoreToken(String(value)))
+    .filter((value) => value.length > 1);
+
+  return keys.find((value) => value.length > 2) || `store-${Math.abs(((campaign.id as string).split("").reduce((sum, char) => sum + char.charCodeAt(0), 0)) % 1000000)}`;
+};
+
+const coordBucket = (lat: number, lng: number) => {
+  const latKey = Math.round(lat * 2500);
+  const lngKey = Math.round(lng * 2500);
+  return `${latKey}-${lngKey}`;
+};
+
+const toPositiveInt = (value: string | undefined, fallback: number) => {
+  const num = Number(value);
+  if (!Number.isFinite(num) || num <= 0) return fallback;
+  return Math.floor(num);
+};
+
+const MAP_GROUP_LIMIT = toPositiveInt(process.env.NEXT_PUBLIC_MAP_GROUP_LIMIT, 180);
+const MAX_MERGE_RADIUS = toPositiveInt(process.env.NEXT_PUBLIC_MAP_MAX_MERGE_RADIUS, 600);
+const DISTANCE_MERGE_RADIUS_M = toPositiveInt(process.env.NEXT_PUBLIC_MAP_MERGE_RADIUS_BASE, 300);
+
+const EARTH_RADIUS_KM = 6371;
+
+const toRadians = (degrees: number) => (degrees * Math.PI) / 180;
+
+const distanceMeters = (aLat: number, aLng: number, bLat: number, bLng: number) => {
+  const dLat = toRadians(bLat - aLat);
+  const dLng = toRadians(bLng - aLng);
+  const lat1 = toRadians(aLat);
+  const lat2 = toRadians(bLat);
+  const sinLat = Math.sin(dLat / 2);
+  const sinLng = Math.sin(dLng / 2);
+  const h = sinLat * sinLat + Math.cos(lat1) * Math.cos(lat2) * sinLng * sinLng;
+  return 2 * EARTH_RADIUS_KM * Math.atan2(Math.sqrt(h), Math.sqrt(1 - h)) * 1000;
+};
+
+const blendCoordinate = (group: CampaignGroup, lat: number, lng: number, score: number) => {
+  const campaignCount = Math.max(1, group.campaigns.length);
+  const campaignWeight = Math.max(0.2, Math.min(1.2, score));
+  const totalWeight = campaignCount + campaignWeight;
+
+  return {
+    lat: (group.lat * campaignCount + lat * campaignWeight) / totalWeight,
+    lng: (group.lng * campaignCount + lng * campaignWeight) / totalWeight,
+  };
+};
+
+const mergeRadiusMeters = (group: CampaignGroup, incomingScore: number) => {
+  const sourceBase: Record<string, number> = {
+    explicit: 100,
+    url_coords: 170,
+    region_center: 280,
+    heuristic: 420,
+  };
+
+  const base = sourceBase[group.source] ?? 320;
+  const uncertainty = Math.max(0, (1 - incomingScore) * 220);
+  const sourceBoost = group.source === "explicit" ? 0 : group.source === "url_coords" ? 20 : group.source === "region_center" ? 70 : 140;
+  const merged = base + uncertainty + sourceBoost;
+  return Math.max(DISTANCE_MERGE_RADIUS_M * 0.6, Math.min(MAX_MERGE_RADIUS, merged));
+};
+
+const gradeColor = (grade: "높음" | "보통" | "낮음") => {
+  if (grade === "높음") return "#16a34a";
+  if (grade === "보통") return "#ca8a04";
+  return "#64748b";
+};
+
+const createMapLabel = (group: CampaignGroup) => {
+  const grade = matchGrade(group.score);
+  const color = gradeColor(grade);
+  const total = group.campaigns.length;
+  const label = mapLabel(group);
+  return `
+    <div style="position:relative; min-width:48px; transform:translate(-50%, -100%);">
+      <div style="background:${color}; color:#fff; border:2px solid #fff; border-radius:9999px; width:42px; height:42px; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:900; box-shadow:0 8px 14px rgba(0,0,0,.25);">
+        ${total}
+      </div>
+      <div style="position:absolute; left:50%; transform:translateX(-50%); top:40px; color:#334155; background:#fff; border-radius:8px; border:1px solid rgba(0,0,0,.1); padding:2px 8px; font-size:10px; white-space:nowrap;">
+        ${label}
+      </div>
+    </div>
+  `;
+};
+
+export default function MapView({ campaigns }: { campaigns: Campaign[] }) {
+  const mapRef = useRef<HTMLDivElement>(null);
+  const mapRefObj = useRef<any>(null);
+  const markersRef = useRef<any[]>([]);
+  const [engine, setEngine] = useState<MapEngine>("kakao");
+  const [activeGroup, setActiveGroup] = useState<CampaignGroup | null>(null);
+  const [loaded, setLoaded] = useState(false);
+  const [isClient, setIsClient] = useState(false);
+
+  const pinnedCampaigns = useMemo(() => {
+    const grouped = new Map<string, CampaignGroup[]>();
+    for (const campaign of campaigns || []) {
+      const lat = parseCoord(campaign.lat);
+      const lng = parseCoord(campaign.lng);
+      if (!Number.isFinite(lat ?? NaN) || !Number.isFinite(lng ?? NaN) || (lat === 0 && lng === 0)) {
+        continue;
+      }
+
+      const storeKey = normalizeStoreKey(campaign);
+      const score = Number(campaign.geo_match_score ?? 0.2);
+      const source = campaign.geo_match_source || "heuristic";
+      const bucket = coordBucket(lat, lng);
+
+      const bucketed = (grouped.get(storeKey) || []).slice();
+      let targetGroup: CampaignGroup | null = null;
+
+      for (const group of bucketed) {
+        const radius = mergeRadiusMeters(group, score);
+        if (group.key.startsWith(`${storeKey}-`) && distanceMeters(lat, lng, group.lat, group.lng) <= radius) {
+          targetGroup = group;
+          break;
+        }
+        if (group.key === `${storeKey}-${bucket}`) {
+          targetGroup = group;
+          break;
+        }
+      }
+
+      if (!targetGroup) {
+        const created: CampaignGroup = {
+          key: `${storeKey}-${bucket}`,
+          lat,
+          lng,
+          storeKey,
+          source,
+          score,
+          campaigns: [campaign],
+          representative: campaign,
+        };
+        bucketed.push(created);
+        grouped.set(storeKey, bucketed);
+        continue;
+      }
+
+      const blended = blendCoordinate(targetGroup, lat, lng, score);
+      targetGroup.lat = blended.lat;
+      targetGroup.lng = blended.lng;
+      targetGroup.campaigns.push(campaign);
+      if (score > targetGroup.score) {
+        targetGroup.score = score;
+        targetGroup.source = source;
+        targetGroup.representative = campaign;
+      }
+      grouped.set(storeKey, bucketed);
+    }
+
+    const groups = Array.from(grouped.values()).flat();
+    groups.sort((a, b) => b.campaigns.length - a.campaigns.length || b.score - a.score);
+    return groups.slice(0, Math.max(1, MAP_GROUP_LIMIT));
+  }, [campaigns]);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isClient || !mapRef.current) return;
+
+    const clearMap = () => {
+      markersRef.current.forEach((m) => m?.setMap?.(null));
+      markersRef.current = [];
+      setActiveGroup(null);
+      if (mapRef.current) mapRef.current.innerHTML = "";
+      mapRefObj.current = null;
+      setLoaded(false);
+    };
+
+    const renderKakaoMap = async () => {
+      const KAKAO_KEY = process.env.NEXT_PUBLIC_KAKAO_JS_KEY || "";
+      const scriptId = "kakao-map-sdk";
+
+      await new Promise<void>((resolve, reject) => {
+        const existing = document.getElementById(scriptId);
+        if (existing) {
+          waitFor(() => window.kakao?.maps).then(() => resolve()).catch(() => reject(new Error("Kakao maps load timeout")));
+          return;
+        }
+        const script = document.createElement("script");
         script.id = scriptId;
+        script.src = `//dapi.kakao.com/v2/maps/sdk.js?appkey=${KAKAO_KEY}&autoload=false&libraries=services,clusterer`;
+        script.async = true;
+        script.onload = () => resolve();
+        script.onerror = () => reject(new Error("Failed to load Kakao map script."));
+        document.head.appendChild(script);
+      });
+
+      if (!window.kakao?.maps) {
+        if (typeof window.kakao?.maps?.load === "function") {
+          await new Promise<void>((res) => window.kakao.maps.load(() => res()));
+        } else {
+          await waitFor(() => window.kakao?.maps, 20, 150).then(() => void 0).catch(() => {
+            throw new Error("Kakao maps load timeout");
+          });
+        }
+      }
+
+      const { kakao } = window;
+      const map = new kakao.maps.Map(mapRef.current, {
+        center: new kakao.maps.LatLng(37.5665, 126.978),
+        level: 8,
+      });
+      mapRefObj.current = map;
+
+      const bounds = new kakao.maps.LatLngBounds();
+      for (const group of pinnedCampaigns) {
+        const container = document.createElement("div");
+        container.innerHTML = createMapLabel(group).trim();
+        const node = container.firstElementChild;
+        const marker = new kakao.maps.CustomOverlay({
+          position: new kakao.maps.LatLng(group.lat, group.lng),
+          map,
+          content: node,
+          xAnchor: 0.5,
+          yAnchor: 1.0,
+        });
+        node?.addEventListener?.("click", () => {
+          setActiveGroup(group);
+          map.panTo(new kakao.maps.LatLng(group.lat, group.lng));
+        });
+        node?.addEventListener?.("touchstart", () => {
+          setActiveGroup(group);
+          map.panTo(new kakao.maps.LatLng(group.lat, group.lng));
+        });
+        markersRef.current.push(marker);
+        bounds.extend(new kakao.maps.LatLng(group.lat, group.lng));
+      }
+
+      if (pinnedCampaigns.length > 0) {
+        map.setBounds(bounds);
+      }
+      setLoaded(true);
+    };
+
+    const renderNaverMap = async () => {
+      const NAVER_ID = process.env.NEXT_PUBLIC_NAVER_CLIENT_ID || "";
+      await new Promise<void>((resolve, reject) => {
+        const id = "naver-map-sdk";
+        const existed = document.getElementById(id);
+        if (existed) {
+          if (window.naver?.maps) resolve();
+          else waitFor(() => window.naver?.maps).then(() => resolve()).catch(() => reject(new Error("Naver maps load timeout")));
+          return;
+        }
+        const script = document.createElement("script");
+        script.id = id;
         script.src = `https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=${NAVER_ID}&submodules=geocoder`;
         script.async = true;
+        script.onload = () => resolve();
+        script.onerror = () => reject(new Error("Failed to load Naver map script."));
         document.head.appendChild(script);
-      }
-      script.addEventListener("load", initNaverMap);
-    };
+      });
 
-    if (engine === "kakao") loadKakao();
-    else loadNaver();
+      if (!window.naver?.maps) return;
+      const { naver } = window;
+      const map = new naver.maps.Map(mapRef.current, {
+        center: new naver.maps.LatLng(37.5665, 126.978),
+        zoom: 8,
+        zoomControl: true,
+      });
+      mapRefObj.current = map;
 
-    // Reverse Geocoding Helper for Naver
-    const updateAddress = (lat: number, lng: number) => {
-      if (engine === 'naver' && window.naver && window.naver.maps.Service) {
-        window.naver.maps.Service.reverseGeocode({
-          coords: new window.naver.maps.LatLng(lat, lng),
-          orders: [
-            window.naver.maps.Service.OrderType.ADDR,
-            window.naver.maps.Service.OrderType.ROAD_ADDR
-          ].join(',')
-        }, (status: any, response: any) => {
-          if (status === window.naver.maps.Service.Status.OK) {
-            const addr = response.v2.address.jibunAddress || response.v2.address.roadAddress;
-            setCurrentAddress(addr.split(' ').slice(0, 3).join(' '));
-          }
+      const bounds = new naver.maps.LatLngBounds();
+      pinnedCampaigns.forEach((group) => {
+        const marker = new naver.maps.Marker({
+          position: new naver.maps.LatLng(group.lat, group.lng),
+          map,
+          title: `${group.representative.title || "캠페인"} (${group.campaigns.length})`,
+          icon: {
+            content: createMapLabel(group),
+            anchor: new naver.maps.Point(21, 44),
+          },
         });
+        naver.maps.Event.addListener(marker, "click", () => setActiveGroup(group));
+        markersRef.current.push(marker);
+        bounds.extend(new naver.maps.LatLng(group.lat, group.lng));
+      });
+
+      if (pinnedCampaigns.length > 0) {
+        map.fitBounds(bounds);
+      }
+      setLoaded(true);
+    };
+
+    const render = async () => {
+      clearMap();
+      try {
+        if (engine === "kakao") {
+          await renderKakaoMap();
+        } else {
+          await renderNaverMap();
+        }
+      } catch {
+        if (engine === "kakao") {
+          setEngine("naver");
+        } else {
+          setLoaded(false);
+        }
       }
     };
 
-    // Pulse animation style
-    const style = document.createElement('style');
-    style.innerHTML = `
-      @keyframes pulse {
-        0% { transform: scale(0.95); opacity: 0.7; }
-        70% { transform: scale(1.5); opacity: 0; }
-        100% { transform: scale(0.95); opacity: 0; }
-      }
-    `;
-    document.head.appendChild(style);
-  }, [engine, pinnedCampaigns]);
+    render();
+
+    return () => {
+      clearMap();
+    };
+  }, [engine, pinnedCampaigns, isClient]);
+
+  if (!isClient) {
+    return <div className="h-[560px] rounded-[2rem] bg-slate-100" />;
+  }
+
+  const count = pinnedCampaigns.length;
+  const activeCampaign = activeGroup?.representative;
 
   return (
-    <div className="relative w-full rounded-[2.5rem] overflow-hidden bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 shadow-2xl h-[700px] font-['Inter']">
-      {!isLoaded && (
-        <div className="absolute inset-0 flex items-center justify-center bg-slate-50 dark:bg-slate-900 z-50">
-          <div className="flex flex-col items-center gap-4">
-            <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
-            <p className="text-xs font-black text-slate-400 tracking-widest uppercase">
-              {engine === "kakao" ? "카카오맵" : "네이버맵"} 지도 로딩 중...
-            </p>
-          </div>
-        </div>
-      )}
-
-      {/* Map Content */}
-      <div key={`${engine}-${pinnedCampaigns.length}`} ref={mapRef} className="w-full h-full z-0" />
-
-      {/* Engine Switcher (Premium UI) */}
-      <div className="absolute top-6 right-6 z-10 flex flex-col items-end gap-3">
-        <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-md p-1.5 rounded-[1.5rem] border border-white/20 shadow-2xl flex gap-1">
-          <button
-            onClick={() => setEngine("kakao")}
-            className={`px-4 py-2 rounded-2xl text-[10px] font-black transition-all ${engine === "kakao" ? "bg-amber-400 text-slate-900 shadow-lg" : "text-slate-400 hover:text-slate-600 dark:hover:text-white"}`}
-          >
-            카카오맵
-          </button>
-          <button
-            onClick={() => setEngine("naver")}
-            className={`px-4 py-2 rounded-2xl text-[10px] font-black transition-all ${engine === "naver" ? "bg-emerald-500 text-white shadow-lg" : "text-slate-400 hover:text-slate-600 dark:hover:text-white"}`}
-          >
-            네이버맵
-          </button>
-        </div>
-
-        <div className={`px-4 py-2.5 rounded-2xl text-[10px] font-black backdrop-blur-md shadow-2xl flex items-center gap-3 border border-white/10 ${engine === 'kakao' ? 'bg-slate-900/90 text-white' : 'bg-emerald-600/90 text-white'}`}>
-          <div className={`w-2 h-2 rounded-full animate-pulse ${engine === 'kakao' ? 'bg-amber-400' : 'bg-white'}`} />
-          현재 {engine === "kakao" ? "카카오맵" : "네이버맵"} 엔진 사용
-        </div>
-
-        {/* My Location Button */}
-        <button
-          onClick={() => {
-            if (mapInstance.current && navigator.geolocation) {
-              navigator.geolocation.getCurrentPosition((pos) => {
-                const lat = pos.coords.latitude;
-                const lng = pos.coords.longitude;
-                if (engine === "kakao") {
-                  mapInstance.current.panTo(new window.kakao.maps.LatLng(lat, lng));
-                } else {
-                  mapInstance.current.panTo(new window.naver.maps.LatLng(lat, lng));
-                }
-              });
-            }
-          }}
-          className="p-3.5 bg-white dark:bg-slate-800 rounded-2.5xl shadow-2xl border border-slate-100 dark:border-slate-700 hover:scale-110 active:scale-95 transition-all text-slate-900 dark:text-white"
-        >
-          <Compass className="w-5 h-5 stroke-[2.5]" />
+    <section className="relative h-[620px] overflow-hidden rounded-[2rem] border border-slate-200 bg-slate-100 dark:bg-slate-950">
+      <div className="absolute top-4 left-4 z-10 flex gap-2 rounded-2xl bg-white/95 p-2 shadow">
+        <button onClick={() => setEngine("kakao")} className={`rounded-xl px-3 py-1.5 text-xs font-black ${engine === "kakao" ? "bg-blue-600 text-white" : "bg-slate-100 text-slate-500"}`}>
+          카카오맵
+        </button>
+        <button onClick={() => setEngine("naver")} className={`rounded-xl px-3 py-1.5 text-xs font-black ${engine === "naver" ? "bg-emerald-500 text-white" : "bg-slate-100 text-slate-500"}`}>
+          네이버지도
         </button>
       </div>
 
-      {/* Floating: Search in this area */}
-      <AnimatePresence>
-        {showSearchBtn && (
-          <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="absolute top-8 left-1/2 -translate-x-1/2 z-20">
-            <button
-              onClick={() => setShowSearchBtn(false)}
-              className="flex items-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-full text-[11px] font-black shadow-2xl border border-white/20 active:scale-95 transition-all"
-            >
-              <Zap className="w-3.5 h-3.5 fill-current text-blue-400" />
-              이 지역에서 다시 조회
-            </button>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Left Overlay Status */}
-      <div className="absolute top-6 left-6 z-10 hidden md:block">
-        <div className="glass-card bg-white/70 dark:bg-slate-900/80 rounded-[2rem] p-6 shadow-2xl border border-white/60 dark:border-slate-700/50">
-          <h3 className="text-xs font-black text-slate-900 dark:text-white mb-4 tracking-widest uppercase flex items-center gap-2">
-            <Globe className="w-4 h-4 text-blue-500" /> 지도 레이어 제어
-          </h3>
-          <div className="space-y-3">
-            <div className="flex items-center justify-between gap-8">
-              <span className="text-[10px] font-bold text-slate-500 uppercase">현재 지역</span>
-              <span className="text-[10px] font-black text-blue-500 uppercase tracking-tighter truncate max-w-[120px]">{currentAddress}</span>
-            </div>
-            <div className="flex items-center justify-between gap-8">
-              <span className="text-[10px] font-bold text-slate-500 uppercase">표시 캠페인</span>
-              <span className="text-[10px] font-black text-slate-900 dark:text-white">{pinnedCampaigns.length}개</span>
-            </div>
-          </div>
-          <div className="mt-6 pt-6 border-t border-slate-200 dark:border-slate-800 flex flex-col gap-2">
-            <div className="flex items-center gap-2 text-[10px] font-bold text-slate-400">
-              <div className="w-2 h-2 rounded-full bg-blue-500" /> 방문형 캠페인
-            </div>
-            <div className="flex items-center gap-2 text-[10px] font-bold text-slate-400">
-              <div className="w-2 h-2 rounded-full bg-emerald-500" /> 배송형 캠페인
-            </div>
-          </div>
-        </div>
+      <div className="absolute top-4 right-4 z-10 rounded-xl bg-white/95 px-4 py-2 text-xs font-black shadow">
+        총 {count}개 매장
       </div>
 
-      {/* Floating Detail Card */}
+      {count === 0 && (
+        <div className="absolute inset-0 z-20 flex items-center justify-center bg-slate-900/70 text-white">
+          <p className="rounded-xl bg-black/30 px-5 py-3 text-sm">유효한 좌표가 있는 캠페인이 없습니다.</p>
+        </div>
+      )}
+
+      {!loaded && count > 0 ? (
+        <div className="absolute inset-0 z-20 flex items-center justify-center bg-slate-100/80 dark:bg-slate-900/80">
+          <div className="flex flex-col items-center gap-3 rounded-xl bg-white/90 px-6 py-4 text-xs font-black text-slate-500 shadow">
+            <div className="h-8 w-8 animate-spin rounded-full border-4 border-blue-500 border-t-transparent" />
+            지도 로딩 중...
+          </div>
+        </div>
+      ) : null}
+
+      <div className="absolute bottom-4 left-4 z-10 rounded-xl bg-white/95 px-4 py-2 text-xs font-black text-slate-500 shadow">
+        {engine === "kakao" ? "카카오맵 모드" : "네이버지도 모드"}
+      </div>
+
+      <button
+        onClick={() => {
+          if (!mapRefObj.current || !navigator.geolocation) return;
+          navigator.geolocation.getCurrentPosition((position) => {
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
+            if (engine === "kakao" && window.kakao?.maps) {
+              mapRefObj.current.panTo(new window.kakao.maps.LatLng(lat, lng));
+            } else if (engine === "naver" && window.naver?.maps) {
+              mapRefObj.current.setCenter(new window.naver.maps.LatLng(lat, lng));
+            }
+          });
+        }}
+        className="absolute top-16 right-4 z-10 rounded-xl bg-white/95 p-3 shadow"
+      >
+        <Compass className="h-4 w-4" />
+      </button>
+
+      <div className="h-full w-full" ref={mapRef} />
+
       <AnimatePresence>
-        {activeCampaign && (
-          <motion.div initial={{ opacity: 0, scale: 0.9, y: 30 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 30 }} className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 w-[360px] glass-card bg-white/95 dark:bg-slate-900/95 rounded-[2.5rem] p-6 shadow-2xl border border-white dark:border-slate-700">
-            <button
-              onClick={() => setActiveCampaign(null)}
-              className="absolute top-4 right-4 w-8 h-8 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all"
-            >
-              <X className="w-4 h-4" />
+        {activeCampaign ? (
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 30 }}
+            className="absolute bottom-4 left-4 right-4 z-20 rounded-2xl border bg-white/95 p-4 shadow-xl"
+          >
+            <button onClick={() => setActiveGroup(null)} className="absolute right-3 top-3 text-slate-400">
+              <X className="h-4 w-4" />
             </button>
-            <div className="flex gap-5">
-              <div className="relative w-28 h-28 rounded-2xl overflow-hidden shrink-0 shadow-lg">
-                <img src={activeCampaign.thumbnail_url || 'https://via.placeholder.com/150'} className="object-cover w-full h-full" alt="" />
-              </div>
-              <div className="flex flex-col justify-center gap-1.5 overflow-hidden">
-                <div className="flex items-center gap-2">
-                  <span className="text-[9px] font-black text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-2 py-0.5 rounded-lg">{activeCampaign.platform?.name}</span>
-                <span className="text-[9px] font-black text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-lg">
-                  {activeCampaign.campaign_type === "VST" ? "방문형" : activeCampaign.campaign_type === "SHP" ? "배송형" : "기타"}
-                </span>
+            <div className="flex gap-3">
+              <img
+                src={activeCampaign.thumbnail_url || "https://via.placeholder.com/140"}
+                alt={activeCampaign.title || "캠페인 썸네일"}
+                className="h-20 w-20 rounded-xl object-cover"
+              />
+              <div className="flex-1 text-sm">
+                <p className="font-black text-slate-900">{activeCampaign.title}</p>
+                <p className="text-xs text-slate-500">
+                  <MapPin className="mr-1 inline h-3 w-3" />
+                  {toDisplayLocation(activeGroup!)}
+                </p>
+                <p className="text-xs text-slate-500">유형: {TYPE_LABEL[activeCampaign.campaign_type || "ETC"] || "기타"}</p>
+                <p className="text-xs text-slate-500">매칭: {mapLabel(activeGroup!)}</p>
+                <p className="text-xs text-slate-500">캠페인 수: {activeGroup?.campaigns.length || 1}</p>
+                <div className="mt-2 flex items-center gap-2">
+                  <Link href={`/campaigns/${activeCampaign.id}`} className="rounded-lg bg-slate-900 px-3 py-2 text-xs font-black text-white">
+                    상세보기
+                  </Link>
+                  <a href={activeCampaign.url || "#"} target="_blank" rel="noopener noreferrer" className="rounded-lg border border-slate-300 px-3 py-2 text-xs font-black text-slate-700">
+                    원문 이동
+                  </a>
+                    {activeCampaign.shop_url ? (
+                    <a href={activeCampaign.shop_url} target="_blank" rel="noopener noreferrer" className="rounded-lg border border-slate-300 px-3 py-2 text-xs font-black text-slate-700">
+                      매장 링크
+                    </a>
+                  ) : null}
                 </div>
-                <h4 className="text-sm font-black text-slate-900 dark:text-white line-clamp-2 leading-tight">{activeCampaign.title}</h4>
-                <p className="text-[10px] text-slate-400 font-bold flex items-center gap-1"><MapIcon className="w-3 h-3" /> {activeCampaign.location}</p>
-                <Link href={`/campaigns/${activeCampaign.id}`} className="mt-3 text-[10px] font-black text-white bg-slate-900 dark:bg-blue-600 px-5 py-2.5 rounded-2xl text-center hover:shadow-xl transition-all shadow-md">
-                  자세히 보기 &rarr;
-                </Link>
+                {activeGroup && activeGroup.campaigns.length > 1 ? (
+                  <ul className="mt-2 text-[11px] text-slate-500 list-disc pl-4">
+                    {activeGroup.campaigns.slice(0, 3).map((item) => (
+                      <li key={item.id}>{item.title || "제목 없음"}</li>
+                    ))}
+                    {activeGroup.campaigns.length > 3 ? <li>...외 {activeGroup.campaigns.length - 3}개 더</li> : null}
+                  </ul>
+                ) : null}
               </div>
             </div>
           </motion.div>
-        )}
+        ) : null}
       </AnimatePresence>
-    </div>
+    </section>
   );
 }

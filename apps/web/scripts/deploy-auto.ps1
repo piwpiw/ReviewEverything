@@ -16,8 +16,7 @@ for ($i = 1; $i -le $MaxAttempts; $i++) {
     $outPath = Join-Path $env:TEMP "vercel_out_$i.txt"
     $errPath = Join-Path $env:TEMP "vercel_err_$i.txt"
 
-    $appRoot = Split-Path $PSScriptRoot -Parent
-    $process = Start-Process -FilePath 'cmd.exe' -ArgumentList @('/c', 'vercel --prod --yes') -WorkingDirectory $appRoot -NoNewWindow -PassThru -RedirectStandardOutput $outPath -RedirectStandardError $errPath
+    $process = Start-Process -FilePath 'cmd.exe' -ArgumentList @('/c', 'vercel --prod --yes') -WorkingDirectory $PSScriptRoot -NoNewWindow -PassThru -RedirectStandardOutput $outPath -RedirectStandardError $errPath
     if (-not $process) {
         Write-Host "Unable to start vercel process." -ForegroundColor Red
         Add-Content -Path $logFile -Value "Unable to start vercel process."
@@ -38,12 +37,19 @@ for ($i = 1; $i -le $MaxAttempts; $i++) {
 
     $isInternalError = ($stdout -match "We encountered an internal error|Error: We encountered an internal error") -or ($stderr -match "We encountered an internal error|Error: We encountered an internal error")
     $isDBError = ($stdout -match "Can.t reach database server|prisma:error|database server") -or ($stderr -match "Can.t reach database server|prisma:error|database server")
+    $isRateLimit = ($stdout -match "api-deployments-free-per-day") -or ($stderr -match "api-deployments-free-per-day")
     $isDeploySuccess = ($stdout -match "Production:\s+https://")
 
-    if ($isDeploySuccess -and -not $isInternalError -and -not $isDBError) {
+    if ($isDeploySuccess -and -not $isInternalError -and -not $isDBError -and -not $isRateLimit) {
         Write-Host "Deployment succeeded." -ForegroundColor Green
         Add-Content -Path $logFile -Value "Deployment succeeded."
         exit 0
+    }
+
+    if ($isRateLimit) {
+        Write-Host "Vercel deployment rate limit reached. Retry stopped automatically." -ForegroundColor Red
+        Add-Content -Path $logFile -Value "Rate limit reached. Retry stopped automatically."
+        exit 2
     }
 
     if ($i -ge $MaxAttempts) {

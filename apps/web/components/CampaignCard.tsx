@@ -1,46 +1,95 @@
 "use client";
 
+import { useEffect, type MouseEvent } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect } from "react";
-import { motion } from "framer-motion";
+import { ExternalLink, Heart, MapPin, ShoppingBag, Store } from "lucide-react";
 import { useFavorites } from "@/lib/useFavorites";
-import {
-  MapPin,
-  ShoppingBag,
-  Store,
-  TrendingDown,
-  Heart,
-  Zap,
-  ExternalLink,
-} from "lucide-react";
 
-const getDDay = (date: Date | string | null): { label: string; cls: string; diff: number } => {
-  if (!date) return { label: "미정", cls: "dday-ok", diff: 99 };
-  const d = new Date(date);
-  const diff = Math.ceil((d.getTime() - Date.now()) / 86_400_000);
-  if (diff < 0) return { label: "마감", cls: "text-slate-400 bg-slate-100", diff: -1 };
-  if (diff === 0) return { label: "오늘 마감", cls: "text-rose-600 bg-rose-50 animate-pulse", diff: 0 };
-  if (diff <= 3) return { label: `D-${diff}`, cls: "text-rose-500 bg-rose-50", diff };
-  return { label: `D-${diff}`, cls: "text-blue-600 bg-blue-50", diff };
+type Campaign = {
+  id: string;
+  campaign_type?: string;
+  media_type?: string;
+  platform?: { name?: string };
+  title?: string;
+  region_depth1?: string;
+  region_depth2?: string;
+  category?: string;
+  reward_value?: number | string;
+  recruit_count?: number | string;
+  applicant_count?: number | string;
+  competition_rate?: number | string;
+  apply_end_date?: Date | string | null;
+  url?: string;
+  link?: string;
+  source_url?: string;
+  thumbnail_url?: string;
+  lat?: number | string;
+  lng?: number | string;
+  shop_url?: string;
+  shop_link?: string;
+  coupon_url?: string;
 };
 
-const MEDIA_MAP: Record<string, { label: string; color: string }> = {
+const getDDay = (date: Date | string | null): { label: string; cls: string } => {
+  if (!date) return { label: "미정", cls: "text-slate-400 bg-slate-100" };
+  const target = new Date(date);
+  const diff = Math.ceil((target.getTime() - Date.now()) / 86_400_000);
+  if (diff < 0) return { label: "마감", cls: "text-slate-400 bg-slate-100" };
+  if (diff === 0) return { label: "D-Day", cls: "text-rose-600 bg-rose-50" };
+  if (diff <= 3) return { label: `D-${diff}`, cls: "text-rose-600 bg-rose-50" };
+  return { label: `D-${diff}`, cls: "text-blue-600 bg-blue-50" };
+};
+
+const TYPE_NAME: Record<string, string> = {
+  VST: "방문형",
+  SHP: "쇼핑형",
+  PRS: "구매형",
+  SNS: "SNS형",
+  EVT: "이벤트형",
+  APP: "앱형",
+  PRM: "홍보형",
+  ETC: "기타",
+};
+
+const TYPE_COLOR: Record<string, string> = {
+  VST: "bg-blue-500",
+  SHP: "bg-emerald-500",
+  PRS: "bg-amber-500",
+  SNS: "bg-fuchsia-500",
+  EVT: "bg-purple-500",
+  APP: "bg-cyan-500",
+  PRM: "bg-rose-500",
+  ETC: "bg-slate-500",
+};
+
+const MEDIA_CHIP: Record<string, { label: string; color: string }> = {
   BP: { label: "블로그", color: "bg-emerald-500" },
   IP: { label: "인스타", color: "bg-pink-500" },
-  RS: { label: "릴스", color: "bg-indigo-500" },
   YP: { label: "유튜브", color: "bg-rose-600" },
-  SH: { label: "숏츠", color: "bg-red-500" },
-  TK: { label: "틱톡", color: "bg-slate-900" },
+  RS: { label: "리뷰", color: "bg-indigo-500" },
+  SH: { label: "쇼핑", color: "bg-red-500" },
+  TK: { label: "쿠폰", color: "bg-slate-900" },
   CL: { label: "클립", color: "bg-blue-500" },
-  OTHER: { label: "기타", color: "bg-slate-400" },
+  RD: { label: "광고", color: "bg-orange-500" },
+  FB: { label: "페북", color: "bg-blue-700" },
+  X: { label: "X", color: "bg-black" },
+  SN: { label: "숏폼", color: "bg-violet-500" },
+  TT: { label: "숏클립", color: "bg-cyan-700" },
+  OTHER: { label: "기타", color: "bg-slate-500" },
 };
 
-export default function CampaignCard({ campaign, rank }: { campaign: any; rank?: number }) {
+const fallbackMedia = { label: "기타", color: "bg-slate-500" };
+
+const num = (value: number | string | undefined | null, fallback = 0) => {
+  const n = Number(value);
+  return Number.isFinite(n) ? n : fallback;
+};
+
+export default function CampaignCard({ campaign, rank }: { campaign: Campaign; rank?: number }) {
   const { isFavorite, toggleFavorite } = useFavorites();
   const pinned = isFavorite(campaign.id);
 
-  // --- Analytics: View Logging ---
   useEffect(() => {
     const logView = async () => {
       try {
@@ -49,222 +98,157 @@ export default function CampaignCard({ campaign, rank }: { campaign: any; rank?:
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ campaignId: campaign.id, action: "VIEW" }),
         });
-      } catch (e) {
-        console.error("View log failed", e);
+      } catch (error) {
+        console.error("View log failed", error);
       }
     };
     logView();
   }, [campaign.id]);
 
-  // --- 가중치 로직 (Weight Logic) ---
-  const recruited = campaign.recruit_count ?? 1;
-  const applied = campaign.applicant_count ?? 0;
-  const compRateValue = campaign.competition_rate ? Number(campaign.competition_rate) : (recruited > 0 ? applied / recruited : 0);
-  const progress = recruited > 0 ? Math.min((applied / recruited) * 100, 100) : 0;
-  const { label: dLabel, cls: dCls, diff: dDiff } = getDDay(campaign.apply_end_date);
+  const recruitCount = num(campaign.recruit_count, 1);
+  const applicantCount = num(campaign.applicant_count, 0);
+  const compRate = campaign.competition_rate ? num(campaign.competition_rate, 0) : recruitCount > 0 ? applicantCount / recruitCount : 0;
+  const reward = num(campaign.reward_value, 0);
+  const { label: dLabel, cls: dCls } = getDDay(campaign.apply_end_date || null);
+  const campaignType = campaign.campaign_type || "ETC";
+  const campaignTypeName = TYPE_NAME[campaignType] || TYPE_NAME.ETC;
+  const media = MEDIA_CHIP[campaign.media_type || "OTHER"] || fallbackMedia;
+  const campaignTypeColor = TYPE_COLOR[campaignType] || TYPE_COLOR.ETC;
+  const primaryUrl = campaign.url || campaign.link || campaign.source_url || "#";
+  const shopUrl = campaign.shop_url || campaign.shop_link || campaign.coupon_url;
 
-  const rewardVal = campaign.reward_value || 0;
-  const isPremiumReward = rewardVal >= 100000;
-  const isUrgent = dDiff <= 1 && dDiff >= 0;
-  const isViral = compRateValue >= 10;
-  const isHighWin = !isViral && compRateValue <= 1.2 && recruited >= 3;
-
-  const media = MEDIA_MAP[campaign.media_type] || MEDIA_MAP.OTHER;
-
-  const cardStyleCls = isPremiumReward
-    ? "border-amber-300 dark:border-amber-500/50 shadow-[0_0_25px_rgba(251,191,36,0.15)] ring-1 ring-amber-400/20"
-    : isUrgent
-      ? "border-rose-300 dark:border-rose-500/50"
-      : "border-slate-100 dark:border-slate-800";
-
-  const handleOutbound = async (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    // --- Analytics: Click Logging ---
-    try {
-      fetch("/api/analytics/log", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ campaignId: campaign.id, action: "CLICK" }),
-      });
-    } catch (e) { }
-
-    if (campaign.shop_url) {
-      window.open(campaign.shop_url, "_blank");
-    } else if (campaign.campaign_type === "VST") {
-      window.open(`https://map.naver.com/v5/search/${encodeURIComponent(campaign.title)}`, "_blank");
-    } else {
-      window.open(campaign.url, "_blank");
+  const openLink = (url?: string | null, fallback?: string) => {
+    if (!url) {
+      if (fallback) window.open(fallback, "_blank", "noopener,noreferrer");
+      return;
     }
+    window.open(url, "_blank", "noopener,noreferrer");
   };
 
+  const handleOutbound = async (event: MouseEvent<HTMLElement>, target: "campaign" | "shop") => {
+    event.preventDefault();
+    event.stopPropagation();
+    try {
+      await fetch("/api/analytics/log", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ campaignId: campaign.id, action: "CLICK", target }),
+      });
+    } catch (error) {
+      console.error(error);
+    }
+
+    if (target === "shop" && shopUrl) {
+      openLink(shopUrl);
+      return;
+    }
+    if (target === "shop" && campaignType === "VST") {
+      openLink(`https://map.naver.com/v5/search/${encodeURIComponent(campaign.title || "")}`);
+      return;
+    }
+    openLink(primaryUrl);
+  };
+
+  const placeholder = "https://via.placeholder.com/640x360?text=ReviewEverything";
+  const locationText = `${campaign.region_depth1 || ""}${campaign.region_depth2 ? ` ${campaign.region_depth2}` : ""}`.trim() || "지역 미지정";
+  const imageUrl =
+    campaign.thumbnail_url ||
+    (campaign.lat && campaign.lng
+      ? `https://naveropenapi.apigw.ntruss.com/map-static/v2/raster?w=600&h=360&center=${campaign.lng},${campaign.lat}&level=15&markers=type:d|size:small|pos:${campaign.lng}%20${campaign.lat}|color:red&ncpClientId=${process.env.NEXT_PUBLIC_NAVER_CLIENT_ID || "xqc9tm6yw6"}`
+      : placeholder);
+
   return (
-    <motion.div
-      layout
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      whileHover={{ y: -8 }}
-      className={`group relative bg-white dark:bg-slate-900 rounded-[2.5rem] border overflow-hidden flex flex-col h-full shadow-sm hover:shadow-2xl transition-all duration-500 ${cardStyleCls}`}
+    <article
+      className={`relative bg-white dark:bg-slate-900 rounded-3xl border-l-8 ${campaignTypeColor} border border-slate-100 dark:border-slate-800 overflow-hidden flex flex-col h-full shadow-sm hover:shadow-lg transition-all duration-300`}
     >
-      {/* 고단가 배경 효과 */}
-      {isPremiumReward && (
-        <div className="absolute inset-x-0 -top-20 -left-20 w-40 h-40 bg-amber-400/10 blur-[60px] pointer-events-none" />
-      )}
-
-      <div className="relative h-[200px] overflow-hidden bg-slate-100 dark:bg-slate-800">
-        <Image
-          src={
-            campaign.thumbnail_url ||
-            (campaign.lat && campaign.lng
-              ? `https://naveropenapi.apigw.ntruss.com/map-static/v2/raster?w=400&h=300&center=${campaign.lng},${campaign.lat}&level=15&markers=type:d|size:small|pos:${campaign.lng}%20${campaign.lat}|color:red&ncpClientId=${process.env.NEXT_PUBLIC_NAVER_CLIENT_ID || "xqc9tm6yw6"}`
-              : "https://via.placeholder.com/400?text=ReviewEverything")
-          }
-          alt={campaign.title}
-          fill
-          className="object-cover group-hover:scale-110 transition-transform duration-[1.5s] ease-[cubic-bezier(0.2,1,0.2,1)]"
-          unoptimized={true}
-        />
-
-        <div className="absolute inset-x-0 bottom-0 p-5 bg-gradient-to-t from-slate-950/90 via-slate-900/40 to-transparent flex justify-between items-end opacity-0 group-hover:opacity-100 transition-all duration-500 z-20 translate-y-2 group-hover:translate-y-0">
+      <div className="relative h-[136px] overflow-hidden bg-slate-100 dark:bg-slate-800">
+        <Image src={imageUrl} alt={campaign.title || "리뷰 캠페인"} fill className="object-cover" unoptimized />
+        <div className="absolute top-2 left-2 right-2 flex items-start justify-between">
+          <span className={`px-2 py-0.5 rounded-lg text-[11px] font-black text-white ${media.color}`}>{media.label}</span>
+          {rank ? <span className="px-2 py-0.5 rounded-lg text-[11px] font-black text-white bg-slate-900">#{rank}</span> : null}
+        </div>
+        <div className="absolute top-2 right-2">
           <button
-            onClick={handleOutbound}
-            className="px-5 py-2.5 bg-white/10 backdrop-blur-xl rounded-2xl text-[11px] font-black text-white hover:bg-white hover:text-slate-900 transition-all flex items-center gap-2 border border-white/20 shadow-[0_8px_30px_rgb(0,0,0,0.5)]"
-          >
-            {campaign.campaign_type === "VST" ? <Store className="w-3.5 h-3.5" /> : <ShoppingBag className="w-3.5 h-3.5" />}
-            {campaign.campaign_type === "VST" ? "매장 바로가기" : "캠페인 상세 보기"}
-          </button>
-          <button
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
+            type="button"
+            onClick={(event) => {
+              event.preventDefault();
+              event.stopPropagation();
               toggleFavorite(campaign.id);
             }}
-            className={`w-10 h-10 rounded-[1rem] backdrop-blur-xl flex items-center justify-center transition-all ${pinned ? "bg-rose-500/90 text-white shadow-[0_0_20px_rgba(244,63,94,0.4)]" : "bg-white/10 text-white hover:bg-white hover:text-rose-500 border border-white/20"}`}
+            className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all ${pinned ? "bg-rose-500/90 text-white" : "bg-white/85 text-slate-500 border border-white/40"}`}
           >
-            <Heart className={`w-5 h-5 ${pinned ? "fill-current" : ""}`} />
+            <Heart className={`w-4 h-4 ${pinned ? "fill-current" : ""}`} />
           </button>
         </div>
-
-        {/* 다이내믹 배지 시스템 */}
-        <div className="absolute top-4 left-4 flex flex-col gap-2 z-10 pointer-events-none">
-          <div className="flex gap-2">
-            <span className={`px-2.5 py-1 rounded-xl text-[10px] font-black text-white ${media.color} uppercase tracking-widest shadow-lg shadow-black/10`}>
-              {media.label}
-            </span>
-            {rank && (
-              <span className="px-2.5 py-1 rounded-xl bg-slate-900 text-white text-[10px] font-black shadow-lg">#{rank}</span>
-            )}
-          </div>
-
-          {isPremiumReward && (
-            <motion.div
-              animate={{ opacity: [0.8, 1, 0.8] }}
-              transition={{ repeat: Infinity, duration: 2 }}
-              className="w-fit flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-600 text-slate-900 text-[10px] font-black shadow-xl border border-amber-200"
-            >
-              <Zap className="w-3 h-3 fill-current" />
-              프리미엄 보상
-            </motion.div>
-          )}
-
-          {isViral && (
-            <motion.div
-              animate={{ scale: [1, 1.05, 1] }}
-              transition={{ repeat: Infinity, duration: 1.5 }}
-              className="w-fit flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-rose-500 to-pink-600 text-white text-[10px] font-black shadow-[0_0_15px_rgba(244,63,94,0.4)] border border-rose-400/50"
-            >
-              <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
-              인기 폭발
-            </motion.div>
-          )}
-
-          {isHighWin && (
-            <div className="w-fit flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500 text-white text-[10px] font-black shadow-xl">
-              <Zap className="w-3 h-3 fill-current" />
-              당첨 고확률
-            </div>
-          )}
+        <div className="absolute bottom-2 left-2">
+          <span className={`px-2.5 py-1 rounded-lg text-[11px] font-black ${dCls}`}>{dLabel}</span>
         </div>
-
-        {/* 긴급 마감 표시 */}
-        <div className="absolute top-4 right-4 z-10 pointer-events-none">
-          <span className={`px-4 py-2 rounded-2xl font-black text-[10px] shadow-2xl border border-white/30 backdrop-blur-md transition-colors ${isUrgent ? 'bg-rose-600 text-white ring-4 ring-rose-500/20' : dCls}`}>
-            {dLabel}
-          </span>
-        </div>
+        <div className="absolute bottom-2 right-2 bg-slate-900/70 text-white rounded-lg px-2 py-1 text-[11px]">{campaignTypeName}</div>
       </div>
 
-      <div className="p-5 flex flex-col flex-1 gap-3 relative">
-        <div className="flex items-center gap-2 text-[10px] font-black">
-          <span className="text-slate-400">@{campaign.platform?.name}</span>
-          {campaign.category && (
-            <span className={`px-2 py-0.5 rounded-lg ${isPremiumReward ? 'bg-amber-100 text-amber-700' : 'bg-blue-50 text-blue-600'}`}>
-              {campaign.category}
-            </span>
-          )}
+      <div className="p-3.5 flex flex-col flex-1 gap-2">
+        <div className="flex items-center gap-2 text-xs font-black text-slate-500 dark:text-slate-400">
+          <span>[{campaign.platform?.name || "플랫폼"}]</span>
+          <span className="text-slate-300">/</span>
+          <span>{campaignTypeName}</span>
+          {campaign.category ? <span className="ml-auto text-blue-600 dark:text-blue-300">#{campaign.category}</span> : null}
         </div>
 
-        <Link href={`/campaigns/${campaign.id}`} className="flex flex-col gap-1.5">
-          <div className="flex items-center gap-2 text-[11px] font-bold text-slate-500 dark:text-slate-400">
-            <MapPin className="w-3.5 h-3.5" />
-            <span className="truncate">[{campaign.region_depth1 || "전국"}] {campaign.region_depth2 || ""}</span>
-          </div>
-          <h3 className={`text-[16px] font-black leading-tight transition-colors line-clamp-2 min-h-[3.2rem] ${isPremiumReward ? 'text-amber-900 dark:text-amber-200' : 'text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400'}`}>
-            {campaign.title}
+        <Link href={`/campaigns/${campaign.id}`}>
+          <h3 className="text-[17px] font-black leading-snug text-slate-900 dark:text-white line-clamp-2">
+            {campaign.title || "캠페인 제목"}
           </h3>
         </Link>
 
-        {/* 요약 박스 (가중치 반영) */}
-        <div className={`flex items-center gap-3 p-3 rounded-2xl border ${isPremiumReward ? 'bg-amber-50 dark:bg-amber-950/30 border-amber-200/50' : 'bg-slate-50/50 dark:bg-slate-800/40 border-slate-100/50'}`}>
-          <div className={`p-1.5 rounded-xl shadow-sm ${isPremiumReward ? 'bg-amber-400' : 'bg-white dark:bg-slate-900'}`}>
-            <TrendingDown className={`w-3.5 h-3.5 ${isPremiumReward ? "text-white" : isHighWin ? "text-emerald-500" : "text-slate-400 dark:text-slate-600"}`} />
+        <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-300">
+          <MapPin className="w-3.5 h-3.5" />
+          <span>{locationText}</span>
+        </div>
+
+        <div className="grid grid-cols-3 gap-2 text-center mt-1">
+          <div className="rounded-lg bg-slate-50 dark:bg-slate-800 p-1.5 border border-slate-100 dark:border-slate-800">
+            <p className="text-[10px] text-slate-500 dark:text-slate-400">보상</p>
+            <p className="text-sm font-black text-blue-600 dark:text-blue-300">{reward > 0 ? `${(reward / 10000).toFixed(1)}만원` : "미정"}</p>
           </div>
-          <div className="flex flex-col">
-            <span className="text-[10px] font-black text-slate-400 uppercase tracking-tighter mb-0.5">경쟁 현황</span>
-            <span className={`text-[13px] font-black leading-none ${isViral ? 'text-rose-600' : isHighWin ? "text-emerald-600" : "text-slate-900 dark:text-white"}`}>
-              {compRateValue.toFixed(1)}:1 <span className="text-[10px] opacity-40 ml-1">({applied}/{recruited})</span>
-            </span>
+          <div className="rounded-lg bg-slate-50 dark:bg-slate-800 p-1.5 border border-slate-100 dark:border-slate-800">
+            <p className="text-[10px] text-slate-500 dark:text-slate-400">경쟁률</p>
+            <p className="text-sm font-black text-slate-900 dark:text-white">{compRate.toFixed(1)}:1</p>
           </div>
-          <div className="ml-auto text-right">
-            <span className={`text-[12px] font-black block ${isPremiumReward ? 'text-amber-600 scale-110' : 'text-blue-600 dark:text-blue-400'}`}>
-              {rewardVal > 0 ? `${(rewardVal / 10000).toFixed(1)}만원 +` : "체험단 혜택"}
-            </span>
+          <div className="rounded-lg bg-slate-50 dark:bg-slate-800 p-1.5 border border-slate-100 dark:border-slate-800">
+            <p className="text-[10px] text-slate-500 dark:text-slate-400">지원/모집</p>
+            <p className="text-sm font-black text-slate-900 dark:text-white">
+              {applicantCount}/{recruitCount}
+            </p>
           </div>
         </div>
 
-        {/* 프로그레스 시스템 */}
-        <div className="mt-auto pt-2">
-          <div className="h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden mb-2">
-            <motion.div
-              initial={{ width: 0 }}
-              animate={{ width: `${progress}%` }}
-              transition={{ duration: 1.5, ease: "easeOut" }}
-              className={`h-full rounded-full ${isViral ? 'bg-rose-500 shadow-[0_0_10px_rgba(244,63,94,0.4)]' : isHighWin ? "bg-emerald-500" : "bg-blue-500"}`}
-            />
-          </div>
-          <div className="flex justify-between items-center px-1">
-            <p className="text-[11px] font-bold text-slate-400">지원 현황 {progress.toFixed(0)}%</p>
-            {isUrgent && <span className="text-[10px] font-black text-rose-500 animate-pulse">마감 임박!</span>}
-          </div>
-        </div>
-
-        <div className="grid grid-cols-2 gap-3 mt-2">
+        <div className="mt-auto pt-1 grid grid-cols-2 gap-2">
           <button
-            onClick={handleOutbound}
-            className="py-3 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-2xl text-[12px] font-black transition-all flex items-center justify-center gap-2"
+            type="button"
+            onClick={(e) => handleOutbound(e, shopUrl ? "shop" : "campaign")}
+            className="py-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-black hover:bg-slate-200 dark:hover:bg-slate-700 flex items-center justify-center gap-1"
           >
-            {campaign.campaign_type === "VST" ? "지도 보기" : "바로가기"}
-            <ExternalLink className="w-3.5 h-3.5" />
+            {shopUrl ? <Store className="w-3.5 h-3.5" /> : <ShoppingBag className="w-3.5 h-3.5" />}
+            {shopUrl ? "스토어 이동" : "자세히 보기"}
+            <ExternalLink className="w-3 h-3" />
           </button>
           <Link
             href={`/campaigns/${campaign.id}`}
-            className={`py-3 rounded-2xl text-[12px] font-black transition-all flex items-center justify-center shadow-lg active:scale-95 ${isPremiumReward ? 'bg-amber-500 hover:bg-amber-600 text-white' : 'bg-slate-900 dark:bg-blue-600 text-white hover:shadow-blue-500/20'}`}
+            className="py-2 rounded-lg bg-slate-900 dark:bg-blue-600 text-white text-center text-xs font-black hover:opacity-90 flex items-center justify-center"
           >
-            상세 정보
+            상세 페이지
           </Link>
+          <a
+            href={primaryUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => handleOutbound(e, "campaign")}
+            className="col-span-2 py-2 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs font-black text-center hover:border-blue-400 hover:text-blue-500"
+          >
+            원문 링크
+          </a>
         </div>
       </div>
-    </motion.div>
+    </article>
   );
 }

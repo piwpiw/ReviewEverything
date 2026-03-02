@@ -6,7 +6,8 @@ import CampaignList from "@/components/CampaignList";
 import ListSkeleton from "@/components/ListSkeleton";
 import HeroSearch from "@/components/HeroSearch";
 import StatsBanner from "@/components/StatsBanner";
-import { Sparkles, Map as MapIcon, LayoutGrid } from "lucide-react";
+import SearchGuidePanel from "@/components/SearchGuidePanel";
+import { LayoutGrid, Map as MapIcon, Sparkles } from "lucide-react";
 
 type SearchParams = {
   q?: string;
@@ -14,6 +15,7 @@ type SearchParams = {
   campaign_type?: string;
   media_type?: string;
   region_depth1?: string;
+  region_depth2?: string;
   category?: string;
   sort?: string;
   view?: "list" | "map";
@@ -31,14 +33,16 @@ const toSearchParams = (source: Record<string, string | undefined>) => {
 export default async function Home({ searchParams }: { searchParams: Promise<SearchParams> }) {
   const sp = await searchParams;
   const viewMode = sp.view === "map" ? "map" : "list";
-  const hasFilters = Boolean(sp.q || sp.platform_id || sp.campaign_type || sp.media_type || sp.region_depth1 || sp.category);
+  const hasFilters = Boolean(
+    sp.q || sp.platform_id || sp.campaign_type || sp.media_type || sp.region_depth1 || sp.region_depth2 || sp.category,
+  );
 
   return (
     <main className="min-h-screen bg-background text-foreground transition-colors duration-300">
       <div className="relative overflow-hidden bg-white dark:bg-slate-950 border-b border-slate-100/60 dark:border-slate-800/50">
         <div className="absolute inset-0 bg-[url('/noise.png')] opacity-[0.02] dark:opacity-[0.04] pointer-events-none" />
         <div className="absolute top-0 right-0 w-3/4 h-full bg-gradient-to-l from-blue-50/80 via-indigo-50/20 to-transparent dark:from-blue-900/10 dark:via-indigo-900/5 pointer-events-none" />
-        <div className="absolute -top-32 -left-32 w-[500px] h-[500px] bg-indigo-200/30 dark:bg-blue-900/20 rounded-full blur-[120px] pointer-events-none animate-pulse duration-1000" />
+        <div className="absolute -top-32 -left-32 w-[500px] h-[500px] bg-indigo-200/30 dark:bg-blue-900/20 rounded-full blur-[120px] pointer-events-none" />
         <div className="absolute bottom-0 right-32 w-[600px] h-[400px] bg-pink-200/20 dark:bg-fuchsia-900/10 rounded-full blur-[150px] pointer-events-none" />
 
         <div className="relative max-w-[1700px] mx-auto px-4 md:px-8 pt-24 pb-20 flex flex-col items-center text-center">
@@ -46,22 +50,28 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
             <div className="w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center">
               <Sparkles className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400 fill-current" />
             </div>
-            <span className="text-[11px] font-black text-slate-800 dark:text-white uppercase tracking-[0.2em]">ReviewEverything Engine v2.0</span>
+            <span className="text-[11px] font-black text-slate-800 dark:text-white uppercase tracking-[0.2em]">ReviewEverything</span>
           </div>
 
           <h1 className="text-5xl md:text-7xl font-black tracking-tighter leading-[1.1] mb-6 text-slate-900 dark:text-white max-w-4xl mx-auto drop-shadow-sm">
-            최고의 캠페인을 가장 먼저, <br className="hidden md:block" />
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400">압도적인 속도로.</span>
+            리뷰에브리띵으로 모든 리뷰를 한눈에 정리하고 운영까지 한 번에 관리하세요 <br className="hidden md:block" />
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400">원클릭 정리, 링크 추적, 지도 확인까지 한 번에</span>
           </h1>
 
           <p className="max-w-2xl text-slate-500 dark:text-slate-400 text-lg md:text-xl font-bold leading-relaxed mb-12">
-            실시간 트렌드 분석부터 AI 기반 보상 가치 산출, 자동화된 D-day 알림까지. <br className="hidden md:block" /> 비교할 수 없는 리뷰어 중심 시스템을 경험하세요.
+            리뷰에브리띵은 플랫폼·매체·유형·지역·카테고리별로 캠페인을 빠르게 찾아보고, 정확한 링크를 그대로 따라가 바로 실행할 수 있게 설계된 리뷰 운영 플랫폼입니다.
+            <br className="hidden md:block" />
+            필요할 때는 지도에서 위치를 확인하고, 핵심 수치로 우선순위를 판단해 캠페인 운영 효율을 높입니다.
           </p>
 
           <div className="w-full max-w-2xl mx-auto mb-16 relative z-50">
             <Suspense>
               <HeroSearch defaultValue={sp.q || ""} />
             </Suspense>
+          </div>
+
+          <div className="w-full mb-10 relative z-40">
+            <SearchGuidePanel />
           </div>
 
           <div className="relative z-40 w-full max-w-4xl mx-auto">
@@ -83,14 +93,14 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
           <div className="flex items-center gap-1.5 p-1.5 bg-slate-100/50 dark:bg-slate-800/50 border border-slate-200/50 dark:border-slate-700/50 rounded-2xl shadow-inner">
             <Link
               href={`/?${toSearchParams({ ...sp, view: "list" })}`}
-              className={`flex items-center gap-2 px-5 py-2 rounded-xl text-xs font-black transition-all ${viewMode === "list" ? "bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xl shadow-slate-900/5" : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"}`}
+              className={`flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-black transition-all ${viewMode === "list" ? "bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xl shadow-slate-900/5" : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"}`}
             >
               <LayoutGrid className="w-3.5 h-3.5" />
               목록 보기
             </Link>
             <Link
               href={`/?${toSearchParams({ ...sp, view: "map" })}`}
-              className={`flex items-center gap-2 px-5 py-2 rounded-xl text-xs font-black transition-all ${viewMode === "map" ? "bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xl shadow-slate-900/5" : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"}`}
+              className={`flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-black transition-all ${viewMode === "map" ? "bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xl shadow-slate-900/5" : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"}`}
             >
               <MapIcon className="w-3.5 h-3.5" />
               지도 보기
@@ -98,11 +108,11 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
           </div>
 
           <div className="flex items-center gap-4">
-            <div className="hidden lg:flex items-center gap-2 text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest border-r border-slate-200 dark:border-slate-800 pr-4">
+            <div className="hidden lg:flex items-center gap-2 text-[11px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest border-r border-slate-200 dark:border-slate-800 pr-4">
               <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              캠페인 동기화 활성
+              <span>필터 요약</span>
             </div>
-            <Suspense fallback={<div className="w-48 h-10 skeleton rounded-2xl" />}>
+            <Suspense fallback={<div className="w-48 h-10 rounded-2xl skeleton" />}>
               <SortBar currentSort={sp.sort || "latest_desc"} />
             </Suspense>
           </div>
@@ -121,10 +131,11 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
               <div className="inline-flex items-center justify-center w-20 h-20 rounded-[2rem] bg-white dark:bg-slate-900 mb-8 text-blue-500 dark:text-blue-400 shadow-2xl shadow-blue-900/10 transition-transform hover:scale-110 duration-500">
                 <MapIcon className="w-8 h-8" />
               </div>
-              <h3 className="text-2xl md:text-3xl font-black text-slate-900 dark:text-white mb-3 tracking-tight">당신의 다음 캠페인을 발굴하세요</h3>
+              <h3 className="text-2xl md:text-3xl font-black text-slate-900 dark:text-white mb-3 tracking-tight">
+                원하는 캠페인을 바로 찾아보세요
+              </h3>
               <p className="text-base text-slate-500 dark:text-slate-400 font-bold max-w-xl mx-auto leading-relaxed">
-                필터를 조합하거나 상단 검색창을 활용해 나에게 딱 맞는 캠페인을 순식간에 찾아낼 수 있습니다. <br className="hidden md:block" />
-                지도를 통해 주변 맛집부터 핫플까지 놓치지 마세요.
+                초기 화면에서는 상단 필터 또는 검색으로 조건을 설정해 빠르게 보세요. 지도 모드에서 지역 기반 캠페인을 이어서 한눈에 비교하고 검토할 수 있습니다.
               </p>
             </div>
           </div>

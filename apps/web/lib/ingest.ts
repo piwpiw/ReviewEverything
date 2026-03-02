@@ -2,7 +2,13 @@ import { db } from "./db";
 import { processAndDedupeCampaign } from "@/sources/normalize";
 import { IPlatformAdapter } from "@/sources/types";
 
-const MAX_PAGES_PER_RUN = 10;
+const parseEnvInt = (value: string | undefined, fallback: number) => {
+    const parsed = Number.parseInt(value ?? String(fallback), 10);
+    return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
+};
+
+const MAX_PAGES_PER_RUN = parseEnvInt(process.env.INGEST_MAX_PAGES_PER_RUN, 100);
+const CHUNK_SIZE = parseEnvInt(process.env.INGEST_CHUNK_SIZE, 16);
 const ACTIVE_RUN_STALE_MINUTES = 45;
 
 export async function isPlatformCurrentlyInProgress(platformId: number): Promise<boolean> {
@@ -65,22 +71,28 @@ export async function executeIngestionTask(adapter: IPlatformAdapter, platformId
     let addedCount = 0;
     let updatedCount = 0;
     let totalItems = 0;
+    let emptyRunCount = 0;
 
     try {
-        // Broaden range for full implementation (up to 10 pages)
+        // Broaden range for full implementation (up to configured pages)
         for (let page = 1; page <= MAX_PAGES_PER_RUN; page++) {
             console.log(`[Ingest] Processing platform ${platformId}, page ${page}...`);
             const results = await adapter.fetchList(page);
 
             if (!results || results.length === 0) {
-                console.log(`[Ingest] No more results for platform ${platformId} at page ${page}.`);
-                break;
+                emptyRunCount++;
+                console.log(`[Ingest] No results for platform ${platformId} at page ${page}. emptyCount=${emptyRunCount}`);
+                if (emptyRunCount >= 3) {
+                    console.log(`[Ingest] Stopping platform ${platformId} after ${emptyRunCount} consecutive empty pages.`);
+                    break;
+                }
+                continue;
             }
+            emptyRunCount = 0;
 
             totalItems += results.length;
 
             // Use chunked parallel processing to avoid DB connection exhaustion
-            const CHUNK_SIZE = 5;
             for (let i = 0; i < results.length; i += CHUNK_SIZE) {
                 const chunk = results.slice(i, i + CHUNK_SIZE);
                 const outcomes = await Promise.allSettled(

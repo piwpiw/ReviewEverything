@@ -75,6 +75,7 @@ export default function StatsBanner() {
 
   const vstCount = stats.typeBreakdown.find((t) => t.campaign_type === "VST")?.count ?? 0;
   const shpCount = stats.typeBreakdown.find((t) => t.campaign_type === "SHP")?.count ?? 0;
+  const platformCount = stats.platformBreakdown.length;
 
   const container: any = {
     hidden: { opacity: 0 },
@@ -93,11 +94,12 @@ export default function StatsBanner() {
 
   return (
     <motion.div variants={container} initial="hidden" animate="show" className="mt-10 flex flex-wrap gap-4 items-center justify-center">
-      <motion.div variants={item} className="flex flex-col bg-gradient-to-br from-blue-600 via-indigo-600 to-violet-700 text-white px-8 py-5 rounded-[2rem] shadow-xl shadow-blue-500/30 min-w-[160px] relative overflow-hidden group">
+      <motion.div variants={item} className="flex flex-col bg-gradient-to-br from-blue-600 via-indigo-600 to-violet-700 text-white px-8 py-5 rounded-[2rem] shadow-xl shadow-blue-500/30 min-w-[220px] relative overflow-hidden group">
         <div className="absolute inset-0 bg-[url('/noise.png')] opacity-10 mix-blend-overlay pointer-events-none" />
         <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700" />
-        <span className="text-[10px] font-black opacity-80 uppercase tracking-widest relative z-10 drop-shadow-sm">현재 활성 캠페인</span>
+        <span className="text-[10px] font-black opacity-80 uppercase tracking-widest relative z-10 drop-shadow-sm">현재 체험 수</span>
         <span className="text-4xl font-black relative z-10 drop-shadow-sm tracking-tighter mt-1">{stats.totalCampaigns.toLocaleString()}</span>
+        <span className="text-xs font-bold opacity-90 mt-1">현재 {stats.totalCampaigns.toLocaleString()}개의 체험이 있어요!</span>
       </motion.div>
 
       <motion.div variants={item} className="flex items-center gap-4 bg-white/60 dark:bg-slate-900/40 backdrop-blur-2xl px-6 py-5 rounded-[2rem] border border-white/50 dark:border-slate-800/50 shadow-lg shadow-slate-900/5 transition-colors">
@@ -125,6 +127,15 @@ export default function StatsBanner() {
           </motion.div>
         ))}
       </div>
+
+      <motion.div variants={item} className="w-full text-center">
+        <p className="text-sm font-black text-slate-700 dark:text-slate-200">
+          {platformCount}개 플랫폼을 한꺼번에 찾아 드릴게요.
+        </p>
+        <p className="text-xs font-bold text-slate-500 dark:text-slate-400 mt-1">
+          검색 가이드를 참고해서 지역과 키워드를 입력해 주세요.
+        </p>
+      </motion.div>
     </motion.div>
   );
 }

@@ -136,7 +136,7 @@ export default function ManagerDashboard({ userId }: { userId: number }) {
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-tight">실적 요약</h2>
             <div className="p-1 px-2 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 text-[10px] font-black rounded-lg">
-              LIVE
+              실시간
             </div>
           </div>
 
