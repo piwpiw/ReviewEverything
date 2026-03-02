@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 
 export function useFavorites() {
-    const [favorites, setFavorites] = useState<number[]>([]);
+    const [favorites, setFavorites] = useState<string[]>([]);
 
     useEffect(() => {
         // Load from localStorage on mount
@@ -18,11 +18,12 @@ export function useFavorites() {
         }
     }, []);
 
-    const toggleFavorite = useCallback((id: number) => {
+    const toggleFavorite = useCallback((id: string | number) => {
+        const favoriteId = String(id);
         setFavorites(prev => {
-            const next = prev.includes(id)
-                ? prev.filter(f => f !== id)
-                : [...prev, id];
+            const next = prev.includes(favoriteId)
+                ? prev.filter(f => f !== favoriteId)
+                : [...prev, favoriteId];
 
             // Save to localStorage
             localStorage.setItem("re_favorites", JSON.stringify(next));
@@ -30,8 +31,8 @@ export function useFavorites() {
         });
     }, []);
 
-    const isFavorite = useCallback((id: number) => {
-        return favorites.includes(id);
+    const isFavorite = useCallback((id: string | number) => {
+        return favorites.includes(String(id));
     }, [favorites]);
 
     return { favorites, toggleFavorite, isFavorite };

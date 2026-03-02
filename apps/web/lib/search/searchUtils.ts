@@ -1,28 +1,23 @@
-import { Prisma } from "@prisma/client";
-
-const KEYWORD_SYNONYMS: Record<string, string[]> = {
-  사진: ["포토", "촬영", "포토그래퍼", "셀프"],
-  체험: ["리뷰", "방문", "참여", "시승", "테스트"],
-  숙박: ["펜션", "호텔", "풀빌라", "모텔", "게스트하우스"],
-  여행: ["여행지", "여행형", "출장", "여행객", "숙소"],
-  뷰티: ["미용", "코스메틱", "화장품", "헤어", "네일", "피부"],
-  카페: ["커피숍", "디저트", "베이커리", "브런치", "카페형"],
-  캠핑: ["캠프", "카라반", "차박", "캠프장"],
-  포토: ["사진", "촬영", "사진촬영"],
-  펜션: ["숙박", "풀빌라", "휴양"],
-  부산: ["부산광역시", "해운대", "부산시"],
-};
-
-const TYPO_CORRECTIONS: Record<string, string> = {
-  "부싼": "부산",
-  "전주": "전주",
-  "ㄴ원": "원",
-  "헤어디": "헤어",
-};
+﻿import { Prisma } from "@prisma/client";
 
 function normalizeToken(token: string): string {
   return token.trim().toLowerCase().replace(/["'`]/g, "");
 }
+
+const KEYWORD_SYNONYMS: Record<string, string[]> = {
+  review: ["후기", "리뷰", "리뷰어"],
+  campaign: ["캠페인", "프로모션", "이벤트"],
+  brand: ["브랜드", "브랜딩"],
+  sns: ["소셜", "social", "인스타"],
+  event: ["행사", "이벤트", "오픈"],
+};
+
+const TYPO_CORRECTIONS: Record<string, string> = {
+  "리뷰어": "리뷰",
+  "캠페인": "캠페인",
+  "비슷함": "슷",
+  "오픈챌린지": "오픈 챌린지",
+};
 
 export function buildSearchTokens(raw: string): string[] {
   const normalized = normalizeToken(raw || "");
@@ -31,7 +26,7 @@ export function buildSearchTokens(raw: string): string[] {
   const words = normalized
     .split(/\s+/)
     .map((w) => TYPO_CORRECTIONS[w] || w)
-    .flatMap((w) => [w, ...((KEYWORD_SYNONYMS[w] || []).map((s) => s.toLowerCase())])
+    .flatMap((w) => [w, ...((KEYWORD_SYNONYMS[w] || []).map((s) => s.toLowerCase()))])
     .map((w) => w.trim())
     .filter((w) => w.length >= 2);
 
@@ -39,7 +34,7 @@ export function buildSearchTokens(raw: string): string[] {
 }
 
 export function expandSearchCondition(token: string): string[] {
-  return [token, ...((KEYWORD_SYNONYMS[token] || []).map((item) => item.toLowerCase())];
+  return [token, ...((KEYWORD_SYNONYMS[token] || []).map((item) => item.toLowerCase()))];
 }
 
 export function extractRegionsFromQuery(raw: string): string[] {
@@ -73,3 +68,4 @@ export function bestCorrection(raw: string): string | null {
   if (corrected && corrected !== normalizeToken(raw)) return corrected;
   return null;
 }
+

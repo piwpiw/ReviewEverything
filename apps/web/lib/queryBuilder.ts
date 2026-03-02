@@ -22,6 +22,7 @@ export function buildCampaignsQuery(searchParams: URLSearchParams) {
   const limit = parseInt(searchParams.get("limit") || "24", 10);
 
   const where: Prisma.CampaignWhereInput = {};
+  const andClauses: Prisma.CampaignWhereInput[] = [];
 
   if (q) {
     const parsed = parseSearchQuery(q);
@@ -30,10 +31,10 @@ export function buildCampaignsQuery(searchParams: URLSearchParams) {
     const categoryClauses = getCategoryQueryClauses(parsed.categoryHints);
 
     if (keywordClauses.length > 0) {
-      where.AND = where.AND ? [...where.AND, ...keywordClauses] : keywordClauses;
+      andClauses.push(...keywordClauses);
     }
     if (categoryClauses.length > 0) {
-      where.AND = where.AND ? [...where.AND, { OR: categoryClauses }] : [{ OR: categoryClauses }];
+      andClauses.push({ OR: categoryClauses });
     }
     if (!parsed.hasOnlyRegion && queryTerms) {
       where.OR = [
@@ -72,6 +73,10 @@ export function buildCampaignsQuery(searchParams: URLSearchParams) {
       cutoff.setDate(cutoff.getDate() + days);
       where.apply_end_date = { gte: new Date(), lte: cutoff };
     }
+  }
+
+  if (andClauses.length > 0) {
+    where.AND = andClauses;
   }
 
   let orderBy: Prisma.CampaignOrderByWithRelationInput | Prisma.CampaignOrderByWithRelationInput[] = {

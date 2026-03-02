@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import CampaignCard from "./CampaignCard";
-import MapView from "./MapView";
+import MapView from "./MapViewCompat";
 import ListSkeleton from "./ListSkeleton";
 import { X, ChevronLeft, ChevronRight, FilterX } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
@@ -59,12 +59,12 @@ export default function CampaignList({
       setError(null);
       try {
         const res = await fetch(`/api/campaigns?${query}`);
-        if (!res.ok) throw new Error(`목록 조회 실패 (${res.status})`);
+        if (!res.ok) throw new Error(`??? ??ȸ ???? (${res.status})`);
         const json = (await res.json()) as CampaignsResponse;
         if (!canceled) setData(json);
       } catch (err: unknown) {
         if (canceled) return;
-        setError(err instanceof Error ? err.message : "목록 조회 중 오류가 발생했습니다.");
+        setError(err instanceof Error ? err.message : "??? ??ȸ ?? ?????? ?߻??߽??ϴ?.");
         setData(null);
       } finally {
         if (!canceled) setLoading(false);
@@ -81,7 +81,7 @@ export default function CampaignList({
   if (error) {
     return (
       <div className="rounded-[2rem] border border-rose-200 bg-rose-50 p-8 text-rose-700">
-        <p className="text-sm font-black">목록 조회 실패</p>
+        <p className="text-sm font-black">??? ??ȸ ????</p>
         <p className="text-sm font-bold opacity-80 mt-2">{error}</p>
       </div>
     );
@@ -117,16 +117,16 @@ export default function CampaignList({
             <span className="text-xs font-black">0</span>
           </div>
         </div>
-        <h3 className="text-2xl font-black text-slate-900 mb-3 tracking-tighter">결과가 없습니다</h3>
+        <h3 className="text-2xl font-black text-slate-900 mb-3 tracking-tighter">????? ?????ϴ?</h3>
         <p className="text-lg text-slate-400 font-bold mb-10 max-w-md text-center leading-relaxed">
-          필터를 바꿔서 다시 검색해보세요.
+          ???͸? ?ٲ㼭 ?ٽ? ?˻??غ?????.
         </p>
         <button
           onClick={() => router.push("/")}
           className="px-8 py-4 bg-slate-900 text-white rounded-[1.5rem] text-[13px] font-black hover:bg-blue-600 transition-all shadow-2xl active:scale-95 flex items-center gap-3"
         >
           <FilterX className="w-5 h-5" />
-          조건 초기화
+          ???? ?ʱ?ȭ
         </button>
       </motion.div>
     );
@@ -138,14 +138,14 @@ export default function CampaignList({
         <div className="flex flex-wrap items-center gap-2">
           <div className="flex items-center gap-2 pr-4 border-r border-slate-100 dark:border-slate-800 mr-2">
             <p className="text-base font-black text-slate-900 dark:text-white uppercase tracking-widest whitespace-nowrap">
-              총 <span className="text-blue-600 dark:text-blue-400 font-black px-1.5 py-0.5 bg-blue-50 dark:bg-blue-900/30 rounded-lg ml-1">{total.toLocaleString()}</span>건
+              ?? <span className="text-blue-600 dark:text-blue-400 font-black px-1.5 py-0.5 bg-blue-50 dark:bg-blue-900/30 rounded-lg ml-1">{total.toLocaleString()}</span>??
             </p>
           </div>
 
           <AnimatePresence>
             {Object.entries(searchParams).map(([key, value]) => {
               if (!value || ["view", "sort", "page"].includes(key)) return null;
-              const label = key === "q" ? `키워드: ${String(value)}` : `${key}: ${String(value)}`;
+              const label = key === "q" ? `Ű????: ${String(value)}` : `${key}: ${String(value)}`;
               return (
                 <motion.button
                   key={key}
@@ -205,7 +205,7 @@ export default function CampaignList({
             </button>
             <div className="flex items-center px-4">
               <span className="text-[13px] font-black tracking-widest text-slate-900 dark:text-white uppercase flex items-center gap-3">
-                <span className="opacity-40">현재</span>
+                <span className="opacity-40">????</span>
                 <span className="bg-slate-900 dark:bg-blue-600 text-white px-2.5 py-1 rounded-lg shadow-lg shadow-blue-500/20">{meta.page}</span>
                 <span className="opacity-40">/ {meta.totalPages}</span>
               </span>
@@ -223,3 +223,6 @@ export default function CampaignList({
     </div>
   );
 }
+
+
+

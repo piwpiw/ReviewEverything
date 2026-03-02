@@ -93,8 +93,8 @@ const toDisplayLocation = (group: CampaignGroup) => {
   return `${first.region_depth1 || ""}${first.region_depth2 ? ` ${first.region_depth2}` : ""}`.trim() || "위치 없음";
 };
 
-const waitFor = <T>(predicate: () => T | undefined, retries = 25, interval = 120): Promise<T> =>
-  new Promise((resolve, reject) => {
+function waitFor<T>(predicate: () => T | undefined, retries = 25, interval = 120): Promise<T> {
+  return new Promise((resolve, reject) => {
     let attempt = 0;
     const loop = () => {
       const value = predicate();
@@ -110,6 +110,7 @@ const waitFor = <T>(predicate: () => T | undefined, retries = 25, interval = 120
     };
     loop();
   });
+}
 
 const normalizeStoreToken = (value: string) => {
   const asciiToken = value
@@ -219,7 +220,7 @@ const createMapLabel = (group: CampaignGroup) => {
   `;
 };
 
-export default function MapView({ campaigns }: { campaigns: Campaign[] }) {
+export function MapView({ campaigns }: { campaigns: Campaign[] }) {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapRefObj = useRef<any>(null);
   const markersRef = useRef<any[]>([]);
@@ -240,14 +241,14 @@ export default function MapView({ campaigns }: { campaigns: Campaign[] }) {
       const storeKey = normalizeStoreKey(campaign);
       const score = Number(campaign.geo_match_score ?? 0.2);
       const source = campaign.geo_match_source || "heuristic";
-      const bucket = coordBucket(lat, lng);
+      const bucket = coordBucket(lat ?? 0, lng ?? 0);
 
       const bucketed = (grouped.get(storeKey) || []).slice();
       let targetGroup: CampaignGroup | null = null;
 
       for (const group of bucketed) {
         const radius = mergeRadiusMeters(group, score);
-        if (group.key.startsWith(`${storeKey}-`) && distanceMeters(lat, lng, group.lat, group.lng) <= radius) {
+        if (group.key.startsWith(`${storeKey}-`) && distanceMeters(lat ?? 0, lng ?? 0, group.lat, group.lng) <= radius) {
           targetGroup = group;
           break;
         }
@@ -260,8 +261,8 @@ export default function MapView({ campaigns }: { campaigns: Campaign[] }) {
       if (!targetGroup) {
         const created: CampaignGroup = {
           key: `${storeKey}-${bucket}`,
-          lat,
-          lng,
+          lat: lat ?? 0,
+          lng: lng ?? 0,
           storeKey,
           source,
           score,
@@ -273,7 +274,7 @@ export default function MapView({ campaigns }: { campaigns: Campaign[] }) {
         continue;
       }
 
-      const blended = blendCoordinate(targetGroup, lat, lng, score);
+      const blended = blendCoordinate(targetGroup, lat ?? 0, lng ?? 0, score);
       targetGroup.lat = blended.lat;
       targetGroup.lng = blended.lng;
       targetGroup.campaigns.push(campaign);
@@ -562,3 +563,5 @@ export default function MapView({ campaigns }: { campaigns: Campaign[] }) {
     </section>
   );
 }
+
+export default MapView;

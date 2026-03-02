@@ -1,0 +1,29 @@
+services:
+  - type: web
+    name: revieweverything
+    runtime: node
+    plan: free
+    region: singapore
+    branch: main
+    rootDir: apps/web
+    buildCommand: npm ci && npm run build
+    startCommand: npm run start
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: DIRECT_URL
+        sync: false
+      - key: CRON_SECRET
+        sync: false
+      - key: PUSH_ENDPOINT
+        sync: false
+      - key: KAKAO_CHANNEL_KEY
+        sync: false
+      - key: KAKAO_ENDPOINT
+        sync: false
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false
+      - key: TELEGRAM_CHAT_ID
+        sync: false
+      - key: TELEGRAM_API_BASE
+        value: https://api.telegram.org

@@ -242,7 +242,7 @@ export function resolveCampaignCoordinates(input: CampaignGeoInput): CampaignGeo
 
   for (const url of candidateList) {
     const byParams = extractCoordsFromSearchParams(url);
-    if (byParams && isValidCoord(byParams[0], byParams[1])) {
+    if (byParams && byParams[0] !== null && byParams[1] !== null && isValidCoord(byParams[0], byParams[1])) {
       return {
         lat: byParams[0],
         lng: byParams[1],
@@ -253,7 +253,7 @@ export function resolveCampaignCoordinates(input: CampaignGeoInput): CampaignGeo
     }
 
     const byText = extractCoordsFromText(url);
-    if (byText && isValidCoord(byText[0], byText[1])) {
+    if (byText && byText[0] !== null && byText[1] !== null && isValidCoord(byText[0], byText[1])) {
       return {
         lat: byText[0],
         lng: byText[1],
@@ -265,7 +265,7 @@ export function resolveCampaignCoordinates(input: CampaignGeoInput): CampaignGeo
   }
 
   const byLocation = extractCoordsFromLocationText(input.location);
-  if (byLocation && isValidCoord(byLocation[0], byLocation[1])) {
+  if (byLocation && byLocation[0] !== null && byLocation[1] !== null && isValidCoord(byLocation[0], byLocation[1])) {
     return {
       lat: byLocation[0],
       lng: byLocation[1],
