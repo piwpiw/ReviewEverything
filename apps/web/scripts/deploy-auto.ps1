@@ -16,7 +16,8 @@ for ($i = 1; $i -le $MaxAttempts; $i++) {
     $outPath = Join-Path $env:TEMP "vercel_out_$i.txt"
     $errPath = Join-Path $env:TEMP "vercel_err_$i.txt"
 
-    $process = Start-Process -FilePath 'cmd.exe' -ArgumentList @('/c', 'vercel --prod --yes') -WorkingDirectory $PSScriptRoot -NoNewWindow -PassThru -RedirectStandardOutput $outPath -RedirectStandardError $errPath
+    $appRoot = Split-Path $PSScriptRoot -Parent
+    $process = Start-Process -FilePath 'cmd.exe' -ArgumentList @('/c', 'vercel --prod --yes') -WorkingDirectory $appRoot -NoNewWindow -PassThru -RedirectStandardOutput $outPath -RedirectStandardError $errPath
     if (-not $process) {
         Write-Host "Unable to start vercel process." -ForegroundColor Red
         Add-Content -Path $logFile -Value "Unable to start vercel process."

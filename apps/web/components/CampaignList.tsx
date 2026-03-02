@@ -189,22 +189,26 @@ export default function CampaignList({
       </AnimatePresence>
 
       {meta && meta.totalPages > 1 ? (
-        <div className="mt-14 flex justify-center pb-10">
-          <div className="flex items-center gap-2 p-1.5 bg-white border border-slate-100 rounded-2xl shadow-xl">
+        <div className="mt-20 flex justify-center pb-12">
+          <div className="flex items-center gap-1.5 p-1.5 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-white/60 dark:border-slate-800/80 rounded-[1.25rem] shadow-[0_12px_32px_-8px_rgba(0,0,0,0.1)] dark:shadow-[0_12px_32px_-8px_rgba(0,0,0,0.4)]">
             <button
               onClick={() => setPage(Math.max(1, meta.page - 1))}
               disabled={meta.page <= 1}
-              className="w-10 h-10 rounded-xl text-xs font-black transition-all disabled:opacity-40 text-slate-400 hover:bg-slate-50 flex items-center justify-center"
+              className="w-10 h-10 rounded-xl text-xs font-black transition-all disabled:opacity-20 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center active:scale-90"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
-            <span className="px-3 text-xs font-black text-slate-600">
-              {meta.page} / {meta.totalPages}
-            </span>
+            <div className="flex items-center px-4">
+              <span className="text-[11px] font-black tracking-widest text-slate-900 dark:text-white uppercase flex items-center gap-3">
+                <span className="opacity-40">Page</span>
+                <span className="bg-slate-900 dark:bg-blue-600 text-white px-2.5 py-1 rounded-lg shadow-lg shadow-blue-500/20">{meta.page}</span>
+                <span className="opacity-40">of {meta.totalPages}</span>
+              </span>
+            </div>
             <button
               onClick={() => setPage(Math.min(meta.totalPages, meta.page + 1))}
               disabled={meta.page >= meta.totalPages}
-              className="w-10 h-10 rounded-xl text-xs font-black transition-all disabled:opacity-40 text-slate-400 hover:bg-slate-50 flex items-center justify-center"
+              className="w-10 h-10 rounded-xl text-xs font-black transition-all disabled:opacity-20 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center active:scale-90"
             >
               <ChevronRight className="w-4 h-4" />
             </button>
