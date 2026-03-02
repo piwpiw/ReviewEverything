@@ -20,6 +20,7 @@
     "release:dry-run": "node scripts/release.js --auto-commit --no-push",
     "release:fast": "node scripts/release.js --auto-commit --fast",
     "deploy:prod:auto": "powershell -ExecutionPolicy Bypass -File ./scripts/deploy-auto.ps1",
+    "tmp:clean": "node scripts/clean-tmp-artifacts.js",
     "test": "vitest run",
     "test:ci": "vitest run",
     "test:watch": "vitest",

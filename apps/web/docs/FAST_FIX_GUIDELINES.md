@@ -21,6 +21,10 @@
 - Local flow:
   - `npm run check`
   - `npm run build`
+- Deployment command:
+- `npm run deploy:prod:auto` must run from `apps/web` package and is hard-locked by `scripts/deploy-auto.ps1` to project name from `apps/web/.vercel/project.json` (`web-gpxvjl5mg-piwpiw99-5213s-projects`).
+  - Script uses `vercel deploy --prebuilt --prod --yes` when `.next` exists to skip remote build; if no prebuilt artifacts, it safely falls back to remote build.
+  - Any project mismatch is treated as deployment failure (no fallback/override).
 - CI flow:
   - standard install flags: `npm ci --no-audit --no-fund --prefer-offline`
   - keep artifact names stable (`ci-reports-*`) for issue automation
@@ -74,7 +78,7 @@
 - [ ] Lint warning hotspots to handle by priority (post-stability):
   - app/trending/page.tsx (previously handled <img> and runtime fallback warning).
   - apps/web/app/me/notifications/page.tsx (single eslint-disable-next-line waiver).
-- [ ] Clean temporary script artifacts in apps/web/tmp at deployment checkpoints (historical debug scripts and large HTML dumps).
+- [x] Clean temporary script artifacts in apps/web/tmp at deployment checkpoints (historical debug scripts and large HTML dumps).
 - [ ] CI artifact hygiene:
   - Keep apps/web/reports bounded by overwriting fixed filenames (agent-review-summary.md, smoke.json, ci-summary.md) to avoid stale cross-run confusion.
   - Add a periodic cleanup rule when running local smoke/build loops.
