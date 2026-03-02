@@ -4,7 +4,6 @@ import { Bell, BarChart3, CalendarDays, Clock3, MapPin } from "lucide-react";
 import AICuration from "@/components/AICuration";
 import ManagerDashboard from "@/components/ManagerDashboard";
 
-type TabKey = "dashboard" | "stats";
 type MeSearchParams = {
   userId?: string;
   tab?: string;

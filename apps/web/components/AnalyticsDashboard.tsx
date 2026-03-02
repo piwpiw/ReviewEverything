@@ -1,14 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import {
   TrendingUp,
   Users,
   Layers,
   BarChart2,
   ArrowUpRight,
-  ArrowDownRight,
   Target
 } from "lucide-react";
 

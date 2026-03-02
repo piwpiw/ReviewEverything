@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { Clock, Filter, Sparkles, X } from "lucide-react";
-import { useCallback, useEffect, useMemo, useState, useTransition } from "react";
+import { useCallback, useMemo, useState, useTransition } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 type RecentFilter = { key: string; label: string; savedAt: string };
@@ -231,13 +231,7 @@ export default function FilterBar() {
     });
   }, []);
 
-  useEffect(() => {
-    if (isMapMode) {
-      setFiltersVisible(false);
-    }
-  }, [isMapMode]);
-
-  const isPanelVisible = filtersVisible;
+  const isPanelVisible = isMapMode ? false : filtersVisible;
   const activeCount = Array.from(searchParams.keys()).filter((k) => k !== "view").length;
   const categories = CATEGORIES[current.type] || CATEGORIES[""];
   const regionAreas = REGIONS[current.region1] || ["전체"];

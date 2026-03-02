@@ -7,8 +7,7 @@ import {
     Zap,
     ArrowRight,
     Star,
-    Search,
-    MessageSquare
+    Search
 } from 'lucide-react';
 
 export default function BusinessPage() {

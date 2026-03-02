@@ -5,7 +5,6 @@ import {
   Activity,
   ArrowUpRight,
   BarChart3,
-  CheckCircle2,
   Database,
   HeartPulse,
   Play,

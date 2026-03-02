@@ -44,15 +44,16 @@ export default function CampaignList({
   const [data, setData] = useState<CampaignsResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const searchParamsEntries = useMemo(() => Object.entries(searchParams), [searchParams]);
 
   const query = useMemo(() => {
-    const next: SearchParamsInput = { ...searchParams };
+    const next = Object.fromEntries(searchParamsEntries) as SearchParamsInput;
     if (viewMode === "map") {
       next.page = "1";
       next.limit = String(MAP_VIEW_LIMIT);
     }
     return buildQueryString(next);
-  }, [JSON.stringify(searchParams), viewMode]);
+  }, [searchParamsEntries, viewMode]);
 
   useEffect(() => {
     let canceled = false;

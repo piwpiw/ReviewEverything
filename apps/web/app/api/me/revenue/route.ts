@@ -105,7 +105,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
         };
 
         return NextResponse.json(response);
-    } catch (error: unknown) {
+    } catch {
         // Mock fallback for local UI testing when DB is unavailable
         const mockMonthly = Array.from({ length: 12 }, (_, i) => ({
             month: i + 1,

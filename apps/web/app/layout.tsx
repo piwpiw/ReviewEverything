@@ -1,10 +1,8 @@
 ﻿import type { Metadata, Viewport } from "next";
 import "./globals.css";
-import Link from "next/link";
 import { Suspense } from "react";
 import Header from "@/components/Header";
 import PWAPrompt from "@/components/PWAPrompt";
-import ThemeToggle from "@/components/ThemeToggle";
 import MobileNav from "@/components/MobileNav";
 import { ThemeProvider } from "@/components/ThemeProvider";
 
