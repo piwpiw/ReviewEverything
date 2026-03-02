@@ -200,9 +200,9 @@ export default function CampaignList({
             </button>
             <div className="flex items-center px-4">
               <span className="text-[11px] font-black tracking-widest text-slate-900 dark:text-white uppercase flex items-center gap-3">
-                <span className="opacity-40">Page</span>
+                <span className="opacity-40">페이지</span>
                 <span className="bg-slate-900 dark:bg-blue-600 text-white px-2.5 py-1 rounded-lg shadow-lg shadow-blue-500/20">{meta.page}</span>
-                <span className="opacity-40">of {meta.totalPages}</span>
+                <span className="opacity-40">/ {meta.totalPages}</span>
               </span>
             </div>
             <button

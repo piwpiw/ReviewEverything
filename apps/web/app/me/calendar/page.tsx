@@ -686,7 +686,7 @@ export default function CalendarPage({ searchParams }: { searchParams?: SearchPa
                       <Sparkles className="w-6 h-6 text-white" />
                     </div>
                     <div>
-                      <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">New Schedule</h3>
+                      <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">새 일정 등록</h3>
                       <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">{month + 1}월 {selectedDay}일 일정 등록</p>
                     </div>
                   </div>
@@ -697,7 +697,7 @@ export default function CalendarPage({ searchParams }: { searchParams?: SearchPa
 
                 <div className="space-y-8">
                   <div>
-                    <label className="text-[10px] font-black text-slate-400 mb-3 block uppercase tracking-widest pl-1">Status Type</label>
+                    <label className="text-[10px] font-black text-slate-400 mb-3 block uppercase tracking-widest pl-1">상태 선택</label>
                     <div className="flex flex-wrap gap-2">
                       {statusKeys.map((key) => {
                         const cfg = STATUS_CONFIG[key];
@@ -716,7 +716,7 @@ export default function CalendarPage({ searchParams }: { searchParams?: SearchPa
                   </div>
 
                   <div>
-                    <label className="text-[10px] font-black text-slate-400 mb-3 block uppercase tracking-widest pl-1">Campaign Title / Memo</label>
+                    <label className="text-[10px] font-black text-slate-400 mb-3 block uppercase tracking-widest pl-1">캠페인 제목 / 메모</label>
                     <div className="relative group">
                       <input
                         type="text"
@@ -735,14 +735,14 @@ export default function CalendarPage({ searchParams }: { searchParams?: SearchPa
                       onClick={() => setShowAddModal(false)}
                       className="flex-1 py-4 bg-slate-100 dark:bg-slate-800 rounded-2xl text-[13px] font-black text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all active:scale-95"
                     >
-                      Cancel
+                      취소
                     </button>
                     <button
                       onClick={addSchedule}
                       disabled={!newTitle.trim() || !selectedDay}
                       className="flex-1 py-4 bg-slate-900 dark:bg-blue-600 text-white rounded-2xl text-[13px] font-black hover:bg-blue-600 dark:hover:bg-blue-500 transition-all shadow-xl shadow-slate-900/10 dark:shadow-blue-900/20 active:scale-95 disabled:opacity-30 disabled:pointer-events-none"
                     >
-                      Save Schedule
+                      일정 저장
                     </button>
                   </div>
                 </div>

@@ -247,19 +247,19 @@ export default function FilterBar() {
                 .map((region) => (
                   <Pill key={region} groupId="region1" active={current.region1 === region} label={region} onClick={() => setParam("region_depth1", region)} />
                 ))}
-              <Pill groupId="region1" active={!current.region1} label="All" onClick={() => setParam("region_depth1", "")} />
+              <Pill groupId="region1" active={!current.region1} label="전체" onClick={() => setParam("region_depth1", "")} />
             </div>
 
             {current.region1 ? (
               <div className="flex flex-wrap items-center gap-2">
                 <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest w-20">구/군</span>
-                {(REGIONS[current.region1] || ["All"]).map((area) => (
+                {(REGIONS[current.region1] || ["전체"]).map((area) => (
                   <Pill
                     key={area}
                     groupId="region2"
-                    active={current.region2 === (area === "All" ? "" : area)}
+                    active={current.region2 === (area === "전체" ? "" : area)}
                     label={area}
-                    onClick={() => setParam("region_depth2", area === "All" ? "" : area)}
+                    onClick={() => setParam("region_depth2", area === "전체" ? "" : area)}
                   />
                 ))}
               </div>
@@ -273,9 +273,9 @@ export default function FilterBar() {
             <Pill
               key={cat}
               groupId="category"
-              active={current.category === (cat === "All" ? "" : cat)}
+              active={current.category === (cat === "전체" ? "" : cat)}
               label={cat}
-              onClick={() => setParam("category", cat === "All" ? "" : cat)}
+              onClick={() => setParam("category", cat === "전체" ? "" : cat)}
             />
           ))}
         </div>
