@@ -43,7 +43,7 @@
 - `baseUrl: string`
 - `fetchList(page: number): Promise<ScrapedCampaign[]>`
 
-정규화 필수 값
+정규화 필수 값 (Rich Data 확장)
 - `original_id`
 - `title`
 - `campaign_type`
@@ -51,6 +51,9 @@
 - `url`
 - `apply_end_date`
 - `recruit_count`, `applicant_count`
+- `main_image` (캠페인 대표 이미지 URL)
+- `brief_desc` (캠페인 핵심 문구/요약)
+- `tags` (카테고리 및 특징 태그)
 
 - `campaign_type`/`media_type`은 공통 타입으로 매핑 (VST/SHP/PRS, BP/IP/YP 등)
 

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { getMissingEnvVars, REQUIRED_DB_ENV } from "@/lib/runtimeEnv";
 
 /**
  * GET /api/me/schedules
@@ -14,6 +15,9 @@ export async function GET(req: NextRequest) {
     }
 
     try {
+        if (getMissingEnvVars(REQUIRED_DB_ENV).length > 0) {
+            return NextResponse.json([]);
+        }
         const schedules = await db.userSchedule.findMany({
             where: { user_id: parseInt(userId, 10) },
             include: { campaign: { include: { platform: true } } },
@@ -38,6 +42,12 @@ export async function POST(req: NextRequest) {
 
         if (!user_id) {
             return NextResponse.json({ error: "user_id is required" }, { status: 400 });
+        }
+        if (getMissingEnvVars(REQUIRED_DB_ENV).length > 0) {
+            return NextResponse.json(
+                { error: "Database is unavailable. Retry when DB is available.", code: "DB_UNAVAILABLE" },
+                { status: 503 },
+            );
         }
 
         const schedule = await db.userSchedule.create({

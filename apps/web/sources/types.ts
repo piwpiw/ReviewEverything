@@ -13,10 +13,16 @@ export interface ScrapedCampaign {
     apply_end_date: Date;
     recruit_count: number;
     applicant_count: number;
+    brief_desc?: string;
+    tags?: string;
 }
 
 export interface IPlatformAdapter {
     platformId: number;
     baseUrl: string;
+    sourceKey?: string;
+    supportsPagination?: boolean;
+    maxPagesPerRun?: number;
+    canRunInParallel?: boolean;
     fetchList(page: number): Promise<ScrapedCampaign[]>;
 }

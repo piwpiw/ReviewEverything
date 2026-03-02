@@ -1,24 +1,25 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { 
-  Globe, 
-  Plus, 
-  Trash2, 
-  Power, 
-  PowerOff, 
-  Check, 
+import { useEffect, useState } from "react";
+import {
   AlertCircle,
+  Check,
+  CheckCircle2,
+  Globe,
+  Power,
+  PowerOff,
+  Plus,
   Search,
-  CheckCircle2
+  Trash2,
 } from "lucide-react";
 
-interface Platform {
+type Platform = {
   id: number;
   name: string;
   base_url: string;
   is_active: boolean;
-}
+  adapter_ready?: boolean;
+};
 
 export default function PlatformManager() {
   const [platforms, setPlatforms] = useState<Platform[]>([]);
@@ -30,10 +31,14 @@ export default function PlatformManager() {
   const fetchPlatforms = async () => {
     try {
       const res = await fetch("/api/admin/platforms");
-      const data = await res.json();
-      setPlatforms(data);
+      if (!res.ok) throw new Error(`플랫폼 조회 실패 (${res.status})`);
+      const data = (await res.json()) as Platform[];
+      setPlatforms(Array.isArray(data) ? data : []);
     } catch (e) {
-      console.error("플랫폼 목록을 불러오지 못했습니다.", e);
+      const message = e instanceof Error ? e.message : "플랫폼 목록을 불러올 수 없습니다.";
+      setMessage({ type: "error", text: message });
+      console.error("플랫폼 조회 실패", e);
+      setPlatforms([]);
     } finally {
       setIsLoading(false);
     }
@@ -59,16 +64,17 @@ export default function PlatformManager() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ urlList: urls }),
       });
-      const data = await res.json();
+      const data = (await res.json()) as { added?: number; error?: string };
       if (res.ok) {
-        setMessage({ type: "success", text: `${data.added}개 플랫폼이 동기화되었습니다.` });
+        setMessage({ type: "success", text: `${data.added ?? 0}개 플랫폼이 동기화되었습니다.` });
         setUrlList("");
-        fetchPlatforms();
+        await fetchPlatforms();
       } else {
-        setMessage({ type: "error", text: data.error });
+        setMessage({ type: "error", text: data.error || "일괄 등록에 실패했습니다." });
       }
-    } catch (e: any) {
-      setMessage({ type: "error", text: e.message });
+    } catch (e) {
+      setMessage({ type: "error", text: e instanceof Error ? e.message : "일괄 등록 처리 중 오류가 발생했습니다." });
+      console.error("일괄 등록 중 에러", e);
     } finally {
       setIsSubmitting(false);
     }
@@ -81,23 +87,24 @@ export default function PlatformManager() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ is_active: !currentStatus }),
       });
-      if (res.ok) {
-        setPlatforms(platforms.map((p) => (p.id === id ? { ...p, is_active: !currentStatus } : p)));
-      }
+      if (!res.ok) throw new Error(`상태 변경 실패 (${res.status})`);
+      setPlatforms((prev) => prev.map((platform) => (platform.id === id ? { ...platform, is_active: !currentStatus } : platform)));
     } catch (e) {
-      console.error("플랫폼 상태 변경에 실패했습니다.", e);
+      setMessage({ type: "error", text: e instanceof Error ? e.message : "상태 변경에 실패했습니다." });
+      console.error("상태 변경 실패", e);
     }
   };
 
   const deletePlatform = async (id: number) => {
-    if (!confirm("정말 삭제하시겠습니까? 플랫폼과 연결된 캠페인도 함께 삭제됩니다.")) return;
+    if (!confirm("정말로 이 플랫폼을 삭제하시겠습니까?")) return;
     try {
       const res = await fetch(`/api/admin/platforms/${id}`, { method: "DELETE" });
-      if (res.ok) {
-        setPlatforms(platforms.filter((p) => p.id !== id));
-      }
+      if (!res.ok) throw new Error(`삭제 실패 (${res.status})`);
+      setPlatforms((prev) => prev.filter((platform) => platform.id !== id));
+      setMessage({ type: "success", text: "플랫폼이 삭제되었습니다." });
     } catch (e) {
-      console.error("플랫폼 삭제에 실패했습니다.", e);
+      setMessage({ type: "error", text: e instanceof Error ? e.message : "플랫폼 삭제에 실패했습니다." });
+      console.error("플랫폼 삭제 실패", e);
     }
   };
 
@@ -109,12 +116,12 @@ export default function PlatformManager() {
           <div className="text-2xl font-black text-white">{platforms.length}</div>
         </div>
         <div className="bg-slate-800/30 p-4 rounded-2xl border border-slate-700/50">
-          <div className="text-[10px] font-black uppercase text-emerald-500 mb-1">활성 스크래퍼</div>
-          <div className="text-2xl font-black text-white">{platforms.filter((p) => p.is_active).length}</div>
+          <div className="text-[10px] font-black uppercase text-emerald-500 mb-1">운영 중</div>
+          <div className="text-2xl font-black text-white">{platforms.filter((platform) => platform.is_active).length}</div>
         </div>
         <div className="bg-slate-800/30 p-4 rounded-2xl border border-slate-700/50">
-          <div className="text-[10px] font-black uppercase text-rose-500 mb-1">비활성 / 대기</div>
-          <div className="text-2xl font-black text-white">{platforms.filter((p) => !p.is_active).length}</div>
+          <div className="text-[10px] font-black uppercase text-rose-500 mb-1">비활성</div>
+          <div className="text-2xl font-black text-white">{platforms.filter((platform) => !platform.is_active).length}</div>
         </div>
       </div>
 
@@ -127,29 +134,28 @@ export default function PlatformManager() {
             </h3>
             <Search className="w-4 h-4 text-slate-500" />
           </div>
+
           <div className="overflow-x-auto">
             <table className="w-full text-left text-[11px]">
               <thead className="bg-slate-800/30 text-slate-500 uppercase font-black tracking-widest">
                 <tr>
                   <th className="px-6 py-4">이름</th>
-                  <th className="px-6 py-4">기본 주소</th>
+                  <th className="px-6 py-4">기본 URL</th>
                   <th className="px-6 py-4">상태</th>
-                  <th className="px-6 py-4 text-right">작업</th>
+                  <th className="px-6 py-4 text-right">동작</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800/50">
                 {isLoading ? (
-                  Array(5)
-                    .fill(0)
-                    .map((_, i) => (
-                      <tr key={i} className="animate-pulse">
-                        <td colSpan={4} className="px-6 py-4 bg-slate-800/10" />
-                      </tr>
-                    ))
+                  Array.from({ length: 5 }).map((_, index) => (
+                    <tr key={index} className="animate-pulse">
+                      <td colSpan={4} className="px-6 py-4 bg-slate-800/10" />
+                    </tr>
+                  ))
                 ) : platforms.length === 0 ? (
                   <tr>
                     <td colSpan={4} className="px-6 py-8 text-center text-slate-600 font-bold uppercase italic">
-                      등록된 플랫폼이 없습니다. URL을 입력해 추가해 주세요.
+                      등록된 플랫폼이 없습니다. URL을 입력해 동기화해 보세요.
                     </td>
                   </tr>
                 ) : (
@@ -159,7 +165,7 @@ export default function PlatformManager() {
                         <span className="font-black text-white">{platform.name}</span>
                       </td>
                       <td className="px-6 py-4">
-                        <span className="text-slate-500 truncate block max-w-[150px]">{platform.base_url}</span>
+                        <span className="text-slate-500 truncate block max-w-[180px]">{platform.base_url}</span>
                       </td>
                       <td className="px-6 py-4">
                         <div
@@ -169,12 +175,8 @@ export default function PlatformManager() {
                               : "bg-slate-500/10 text-slate-500 border-slate-500/20"
                           }`}
                         >
-                          <div
-                            className={`w-1.5 h-1.5 rounded-full ${
-                              platform.is_active ? "bg-emerald-500 shadow-lg shadow-emerald-500/50" : "bg-slate-500"
-                            }`}
-                          />
-                          {platform.is_active ? "운영 중" : "중단"}
+                          <div className={`w-1.5 h-1.5 rounded-full ${platform.adapter_ready ? "bg-emerald-500" : "bg-slate-500"}`} />
+                          {platform.adapter_ready ? "IMPLEMENTED" : "NOT READY"}
                         </div>
                       </td>
                       <td className="px-6 py-4 text-right whitespace-nowrap">
@@ -214,7 +216,7 @@ export default function PlatformManager() {
               일괄 등록
             </h4>
             <p className="text-[10px] text-slate-500 uppercase font-bold tracking-widest">
-              URL 목록을 붙여넣으면 지원 플랫폼을 자동으로 등록합니다.
+              URL 목록을 붙여넣으면 저장된 플랫폼을 자동으로 등록합니다.
             </p>
           </div>
 
@@ -251,9 +253,9 @@ export default function PlatformManager() {
           </button>
 
           <div className="p-4 bg-blue-500/5 rounded-2xl border border-blue-500/10 flex items-start gap-3">
-            <AlertCircle className="w-4 h-4 text-blue-500 shrink-0 mt-0.5" />
+            <Check className="w-4 h-4 text-blue-500 shrink-0 mt-0.5" />
             <div className="text-[10px] text-blue-200/60 leading-relaxed font-bold">
-              시스템이 호스트명으로 플랫폼명을 자동 추출합니다. 중복된 데이터는 UPSERT로 처리됩니다.
+              시스템이 호스트명으로 플랫폼명을 자동 추출합니다. 중복 데이터는 UPSERT로 처리됩니다.
             </div>
           </div>
         </div>

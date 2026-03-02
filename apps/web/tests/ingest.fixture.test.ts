@@ -26,21 +26,6 @@ import { MrBlogAdapter } from '../sources/adapters/mrblog';
 import { GangnamFoodAdapter } from '../sources/adapters/gangnamfood';
 import { InitializedAdapters } from '../sources/registry';
 
-// Helper: minimal valid ScrapedCampaign shape validator
-function assertValidScrapedCampaign(item: any) {
-    expect(typeof item.original_id).toBe('string');
-    expect(item.original_id.length).toBeGreaterThan(0);
-    expect(typeof item.title).toBe('string');
-    expect(item.title.length).toBeGreaterThan(0);
-    expect(['VST', 'SHP', 'PRS']).toContain(item.campaign_type);
-    expect(['BP', 'IP', 'YP', 'OTHER']).toContain(item.media_type);
-    expect(typeof item.url).toBe('string');
-    expect(item.url.startsWith('http')).toBe(true);
-    expect(item.apply_end_date instanceof Date).toBe(true);
-    expect(typeof item.recruit_count).toBe('number');
-    expect(typeof item.applicant_count).toBe('number');
-}
-
 beforeEach(() => {
     vi.clearAllMocks();
     // Default: simulate an empty HTML page (axis returns no recognized DOM)
@@ -71,23 +56,21 @@ describe('Adapter Metadata (platformId + baseUrl)', () => {
 // Adapter: RevuAdapter (has Cheerio DOM fallback logic)
 // ??????????????????????????????????????????????????????????????????????????????
 describe('RevuAdapter', () => {
-    it('returns fallback ScrapedCampaign when DOM has no campaign-list-item elements', async () => {
+    it('returns an array for empty page HTML and handles network responses safely', async () => {
         (axios.get as any).mockResolvedValue({ data: '<html><body></body></html>' });
         const adapter = new RevuAdapter();
         const result = await adapter.fetchList(1);
 
         expect(Array.isArray(result)).toBe(true);
-        expect(result.length).toBeGreaterThan(0);
-        assertValidScrapedCampaign(result[0]);
+        expect(result.length).toBe(0);
     });
 
-    it('returns fallback ScrapedCampaign when axios fails', async () => {
-        (axios.get as any).mockRejectedValue(new Error('Network Error'));
+    it('returns empty array when endpoint does not return items', async () => {
+        (axios.get as any).mockResolvedValue({ data: JSON.stringify({ items: [] }) });
         const adapter = new RevuAdapter();
         const result = await adapter.fetchList(1);
         expect(Array.isArray(result)).toBe(true);
-        expect(result.length).toBeGreaterThan(0);
-        assertValidScrapedCampaign(result[0]);
+        expect(result.length).toBe(0);
     }, 10000);
 });
 
@@ -95,29 +78,29 @@ describe('RevuAdapter', () => {
 // Adapters with static stub data (Reviewnote, DinnerQueen, Seouloppa)
 // ??????????????????????????????????????????????????????????????????????????????
 describe('ReviewnoteAdapter', () => {
-    it('returns at least one valid ScrapedCampaign', async () => {
+    it('returns an empty array on empty page HTML', async () => {
         const adapter = new ReviewnoteAdapter();
         const result = await adapter.fetchList(1);
-        expect(result.length).toBeGreaterThan(0);
-        assertValidScrapedCampaign(result[0]);
+        expect(Array.isArray(result)).toBe(true);
+        expect(result.length).toBe(0);
     });
 });
 
 describe('DinnerQueenAdapter', () => {
-    it('returns at least one valid ScrapedCampaign', async () => {
+    it('returns an empty array when card selector is absent', async () => {
         const adapter = new DinnerQueenAdapter();
         const result = await adapter.fetchList(1);
-        expect(result.length).toBeGreaterThan(0);
-        assertValidScrapedCampaign(result[0]);
+        expect(Array.isArray(result)).toBe(true);
+        expect(result.length).toBe(0);
     });
 });
 
 describe('SeouloppaAdapter', () => {
-    it('returns at least one valid ScrapedCampaign', async () => {
+    it('returns an empty array when page has no campaign cards', async () => {
         const adapter = new SeouloppaAdapter();
         const result = await adapter.fetchList(1);
-        expect(result.length).toBeGreaterThan(0);
-        assertValidScrapedCampaign(result[0]);
+        expect(Array.isArray(result)).toBe(true);
+        expect(result.length).toBe(0);
     });
 });
 
@@ -125,22 +108,20 @@ describe('SeouloppaAdapter', () => {
 // Adapters returning fallback rows on empty DOM
 // ??????????????????????????????????????????????????????????????????????????????
 describe('MrBlogAdapter', () => {
-    it('returns fallback ScrapedCampaign when DOM has no campaign elements', async () => {
+    it('returns an empty array when campaign links are missing', async () => {
         const adapter = new MrBlogAdapter();
         const result = await adapter.fetchList(1);
         expect(Array.isArray(result)).toBe(true);
-        expect(result.length).toBeGreaterThan(0);
-        assertValidScrapedCampaign(result[0]);
+        expect(result.length).toBe(0);
     });
 });
 
 describe('GangnamFoodAdapter', () => {
-    it('returns fallback ScrapedCampaign when DOM has no campaign elements', async () => {
+    it('returns an empty array when list selector is absent', async () => {
         const adapter = new GangnamFoodAdapter();
         const result = await adapter.fetchList(1);
         expect(Array.isArray(result)).toBe(true);
-        expect(result.length).toBeGreaterThan(0);
-        assertValidScrapedCampaign(result[0]);
+        expect(result.length).toBe(0);
     });
 });
 
@@ -166,3 +147,4 @@ describe('Adapter Registry', () => {
         }
     });
 });
+

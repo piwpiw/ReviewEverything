@@ -178,5 +178,10 @@
 - **타입 고도화**: `any` 타입을 구체적인 인터페이스로 교체하여 빌드 안정성 확보.
 
 ### 11.3 최종 검증 (Final QA)
-- `npm run agent:review` 또는 `npm run agent:qa`를 실행하여 린트, 타입, 테스트 통과 확인.
+- `npm run deploy:env-check` → `npm run agent:review` 또는 `npm run agent:qa` 순으로 실행해 린트, 타입, 테스트 통과를 확인.
+- apps/web/reports 산출물은 배포 전/후 동일 키로 덮어쓰기 하여 스모크/스캔 혼합을 방지.
+- 반복 경고 정리 작업은 최우선 파일 2~3개 원칙으로 분할해 병렬 병행 큐로 처리.
 - `reports/` 내의 정합성 리포트가 모두 녹색 상태인지 확인.
+
+
+

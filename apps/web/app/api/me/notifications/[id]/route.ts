@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { getMissingEnvVars, REQUIRED_DB_ENV } from "@/lib/runtimeEnv";
 
 /**
  * DELETE /api/me/notifications/[id]?userId=1
@@ -30,6 +31,13 @@ export async function DELETE(
   }
 
   try {
+    if (getMissingEnvVars(REQUIRED_DB_ENV).length > 0) {
+      return NextResponse.json(
+        { error: "Database is unavailable. Retry when DB is available.", code: "DB_UNAVAILABLE" },
+        { status: 503 },
+      );
+    }
+
     const existing = await db.notificationDelivery.findUnique({
       where: { id: notificationId },
       select: { id: true, user_id: true },

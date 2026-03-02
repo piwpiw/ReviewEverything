@@ -8,6 +8,7 @@ import {
 } from '@/lib/notificationSender';
 
 type JobType = 'INGEST_PLATFORM' | 'REMINDER_SCAN';
+const ADAPTER_NOT_READY_CODE = "ADAPTER_NOT_READY";
 
 const JOB_STALE_MINUTES = 5;
 type BackgroundJobWithPayload = {
@@ -17,6 +18,10 @@ type BackgroundJobWithPayload = {
   platform_id: number | null;
   attempts: number;
   max_attempts: number;
+};
+
+type IngestionPayload = {
+  platform_id?: number | string;
 };
 
 const DEFAULT_RUN_LIMIT = 12;
@@ -30,7 +35,13 @@ function dateOnly(date: Date): Date {
 }
 
 function parsePayload(job: BackgroundJobWithPayload) {
-  return job.payload ? JSON.parse(job.payload) : {};
+  if (!job.payload) return {};
+  try {
+    return JSON.parse(job.payload);
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : String(error);
+    throw new Error(`invalid_payload_json: ${message}`);
+  }
 }
 
 export async function enqueueIngestJobs() {
@@ -127,13 +138,20 @@ export async function runJobs(limit = DEFAULT_RUN_LIMIT) {
 
     try {
       if (job.type === 'INGEST_PLATFORM') {
-        const payload = parsePayload(job as BackgroundJobWithPayload);
+        const payload = parsePayload(job as BackgroundJobWithPayload) as IngestionPayload;
         const platformId = Number(payload.platform_id);
+        if (!Number.isInteger(platformId)) {
+          throw new Error(`invalid_platform_id_in_payload:${platformId}`);
+        }
         const platform = await db.platform.findUnique({ where: { id: platformId } });
         if (!platform) throw new Error(`platform ${platformId} not found`);
 
         const adapter = InitializedAdapters[platform.name.toLowerCase()];
-        if (!adapter) throw new Error(`adapter for ${platform.name} not found`);
+        if (!adapter) {
+          const err: Error & { code?: string } = new Error(`adapter for ${platform.name} not found`);
+          err.code = ADAPTER_NOT_READY_CODE;
+          throw err;
+        }
 
         const result = await executeIngestionTask(adapter, platformId);
         if (!result.success) throw new Error(result.reason || result.error || 'ingest failed');
@@ -162,7 +180,9 @@ export async function runJobs(limit = DEFAULT_RUN_LIMIT) {
       summary.failed += 1;
       summary.processed += 1;
       summary.total += 1;
-      const hasRetry = job.attempts + 1 < job.max_attempts;
+      const hasRetry =
+        error?.code !== ADAPTER_NOT_READY_CODE &&
+        job.attempts + 1 < job.max_attempts;
       await db.backgroundJob.update({
         where: { id: job.id },
         data: {

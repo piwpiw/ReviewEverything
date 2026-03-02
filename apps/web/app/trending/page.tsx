@@ -1,67 +1,157 @@
 ﻿"use client";
 
+import Image from "next/image";
 import { motion } from "framer-motion";
-import { ArrowRight, Flame, Clock, Target, ChevronRight, TrendingUp, Trophy } from "lucide-react";
+import { ArrowRight, Flame, Clock, Target, ChevronRight, TrendingUp, Trophy, RefreshCw } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
-const TRENDING_MOCK = [
-  { id: 1, title: "[리뷰단] 2차 추첨 이벤트, 포인트 1200원 보상", recruit: 2, applicants: 1540, reward: "1,200원, 최대 보상", img: "https://images.unsplash.com/photo-1542314831-c6a4203251f8?w=500" },
-  { id: 2, title: "[체험단] 신제품 체험 리워드 1건 (D-1 마감)", recruit: 5, applicants: 2310, reward: "상금 709,000원", img: "https://images.unsplash.com/photo-1634546416952-4752b07e868f?w=500" },
-  { id: 3, title: "[미식] 2개월 연속 참여자 대기, 즉시 지급", recruit: 3, applicants: 855, reward: "적립금 350,000원(2개월)", img: "https://images.unsplash.com/photo-1590454647900-a61f5b0ad5fb?w=500" },
+type CampaignSnapshot = {
+  recruit_count?: number;
+  applicant_count?: number;
+};
+
+type TrendingCampaign = {
+  id: number | string;
+  title: string;
+  reward_value?: number | null;
+  reward_text?: string | null;
+  image_url?: string | null;
+  snapshots?: CampaignSnapshot[];
+  trend_score?: number | null;
+};
+
+const TRENDING_MOCK: TrendingCampaign[] = [
+  {
+    id: 1,
+    title: "[리뷰단] 2차 추첨 이벤트, 포인트 1200원 보상",
+    reward_text: "1,200원, 최대 보상",
+    snapshots: [{ recruit_count: 2, applicant_count: 1540 }],
+  },
+  {
+    id: 2,
+    title: "[체험단] 신제품 체험 리워드 1건 (D-1 마감)",
+    reward_text: "상금 709,000원",
+    snapshots: [{ recruit_count: 5, applicant_count: 2310 }],
+  },
+  {
+    id: 3,
+    title: "[미식] 2개월 연속 참여자 대기, 즉시 지급",
+    reward_text: "적립금 350,000원(2개월)",
+    snapshots: [{ recruit_count: 3, applicant_count: 855 }],
+  },
 ];
 
-const HONEYPOT_MOCK = [
-  { id: 10, title: "[마감 임박] 30건 한정 모집 마감 임박", recruit: 30, applicants: 8, reward: "상금 200,000원", img: "https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?w=400" },
-  { id: 11, title: "[체험단] 신규 리뷰어 특별 보너스", recruit: 5, applicants: 2, reward: "보너스 60,000원", img: "https://images.unsplash.com/photo-1553621042-f6e147245754?w=400" },
-  { id: 12, title: "[SNS] 콘텐츠 공유 모집 4건 모집중", recruit: 20, applicants: 5, reward: "캐시 100,000원", img: "https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=400" },
+const HONEYPOT_MOCK: TrendingCampaign[] = [
+  {
+    id: 10,
+    title: "[마감 임박] 30건 한정 모집 마감 임박",
+    reward_text: "상금 200,000원",
+    image_url: "https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?w=400",
+  },
+  {
+    id: 11,
+    title: "[체험단] 신규 리뷰어 특별 보너스",
+    reward_text: "보너스 60,000원",
+    image_url: "https://images.unsplash.com/photo-1553621042-f6e147245754?w=400",
+  },
+  {
+    id: 12,
+    title: "[SNS] 콘텐츠 공유 모집 4건 모집중",
+    reward_text: "캐시 100,000원",
+    image_url: "https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=400",
+  },
 ];
+
+type DataSource = "live" | "fallback" | "mock";
+
+const SOURCE_LABEL: Record<DataSource, string> = {
+  live: "실시간 분석",
+  fallback: "DB 폴백",
+  mock: "샘플 데이터",
+};
+
+const resolveCardItems = (items: TrendingCampaign[]) =>
+  items.map((item, idx) => {
+    const recruit = Math.max(1, item.snapshots?.[0]?.recruit_count || 10);
+    const applicants = Math.max(0, item.snapshots?.[0]?.applicant_count || 0);
+    const image = item.image_url || "https://images.unsplash.com/photo-1512436991641-c6a4203251f8?w=500";
+    const reward = item.reward_text || (item.reward_value ? `${item.reward_value.toLocaleString()}원` : "보상은 개별 안내 예정");
+    return {
+      ...item,
+      recruit,
+      applicants,
+      image,
+      reward,
+      rankRatio: applicants > 0 && recruit > 0 ? applicants / recruit : 0,
+      sourceIndex: idx + 1,
+    };
+  });
 
 export default function TrendingPage() {
-  const [realTrending, setRealTrending] = useState<any[]>([]);
+  const [campaigns, setCampaigns] = useState<TrendingCampaign[]>([]);
   const [loading, setLoading] = useState(true);
-
-  const containerFade: any = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: { staggerChildren: 0.15 },
-    },
-  };
-
-  const slideUp: any = {
-    hidden: { opacity: 0, y: 30 },
-    show: { opacity: 1, y: 0, transition: { type: "spring", bounce: 0.2, duration: 0.8 } },
-  };
+  const [error, setError] = useState<string | null>(null);
+  const [dataSource, setDataSource] = useState<DataSource>("live");
+  const [refreshTick, setRefreshTick] = useState(0);
 
   useEffect(() => {
+    const controller = new AbortController();
+
     const load = async () => {
+      setLoading(true);
+      setError(null);
+
       try {
-        const res = await fetch("/api/analytics");
-        const json = await res.json();
-        if (json.data && Array.isArray(json.data)) {
-          setRealTrending(json.data);
+        const analyticsRes = await fetch("/api/analytics", { signal: controller.signal });
+        if (!analyticsRes.ok) {
+          throw new Error(`실시간 트렌드 조회 실패 (${analyticsRes.status})`);
         }
-      } catch {
-        // ignore
+
+        const analyticsPayload = await analyticsRes.json();
+        const list = Array.isArray(analyticsPayload?.data) ? analyticsPayload.data : [];
+        if (list.length > 0) {
+          setCampaigns(list as TrendingCampaign[]);
+          setDataSource("live");
+          return;
+        }
+
+        throw new Error("트렌드 응답이 비어있습니다.");
+      } catch (e) {
+        if (controller.signal.aborted) return;
+        setDataSource("fallback");
+        setError(e instanceof Error ? e.message : "트렌드 조회에 실패해 폴백 데이터를 사용합니다.");
+
+        try {
+          const fallbackRes = await fetch("/api/campaigns?sort=applicant_desc&limit=10", { signal: controller.signal });
+          if (fallbackRes.ok) {
+            const payload = await fallbackRes.json();
+            const fallbackList = Array.isArray(payload?.data) ? payload.data : [];
+            if (fallbackList.length > 0) {
+              setCampaigns(fallbackList as TrendingCampaign[]);
+              return;
+            }
+          }
+          setCampaigns(TRENDING_MOCK);
+          setDataSource("mock");
+        } catch {
+          setCampaigns(TRENDING_MOCK);
+          setDataSource("mock");
+        }
       } finally {
         setLoading(false);
       }
     };
-    load();
-  }, []);
 
-  const displayedTrending =
-    realTrending.length > 0
-      ? realTrending.map((c) => ({
-        id: c.id,
-        title: c.title,
-        recruit: c.snapshots?.[0]?.recruit_count || 10,
-        applicants: c.snapshots?.[0]?.applicant_count || 0,
-        reward: c.reward_value || "보상은 개별 안내 예정",
-        img: c.image_url || "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?w=500",
-      }))
-      : TRENDING_MOCK;
+    void load();
+    return () => controller.abort();
+  }, [refreshTick]);
+
+  const topCards = useMemo(() => resolveCardItems(campaigns).slice(0, 10), [campaigns]);
+  const honeypotItems = useMemo(() => {
+    if (dataSource === "mock") return HONEYPOT_MOCK;
+    return campaigns.length > 0 ? resolveCardItems(campaigns.slice(3, 6)) : HONEYPOT_MOCK;
+  }, [campaigns, dataSource]);
 
   return (
     <div className="min-h-screen bg-black text-white pb-32 font-sans selection:bg-orange-500/30">
@@ -73,39 +163,57 @@ export default function TrendingPage() {
               실시간 트렌드
             </h1>
             <p className="text-slate-400 text-sm mt-1 font-medium">최근 오픈된 인기 캠페인과 마감 임박 리스트를 한눈에 확인하세요.</p>
+            <p className="text-[11px] mt-2 text-amber-200/90 font-black tracking-[0.15em] uppercase">데이터 소스: {SOURCE_LABEL[dataSource]}</p>
           </div>
+          <button
+            type="button"
+            onClick={() => setRefreshTick((prev) => prev + 1)}
+            disabled={loading}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-amber-500/40 bg-amber-500/10 text-amber-200 text-xs font-black"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} />
+            실시간 재조회
+          </button>
         </div>
+        {error ? <p className="mt-2 text-xs text-rose-300">{error}</p> : null}
       </div>
 
-      <motion.div variants={containerFade} initial="hidden" animate="show" className="space-y-12 mt-6 overflow-hidden">
-        <motion.section variants={slideUp} className="pl-6">
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-12 mt-6 overflow-hidden">
+        <motion.section className="pl-6">
           <div className="flex items-center gap-2 mb-4">
             <Flame className="w-5 h-5 text-red-500" />
             <h2 className="text-lg font-bold tracking-tight">실시간 TOP 10</h2>
             <ChevronRight className="w-4 h-4 text-slate-500 ml-2" />
           </div>
           <div className="flex gap-4 overflow-x-auto pb-6 pr-6 snap-x hide-scrollbar" style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
-            {loading && displayedTrending === TRENDING_MOCK ? (
+            {loading ? (
               Array.from({ length: 3 }).map((_, i) => (
                 <div key={i} className="snap-start shrink-0 w-72 h-80 rounded-[2rem] bg-slate-900 animate-pulse border border-white/5" />
               ))
             ) : (
-              displayedTrending.map((item, idx) => (
+              topCards.map((item) => (
                 <Link
                   key={item.id}
                   href={`/campaigns/${item.id}`}
                   className="snap-start shrink-0 w-72 relative rounded-[2rem] overflow-hidden group cursor-pointer border border-white/10 hover:border-orange-500/50 transition-colors"
                 >
                   <div className="absolute top-4 left-4 z-20 bg-black/60 backdrop-blur-md text-white font-black text-xs px-3 py-1.5 rounded-full flex items-center gap-1 border border-white/10 shadow-lg">
-                    <Trophy className="w-3 h-3 text-yellow-400" /> {idx + 1}위
+                    <Trophy className="w-3 h-3 text-yellow-400" />
+                    {item.sourceIndex}위
                   </div>
                   <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent z-10" />
-                  <img src={item.img} alt={item.title} className="w-full h-80 object-cover group-hover:scale-110 transition-transform duration-700 ease-out" />
+                  <Image
+                    src={item.image}
+                    alt={item.title}
+                    fill
+                    className="w-full h-80 object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
+                  />
                   <div className="absolute bottom-0 left-0 right-0 p-5 z-20">
                     <div className="flex justify-between items-end mb-2">
                       <span className="text-xs font-bold px-2 py-1 bg-white/10 backdrop-blur-md rounded-md text-orange-300">
-                        경쟁률 {item.applicants > 0 && item.recruit > 0 ? (item.applicants / item.recruit).toFixed(1) : "0"}:1
+                        경쟁률 {item.rankRatio.toFixed(1)}:1
                       </span>
+                      {item.trend_score ? <span className="text-xs font-black px-2 py-1 bg-blue-500/20 text-blue-200 rounded-md">+{item.trend_score}%</span> : null}
                     </div>
                     <h3 className="font-bold text-lg leading-tight text-white line-clamp-2 mb-1">{item.title}</h3>
                     <p className="text-sm text-slate-300 font-medium">{item.reward}</p>
@@ -116,7 +224,7 @@ export default function TrendingPage() {
           </div>
         </motion.section>
 
-        <motion.section variants={slideUp} className="px-6">
+        <motion.section className="px-6">
           <div className="bg-gradient-to-br from-indigo-900/40 via-purple-900/20 to-black border border-indigo-500/20 rounded-3xl p-6 relative overflow-hidden group">
             <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/20 blur-3xl rounded-full pointer-events-none" />
             <div className="flex items-start justify-between mb-6">
@@ -130,26 +238,29 @@ export default function TrendingPage() {
             </div>
 
             <div className="space-y-3">
-              {HONEYPOT_MOCK.map((item) => (
-                <div key={item.id} className="flex gap-4 p-3 rounded-2xl bg-white/5 hover:bg-white/10 transition-colors border border-white/5 cursor-pointer items-center">
-                  <img src={item.img} className="w-16 h-16 rounded-xl object-cover shrink-0" />
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-bold text-sm text-white truncate">{item.title}</h3>
-                    <p className="text-xs text-slate-400 mt-0.5">{item.reward}</p>
-                    <div className="flex items-center gap-2 mt-1.5">
-                      <div className="h-1.5 flex-1 bg-slate-800 rounded-full overflow-hidden">
-                        <div className="h-full bg-indigo-500 rounded-full" style={{ width: `${(item.applicants / item.recruit) * 100}%` }} />
+              {honeypotItems.map((item) => {
+                const base = resolveCardItems([item])[0];
+                return (
+                  <div key={base.id} className="flex gap-4 p-3 rounded-2xl bg-white/5 hover:bg-white/10 transition-colors border border-white/5 cursor-pointer items-center">
+                    <Image src={base.image} alt={base.title} width={64} height={64} className="w-16 h-16 rounded-xl object-cover shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-bold text-sm text-white truncate">{base.title}</h3>
+                      <p className="text-xs text-slate-400 mt-0.5">{base.reward}</p>
+                      <div className="flex items-center gap-2 mt-1.5">
+                        <div className="h-1.5 flex-1 bg-slate-800 rounded-full overflow-hidden">
+                          <div className="h-full bg-indigo-500 rounded-full" style={{ width: `${Math.min(100, base.rankRatio * 100)}%` }} />
+                        </div>
+                        <span className="text-[10px] text-indigo-300 font-bold tracking-tighter">{base.applicants}/{base.recruit}</span>
                       </div>
-                      <span className="text-[10px] text-indigo-300 font-bold tracking-tighter">{item.applicants}/{item.recruit}</span>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </motion.section>
 
-        <motion.section variants={slideUp} className="px-6 mb-12">
+        <motion.section className="px-6 mb-12">
           <div className="flex items-center gap-2 mb-4">
             <Clock className="w-5 h-5 text-slate-400" />
             <h2 className="text-lg font-bold tracking-tight text-slate-200">마감 임박</h2>

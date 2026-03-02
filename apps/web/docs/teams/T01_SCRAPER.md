@@ -1,12 +1,12 @@
 # T01_SCRAPER — Data Acquisition Agent
 
 ## Mission
-고정된 로직을 넘어, MCP와 동적 선택자(Skill)를 결합하여 7개 이상의 리뷰 플랫폼(Revu, ReviewNote 등)에서 극한의 환경에서도 데이터를 탄력적으로 수집한다.
+고정된 로직을 넘어, MCP와 동적 선택자(Skill)를 결합하여 7개 이상의 리뷰 플랫폼에서 **메인 이미지와 홍보 문구(Rich Data)**를 포함한 극한의 데이터를 탄력적으로 수집한다.
 
 ---
 
 ## 1. Domain Scope (책임 영역)
-- **어댑터**: `sources/adapters/*.ts` (revu, reviewnote, dinnerqueen, reviewplace, seouloppa, mrblog, gangnamfood)
+- **어댑터**: `sources/adapters/*.ts` (Rich Data 수집: 메인 이미지, 요약 문구 필수 파싱)
 - **플랫폼 관리**: `sources/registry.ts`
 - **HTTP 통신**: `lib/fetcher.ts` (fetchWithRetry)
 

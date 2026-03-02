@@ -1,161 +1,150 @@
 import { IPlatformAdapter, ScrapedCampaign } from "../types";
 import { fetchWithRetry } from "../../lib/fetcher";
+import {
+  absoluteUrl,
+  DEFAULT_APPLICANT_COUNT,
+  DEFAULT_DDAY_DAYS,
+  DEFAULT_RECRUIT_COUNT,
+  parseIntSafe,
+  sleep,
+} from "./_shared";
 
-const delay = (ms: number) => new Promise(r => setTimeout(r, ms));
-
-/**
- * Revu adapter using the public api.weble.net JSON API.
- * Discovered endpoints:
- *   - /v1/campaigns/trending  (public, no auth)
- *   - /v1/campaigns/upcoming  (public, no auth)
- *   - /categories             (public)
- *   - /stats                  (public)
- * 
- * The /campaigns endpoint requires auth (401), so we use trending + upcoming
- * which together cover all active campaigns visible on the homepage.
- */
 export class RevuAdapter implements IPlatformAdapter {
-    platformId = 1;
-    baseUrl = "https://www.revu.net";
+  platformId = 1;
+  baseUrl = "https://www.revu.net";
 
-    async fetchList(page: number): Promise<ScrapedCampaign[]> {
-        console.log(`[Revu] Page ${page}`);
-        await delay(800 + Math.random() * 400);
+  async fetchList(page: number): Promise<ScrapedCampaign[]> {
+    console.log(`[Revu] Page ${page}`);
+    await sleep(800 + Math.random() * 400);
 
-        try {
-            // Page 1 = trending, Page 2 = upcoming, Page 3+ = empty (API doesn't paginate)
-            if (page === 1) {
-                const campaigns = await this.fetchEndpoint("trending", page);
-                return campaigns.length > 0 ? campaigns : this.getFallback(page);
-            } else if (page === 2) {
-                const campaigns = await this.fetchEndpoint("upcoming", page);
-                return campaigns.length > 0 ? campaigns : this.getFallback(page);
-            }
-            return []; // No more pages
-        } catch (e: unknown) {
-            const message = e instanceof Error ? e.message : String(e);
-            console.error(`[Revu] Page ${page} failed:`, message);
-            return this.getFallback(page);
-        }
+    try {
+      if (page === 1) {
+        return this.fetchEndpoint("trending");
+      }
+      if (page === 2) {
+        return this.fetchEndpoint("upcoming");
+      }
+      return [];
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
+      console.error(`[Revu] Page ${page} failed:`, message);
+      return [];
+    }
+  }
+
+  private async fetchEndpoint(type: "trending" | "upcoming"): Promise<ScrapedCampaign[]> {
+    const apiUrl = type === "trending"
+      ? "https://api.weble.net/v1/campaigns/trending"
+      : "https://api.weble.net/v1/campaigns/upcoming";
+
+    const { data } = await fetchWithRetry(
+      apiUrl,
+      {
+        headers: {
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/121.0.0.0 Safari/537.36",
+          "Accept": "application/json",
+          "Origin": "https://www.revu.net",
+          "Referer": "https://www.revu.net/",
+        },
+      },
+    );
+
+    const items: unknown[] = (data as { items?: unknown[] })?.items || [];
+    if (!items.length) {
+      console.warn(`[Revu] No items from ${type} endpoint.`);
+      return [];
     }
 
-    private async fetchEndpoint(type: "trending" | "upcoming", _page: number): Promise<ScrapedCampaign[]> {
-        const { data } = await fetchWithRetry(
-            `${this.baseUrl}/v1/campaigns/${type}`,
-            {
-                headers: {
-                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/121.0.0.0 Safari/537.36",
-                    "Accept": "application/json",
-                    "Origin": "https://www.revu.net",
-                    "Referer": "https://www.revu.net/",
-                },
-            }
-        );
+    const campaigns: ScrapedCampaign[] = [];
 
-        const items: any[] = data?.items || [];
-        if (!items.length) {
-            console.warn(`[Revu] No items from ${type} endpoint.`);
-            return [];
+    for (const rawItem of items) {
+      const item = rawItem as Record<string, unknown>;
+      const title = String(item?.item || item?.title || "").trim();
+      const id = item?.id;
+      if (!title || !id) continue;
+
+      const mediaRaw = String(item?.media || "").toLowerCase();
+      const mediaType: ScrapedCampaign["media_type"] =
+        mediaRaw.includes("instagram") || mediaRaw.includes("insta")
+          ? "IP"
+          : mediaRaw.includes("youtube")
+            ? "YP"
+            : mediaRaw.includes("blog")
+              ? "BP"
+              : mediaRaw.includes("clip")
+                ? "CL"
+                : mediaRaw.includes("reels")
+                  ? "RS"
+                  : mediaRaw.includes("shorts")
+                    ? "SH"
+                    : "BP";
+
+      const categoryList = Array.isArray(item?.category)
+        ? (item?.category as unknown[]).map((c) => String(c || ""))
+        : [];
+      const categories = categoryList.join(" ");
+      const venue = (item?.venue && typeof item.venue === "object")
+        ? (item.venue as Record<string, unknown>)
+        : {};
+      const location = venue?.addressFirst
+        ? String(venue.addressFirst).split(" ").slice(0, 2).join(" ")
+        : (Array.isArray(item?.localTag) && item.localTag.length
+          ? String((item.localTag as unknown[])[0])
+          : "Seoul");
+
+      const campaignType: ScrapedCampaign["campaign_type"] =
+        /review|reviewer|리뷰어|리뷰/.test(categories.toLowerCase())
+          ? "PRS"
+          : /visit|offlines|offline|in-store|오프라인|스토어|방문/.test(categories.toLowerCase())
+            ? "VST"
+            : "SHP";
+
+      const campaignData = item?.campaignData && typeof item.campaignData === "object"
+        ? (item.campaignData as Record<string, unknown>)
+        : {};
+      let rewardText = String(campaignData.reward || "").trim();
+      if (campaignData.point && Number.isFinite(Number(campaignData.point))) {
+        const pointValue = Number(campaignData.point);
+        if (pointValue > 0) {
+          rewardText = rewardText
+            ? `${rewardText} + ${pointValue.toLocaleString()}P`
+            : `${pointValue.toLocaleString()}P`;
         }
+      }
 
-            console.log(`[Revu] ${type}: ${items.length} items fetched.`);
-            const campaigns: ScrapedCampaign[] = [];
+      const byDeadline = parseIntSafe(String(item?.byDeadline || ""), DEFAULT_DDAY_DAYS);
+      const applyEnd = item?.requestEndedOn
+        ? new Date(`${item.requestEndedOn}T23:59:59+09:00`)
+        : new Date(Date.now() + 86_400_000 * byDeadline);
+      const stats = item?.campaignStats && typeof item.campaignStats === "object"
+        ? (item.campaignStats as Record<string, unknown>)
+        : {};
 
-        for (const item of items) {
-            const title = item.item || item.title || "";
-            if (!title || !item.id) continue;
-
-            // Media type mapping
-            const mediaRaw = (item.media || "").toLowerCase();
-            const mediaType: ScrapedCampaign["media_type"] =
-                mediaRaw.includes("instagram") || mediaRaw.includes("insta") ? "IP" :
-                mediaRaw.includes("youtube") ? "YP" :
-                mediaRaw.includes("blog") ? "BP" :
-                mediaRaw.includes("clip") ? "CL" :
-                mediaRaw.includes("reels") ? "RS" :
-                mediaRaw.includes("shorts") ? "SH" : "BP";
-
-            // Campaign type from category array
-            const categories = Array.isArray(item.category) ? item.category.join(" ") : "";
-            const isVisit = categories.includes("방문") || categories.includes("지역") || !!item.venue?.name;
-            const isReporter = categories.includes("기자단");
-            const campaignType = isReporter ? "PRS" : isVisit ? "VST" : "SHP";
-
-            // Location from venue
-            const venue = item.venue || {};
-            const location = venue.addressFirst 
-                ? venue.addressFirst.split(" ").slice(0, 2).join(" ")
-                : (item.localTag?.length ? item.localTag[0] : "전국");
-
-            // Reward
-            const campData = item.campaignData || {};
-            let rewardText = campData.reward || "";
-            if (campData.point && campData.point > 0) {
-                rewardText = rewardText 
-                    ? `${rewardText} + 레뷰포인트 ${campData.point.toLocaleString()}P`
-                    : `레뷰포인트 ${campData.point.toLocaleString()}P`;
-            }
-            if (!rewardText) rewardText = "상세 가이드 참조";
-
-            // Apply end date
-            const applyEnd = item.requestEndedOn 
-                ? new Date(item.requestEndedOn + "T23:59:59+09:00")
-                : new Date(Date.now() + 86_400_000 * (item.byDeadline || 7));
-
-            // Applicant stats
-            const stats = item.campaignStats || {};
-
-            campaigns.push({
-                original_id: `rv_${item.id}`,
-                title,
-                campaign_type: campaignType,
-                media_type: mediaType,
-                location,
-                reward_text: rewardText,
-                thumbnail_url: item.thumbnail || item.contentImage || undefined,
-                url: `https://www.revu.net/campaign/${item.id}`,
-                lat: venue.lat ? parseFloat(venue.lat) : undefined,
-                lng: venue.lng ? parseFloat(venue.lng) : undefined,
-                apply_end_date: applyEnd,
-                recruit_count: item.reviewerLimit || 10,
-                applicant_count: stats.requestCount || 0,
-            });
-        }
-        return campaigns;
+      campaigns.push({
+        original_id: `rv_${id}`,
+        title,
+        campaign_type: campaignType,
+        media_type: mediaType,
+        location,
+        reward_text: rewardText || "보상 정보 없음",
+        thumbnail_url: item?.thumbnail
+          ? String(item.thumbnail)
+          : item?.contentImage
+            ? String(item.contentImage)
+            : undefined,
+        url: absoluteUrl(this.baseUrl, `/campaign/${id}`),
+        shop_url: undefined,
+        lat: venue?.lat ? parseFloat(String(venue.lat)) : undefined,
+        lng: venue?.lng ? parseFloat(String(venue.lng)) : undefined,
+        apply_end_date: applyEnd,
+        recruit_count: parseIntSafe(String(item?.reviewerLimit || ""), DEFAULT_RECRUIT_COUNT),
+        applicant_count: parseIntSafe(String(stats?.requestCount || ""), DEFAULT_APPLICANT_COUNT),
+        brief_desc: rewardText.split("+")[0].trim(),
+        tags: categories,
+      });
     }
 
-    private getFallback(page: number): ScrapedCampaign[] {
-        const samples = [
-            {
-                title: "리뷰 체험단 - 서울 카페 방문",
-                location: "서울 강남구",
-                rewardText: "5만원",
-                recruit: 15,
-                applicants: 3,
-            },
-            {
-                title: "먹방 체험단 - 로컬 맛집",
-                location: "서울 마포구",
-                rewardText: "2만원",
-                recruit: 20,
-                applicants: 6,
-            },
-        ];
-
-        const start = (page - 1) % samples.length;
-        const end = Math.min(start + 2, samples.length);
-        return samples.slice(start, end).map((sample, i) => ({
-            original_id: `rv_sample_p${page}_${i}`,
-            title: sample.title,
-            campaign_type: "SHP",
-            media_type: "BP",
-            location: sample.location,
-            reward_text: sample.rewardText,
-            thumbnail_url: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600",
-            url: `${this.baseUrl}/campaigns`,
-            apply_end_date: new Date(Date.now() + 86_400_000 * (1 + i)),
-            recruit_count: sample.recruit,
-            applicant_count: sample.applicants,
-        }));
-    }
+    return campaigns;
+  }
 }
+

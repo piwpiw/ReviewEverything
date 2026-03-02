@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, type MouseEvent } from "react";
 import Image from "next/image";
@@ -29,6 +29,8 @@ type Campaign = {
   shop_url?: string;
   shop_link?: string;
   coupon_url?: string;
+  brief_desc?: string;
+  tags?: string;
 };
 
 const getDDay = (date: Date | string | null): { label: string; cls: string } => {
@@ -43,7 +45,7 @@ const getDDay = (date: Date | string | null): { label: string; cls: string } => 
 
 const TYPE_NAME: Record<string, string> = {
   VST: "방문형",
-  SHP: "쇼핑형",
+  SHP: "샘플형",
   PRS: "구매형",
   SNS: "SNS형",
   EVT: "이벤트형",
@@ -75,7 +77,7 @@ const MEDIA_CHIP: Record<string, { label: string; color: string }> = {
   FB: { label: "페북", color: "bg-blue-700" },
   X: { label: "X", color: "bg-black" },
   SN: { label: "숏폼", color: "bg-violet-500" },
-  TT: { label: "숏클립", color: "bg-cyan-700" },
+  TT: { label: "타임", color: "bg-cyan-700" },
   OTHER: { label: "기타", color: "bg-slate-500" },
 };
 
@@ -162,7 +164,7 @@ export default function CampaignCard({ campaign, rank }: { campaign: Campaign; r
       className={`relative bg-white dark:bg-slate-900 rounded-3xl border-l-8 ${campaignTypeColor} border border-slate-100 dark:border-slate-800 overflow-hidden flex flex-col h-full shadow-sm hover:shadow-lg transition-all duration-300`}
     >
       <div className="relative h-[136px] overflow-hidden bg-slate-100 dark:bg-slate-800">
-        <Image src={imageUrl} alt={campaign.title || "리뷰 캠페인"} fill className="object-cover" unoptimized />
+        <Image src={imageUrl} alt={campaign.title || "캠페인 이미지"} fill className="object-cover" unoptimized />
         <div className="absolute top-2 left-2 right-2 flex items-start justify-between">
           <span className={`px-2 py-0.5 rounded-lg text-[11px] font-black text-white ${media.color}`}>{media.label}</span>
           {rank ? <span className="px-2 py-0.5 rounded-lg text-[11px] font-black text-white bg-slate-900">#{rank}</span> : null}
@@ -175,7 +177,9 @@ export default function CampaignCard({ campaign, rank }: { campaign: Campaign; r
               event.stopPropagation();
               toggleFavorite(campaign.id);
             }}
-            className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all ${pinned ? "bg-rose-500/90 text-white" : "bg-white/85 text-slate-500 border border-white/40"}`}
+            className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all ${
+              pinned ? "bg-rose-500/90 text-white" : "bg-white/85 text-slate-500 border border-white/40"
+            }`}
           >
             <Heart className={`w-4 h-4 ${pinned ? "fill-current" : ""}`} />
           </button>
@@ -195,15 +199,19 @@ export default function CampaignCard({ campaign, rank }: { campaign: Campaign; r
         </div>
 
         <Link href={`/campaigns/${campaign.id}`}>
-          <h3 className="text-[17px] font-black leading-snug text-slate-900 dark:text-white line-clamp-2">
-            {campaign.title || "캠페인 제목"}
-          </h3>
+          <h3 className="text-[17px] font-black leading-snug text-slate-900 dark:text-white line-clamp-2">{campaign.title || "캠페인"}</h3>
         </Link>
 
         <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-300">
           <MapPin className="w-3.5 h-3.5" />
-          <span>{locationText}</span>
+          <span className="truncate">{locationText}</span>
         </div>
+
+        {campaign.brief_desc && (
+          <p className="text-[11px] font-medium text-blue-600 dark:text-blue-300 line-clamp-1 bg-blue-50 dark:bg-blue-900/30 px-2 py-1 rounded">
+            {campaign.brief_desc}
+          </p>
+        )}
 
         <div className="grid grid-cols-3 gap-2 text-center mt-1">
           <div className="rounded-lg bg-slate-50 dark:bg-slate-800 p-1.5 border border-slate-100 dark:border-slate-800">
@@ -236,7 +244,7 @@ export default function CampaignCard({ campaign, rank }: { campaign: Campaign; r
             href={`/campaigns/${campaign.id}`}
             className="py-2 rounded-lg bg-slate-900 dark:bg-blue-600 text-white text-center text-xs font-black hover:opacity-90 flex items-center justify-center"
           >
-            상세 페이지
+            상세 확인
           </Link>
           <a
             href={primaryUrl}
@@ -245,10 +253,11 @@ export default function CampaignCard({ campaign, rank }: { campaign: Campaign; r
             onClick={(e) => handleOutbound(e, "campaign")}
             className="col-span-2 py-2 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs font-black text-center hover:border-blue-400 hover:text-blue-500"
           >
-            원문 링크
+            원문으로 이동
           </a>
         </div>
       </div>
     </article>
   );
 }
+

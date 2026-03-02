@@ -15,7 +15,7 @@ const KEYWORD_SYNONYMS: Record<string, string[]> = {
 const TYPO_CORRECTIONS: Record<string, string> = {
   "리뷰어": "리뷰",
   "캠페인": "캠페인",
-  "비슷함": "슷",
+  "비슷함": "비슷",
   "오픈챌린지": "오픈 챌린지",
 };
 
@@ -26,7 +26,10 @@ export function buildSearchTokens(raw: string): string[] {
   const words = normalized
     .split(/\s+/)
     .map((w) => TYPO_CORRECTIONS[w] || w)
-    .flatMap((w) => [w, ...((KEYWORD_SYNONYMS[w] || []).map((s) => s.toLowerCase()))])
+    .flatMap((w) => {
+      const synonyms = KEYWORD_SYNONYMS[w] || [];
+      return [w, ...synonyms.map((s) => s.toLowerCase())];
+    })
     .map((w) => w.trim())
     .filter((w) => w.length >= 2);
 
@@ -34,7 +37,8 @@ export function buildSearchTokens(raw: string): string[] {
 }
 
 export function expandSearchCondition(token: string): string[] {
-  return [token, ...((KEYWORD_SYNONYMS[token] || []).map((item) => item.toLowerCase()))];
+  const synonyms = KEYWORD_SYNONYMS[token] || [];
+  return [token, ...synonyms.map((item) => item.toLowerCase())];
 }
 
 export function extractRegionsFromQuery(raw: string): string[] {

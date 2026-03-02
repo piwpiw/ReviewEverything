@@ -47,6 +47,8 @@ model Campaign {
   shop_url       String?   
   thumbnail_url  String?
   url            String    @unique
+  brief_desc     String?   @db.Text
+  tags           String?
   
   // Real-time Stats (Denormalized for fast reading)
   recruit_count   Int      @default(0)

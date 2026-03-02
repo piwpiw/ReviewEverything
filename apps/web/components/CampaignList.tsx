@@ -16,6 +16,8 @@ type CampaignsResponse = {
 
 type SearchParamsInput = Record<string, string | string[] | undefined>;
 
+const MAP_VIEW_LIMIT = 320;
+
 const buildQueryString = (input: SearchParamsInput) => {
   const params = new URLSearchParams();
   Object.entries(input).forEach(([key, value]) => {
@@ -47,30 +49,33 @@ export default function CampaignList({
     const next: SearchParamsInput = { ...searchParams };
     if (viewMode === "map") {
       next.page = "1";
-      next.limit = "5000";
+      next.limit = String(MAP_VIEW_LIMIT);
     }
     return buildQueryString(next);
   }, [JSON.stringify(searchParams), viewMode]);
 
   useEffect(() => {
     let canceled = false;
+
     async function fetchData() {
       setLoading(true);
       setError(null);
       try {
         const res = await fetch(`/api/campaigns?${query}`);
-        if (!res.ok) throw new Error(`??? ??ȸ ???? (${res.status})`);
+        if (!res.ok) throw new Error(`데이터 조회 실패 (${res.status})`);
         const json = (await res.json()) as CampaignsResponse;
         if (!canceled) setData(json);
       } catch (err: unknown) {
         if (canceled) return;
-        setError(err instanceof Error ? err.message : "??? ??ȸ ?? ?????? ?߻??߽??ϴ?.");
+        setError(err instanceof Error ? err.message : "데이터 조회 중 알 수 없는 오류가 발생했습니다.");
         setData(null);
       } finally {
         if (!canceled) setLoading(false);
       }
     }
-    fetchData();
+
+    void fetchData();
+
     return () => {
       canceled = true;
     };
@@ -80,9 +85,15 @@ export default function CampaignList({
 
   if (error) {
     return (
-      <div className="rounded-[2rem] border border-rose-200 bg-rose-50 p-8 text-rose-700">
-        <p className="text-sm font-black">??? ??ȸ ????</p>
+      <div className="rounded-[2rem] border border-rose-200 bg-rose-50 p-8 text-rose-700 flex flex-col items-center">
+        <p className="text-sm font-black">데이터 조회 오류</p>
         <p className="text-sm font-bold opacity-80 mt-2">{error}</p>
+        <button
+          onClick={() => router.refresh()}
+          className="mt-4 px-4 py-2 bg-rose-600 text-white rounded-xl text-xs font-black shadow-lg"
+        >
+          페이지 새로고침
+        </button>
       </div>
     );
   }
@@ -109,24 +120,24 @@ export default function CampaignList({
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="flex flex-col items-center justify-center py-40 bg-white rounded-[3rem] border border-slate-100 shadow-sm"
+        className="flex flex-col items-center justify-center py-40 bg-white dark:bg-slate-900 rounded-[3rem] border border-slate-100 dark:border-slate-800 shadow-sm"
       >
-        <div className="w-24 h-24 bg-slate-50 rounded-[2.5rem] flex items-center justify-center mb-8 border border-slate-100 relative">
-          <FilterX className="w-10 h-10 text-slate-300" />
+        <div className="w-24 h-24 bg-slate-50 dark:bg-slate-800 rounded-[2.5rem] flex items-center justify-center mb-8 border border-slate-100 dark:border-slate-700 relative text-slate-300">
+          <FilterX className="w-10 h-10" />
           <div className="absolute -top-2 -right-2 w-8 h-8 bg-rose-500 rounded-full flex items-center justify-center text-white shadow-xl">
             <span className="text-xs font-black">0</span>
           </div>
         </div>
-        <h3 className="text-2xl font-black text-slate-900 mb-3 tracking-tighter">????? ?????ϴ?</h3>
+        <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-3 tracking-tighter">조건에 맞는 캠페인이 없습니다</h3>
         <p className="text-lg text-slate-400 font-bold mb-10 max-w-md text-center leading-relaxed">
-          ???͸? ?ٲ㼭 ?ٽ? ?˻??غ?????.
+          필터를 변경하거나 검색어를 다르게 설정해보세요.
         </p>
         <button
           onClick={() => router.push("/")}
-          className="px-8 py-4 bg-slate-900 text-white rounded-[1.5rem] text-[13px] font-black hover:bg-blue-600 transition-all shadow-2xl active:scale-95 flex items-center gap-3"
+          className="px-8 py-4 bg-slate-900 dark:bg-blue-600 text-white rounded-[1.5rem] text-[13px] font-black hover:bg-blue-600 transition-all shadow-2xl active:scale-95 flex items-center gap-3"
         >
           <FilterX className="w-5 h-5" />
-          ???? ?ʱ?ȭ
+          검색 초기화하기
         </button>
       </motion.div>
     );
@@ -138,14 +149,14 @@ export default function CampaignList({
         <div className="flex flex-wrap items-center gap-2">
           <div className="flex items-center gap-2 pr-4 border-r border-slate-100 dark:border-slate-800 mr-2">
             <p className="text-base font-black text-slate-900 dark:text-white uppercase tracking-widest whitespace-nowrap">
-              ?? <span className="text-blue-600 dark:text-blue-400 font-black px-1.5 py-0.5 bg-blue-50 dark:bg-blue-900/30 rounded-lg ml-1">{total.toLocaleString()}</span>??
+              총 <span className="text-blue-600 dark:text-blue-400 font-black px-1.5 py-0.5 bg-blue-50 dark:bg-blue-900/30 rounded-lg ml-1">{total.toLocaleString()}</span>개
             </p>
           </div>
 
           <AnimatePresence>
             {Object.entries(searchParams).map(([key, value]) => {
               if (!value || ["view", "sort", "page"].includes(key)) return null;
-              const label = key === "q" ? `Ű????: ${String(value)}` : `${key}: ${String(value)}`;
+              const label = key === "q" ? `키워드: ${String(value)}` : `${key}: ${String(value)}`;
               return (
                 <motion.button
                   key={key}
@@ -205,7 +216,7 @@ export default function CampaignList({
             </button>
             <div className="flex items-center px-4">
               <span className="text-[13px] font-black tracking-widest text-slate-900 dark:text-white uppercase flex items-center gap-3">
-                <span className="opacity-40">????</span>
+                <span className="opacity-40 whitespace-nowrap">페이지</span>
                 <span className="bg-slate-900 dark:bg-blue-600 text-white px-2.5 py-1 rounded-lg shadow-lg shadow-blue-500/20">{meta.page}</span>
                 <span className="opacity-40">/ {meta.totalPages}</span>
               </span>
@@ -223,6 +234,3 @@ export default function CampaignList({
     </div>
   );
 }
-
-
-

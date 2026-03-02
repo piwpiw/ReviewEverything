@@ -7,9 +7,30 @@ const parseEnvInt = (value: string | undefined, fallback: number) => {
     return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
 };
 
+const MAX_CONSECUTIVE_EMPTY_PAGES = parseEnvInt(process.env.INGEST_MAX_EMPTY_PAGES, 3);
 const MAX_PAGES_PER_RUN = parseEnvInt(process.env.INGEST_MAX_PAGES_PER_RUN, 100);
 const CHUNK_SIZE = parseEnvInt(process.env.INGEST_CHUNK_SIZE, 16);
 const ACTIVE_RUN_STALE_MINUTES = 45;
+const PAGE_STAGGER_MS = parseEnvInt(process.env.INGEST_PAGE_STAGGER_MS, 1000);
+const MIN_VALID_ITEM_RATE = Math.min(
+    Math.max(parseEnvInt(process.env.INGEST_MIN_VALID_ITEM_RATE, 65), 0),
+    100,
+);
+const PAGE_TIMEOUT_MS = parseEnvInt(process.env.INGEST_PAGE_TIMEOUT_MS, 60_000);
+const MAX_ITEM_RETRIES = 3;
+
+function withTimeout<T>(promise: Promise<T>, timeoutMs: number) {
+    return Promise.race([
+        promise,
+        new Promise<never>((_, reject) =>
+            setTimeout(() => reject(new Error(`page_timeout_${timeoutMs}ms`)), timeoutMs)
+        ),
+    ]) as Promise<T>;
+}
+
+function buildRunLog(parts: Array<string | undefined>) {
+    return parts.filter(Boolean).join(" | ");
+}
 
 export async function isPlatformCurrentlyInProgress(platformId: number): Promise<boolean> {
     const cutoff = new Date(Date.now() - ACTIVE_RUN_STALE_MINUTES * 60 * 1000);
@@ -72,17 +93,33 @@ export async function executeIngestionTask(adapter: IPlatformAdapter, platformId
     let updatedCount = 0;
     let totalItems = 0;
     let emptyRunCount = 0;
+    let pagesScraped = 0;
+    let invalidItems = 0;
+    let failedPages = 0;
 
     try {
-        // Broaden range for full implementation (up to configured pages)
-        for (let page = 1; page <= MAX_PAGES_PER_RUN; page++) {
+        const configuredPages = adapter.maxPagesPerRun ?? MAX_PAGES_PER_RUN;
+
+        for (let page = 1; page <= configuredPages; page++) {
             console.log(`[Ingest] Processing platform ${platformId}, page ${page}...`);
-            const results = await adapter.fetchList(page);
+
+            let results: any[];
+            try {
+                results = await withTimeout(adapter.fetchList(page), PAGE_TIMEOUT_MS);
+                pagesScraped += 1;
+            } catch (error: unknown) {
+                failedPages += 1;
+                console.error(`[Ingest] Page ${page} failed for platform ${platformId}:`, error);
+                if (failedPages >= MAX_ITEM_RETRIES) {
+                    throw error;
+                }
+                continue;
+            }
 
             if (!results || results.length === 0) {
                 emptyRunCount++;
                 console.log(`[Ingest] No results for platform ${platformId} at page ${page}. emptyCount=${emptyRunCount}`);
-                if (emptyRunCount >= 3) {
+                if (emptyRunCount >= MAX_CONSECUTIVE_EMPTY_PAGES) {
                     console.log(`[Ingest] Stopping platform ${platformId} after ${emptyRunCount} consecutive empty pages.`);
                     break;
                 }
@@ -91,10 +128,23 @@ export async function executeIngestionTask(adapter: IPlatformAdapter, platformId
             emptyRunCount = 0;
 
             totalItems += results.length;
+            const validItems = results.filter((item) => Boolean(item?.url) && Boolean(item?.title));
+            invalidItems += results.length - validItems.length;
+
+            if (validItems.length === 0) {
+                continue;
+            }
+
+            const validRate = (validItems.length / results.length) * 100;
+            if (validRate < MIN_VALID_ITEM_RATE) {
+                console.warn(
+                    `[Ingest] platform ${platformId} low valid rate: page=${page}, valid=${validItems.length}/${results.length} (${validRate.toFixed(1)}%)`,
+                );
+            }
 
             // Use chunked parallel processing to avoid DB connection exhaustion
-            for (let i = 0; i < results.length; i += CHUNK_SIZE) {
-                const chunk = results.slice(i, i + CHUNK_SIZE);
+            for (let i = 0; i < validItems.length; i += CHUNK_SIZE) {
+                const chunk = validItems.slice(i, i + CHUNK_SIZE);
                 const outcomes = await Promise.allSettled(
                     chunk.map(item => processAndDedupeCampaign(platformId, item))
                 );
@@ -110,7 +160,33 @@ export async function executeIngestionTask(adapter: IPlatformAdapter, platformId
             }
 
             // Stagger page requests to avoid rate limiting
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            await new Promise((resolve) => setTimeout(resolve, PAGE_STAGGER_MS));
+        }
+
+        const validRateTotal = totalItems > 0 ? ((totalItems - invalidItems) / totalItems) * 100 : 100;
+        const hasRecoveredData = addedCount > 0 || updatedCount > 0;
+        if (pagesScraped > 0 && !hasRecoveredData && totalItems === 0) {
+            throw new Error("no_upserted_items");
+        }
+
+        if (validRateTotal < MIN_VALID_ITEM_RATE && invalidItems > 0) {
+            await db.ingestRun.update({
+                where: { id: run.id },
+                data: {
+                    status: 'FAILED',
+                    end_time: new Date(),
+                    records_added: addedCount,
+                    records_updated: updatedCount,
+                    error_log: buildRunLog([
+                        `Pages: ${pagesScraped}`,
+                        `Total items: ${totalItems}`,
+                        `Invalid: ${invalidItems}`,
+                        `Valid item rate: ${validRateTotal.toFixed(1)}%`,
+                        `Error: low_quality_data_rate`,
+                    ]),
+                },
+            });
+            return { success: false, run_id: run.id, error: "low_valid_item_rate" };
         }
 
         await db.ingestRun.update({
@@ -120,7 +196,14 @@ export async function executeIngestionTask(adapter: IPlatformAdapter, platformId
                 end_time: new Date(),
                 records_added: addedCount,
                 records_updated: updatedCount,
-                error_log: `Processed ${totalItems} items. ${addedCount} new, ${updatedCount} updated.`
+                error_log: buildRunLog([
+                    `Pages: ${pagesScraped}`,
+                    `Total items: ${totalItems}`,
+                    `Invalid: ${invalidItems}`,
+                    `Added: ${addedCount}`,
+                    `Updated: ${updatedCount}`,
+                    failedPages ? `Failed pages: ${failedPages}` : undefined,
+                ]),
             }
         });
 

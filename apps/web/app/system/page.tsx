@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
@@ -18,11 +18,8 @@ type QualityPayload = {
     notifications: { total: number; sent: number; failed: number; successRate: number };
     dataFreshness: { lastCampaignUpdateAt: string | null; ageMinutes: number | null };
   };
-  thresholds: {
-    ingestSuccessMin: number;
-    notificationSuccessMin: number;
-    freshnessMaxMinutes: number;
-    staleRunningJobMaxMinutes: number;
+  thresholds?: {
+    freshnessMaxMinutes?: number;
   };
 };
 
@@ -30,17 +27,14 @@ type AlertPayload = {
   status: "ok" | "warn" | "critical";
   measured_at: string;
   summary: { total: number; critical: number; warn: number };
-  suppressed?: Array<{ id: string; action: "ack" | "snooze"; until: string }>;
-  data: AlertItem[];
-};
-
-type AlertItem = {
-  id: string;
-  level: "info" | "warn" | "critical";
-  source: string;
-  title: string;
-  detail: string;
-  actionPath?: string;
+  data: Array<{
+    id: string;
+    level: "info" | "warn" | "critical";
+    source: string;
+    title: string;
+    detail: string;
+    actionPath?: string;
+  }>;
 };
 
 type FetchState = {
@@ -80,10 +74,12 @@ export default function SystemPage() {
         const qualityData = (await qualityRes.json()) as QualityPayload;
         setQuality(qualityData);
       }
+
       if (alertsRes.ok) {
         const alertsData = (await alertsRes.json()) as AlertPayload;
         setAlerts(alertsData);
       }
+
       if (healthRes.ok) {
         const healthData = (await healthRes.json()) as { db?: string };
         setHealthStatus(healthData.db === "ok" ? "ok" : "error");
@@ -94,12 +90,12 @@ export default function SystemPage() {
       setFetchState({ status: "loaded", error: null });
     } catch {
       setHealthStatus("error");
-      setFetchState({ status: "error", error: "시스템 상태 정보를 불러오지 못했습니다." });
+      setFetchState({ status: "error", error: "시스템 상태 점검 또는 알림 조회에 실패했습니다." });
     }
   };
 
   useEffect(() => {
-    fetchAll();
+    void fetchAll();
     const timer = setInterval(fetchAll, 30000);
     return () => clearInterval(timer);
   }, []);
@@ -112,10 +108,10 @@ export default function SystemPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id, action: "ack", minutes: 120 }),
       });
-      if (!res.ok) throw new Error("알림 조치 처리에 실패했습니다.");
+      if (!res.ok) throw new Error("알림 조치 요청이 실패했습니다.");
       await fetchAll();
     } catch {
-      setFetchState({ ...fetchState, status: "error", error: "알림 조치가 실패했습니다." });
+      setFetchState((prev) => ({ ...prev, status: "error", error: "알림 조치 요청이 실패했습니다." }));
     } finally {
       setActioningId(null);
     }
@@ -134,21 +130,30 @@ export default function SystemPage() {
       <section className="max-w-[1300px] mx-auto px-4 md:px-8 pt-10 space-y-6">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <p className="text-xs uppercase tracking-[0.2em] text-blue-300 font-black">시스템 운영</p>
-            <h1 className="text-3xl md:text-4xl font-black tracking-tight text-white">운영 제어 센터</h1>
-            <p className="text-sm text-slate-400 mt-2">서비스 상태, 알림 큐, 복구 흐름을 한 번에 확인합니다.</p>
+            <p className="text-xs uppercase tracking-[0.2em] text-blue-300 font-black">운영 인프라</p>
+            <h1 className="text-3xl md:text-4xl font-black tracking-tight text-white">시스템 운영 대시보드</h1>
+            <p className="text-sm text-slate-400 mt-2">실시간 상태, 수집 품질, 알림을 한 화면에서 점검하고 조치할 수 있습니다.</p>
           </div>
-          <div className="flex items-center gap-2">
-            <Link href="/admin" className="px-4 py-2 rounded-xl bg-slate-800 border border-slate-700 text-sm font-bold hover:bg-slate-700 transition-colors">
-              관리자 콘솔
+          <div className="flex flex-wrap items-center gap-2 justify-end">
+            <Link
+              href="/admin"
+              className="px-4 py-2 rounded-xl bg-slate-800 border border-slate-700 text-xs font-bold hover:bg-slate-700 transition-colors whitespace-nowrap"
+            >
+              운영 콘솔
+            </Link>
+            <Link
+              href="/me"
+              className="px-4 py-2 rounded-xl bg-slate-800 border border-slate-700 text-sm font-bold hover:bg-slate-700 transition-colors"
+            >
+              사용자 홈
             </Link>
             <button
-              onClick={fetchAll}
+              onClick={() => void fetchAll()}
               disabled={fetchState.status === "loading"}
               className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 disabled:opacity-50 transition-colors text-sm font-bold inline-flex items-center gap-2"
             >
               <RefreshCcw className={`w-4 h-4 ${fetchState.status === "loading" ? "animate-spin" : ""}`} />
-              새로고침
+              다시 점검
             </button>
           </div>
         </div>
@@ -160,12 +165,12 @@ export default function SystemPage() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-5">
             <div className="flex items-center justify-between">
-              <span className="text-xs text-slate-400 font-bold">서비스 상태</span>
+              <span className="text-xs text-slate-400 font-bold">데이터베이스 상태</span>
               <Server className="w-4 h-4 text-blue-300" />
             </div>
             <p className="mt-3 text-2xl font-black text-white">{healthStatus.toUpperCase()}</p>
             <span className={`inline-flex mt-2 text-xs px-2 py-1 rounded-full border ${statusBadge(healthStatus === "checking" ? "warn" : healthStatus === "ok" ? "ok" : "critical")}`}>
-              db {healthStatus}
+              db: {healthStatus}
             </span>
           </div>
 
@@ -187,7 +192,7 @@ export default function SystemPage() {
               <Activity className="w-4 h-4 text-emerald-300" />
             </div>
             <p className="mt-3 text-2xl font-black text-white">{score ?? "-"}</p>
-            <p className="text-xs text-slate-400 mt-2">ingest + jobs + notification</p>
+            <p className="text-xs text-slate-400 mt-2">수집 + 작업 + 알림 성공률 기반</p>
           </div>
 
           <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-5">
@@ -202,7 +207,7 @@ export default function SystemPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <section className="rounded-2xl border border-slate-800 bg-slate-900/60 p-6">
-            <h2 className="text-lg font-black text-white mb-4">품질 지표 (24시간)</h2>
+            <h2 className="text-lg font-black text-white mb-4">24시간 운영 지표</h2>
             <div className="space-y-4 text-sm">
               <div className="rounded-xl border border-slate-800 bg-slate-950/50 p-4">
                 <p className="text-slate-400">수집 성공률</p>
@@ -210,12 +215,12 @@ export default function SystemPage() {
                 <p className="text-xs text-slate-500">성공 {quality?.metrics.ingest.success ?? 0} / 전체 {quality?.metrics.ingest.total ?? 0}</p>
               </div>
               <div className="rounded-xl border border-slate-800 bg-slate-950/50 p-4">
-                <p className="text-slate-400">백그라운드 작업 완료</p>
+                <p className="text-slate-400">배치 작업 완료율</p>
                 <p className="text-xl font-black text-white">{quality?.metrics.jobs.completionRate ?? 0}%</p>
-                <p className="text-xs text-slate-500">실행중 {quality?.metrics.jobs.running ?? 0} / 실패 {quality?.metrics.jobs.failed ?? 0}</p>
+                <p className="text-xs text-slate-500">진행중 {quality?.metrics.jobs.running ?? 0} / 실패 {quality?.metrics.jobs.failed ?? 0}</p>
               </div>
               <div className="rounded-xl border border-slate-800 bg-slate-950/50 p-4">
-                <p className="text-slate-400">알림 전송 성공</p>
+                <p className="text-slate-400">알림 전송 성공률</p>
                 <p className="text-xl font-black text-white">{quality?.metrics.notifications.successRate ?? 0}%</p>
                 <p className="text-xs text-slate-500">전송 {quality?.metrics.notifications.sent ?? 0} / 실패 {quality?.metrics.notifications.failed ?? 0}</p>
               </div>
@@ -226,20 +231,20 @@ export default function SystemPage() {
                     ? `${quality.metrics.dataFreshness.ageMinutes}m`
                     : "n/a"}
                 </p>
-                <p className="text-xs text-slate-500">목표 &lt;= {quality?.thresholds.freshnessMaxMinutes ?? 180}분</p>
+                <p className="text-xs text-slate-500">목표 {quality?.thresholds?.freshnessMaxMinutes ?? 180}분 이내</p>
               </div>
             </div>
           </section>
 
           <section className="rounded-2xl border border-slate-800 bg-slate-900/60 p-6">
-            <h2 className="text-lg font-black text-white mb-4">활성 알림</h2>
+            <h2 className="text-lg font-black text-white mb-4">운영 알림</h2>
             <div className="space-y-3 max-h-[560px] overflow-auto pr-1">
               {(alerts?.data ?? []).length === 0 ? (
                 <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-4 flex items-start gap-3">
                   <CheckCircle2 className="w-5 h-5 text-emerald-300 mt-0.5" />
                   <div>
-                    <p className="text-sm font-bold text-emerald-200">활성 알림이 없습니다</p>
-                    <p className="text-xs text-emerald-100/80">시스템 상태가 정상 범위입니다.</p>
+                    <p className="text-sm font-bold text-emerald-200">처리할 알림이 없습니다</p>
+                    <p className="text-xs text-emerald-100/80">현재 운영 상태가 정상 범위 내입니다.</p>
                   </div>
                 </div>
               ) : (
@@ -251,23 +256,21 @@ export default function SystemPage() {
                     </div>
                     <p className="text-xs text-slate-400 mt-2">{alert.detail}</p>
                     <div className="mt-3 flex items-center justify-between">
-                  <p className="text-[11px] text-slate-500">출처: {alert.source}</p>
+                      <p className="text-[11px] text-slate-500">원인: {alert.source}</p>
                       <div className="flex items-center gap-2">
                         <button
-                          onClick={() => runAlertAction(alert.id)}
+                          onClick={() => void runAlertAction(alert.id)}
                           disabled={actioningId === alert.id}
                           className="text-[11px] px-2 py-1 rounded-md border border-emerald-500/40 text-emerald-300 hover:bg-emerald-500/10 disabled:opacity-40"
                         >
-                          2시간 후 조치
+                          상태 처리
                         </button>
                         {alert.actionPath ? (
                           <Link href={alert.actionPath} className="inline-flex items-center gap-1 text-xs font-bold text-blue-300 hover:text-blue-200">
                             <Wrench className="w-3.5 h-3.5" />
-                            조치 이동
+                            이동
                           </Link>
-                        ) : (
-                          <span className="text-[11px] text-slate-600">해당 없음</span>
-                        )}
+                        ) : null}
                       </div>
                     </div>
                   </article>

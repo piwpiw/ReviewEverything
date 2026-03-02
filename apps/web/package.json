@@ -15,7 +15,8 @@
     "lint:ci": "eslint . --format json --output-file reports/eslint.json",
     "typecheck": "tsc --noEmit",
     "release": "node scripts/release.js --auto-commit",
-    "predeploy:local": "npm run agent:review && npm run build",
+    "predeploy:local": "npm run deploy:env-check && npm run agent:review && npm run build",
+    "deploy:env-check": "node scripts/deploy-env-check.js",
     "release:dry-run": "node scripts/release.js --auto-commit --no-push",
     "release:fast": "node scripts/release.js --auto-commit --fast",
     "deploy:prod:auto": "powershell -ExecutionPolicy Bypass -File ./scripts/deploy-auto.ps1",
@@ -66,6 +67,8 @@
     "vitest": "^4.0.18"
   },
   "optionalDependencies": {
-    "@rollup/rollup-win32-x64-msvc": "^4.59.0"
+    "@rollup/rollup-win32-x64-msvc": "^4.59.0",
+    "@tailwindcss/oxide-win32-x64-msvc": "^4.2.1",
+    "lightningcss-win32-x64-msvc": "^1.31.1"
   }
 }

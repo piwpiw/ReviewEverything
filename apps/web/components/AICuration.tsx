@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
+import Image from "next/image";
 import { Sparkles, TrendingUp, Calculator, ShieldCheck, ChevronRight } from "lucide-react";
 import Link from "next/link";
 
@@ -105,10 +106,12 @@ export default function AICuration() {
 
               <div className="flex flex-col md:flex-row gap-6">
                 <div className="relative w-full md:w-40 h-40 rounded-3xl overflow-hidden shrink-0 shadow-lg bg-slate-100 dark:bg-slate-800">
-                  <img
+                  <Image
                     src={pick.thumbnail_url || "https://via.placeholder.com/400"}
                     alt={pick.title}
-                    className="object-cover w-full h-full group-hover:scale-110 transition-transform duration-700"
+                    fill
+                    sizes="(min-width: 768px) 10rem, 100vw"
+                    className="object-cover group-hover:scale-110 transition-transform duration-700"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
                   <div className="absolute bottom-3 left-3 flex gap-1.5">

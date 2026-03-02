@@ -1,11 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
+import { getEnvironmentMode, getMissingEnvVars, REQUIRED_DB_ENV } from '@/lib/runtimeEnv';
 
 export async function GET(req: NextRequest): Promise<NextResponse> {
     const includeAdapters = req.nextUrl.searchParams.get('adapters') === 'true';
 
     let dbStatus: 'ok' | 'down' = 'ok';
     let dbError: string | undefined;
+    const envMode = getEnvironmentMode();
+    const isLocal = envMode !== 'production';
+    const missingCritical = getMissingEnvVars(REQUIRED_DB_ENV);
 
     try {
         await db.$queryRaw`SELECT 1`;
@@ -37,12 +41,21 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
         }
     }
 
-    const httpStatus = dbStatus === 'ok' ? 200 : 200; // Local DB fallback: Always return 200 to allow Admin view
+    const isHealthy = dbStatus === 'ok' && missingCritical.length === 0;
+    const httpStatus = isHealthy || isLocal ? 200 : 503;
 
-    // Override payload for local mock
-    if (dbStatus !== 'ok') {
-        payload.status = 'ok';
-        payload.message = 'Using Local Mock DB';
+    if (!isHealthy && !isLocal) {
+        payload.status = 'error';
+        payload.message = 'Database and environment verification failed';
+        if (dbError) {
+            payload.db_error = dbError;
+        }
+    }
+
+    if (missingCritical.length > 0) {
+        payload.status = 'error';
+        payload.message = 'Missing critical runtime env vars';
+        payload.missing_runtime_env = missingCritical;
     }
 
     return NextResponse.json(payload, { status: httpStatus });

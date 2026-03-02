@@ -1,4 +1,4 @@
-const fs = require('fs');
+﻿const fs = require('fs');
 const path = require('path');
 
 /**
@@ -26,18 +26,21 @@ function checkFile(filePath) {
     // 1. Check for garbled characters (common indicator of encoding issues)
     // Looking for the replacement character or excessive high-bit patterns
     if (content.includes('\ufffd')) {
-        console.error(`❌ [ENCODING ERROR] ${filePath}: Contains invalid UTF-8 characters (\ufffd).`);
+        console.error(`??[ENCODING ERROR] ${filePath}: Contains invalid UTF-8 characters (\ufffd).`);
         errorsFound++;
     }
 
     // 2. Check for missing Link/Image imports in TSX
     if (ext === '.tsx') {
-        if (content.includes('<Link') && !content.includes('import Link from "next/link"')) {
-            console.error(`❌ [IMPORT ERROR] ${filePath}: <Link> used but 'next/link' not imported.`);
+        const hasLinkImport = /import\s+Link\s+from\s+['"]next\/link['"]/.test(content);
+        const hasImageImport = /import\s+Image\s+from\s+['"]next\/image['"]/.test(content);
+
+        if (content.includes('<Link') && !hasLinkImport) {
+            console.error(`??[IMPORT ERROR] ${filePath}: <Link> used but 'next/link' not imported.`);
             errorsFound++;
         }
-        if (content.includes('<Image') && !content.includes('import Image from "next/image"')) {
-            console.error(`❌ [IMPORT ERROR] ${filePath}: <Image> used but 'next/image' not imported.`);
+        if (content.includes('<Image') && !hasImageImport) {
+            console.error(`??[IMPORT ERROR] ${filePath}: <Image> used but 'next/image' not imported.`);
             errorsFound++;
         }
     }
@@ -56,14 +59,14 @@ function walk(dir) {
     });
 }
 
-console.log('🛡️ Starting System Guard integrity check...');
+console.log('?썳截?Starting System Guard integrity check...');
 TARGET_DIRS.forEach(dir => {
     if (fs.existsSync(dir)) walk(dir);
 });
 
 if (errorsFound > 0) {
-    console.error(`\n🚨 Guard failed with ${errorsFound} issues. Please fix them before proceeding.`);
+    console.error(`\n?슚 Guard failed with ${errorsFound} issues. Please fix them before proceeding.`);
     process.exit(1);
 } else {
-    console.log('\n✅ Integrity check passed. Ready for deployment.');
+    console.log('\n??Integrity check passed. Ready for deployment.');
 }

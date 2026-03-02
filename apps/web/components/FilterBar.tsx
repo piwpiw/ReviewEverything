@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { Clock, Filter, Sparkles, X } from "lucide-react";
-import { useCallback, useMemo, useState, useTransition } from "react";
+import { useCallback, useEffect, useMemo, useState, useTransition } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 type RecentFilter = { key: string; label: string; savedAt: string };
@@ -67,7 +67,7 @@ const REGIONS: Record<string, string[]> = {
   광주: ["전체", "상무", "봉선동", "첨단", "송정동", "월드컵", "충장로", "서구", "북구"],
   울산: ["전체", "남구", "북구", "중구", "울주", "동구"],
   제주: ["전체", "제주시", "애월", "서귀포", "한림", "협재", "조천", "한경면"],
-  세종: ["전체", "한누리", "도담동", "어진동", "가람동", "어진리", "조치원"],
+  세종: ["전체", "한누리", "도담동", "어진동", "가람동", "조치원"],
   강원: ["전체", "춘천", "강릉", "동해", "속초", "원주"],
   경북: ["전체", "경산", "안동", "칠곡", "포항", "구미"],
   경남: ["전체", "창원", "진주", "김해", "양산", "부산", "통영"],
@@ -119,8 +119,7 @@ function Pill({
       onClick={onClick}
       className={`relative rounded-lg px-4 py-2 text-xs font-black transition-all ${{
         ["bg-slate-900 text-white dark:bg-blue-600"]: active,
-        ["bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-200"]:
-          !active,
+        ["bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-200"]: !active,
       }[active.toString()]}`}
     >
       {active ? <motion.span layoutId={`pill-${groupId}`} className="absolute inset-0 -z-10 rounded-lg bg-slate-900 dark:bg-blue-600" /> : null}
@@ -147,17 +146,21 @@ function saveRecents(value: RecentFilter[]) {
 }
 
 function parseVisibleDefault() {
-  if (typeof window === "undefined") return true;
+  if (typeof window === "undefined") return false;
   const raw = localStorage.getItem(FILTER_VISIBILITY_KEY);
-  if (raw === null) return true;
+  if (raw === null) return false;
   return raw === "1";
 }
 
 export default function FilterBar() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const isMapMode = searchParams.get("view") === "map";
   const [isPending, startTransition] = useTransition();
-  const [filtersVisible, setFiltersVisible] = useState(() => parseVisibleDefault());
+  const [filtersVisible, setFiltersVisible] = useState(() => {
+    const saved = parseVisibleDefault();
+    return saved;
+  });
   const [recents, setRecents] = useState<RecentFilter[]>(() => loadRecents());
   const current = useMemo<FilterQuery>(() => {
     return {
@@ -228,10 +231,31 @@ export default function FilterBar() {
     });
   }, []);
 
+  useEffect(() => {
+    if (isMapMode) {
+      setFiltersVisible(false);
+    }
+  }, [isMapMode]);
+
   const isPanelVisible = filtersVisible;
   const activeCount = Array.from(searchParams.keys()).filter((k) => k !== "view").length;
   const categories = CATEGORIES[current.type] || CATEGORIES[""];
   const regionAreas = REGIONS[current.region1] || ["전체"];
+  const activeBadges = useMemo(() => {
+    const parts = [
+      current.type ? `유형:${current.type}` : null,
+      current.platformId ? `플랫폼:${current.platformId}` : null,
+      current.media ? `매체:${current.media}` : null,
+      current.region1 ? `지역:${current.region1}` : null,
+      current.region2 ? `세부:${current.region2}` : null,
+      current.category ? `카테고리:${current.category}` : null,
+      current.minReward ? `최소보상:${current.minReward}` : null,
+      current.maxComp ? `경쟁률:${current.maxComp}` : null,
+      current.maxDeadlineDays ? `D-Day:${current.maxDeadlineDays}` : null,
+    ].filter(Boolean) as string[];
+
+    return parts;
+  }, [current]);
 
   return (
     <section className="relative rounded-3xl border border-white/60 bg-white/90 p-6 dark:bg-slate-900/90">
@@ -248,30 +272,24 @@ export default function FilterBar() {
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
-          {isPanelVisible ? (
-            <button
-              onClick={togglePanel}
-              className="rounded-xl bg-slate-900 px-5 py-2 text-sm font-black text-white dark:bg-blue-600"
-            >
-              필터 접기
-            </button>
-          ) : null}
-          {!isPanelVisible ? (
-            <button
-              onClick={togglePanel}
-              className="rounded-xl bg-slate-900 px-5 py-2 text-sm font-black text-white dark:bg-blue-600"
-            >
-              필터 펼치기
-            </button>
-          ) : null}
+        <div className="flex flex-wrap items-center gap-2">
           <button
-            onClick={saveCurrent}
+            onClick={togglePanel}
             className="rounded-xl bg-slate-900 px-5 py-2 text-sm font-black text-white dark:bg-blue-600"
           >
-            <Sparkles className="mr-1 inline h-4 w-4" />
-            현재 조건 저장
+            {isPanelVisible ? "필터 닫기" : isMapMode ? "지도에서 필터 열기" : "필터 펼치기"}
           </button>
+
+          {!isMapMode && (
+            <button
+              onClick={saveCurrent}
+              className="rounded-xl bg-slate-900 px-5 py-2 text-sm font-black text-white dark:bg-blue-600"
+            >
+              <Sparkles className="mr-1 inline h-4 w-4" />
+              현재 조건 저장
+            </button>
+          )}
+
           {activeCount > 0 ? (
             <button
               onClick={resetAll}
@@ -284,7 +302,7 @@ export default function FilterBar() {
         </div>
       </header>
 
-      {recents.length > 0 ? (
+      {!isMapMode && recents.length > 0 ? (
         <div className="mb-4 flex flex-wrap items-center gap-2">
           <span className="mr-2 text-xs font-black text-slate-400">최근 조건</span>
           {recents.map((item) => (
@@ -300,7 +318,7 @@ export default function FilterBar() {
       ) : null}
 
       {isPanelVisible ? (
-        <div className="space-y-4">
+        <div className="max-h-[48vh] overflow-y-auto space-y-4 pr-1">
           <div className="flex flex-wrap items-center gap-2">
             <span className="w-16 text-xs font-black text-slate-400">유형</span>
             {TYPES.map((item) => (
@@ -341,16 +359,16 @@ export default function FilterBar() {
           </div>
 
           <div className="grid gap-2 md:grid-cols-2">
-              <div className="rounded-2xl border border-slate-200 p-3 dark:border-slate-700">
-                <label className="mb-2 block text-xs font-black text-slate-500">지역 1단계</label>
-                <select
-                  value={current.region1}
-                  onChange={(e) => {
-                    const next = e.target.value;
-                    setParam("region_depth1", next);
-                  }}
-                  className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-white"
-                >
+            <div className="rounded-2xl border border-slate-200 p-3 dark:border-slate-700">
+              <label className="mb-2 block text-xs font-black text-slate-500">지역 1단계</label>
+              <select
+                value={current.region1}
+                onChange={(e) => {
+                  const next = e.target.value;
+                  setParam("region_depth1", next);
+                }}
+                className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-white"
+              >
                 <option value="">전체</option>
                 {regionDepth1Options.map((region) => (
                   <option key={region} value={region}>
@@ -360,7 +378,7 @@ export default function FilterBar() {
               </select>
             </div>
             <div className="rounded-2xl border border-slate-200 p-3 dark:border-slate-700">
-              <label className="mb-2 block text-xs font-black text-slate-500">지역 2단계(시군구)</label>
+              <label className="mb-2 text-xs font-black text-slate-500">지역 2단계(시군구)</label>
               <select
                 value={current.region2}
                 onChange={(e) => {
@@ -428,6 +446,24 @@ export default function FilterBar() {
               />
             </div>
           </div>
+        </div>
+      ) : isMapMode ? (
+        <div className="flex flex-wrap gap-2 text-xs text-slate-500">
+          {activeBadges.length === 0 ? (
+            <span>현재 기본 지도 뷰(조건 없이 전체 조회)</span>
+          ) : (
+            <>
+              <span className="text-slate-400">지도 적용 필터</span>
+              {activeBadges.map((badge) => (
+                <span
+                  key={badge}
+                  className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-slate-600 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300"
+                >
+                  {badge}
+                </span>
+              ))}
+            </>
+          )}
         </div>
       ) : (
         <div className="text-xs text-slate-400">필터 패널이 접힌 상태입니다. 접기/펴기 버튼으로 열어주세요.</div>

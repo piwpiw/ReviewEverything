@@ -1,4 +1,4 @@
-services:
+﻿services:
   - type: web
     name: revieweverything
     runtime: node
@@ -6,14 +6,18 @@ services:
     region: singapore
     branch: main
     rootDir: apps/web
-    buildCommand: npm ci --no-audit && npm run build
+    buildCommand: npm ci --no-audit --no-fund --prefer-offline && npm run build
+    preDeployCommand: npm run deploy:env-check
     startCommand: npm run start
+    healthCheckPath: /api/health
     envVars:
       - key: DATABASE_URL
         sync: false
       - key: DIRECT_URL
         sync: false
       - key: CRON_SECRET
+        sync: false
+      - key: ADMIN_PASSWORD
         sync: false
       - key: PUSH_ENDPOINT
         sync: false
@@ -27,3 +31,7 @@ services:
         sync: false
       - key: TELEGRAM_API_BASE
         value: https://api.telegram.org
+      - key: NEXT_PUBLIC_KAKAO_JS_KEY
+        sync: false
+      - key: NEXT_PUBLIC_NAVER_CLIENT_ID
+        sync: false

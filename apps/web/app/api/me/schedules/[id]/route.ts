@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { getMissingEnvVars, REQUIRED_DB_ENV } from "@/lib/runtimeEnv";
 
 /**
  * PATCH /api/me/schedules/[id]
@@ -17,6 +18,12 @@ export async function PATCH(
     }
 
     try {
+        if (getMissingEnvVars(REQUIRED_DB_ENV).length > 0) {
+            return NextResponse.json(
+                { error: "Database is unavailable. Retry when DB is available.", code: "DB_UNAVAILABLE" },
+                { status: 503 },
+            );
+        }
         const body = await req.json();
         const { status, custom_title, visit_date, deadline_date, sponsorship_value, ad_fee, memo, alarm_enabled } = body;
 
@@ -68,6 +75,12 @@ export async function DELETE(
     }
 
     try {
+        if (getMissingEnvVars(REQUIRED_DB_ENV).length > 0) {
+            return NextResponse.json(
+                { error: "Database is unavailable. Retry when DB is available.", code: "DB_UNAVAILABLE" },
+                { status: 503 },
+            );
+        }
         await db.userSchedule.delete({
             where: { id: scheduleId },
         });

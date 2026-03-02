@@ -1,11 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { getMissingEnvVars, REQUIRED_DB_ENV } from "@/lib/runtimeEnv";
 
 type PreferencePayload = {
   userId: number;
   notify_kakao_enabled?: boolean;
   notify_telegram_enabled?: boolean;
   notify_push_enabled?: boolean;
+};
+
+const isDbReady = () => getMissingEnvVars(REQUIRED_DB_ENV).length === 0;
+const DEFAULT_PREFERENCES = {
+  notify_kakao_enabled: false,
+  notify_telegram_enabled: false,
+  notify_push_enabled: false,
 };
 
 export async function GET(req: NextRequest) {
@@ -18,6 +26,14 @@ export async function GET(req: NextRequest) {
   const userId = Number.parseInt(userIdRaw, 10);
   if (!Number.isInteger(userId)) {
     return NextResponse.json({ error: "invalid userId" }, { status: 400 });
+  }
+
+  if (!isDbReady()) {
+    return NextResponse.json({
+      ...DEFAULT_PREFERENCES,
+      userId,
+      source: "mock",
+    });
   }
 
   const user = await db.user.findUnique({
@@ -54,6 +70,18 @@ export async function PUT(req: NextRequest) {
       notify_push_enabled:
         typeof body?.notify_push_enabled === "boolean" ? body.notify_push_enabled : undefined,
     };
+
+    if (!isDbReady()) {
+      return NextResponse.json({
+        success: true,
+        source: "mock",
+        preferences: {
+          notify_kakao_enabled: payload.notify_kakao_enabled ?? DEFAULT_PREFERENCES.notify_kakao_enabled,
+          notify_telegram_enabled: payload.notify_telegram_enabled ?? DEFAULT_PREFERENCES.notify_telegram_enabled,
+          notify_push_enabled: payload.notify_push_enabled ?? DEFAULT_PREFERENCES.notify_push_enabled,
+        },
+      });
+    }
 
     const user = await db.user.findUnique({
       where: { id: userId },

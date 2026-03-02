@@ -1,38 +1,13 @@
-"use client";
+﻿"use client";
 
-import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import {
-  Activity,
-  Database,
-  RefreshCcw,
-  CheckCircle2,
-  Layers,
-  Terminal,
-  BarChart3,
-  ShieldAlert,
-  Cpu,
-  Globe,
-  Zap,
-  ArrowUpRight,
-} from "lucide-react";
+import { Activity, ArrowUpRight, CheckCircle2, Database, Layers, RefreshCcw, ShieldAlert, Terminal, BarChart3, TerminalSquare } from "lucide-react";
 import ScraperStatusTable from "@/components/ScraperStatusTable";
 import CsvUploadFallback from "@/components/CsvUploadFallback";
 import PlatformManager from "@/components/PlatformManager";
 import AnalyticsDashboard from "@/components/AnalyticsDashboard";
-import { motion } from "framer-motion";
 
-const PLATFORM_LIST = [
-  { id: 1, name: "Revu", color: "#3b82f6" },
-  { id: 2, name: "Reviewnote", color: "#8b5cf6" },
-  { id: 3, name: "DinnerQueen", color: "#f59e0b" },
-  { id: 4, name: "ReviewPlace", color: "#10b981" },
-  { id: 5, name: "Seouloppa", color: "#ef4444" },
-  { id: 6, name: "MrBlog", color: "#6366f1" },
-  { id: 7, name: "GangnamFood", color: "#f97316" },
-] as const;
-
-type IngestStatus = "idle" | "triggering" | "success" | "error";
+type IngestStatus = "idle" | "running" | "success" | "error";
 type HealthStatus = "ok" | "error" | "checking";
 
 type IngestRun = {
@@ -44,13 +19,23 @@ type IngestRun = {
   records_updated: number;
 };
 
+type PlatformInfo = { id: number; name: string; is_active?: boolean; adapter_ready?: boolean; adapter_status?: string };
+
 type CampaignMeta = { total: number; page: number; totalPages: number };
 
-const createLog = (msg: string) => `${new Date().toLocaleTimeString()} ${msg}`;
+type QualityPayload = { status: "ok" | "warn" | "critical"; alerts_count?: number };
 
 const toNumber = (value: unknown, fallback = 0) => {
   const parsed = Number(value);
   return Number.isFinite(parsed) ? parsed : fallback;
+};
+
+const createLog = (msg: string) => `${new Date().toLocaleTimeString()} ${msg}`;
+
+const statusBadge = (status: HealthStatus | "warn" | "critical") => {
+  if (status === "ok") return "text-emerald-300 border-emerald-500/40 bg-emerald-500/10";
+  if (status === "warn") return "text-amber-300 border-amber-500/40 bg-amber-500/10";
+  return "text-rose-300 border-rose-500/40 bg-rose-500/10";
 };
 
 export default function AdminDashboard() {
@@ -59,14 +44,18 @@ export default function AdminDashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingSnapshot, setIsLoadingSnapshot] = useState(false);
   const [selectedPlatformId, setSelectedPlatformId] = useState<number | "all">("all");
-  const [dbPlatforms, setDbPlatforms] = useState<any[]>([]);
+  const [dbPlatforms, setDbPlatforms] = useState<PlatformInfo[]>([]);
   const [ingestStatus, setIngestStatus] = useState<IngestStatus>("idle");
-  const [logs, setLogs] = useState<string[]>(["[시스템] 대시보드가 초기화되었습니다.", "[준비] 사용자 명령 대기 중입니다."]);
+  const [logs, setLogs] = useState<string[]>([
+    createLog("[시스템] 관리자 콘솔 준비 완료"),
+    createLog("[대기] 명령 대기 중입니다."),
+  ]);
   const [healthStatus, setHealthStatus] = useState<HealthStatus>("checking");
   const [qualityStatus, setQualityStatus] = useState<HealthStatus | "warn" | "critical">("checking");
   const [alertsCount, setAlertsCount] = useState(0);
   const [totalCampaigns, setTotalCampaigns] = useState<number | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [requiresAdminConfig, setRequiresAdminConfig] = useState(false);
   const logContainerRef = useRef<HTMLDivElement>(null);
 
   const addLog = useCallback((msg: string) => {
@@ -76,10 +65,15 @@ export default function AdminDashboard() {
   const fetchRuns = useCallback(async () => {
     try {
       const res = await fetch("/api/admin/runs?limit=30");
+      if (res.status === 503) {
+        setRequiresAdminConfig(true);
+        throw new Error("ADMIN API is temporarily unavailable.");
+      }
       if (!res.ok) throw new Error(`수집 이력 API 호출 실패 (${res.status})`);
       const data = (await res.json()) as { data: IngestRun[]; meta?: CampaignMeta };
       setRuns(data.data || []);
       setRunMeta(data.meta || null);
+      setRequiresAdminConfig(false);
     } catch (e: unknown) {
       const message = e instanceof Error ? e.message : "수집 이력 조회에 실패했습니다.";
       setErrorMessage(message);
@@ -92,35 +86,46 @@ export default function AdminDashboard() {
   const fetchPlatforms = useCallback(async () => {
     try {
       const res = await fetch("/api/admin/platforms");
-      if (res.ok) {
-        const data = await res.json();
-        setDbPlatforms(data.filter((p: any) => p.is_active));
+      if (res.status === 503) {
+        setRequiresAdminConfig(true);
+        throw new Error("ADMIN API is temporarily unavailable.");
       }
+      if (!res.ok) return;
+      const payload = (await res.json()) as PlatformInfo[];
+      setDbPlatforms(Array.isArray(payload) ? payload.filter((platform) => platform.is_active !== false) : []);
+      setRequiresAdminConfig(false);
     } catch (e) {
-      console.error("활성 플랫폼 조회 실패", e);
+      console.error("플랫폼 조회 실패", e);
     }
   }, []);
 
   const checkHealth = useCallback(async () => {
     try {
-      const [healthRes, campRes, qualityRes] = await Promise.all([
+      const [healthRes, campaignRes, qualityRes] = await Promise.all([
         fetch("/api/health"),
         fetch("/api/campaigns?limit=1"),
         fetch("/api/admin/quality"),
       ]);
+
       const healthData = healthRes.ok ? ((await healthRes.json()) as { db?: string }) : null;
       setHealthStatus(healthData?.db === "ok" ? "ok" : "error");
 
-      if (campRes.ok) {
-        const campData = (await campRes.json()) as { meta?: { total?: number } };
-        setTotalCampaigns(toNumber(campData?.meta?.total, 0));
+      if (campaignRes.ok) {
+        const campaignData = (await campaignRes.json()) as { meta?: { total?: number } };
+        setTotalCampaigns(toNumber(campaignData?.meta?.total, 0));
+      } else if (campaignRes.status === 503) {
+        setRequiresAdminConfig(true);
       }
 
       if (qualityRes.ok) {
-        const qualityData = (await qualityRes.json()) as { status?: "ok" | "warn" | "critical"; alerts_count?: number };
+        const qualityData = (await qualityRes.json()) as QualityPayload;
         setQualityStatus((qualityData.status as HealthStatus) || "warn");
         setAlertsCount(toNumber(qualityData.alerts_count, 0));
+        setRequiresAdminConfig(false);
       } else {
+        if (qualityRes.status === 503) {
+          setRequiresAdminConfig(true);
+        }
         setQualityStatus("warn");
       }
     } catch (e: unknown) {
@@ -132,13 +137,27 @@ export default function AdminDashboard() {
   }, []);
 
   const triggerIngest = async () => {
-    if (ingestStatus === "triggering") return;
-    setIngestStatus("triggering");
+    if (ingestStatus === "running") return;
+    if (requiresAdminConfig) {
+      setErrorMessage("관리자 API 설정이 필요합니다. ADMIN_PASSWORD를 Render 환경 변수에 등록하세요.");
+      return;
+    }
+
+    setIngestStatus("running");
     setErrorMessage(null);
-    addLog(`수동 수집 실행: ${selectedPlatformId === "all" ? "전체 플랫폼" : `플랫폼 ${selectedPlatformId}`}`);
 
     const targets =
       selectedPlatformId === "all" ? dbPlatforms : dbPlatforms.filter((platform) => platform.id === selectedPlatformId);
+
+    if (targets.length === 0) {
+      setErrorMessage("실행할 플랫폼이 없습니다.");
+      setIngestStatus("error");
+      setTimeout(() => setIngestStatus("idle"), 1800);
+      return;
+    }
+
+    const targetLabel = selectedPlatformId === "all" ? "전체 플랫폼" : String(selectedPlatformId);
+    addLog(`수집 요청: ${targetLabel} (${targets.length}개)`);
 
     try {
       for (const target of targets) {
@@ -148,21 +167,29 @@ export default function AdminDashboard() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ platform_id: target.id }),
         });
+        if (res.status === 503) {
+          setRequiresAdminConfig(true);
+          throw new Error("ADMIN API is temporarily unavailable.");
+        }
+
         if (!res.ok) {
           const payload = (await res.json().catch(() => null)) as { error?: string } | null;
           throw new Error(payload?.error || `${target.name} 수집 시작 실패`);
         }
+
         addLog(`${target.name} 수집 요청 승인`);
       }
+
       setIngestStatus("success");
-      setTimeout(fetchRuns, 2000);
+      addLog("수집 요청 완료");
+      await fetchRuns();
     } catch (e: unknown) {
       const message = e instanceof Error ? e.message : "수집 실행에 실패했습니다.";
       setErrorMessage(message);
       setIngestStatus("error");
       addLog(`ERROR: ${message}`);
     } finally {
-      setTimeout(() => setIngestStatus("idle"), 5000);
+      setTimeout(() => setIngestStatus("idle"), 3000);
     }
   };
 
@@ -172,7 +199,9 @@ export default function AdminDashboard() {
       await Promise.all([fetchRuns(), checkHealth(), fetchPlatforms()]);
       setIsLoadingSnapshot(false);
     };
-    bootstrap();
+
+    void bootstrap();
+
     const runsTimer = setInterval(fetchRuns, 10000);
     const healthTimer = setInterval(checkHealth, 30000);
     const platformsTimer = setInterval(fetchPlatforms, 60000);
@@ -181,7 +210,7 @@ export default function AdminDashboard() {
       clearInterval(healthTimer);
       clearInterval(platformsTimer);
     };
-  }, [fetchRuns, checkHealth, fetchPlatforms]);
+  }, [checkHealth, fetchRuns, fetchPlatforms]);
 
   useEffect(() => {
     if (logContainerRef.current) {
@@ -191,263 +220,280 @@ export default function AdminDashboard() {
 
   const successRuns = useMemo(() => runs.filter((run) => run.status === "SUCCESS").length, [runs]);
   const failedRuns = useMemo(() => runs.filter((run) => run.status === "FAILED").length, [runs]);
+  const runningRuns = useMemo(() => runs.filter((run) => run.status === "RUNNING").length, [runs]);
   const lastRun = runs[0];
-  const lastSyncLabel = lastRun ? new Date(lastRun.start_time).toLocaleTimeString() : "IDLE";
+  const lastSyncLabel = lastRun ? new Date(lastRun.start_time).toLocaleString() : "대기";
 
-  const statCards = [
-    { label: "색인 건수", val: totalCampaigns?.toLocaleString() ?? "조회 중...", icon: Database, color: "text-blue-500", bg: "bg-blue-500/10" },
-    { label: "성공 수집", val: successRuns, icon: CheckCircle2, color: "text-green-500", bg: "bg-green-500/10" },
-    { label: "시스템 오류", val: failedRuns, icon: ShieldAlert, color: "text-rose-500", bg: "bg-rose-500/10" },
-    { label: "마지막 동기화", val: lastSyncLabel, icon: ArrowUpRight, color: "text-amber-500", bg: "bg-amber-500/10" },
-    { label: "총 실행 수", val: runMeta?.total ?? 0, icon: Activity, color: "text-emerald-500", bg: "bg-emerald-500/10" },
+  const cards = [
+    {
+      label: "총 인덱스 캠페인",
+      value: totalCampaigns?.toLocaleString() ?? "조회중...",
+      icon: Database,
+      className: statusBadge("ok"),
+    },
+    {
+      label: "성공 수집 건수",
+      value: successRuns,
+      icon: CheckCircle2,
+      className: statusBadge("ok"),
+    },
+    {
+      label: "실패 수집 건수",
+      value: failedRuns,
+      icon: ShieldAlert,
+      className: statusBadge("critical"),
+    },
+    {
+      label: "마지막 동기화",
+      value: lastSyncLabel,
+      icon: ArrowUpRight,
+      className: statusBadge("warn"),
+    },
+    {
+      label: "백그라운드 실행중",
+      value: runMeta?.total ?? 0,
+      icon: Activity,
+      className: statusBadge("ok"),
+    },
   ];
 
   return (
-    <div className="min-h-screen bg-[#020617] text-slate-400 font-sans selection:bg-blue-500/30 pb-40">
-      <div className="bg-slate-900/50 backdrop-blur-xl border-b border-slate-800 sticky top-0 z-[100]">
-        <div className="max-w-[1700px] mx-auto px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-6">
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/20">
-                <Cpu className="w-5 h-5 text-white" />
-              </div>
-              <div className="flex flex-col">
-                <span className="text-[10px] font-black text-slate-500 tracking-widest uppercase">운영센터 01</span>
-                <h1 className="text-sm font-black text-white leading-none">수집 제어 패널</h1>
-              </div>
-            </div>
-            <div className="h-8 w-px bg-slate-800" />
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
-                <div className={`w-2 h-2 rounded-full ${healthStatus === "ok" ? "bg-green-500 animate-pulse" : "bg-red-500"}`} />
-                <span className="text-[10px] font-black uppercase">DB 연결</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className={`w-2 h-2 rounded-full ${qualityStatus === "ok" ? "bg-emerald-500" : qualityStatus === "warn" ? "bg-amber-500" : "bg-rose-500"}`} />
-                <span className="text-[10px] font-black uppercase">운영 상태 {qualityStatus.toUpperCase()}</span>
-                <span className="text-[10px] font-black text-slate-500">알림 {alertsCount}건</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Globe className="w-3.5 h-3.5 text-blue-500" />
-                <span className="text-[10px] font-black uppercase tracking-widest">{dbPlatforms.length}개 활성 플랫폼</span>
-              </div>
-            </div>
-          </div>
-          <div className="flex items-center gap-4">
-            <Link href="/system" className="px-5 py-2 rounded-xl bg-blue-600 text-white text-[10px] font-black hover:bg-blue-500 transition-all border border-blue-500/50 shadow-inner">
-              운영 제어 열기
-            </Link>
-            <Link href="/" className="px-5 py-2 rounded-xl bg-slate-800 text-white text-[10px] font-black hover:bg-slate-700 transition-all border border-slate-700/50 shadow-inner">
-              홈으로 이동
-            </Link>
-          </div>
-        </div>
-      </div>
+    <div className="min-h-screen bg-[#020617] text-slate-200 pb-20">
+      <main className="max-w-[1680px] mx-auto p-6 space-y-6">
+        <section className="rounded-2xl bg-slate-900/60 border border-slate-800 p-6">
+          <p className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">운영 대시보드</p>
+          <h1 className="text-2xl font-black text-white mt-2">관리자 콘솔</h1>
+          <p className="text-sm text-slate-400 mt-2">수집, 플랫폼 상태, 분석, 알림 이력을 한 화면에서 운영합니다.</p>
+          <button
+            onClick={() => void checkHealth()}
+            className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-800 text-white text-xs font-black border border-slate-700/50 hover:bg-slate-700"
+            disabled={healthStatus === "checking"}
+          >
+            운영 상태 재점검
+          </button>
+        </section>
 
-      <div className="max-w-[1700px] mx-auto p-6 flex flex-col gap-6 mt-4">
-        {errorMessage ? <div className="rounded-xl border border-rose-500/40 bg-rose-500/10 px-4 py-2 text-sm text-rose-200">{errorMessage}</div> : null}
+        {errorMessage ? <div className="rounded-lg border border-rose-500/40 bg-rose-500/10 text-rose-200 px-4 py-3 text-sm">{errorMessage}</div> : null}
+        {requiresAdminConfig ? (
+          <section className="rounded-lg border border-rose-400/50 bg-rose-500/10 px-4 py-4 text-rose-200 text-sm space-y-3">
+            <p className="font-black text-rose-100">관리자 API 인증 설정 필요</p>
+            <p className="text-rose-200/90 leading-relaxed">
+              관리자 API 요청이 503으로 내려옵니다. Render 환경 변수에 아래 값을 등록하고 재배포하면 즉시 해소됩니다.
+            </p>
+            <ul className="list-disc list-inside text-xs text-rose-200/90 space-y-1">
+              <li><strong>ADMIN_PASSWORD</strong> : 운영자 전용 비밀번호</li>
+              <li><strong>CRON_SECRET</strong> : 자동 수집 트리거 토큰</li>
+              <li><strong>DATABASE_URL</strong> / <strong>DIRECT_URL</strong> : DB 연결</li>
+              <li><strong>NEXT_PUBLIC_KAKAO_JS_KEY</strong> 또는 <strong>NEXT_PUBLIC_NAVER_CLIENT_ID</strong> : 지도 표시</li>
+            </ul>
+            <p className="text-xs font-black">
+              현재 환경: <code className="rounded bg-rose-900/40 px-2 py-0.5">{process.env.NODE_ENV}</code>
+            </p>
+          </section>
+        ) : null}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-4">
-          {statCards.map((stat, i) => (
-            <motion.div
-              key={stat.label}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.05 }}
-              className="bg-slate-900/50 p-6 rounded-[2rem] border border-slate-800/80 shadow-2xl relative overflow-hidden group"
+        <section id="overview" className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-4">
+          {cards.map((card) => (
+            <div
+              key={card.label}
+              className={`rounded-2xl border border-slate-800 p-6 ${card.className} backdrop-blur`}
             >
-              <div className="absolute -right-4 -top-4 w-24 h-24 bg-white/5 rounded-full blur-[30px] group-hover:bg-white/10 transition-all" />
-              <div className="flex justify-between items-start mb-4 relative z-10">
-                <div className={`p-2.5 ${stat.bg} ${stat.color} rounded-2xl`}>
-                  <stat.icon className="w-5 h-5" />
-                </div>
-                <span className="text-[9px] font-black tracking-[0.2em] text-slate-500">NODE_{i + 1}</span>
+              <div className="flex justify-between items-start">
+                <h3 className="text-[11px] font-black text-slate-500 uppercase tracking-[0.2em]">{card.label}</h3>
+                <card.icon className="w-4 h-4" />
               </div>
-              <div className="text-3xl font-black text-white mb-1">{stat.val}</div>
-              <div className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{stat.label}</div>
-            </motion.div>
+              <p className="mt-4 text-2xl font-black text-white break-words">{card.value}</p>
+            </div>
           ))}
-        </div>
+        </section>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          <div className="lg:col-span-8 flex flex-col gap-6">
-            <div className="bg-slate-900/50 rounded-[2.5rem] border border-slate-800/80 shadow-2xl p-8">
-              <div className="flex justify-between items-center mb-10">
-                <div className="flex flex-col gap-1">
-                  <h2 className="text-xl font-black text-white flex items-center gap-3 italic">
-                    <Terminal className="w-5 h-5 text-blue-500" />
-                    COMMAND_DESK_V2
-                  </h2>
-                <p className="text-[10px] text-slate-500 font-black uppercase tracking-widest">플랫폼 전체 수집을 수동으로 실행합니다.</p>
-                </div>
-                <button
-                  onClick={fetchRuns}
-                  className="p-3 bg-slate-800/50 rounded-2xl text-slate-400 hover:text-white transition-all border border-slate-700/50 active:rotate-180 duration-500"
-                  disabled={isLoadingSnapshot}
-                >
-                  <RefreshCcw className="w-5 h-5" />
-                </button>
-              </div>
-
-              <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-8 gap-2 mb-10">
-                <button
-                  onClick={() => setSelectedPlatformId("all")}
-                  className={`px-3 py-3 rounded-2xl text-[10px] font-black transition-all border ${
-                    selectedPlatformId === "all"
-                      ? "bg-blue-600 text-white border-blue-600 shadow-2xl shadow-blue-500/40"
-                      : "bg-slate-800/50 text-slate-500 border-slate-700/50 hover:border-slate-500"
-                  }`}
-                >
-                  전체 플랫폼
-                </button>
-                {dbPlatforms.map((platform) => (
-                  <button
-                    key={platform.id}
-                    onClick={() => setSelectedPlatformId(platform.id)}
-                    className={`px-3 py-3 rounded-2xl text-[10px] font-black transition-all border ${
-                      selectedPlatformId === platform.id
-                        ? "bg-blue-600 text-white border-blue-600 shadow-2xl shadow-blue-500/40"
-                        : "bg-slate-800/50 text-slate-500 border-slate-700/50 hover:border-slate-500"
-                    }`}
-                  >
-                    {platform.name.toUpperCase()}
-                  </button>
-                ))}
-              </div>
-
-              <div className="space-y-6">
-                <div className="flex flex-col md:flex-row gap-6 p-10 rounded-[2.5rem] bg-black/40 border border-slate-800/50 items-center justify-between group">
-                  <div className="flex items-center gap-6">
-                    <div className="relative">
-                      <div className="w-20 h-20 bg-blue-500/10 rounded-[2rem] flex items-center justify-center text-blue-400 border border-blue-500/20 group-hover:rotate-12 transition-transform">
-                        <Layers className="w-10 h-10" />
-                      </div>
-                      {ingestStatus === "triggering" ? <div className="absolute inset-0 border-4 border-blue-500 border-t-transparent rounded-[2rem] animate-spin" /> : null}
-                    </div>
-                    <div>
-                      <div className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">대상 클러스터</div>
-                      <div className="text-3xl font-black text-white tracking-tighter">
-                        {selectedPlatformId === "all" ? "전체 파이프라인" : dbPlatforms.find((platform) => platform.id === selectedPlatformId)?.name}
-                      </div>
-                      <div className="flex items-center gap-2 mt-2">
-                        <div className="w-2 h-2 rounded-full bg-emerald-500" />
-                        <span className="text-[9px] font-black text-emerald-500/80 uppercase">명령 대기 중</span>
-                      </div>
-                    </div>
-                  </div>
-                  <button
-                    onClick={triggerIngest}
-                    disabled={ingestStatus === "triggering"}
-                    className={`group relative overflow-hidden px-12 py-7 rounded-[2rem] font-black text-xs tracking-[0.2em] transition-all ${
-                      ingestStatus === "triggering"
-                        ? "bg-slate-800 text-slate-600 cursor-not-allowed"
-                        : "bg-white text-slate-900 hover:bg-blue-600 hover:text-white transform active:scale-95 shadow-[0_20px_40px_-15px_rgba(255,255,255,0.2)]"
-                    }`}
-                  >
-                    <span className="relative z-10">{ingestStatus === "triggering" ? "실행 중..." : "수집 실행"}</span>
-                    <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity" />
-                  </button>
-                </div>
-
-                <div className="flex flex-col gap-3">
-                  <div className="flex items-center justify-between px-2">
-                    <span className="text-[10px] font-black text-slate-500 tracking-widest uppercase flex items-center gap-2">
-                      <Terminal className="w-3 h-3 text-emerald-500" />
-                      운영 터미널
-                    </span>
-                    <span className="text-[10px] font-bold text-slate-600">연결: TCP/IP + SSL</span>
-                  </div>
-                  <div
-                    ref={logContainerRef}
-                    className="h-44 bg-black/80 rounded-[2rem] p-6 font-mono text-[11px] text-emerald-500/90 leading-relaxed overflow-y-auto border border-slate-800/60 shadow-inner custom-scrollbar"
-                  >
-                    {isLoading ? <p>로그를 불러오는 중...</p> : null}
-                    {logs.map((log, i) => (
-                      <div key={`${log}-${i}`} className="mb-1 opacity-80 hover:opacity-100 transition-opacity">
-                        <span className="text-slate-600 mr-2">root@system:~$</span>
-                        {log}
-                      </div>
-                    ))}
-                    {ingestStatus === "triggering" ? <div className="animate-pulse">_</div> : null}
-                  </div>
+        <section id="control" className="grid grid-cols-1 lg:grid-cols-[1.2fr_1fr] gap-6">
+          <div className="rounded-2xl bg-slate-900/50 border border-slate-800 p-6">
+            <div className="flex items-center justify-between mb-5">
+              <div className="flex items-center gap-3">
+                <Terminal className="w-5 h-5 text-blue-300" />
+                <div>
+                  <h2 className="text-lg font-black text-white">수집 실행</h2>
+                  <p className="text-xs text-slate-400">선택한 플랫폼을 즉시 수집합니다.</p>
                 </div>
               </div>
-            </div>
-
-            {/* --- Market Analytics Section --- */}
-            <div className="bg-slate-900/50 rounded-[2.5rem] border border-slate-800/80 shadow-2xl p-8 mb-6 mt-4 relative overflow-hidden group">
-              <div className="absolute inset-0 bg-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
-              <div className="flex flex-col gap-1 mb-10 text-center relative z-10">
-                <h2 className="text-2xl font-black text-white flex items-center justify-center gap-3 italic tracking-tighter">
-                  <BarChart3 className="w-8 h-8 text-blue-500" />
-                  MARKET_INTELLIGENCE_CENTER
-                </h2>
-                <p className="text-[10px] text-slate-500 font-black uppercase tracking-[0.3em]">Advanced cross-platform metrics and trend analysis.</p>
-              </div>
-              <AnalyticsDashboard />
-            </div>
-
-            <div className="bg-slate-900/50 rounded-[2.5rem] border border-slate-800/80 shadow-2xl overflow-hidden">
-              <div className="p-8 border-b border-slate-800/60 flex justify-between items-center bg-slate-900/30">
-                <h3 className="text-sm font-black text-white flex items-center gap-3">
-                  <BarChart3 className="w-5 h-5 text-emerald-500" />
-                  파이프라인 실행 기록
-                </h3>
-                <div className="text-[9px] font-black text-slate-600 uppercase tracking-widest px-3 py-1 bg-black/40 rounded-full border border-slate-800">최근 30건</div>
-              </div>
-              <ScraperStatusTable initialRuns={runs} />
-            </div>
-          </div>
-
-          <div className="lg:col-span-4 flex flex-col gap-6">
-            <div className="bg-slate-900/50 rounded-[2.5rem] border border-slate-800/80 p-8 shadow-2xl relative overflow-hidden group">
-              <div className="absolute inset-0 bg-blue-600/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-              <h3 className="text-lg font-black text-white mb-6 flex items-center gap-3 relative z-10 italic">
-                <ShieldAlert className="w-5 h-5 text-amber-500" />
-                안전 제어
-              </h3>
-              <CsvUploadFallback />
-            </div>
-
-            <div className="bg-gradient-to-br from-blue-600 to-indigo-900 rounded-[2.5rem] p-8 shadow-2xl text-white relative overflow-hidden group">
-              <div className="absolute -right-10 -bottom-10 w-40 h-40 bg-white/10 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-[2s]" />
-              <h3 className="text-xl font-black mb-4 flex items-center gap-3">
-                <Zap className="w-6 h-6 text-amber-300" />
-                하이퍼 수집 AI
-              </h3>
-              <p className="text-sm text-blue-100/70 mb-8 leading-relaxed font-bold">
-                IP 로테이션과 동적 재시도로 고성능 모드가 동작 중입니다.
-              </p>
-              <div className="space-y-5 relative z-10">
-                {[
-                  { k: "동시 실행 수", v: "15개 워커" },
-                  { k: "인코딩", v: "Strict UTF-8 (BOM 없음)" },
-                  { k: "우회 방식", v: "User-Agent 자동 회전" },
-                  { k: "보호 정책", v: "속도 제한 자동 조절" },
-                ].map((item) => (
-                  <div key={item.k} className="flex justify-between text-[11px] font-black border-b border-white/10 pb-3">
-                    <span className="text-blue-200 uppercase tracking-widest">{item.k}</span>
-                    <span className="text-white">{item.v}</span>
-                  </div>
-                ))}
-              </div>
-              <button className="mt-8 w-full py-4 bg-white/10 hover:bg-white/20 border border-white/20 rounded-2xl text-[10px] font-black tracking-[0.2em] transition-all">
-                상세 로그 열기
+              <button
+                onClick={() => void fetchRuns()}
+                disabled={isLoadingSnapshot}
+                className="p-2 rounded-xl bg-slate-800 border border-slate-700 hover:bg-slate-700"
+              >
+                <RefreshCcw className={`w-4 h-4 ${isLoadingSnapshot ? "animate-spin" : ""}`} />
               </button>
             </div>
+
+            <div className="flex flex-wrap gap-2 mb-5">
+              <button
+                onClick={() => setSelectedPlatformId("all")}
+                className={`px-3 py-2 text-xs rounded-xl border font-black ${
+                  selectedPlatformId === "all"
+                    ? "bg-blue-600 border-blue-500 text-white"
+                    : "bg-slate-800 border-slate-700 text-slate-400"
+                }`}
+              >
+                전체 플랫폼
+              </button>
+              {dbPlatforms.map((platform) => (
+                <button
+                  key={platform.id}
+                  onClick={() => setSelectedPlatformId(platform.id)}
+                  className={`px-3 py-2 text-xs rounded-xl border font-black ${
+                    selectedPlatformId === platform.id
+                      ? "bg-blue-600 border-blue-500 text-white"
+                      : "bg-slate-800 border-slate-700 text-slate-400"
+                  }`}
+                >
+                  {platform.name}
+                </button>
+              ))}
+            </div>
+
+            <div className="grid sm:grid-cols-3 gap-3 text-xs text-slate-400 mb-5">
+              <div className="rounded-xl border border-slate-800 p-3">
+                <p className="text-slate-500 mb-1">수집 상태</p>
+                <p className="text-white font-black">
+                  {ingestStatus === "running"
+                    ? "실행 중"
+                    : ingestStatus === "success"
+                      ? "요청 완료"
+                      : ingestStatus === "error"
+                        ? "실패"
+                        : "대기"}
+                </p>
+              </div>
+              <div className="rounded-xl border border-slate-800 p-3">
+                <p className="text-slate-500 mb-1">DB 상태</p>
+                <p className="text-white font-black">{healthStatus === "ok" ? "정상" : healthStatus === "error" ? "오류" : "확인중"}</p>
+              </div>
+              <div className="rounded-xl border border-slate-800 p-3">
+                <p className="text-slate-500 mb-1">실시간 실행</p>
+                <p className="text-white font-black">{runningRuns} / {runs.length}</p>
+              </div>
+            </div>
+
+            <button
+              onClick={triggerIngest}
+              disabled={ingestStatus === "running" || requiresAdminConfig}
+              className={`w-full py-4 rounded-2xl border border-slate-700 font-black text-sm tracking-wide ${
+                ingestStatus === "running"
+                  ? "bg-slate-800 text-slate-500"
+                  : requiresAdminConfig
+                    ? "bg-slate-800 text-rose-300 cursor-not-allowed"
+                  : "bg-white text-slate-900 hover:bg-blue-500 hover:text-white"
+              }`}
+            >
+              {requiresAdminConfig
+                ? "환경 설정 필요"
+                : ingestStatus === "running"
+                  ? "수집 실행 중..."
+                  : "수집 실행"}
+            </button>
+
+            <div
+              className="mt-5 border border-slate-800 rounded-2xl p-4 bg-black/40 h-56 overflow-y-auto"
+              ref={logContainerRef}
+            >
+              {isLoading ? <p className="text-slate-500">이전 로그를 불러오는 중입니다.</p> : null}
+              {logs.map((log) => (
+                <p key={log} className="font-mono text-xs text-emerald-300/90 mb-1">
+                  {log}
+                </p>
+              ))}
+            </div>
           </div>
-        </div>
-        <div className="bg-slate-900/50 rounded-[2.5rem] border border-slate-800/80 shadow-2xl p-8 mt-6">
-          <div className="flex flex-col gap-1 mb-8">
-            <h2 className="text-xl font-black text-white flex items-center gap-3 italic">
-              <Globe className="w-5 h-5 text-blue-500" />
-              플랫폼 도메인 관리자
-            </h2>
-            <p className="text-[10px] text-slate-500 font-black uppercase tracking-widest">도메인 일괄 동기화로 수집 대상을 등록·수정합니다.</p>
+
+          <div className="space-y-6">
+            <div className="rounded-2xl bg-slate-900/50 border border-slate-800 p-6">
+              <h3 className="text-lg font-black text-white mb-3 flex items-center gap-2">
+                <Layers className="w-5 h-5 text-blue-400" />
+                수집 환경 요약
+              </h3>
+              <div className="space-y-2 text-sm text-slate-300">
+                <div className="flex items-center justify-between">
+                  <span>활성 플랫폼</span>
+                  <span className="font-black">{dbPlatforms.length}개</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span>알림 건수</span>
+                  <span
+                    className={`px-2 py-1 rounded-full text-xs border ${
+                      qualityStatus === "ok"
+                        ? "text-emerald-300 border-emerald-500/40 bg-emerald-500/10"
+                        : qualityStatus === "warn"
+                          ? "text-amber-300 border-amber-500/40 bg-amber-500/10"
+                          : "text-rose-300 border-rose-500/40 bg-rose-500/10"
+                    }`}
+                  >
+                    {alertsCount}건
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span>총 실행 수</span>
+                  <span className="font-black">{runMeta?.total ?? 0}건</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="rounded-2xl bg-slate-900/50 border border-slate-800 p-6">
+              <h3 className="text-lg font-black text-white mb-3 flex items-center gap-2">
+                <TerminalSquare className="w-5 h-5 text-blue-400" />
+                운영 바로가기
+              </h3>
+              <div className="space-y-2">
+                <a
+                  href="/system"
+                  className="block rounded-xl border border-slate-700 p-3 text-sm text-slate-200 hover:bg-slate-800"
+                >
+                  운영 점검 센터로 이동
+                </a>
+                <a
+                  href="/me"
+                  className="block rounded-xl border border-slate-700 p-3 text-sm text-slate-200 hover:bg-slate-800"
+                >
+                  사용자 대시보드 보기
+                </a>
+                <a
+                  href="/me/console"
+                  className="block rounded-xl border border-slate-700 p-3 text-sm text-slate-200 hover:bg-slate-800"
+                >
+                  프로젝트 콘솔로 이동
+                </a>
+              </div>
+            </div>
+
+            <div className="rounded-2xl bg-slate-900/50 border border-slate-800 p-6">
+              <h3 className="text-lg font-black text-white mb-3 flex items-center gap-2">
+                <BarChart3 className="w-5 h-5 text-emerald-400" />
+                배치 운영
+              </h3>
+              <p className="text-sm text-slate-300 mt-2">CSV 업로드 fallback과 수동 보정 기능을 이용해 데이터 정합성을 유지하세요.</p>
+              <div className="mt-4">
+                <CsvUploadFallback />
+              </div>
+            </div>
           </div>
+        </section>
+
+        <section id="history" className="rounded-2xl bg-slate-900/50 border border-slate-800 p-6">
+          <h2 className="text-lg font-black text-white mb-4">수집 이력</h2>
+          <ScraperStatusTable initialRuns={runs} />
+        </section>
+
+        <section id="analysis" className="rounded-2xl bg-slate-900/50 border border-slate-800 p-6">
+          <h2 className="text-lg font-black text-white mb-4">분석 대시보드</h2>
+          <AnalyticsDashboard />
+        </section>
+
+        <section id="platforms" className="rounded-2xl bg-slate-900/50 border border-slate-800 p-6">
+          <h2 className="text-lg font-black text-white mb-4">플랫폼 관리</h2>
           <PlatformManager />
-        </div>
-      </div>
+        </section>
+      </main>
     </div>
   );
 }
+

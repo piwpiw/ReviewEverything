@@ -18,7 +18,12 @@ export async function POST(req: NextRequest) {
         const adapter = InitializedAdapters[adapterName];
 
         if (!adapter) {
-            return NextResponse.json({ error: "Adapter not initialized for platform" }, { status: 500 });
+            return NextResponse.json({
+                error: "Adapter not implemented for this platform yet",
+                platform: platform.name,
+                platform_id: platform.id,
+                code: "ADAPTER_NOT_IMPLEMENTED",
+            }, { status: 409 });
         }
 
         // Run ingestion asynchronously so the API responds before Vercel timeout

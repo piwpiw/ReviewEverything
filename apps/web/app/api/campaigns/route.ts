@@ -165,7 +165,7 @@ const clamp = (value: number, min: number, max: number) => Math.max(min, Math.mi
 
 const regionCenter = (d1: string, d2: string): Coord => {
   const city = REGION_CENTERS[d1] || {};
-  return city[d2] || city[""] || city["?꾩껜"] || { lat: 37.5665, lng: 126.978 };
+  return city[d2] || city["전체"] || city[""] || { lat: 37.5665, lng: 126.978 };
 };
 
 const withFallbackCoords = (campaign: any) => {
@@ -265,7 +265,7 @@ const MOCK_CAMPAIGNS: MockCampaign[] = Array.from({ length: 1200 }).map((_, i) =
     region_depth2: region.d2,
     lat: center.lat + jitterLat,
     lng: center.lng + jitterLng,
-    reward_text: `${reward}留뚯썝`,
+    reward_text: `${reward}원`,
     reward_value: reward * 10000,
     recruit_count: recruit,
     applicant_count: applicants,

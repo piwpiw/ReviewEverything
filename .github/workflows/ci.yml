@@ -12,6 +12,7 @@ on:
 
 env:
   NODE_VERSION: "22"
+  NPM_INSTALL_FLAGS: "--no-audit --no-fund --prefer-offline"
 
 jobs:
   scope:
@@ -108,7 +109,7 @@ jobs:
           cache-dependency-path: apps/web/package-lock.json
 
       - name: Install dependencies
-        run: npm ci
+        run: npm ci ${{ env.NPM_INSTALL_FLAGS }}
 
       - name: Lint gate
         run: |
@@ -143,7 +144,7 @@ jobs:
           cache-dependency-path: apps/web/package-lock.json
 
       - name: Install dependencies
-        run: npm ci
+        run: npm ci ${{ env.NPM_INSTALL_FLAGS }}
 
       - name: Typecheck gate
         run: |
@@ -179,7 +180,7 @@ jobs:
           cache-dependency-path: apps/web/package-lock.json
 
       - name: Install dependencies
-        run: npm ci
+        run: npm ci ${{ env.NPM_INSTALL_FLAGS }}
 
       - name: Smoke gate
         run: |
@@ -217,7 +218,7 @@ jobs:
           cache-dependency-path: apps/web/package-lock.json
 
       - name: Install dependencies
-        run: npm ci
+        run: npm ci ${{ env.NPM_INSTALL_FLAGS }}
 
       - name: Test gate
         run: |
@@ -440,17 +441,53 @@ jobs:
       issues: write
     runs-on: ubuntu-latest
     steps:
+      - name: Download CI reports
+        uses: actions/download-artifact@v4
+        with:
+          name: web-ci-reports
+          path: artifacts
+          merge-multiple: true
+          if-no-files-found: ignore
+
       - name: Open issue on CI failure
         uses: actions/github-script@v7
         with:
           script: |
             const title = `CI Failure: ${context.repo.owner}/${context.repo.repo} ${context.sha}`;
+            const fs = require("node:fs");
+            const path = "artifacts/ci-summary.md";
+            const repoBaseUrl = context.payload.repository.html_url;
+            const summary = fs.existsSync(path)
+              ? fs.readFileSync(path, "utf8").trim()
+              : "CI summary file unavailable.";
+            const snippet = summary
+              .split(/\r?\n/)
+              .filter((line) => line.trim())
+              .slice(0, 40)
+              .join("\n");
+            const gateSummary = [
+              "lint: ${{ needs.lint.result }}",
+              "typecheck: ${{ needs.typecheck.result }}",
+              "smoke: ${{ needs.smoke.result }}",
+              "test: ${{ needs.test.result }}",
+              "api_contract: ${{ needs.api_contract.result }}",
+              "api_sync: ${{ needs.api_sync.result }}",
+              "scope: ${{ needs.scope.outputs.scope }}",
+            ].join("\n- ");
+
             const { data: issues } = await github.rest.search.issuesAndPullRequests({
               q: `repo:${context.repo.owner}/${context.repo.repo} is:issue is:open "${title}" in:title`
             });
 
-            if (issues.total_count > 0) {
-              core.info(`Existing issue found: ${issues.items[0].html_url}`);
+            const existingIssue = issues.items.find((issue) => issue.title === title && issue.state === "open");
+            if (existingIssue) {
+              core.info(`Updating existing issue: ${existingIssue.html_url}`);
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: existingIssue.number,
+                body: `CI gates failed on commit ${context.sha}.\n\n### CI summary (top)\n\n\`\`\`\n${snippet}\n\`\`\`\n\n### Gate status\n- ${gateSummary}\n\n### Run details\n- commit: ${repoBaseUrl}/commit/${context.sha}\n- workflow run: ${repoBaseUrl}/actions/runs/${context.runId}\n\nSee artifact: \`web-ci-reports\``,
+              });
               return;
             }
 
@@ -458,6 +495,6 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               title,
-              body: `CI gates failed on commit ${context.sha}.\n\nSee artifact: \`web-ci-reports\``,
+              body: `CI gates failed on commit ${context.sha}.\n\n### CI summary (top)\n\n\`\`\`\n${snippet}\n\`\`\`\n\n### Gate status\n- ${gateSummary}\n\n### Run details\n- commit: ${repoBaseUrl}/commit/${context.sha}\n- workflow run: ${repoBaseUrl}/actions/runs/${context.runId}\n\nSee artifact: \`web-ci-reports\``,
               labels: ['ci-failure', 'automated'],
             });

@@ -1,12 +1,22 @@
 import { db } from "@/lib/db";
 import { NextResponse } from "next/server";
+import { InitializedAdapters } from "@/sources/registry";
 
 export async function GET() {
   try {
     const platforms = await db.platform.findMany({
       orderBy: { created_at: "desc" },
     });
-    return NextResponse.json(platforms);
+    const payload = platforms.map((platform) => {
+      const key = platform.name.toLowerCase();
+      const hasAdapter = Boolean(InitializedAdapters[key]);
+      return {
+        ...platform,
+        adapter_ready: hasAdapter,
+        adapter_status: hasAdapter ? "implemented" : "missing",
+      };
+    });
+    return NextResponse.json(payload);
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

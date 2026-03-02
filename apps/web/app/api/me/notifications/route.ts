@@ -1,11 +1,25 @@
 import { NextRequest, NextResponse } from "next/server";
 import { dispatchNotificationWithRetry, normalizeDeliveryChannel } from "@/lib/notificationSender";
 import { db } from "@/lib/db";
+import { getMissingEnvVars, REQUIRED_DB_ENV } from "@/lib/runtimeEnv";
 
 /**
  * GET /api/me/notifications
  * Fetch recent notification history for a user.
  */
+
+const isDbReady = () => getMissingEnvVars(REQUIRED_DB_ENV).length === 0;
+const buildMockListResponse = (take = 50) => ({
+    data: [],
+    meta: {
+        count: 0,
+        hasMore: false,
+        nextCursor: null,
+        source: "mock",
+        take,
+    },
+});
+
 export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const userId = searchParams.get("userId");
@@ -44,6 +58,10 @@ export async function GET(req: NextRequest) {
         return NextResponse.json({ error: "invalid cursor", code: "INVALID_CURSOR" }, { status: 400 });
     }
 
+    if (!isDbReady()) {
+        return NextResponse.json(buildMockListResponse(parsedTake), { status: 200 });
+    }
+
     const where: {
         user_id: number;
         status?: { in: string[] } | { notIn: string[] } | string;
@@ -51,7 +69,7 @@ export async function GET(req: NextRequest) {
         created_at?: { gte?: Date; lte?: Date };
     } = { user_id: parsedUserId };
 
-    if (statusFilter && !["success", "pending", "failed"].includes(statusFilter)) {
+    if (statusFilter && !["all", "success", "pending", "failed"].includes(statusFilter)) {
         return NextResponse.json({ error: "invalid status filter", code: "INVALID_STATUS_FILTER" }, { status: 400 });
     }
 
@@ -63,7 +81,9 @@ export async function GET(req: NextRequest) {
         where.status = "PENDING";
     }
 
-    if (channelFilter && channelFilter !== "all" && ["push", "kakao", "telegram"].includes(channelFilter)) {
+    if (!channelFilter || channelFilter === "all") {
+        // no-op: return all channels
+    } else if (["push", "kakao", "telegram"].includes(channelFilter)) {
         where.channel = channelFilter;
     } else if (channelFilter) {
         return NextResponse.json({ error: "invalid channel filter", code: "INVALID_CHANNEL_FILTER" }, { status: 400 });
@@ -186,6 +206,12 @@ export async function POST(req: NextRequest) {
 
         let deliveryId: number | undefined;
         if (shouldPersist && payload.scheduleId !== null) {
+            if (!isDbReady()) {
+                return NextResponse.json(
+                    { error: "Database is unavailable. Retry when DB is available.", code: "DB_UNAVAILABLE" },
+                    { status: 503 },
+                );
+            }
             const now = new Date();
             const delivery = await db.notificationDelivery.create({
                 data: {
@@ -255,6 +281,13 @@ export async function PATCH(req: NextRequest) {
         }
         if (!Number.isInteger(deliveryId) || deliveryId <= 0) {
             return NextResponse.json({ error: "invalid deliveryId", code: "INVALID_DELIVERY_ID" }, { status: 400 });
+        }
+
+        if (!isDbReady()) {
+            return NextResponse.json(
+              { error: "Database is unavailable. Retry when DB is available.", code: "DB_UNAVAILABLE" },
+              { status: 503 },
+            );
         }
 
         const updates: Record<string, unknown> = {};
