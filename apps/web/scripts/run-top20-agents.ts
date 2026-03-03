@@ -1,4 +1,4 @@
-﻿import { spawn, ChildProcessWithoutNullStreams } from "node:child_process";
+﻿import { spawn } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 
@@ -12,7 +12,7 @@ type RawArgs = Record<string, string | undefined>;
 type StopReason = "signal" | "duration" | "manual";
 
 type ActiveAgent = {
-  child: ChildProcessWithoutNullStreams;
+  child: ReturnType<typeof spawn>;
   phase: string;
   name: string;
   index: number;
@@ -155,7 +155,7 @@ async function main() {
     }
   }, Math.max(0, stopAt - Date.now()));
 
-  const startAgent = (agent: AgentMode, index: number): ChildProcessWithoutNullStreams => {
+  const startAgent = (agent: AgentMode, index: number): ReturnType<typeof spawn> => {
     const remainingMinutes = Math.max(1, Math.floor((stopAt - Date.now()) / 60000));
     const logFile = path.join(logDir, `${agent.name}.log`);
     const commandArgs = buildAgentCommand(agent.phase, {
@@ -251,3 +251,4 @@ main().catch((error) => {
   console.error("[top20-agents] failed", error);
   process.exit(1);
 });
+
