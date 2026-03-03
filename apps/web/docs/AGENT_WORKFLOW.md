@@ -215,3 +215,5 @@
 - 루프 로그: `apps/web/logs/autonomous/autonomous-ops-<timestamp>.log`
 - 사이클별 로그: `apps/web/logs/autonomous/cycle-<N>-refactor.log`, `cycle-<N>-api-audit.log`
 - 요약 리포트: `apps/web/logs/autonomous/autonomous-ops-<timestamp>.json`
+
+- [03/04/2026 01:05:47] autonomous loop: ops:autonomous:5h now uses ingest supervisor restart loop (on child exit, auto-restart within remaining window). Added parallel cycle execution for refactor + API audit tasks to keep 5h window throughput high.

@@ -1,4 +1,4 @@
-﻿import { spawn, type ChildProcessWithoutNullStreams } from "node:child_process";
+import { spawn, type ChildProcessWithoutNullStreams } from "node:child_process";
 import fs from "node:fs/promises";
 import { createWriteStream, existsSync, mkdirSync } from "node:fs";
 import path from "node:path";
@@ -11,6 +11,7 @@ type LoopSummary = {
   durationMinutes: number;
   cycleMinutes: number;
   completedCycles: number;
+  ingestRestarts: number;
   stopReason: "duration" | "signal";
   tasks: Array<{
     cycle: number;
@@ -127,7 +128,6 @@ async function runGitCommit(cwd: string): Promise<boolean> {
 }
 
 async function runHealthCheck(url: string): Promise<{ status: number; ok: boolean; bodyPreview: string }> {
-  const started = Date.now();
   const response = await fetch(url, { redirect: "manual", cache: "no-store", headers: { "User-Agent": "autonomous-ops-loop/1.0" } });
   const status = response.status;
   const text = await response.text();
@@ -148,6 +148,7 @@ async function main() {
   const runApiAudits = boolValue(args.apiAudits, true);
   const healthProbe = args.healthUrl || DEFAULT_HEALTH_URL;
   const phases = (args.phases || DEFAULT_INGEST_PHASES).toUpperCase();
+  const ingestRestartDelayMs = parsePositiveInt(args.ingestRestartDelayMs, 20_000);
   const repoRoot = path.resolve(process.cwd());
   const logDir = path.join(repoRoot, "logs", "autonomous");
   const logPath = path.join(logDir, `autonomous-ops-${new Date().toISOString().replace(/[:.]/g, "-")}.log`);
@@ -155,6 +156,7 @@ async function main() {
   const cycleLimitMs = cycleMinutes * 60_000;
   const durationMs = durationMinutes * 60_000;
   const startedAt = new Date();
+  const endAt = Date.now() + durationMs;
 
   mkdirSync(logDir, { recursive: true });
   await fs.appendFile(logPath, `[${startedAt.toISOString()}] autonomous loop started. duration=${durationMinutes}m cycle=${cycleMinutes}m\n`, "utf8");
@@ -164,6 +166,7 @@ async function main() {
     durationMinutes,
     cycleMinutes,
     completedCycles: 0,
+    ingestRestarts: 0,
     stopReason: "duration",
     tasks: [],
     healthChecks: [],
@@ -179,106 +182,164 @@ async function main() {
     summary.stopReason = "signal";
   });
 
-  const children: ChildProcessWithoutNullStreams[] = [];
+  const ingestLog = path.join(logDir, "ingest-loop.log");
+  const runner = process.platform === "win32" ? "npm.cmd" : "npm";
+  let activeIngest: ChildProcessWithoutNullStreams | null = null;
+  let ingestStopRequested = false;
 
-  if (runIngest) {
-    const ingestLog = path.join(logDir, "ingest-loop.log");
-    const args = ["run", "ingest:top20:agents", "--", `--durationMinutes=${durationMinutes}`, `--interval=20`, `--phases=${phases}`];
-    const command = process.platform === "win32" ? "npm.cmd" : "npm";
-    const runner = spawn(command, args, {
+  const launchIngest = async (isRestart = false): Promise<void> => {
+    if (isRestart) {
+      summary.ingestRestarts += 1;
+    }
+
+    const remainingMinutes = Math.max(1, Math.floor((endAt - Date.now()) / 60_000));
+    const args = [
+      "run",
+      "ingest:top20:agents",
+      "--",
+      `--durationMinutes=${remainingMinutes}`,
+      `--interval=20`,
+      `--phases=${phases}`,
+    ];
+    const child = spawn(runner, args, {
       cwd: repoRoot,
       shell: process.platform === "win32",
       stdio: ["ignore", "pipe", "pipe"],
     }) as ChildProcessWithoutNullStreams;
-    const ingestStream = createWriteStream(ingestLog, { flags: "a" });
-    children.push(runner);
+    const label = isRestart ? "ingest-restart" : "ingest-start";
+    const stream = createWriteStream(ingestLog, { flags: "a" });
     const prefix = `[${new Date().toISOString()}][ingest] `;
-    runner.stdout?.on("data", (chunk) => {
+
+    activeIngest = child;
+    await fs.appendFile(
+      logPath,
+      `[${new Date().toISOString()}] ingest ${label} launched. remainingMinutes=${remainingMinutes} phases=${phases}\n`,
+      "utf8",
+    );
+
+    child.stdout?.on("data", (chunk) => {
       const text = chunk.toString();
-      ingestStream.write(prefix + text);
+      stream.write(prefix + text);
       process.stdout.write(prefix + text);
     });
-    runner.stderr?.on("data", (chunk) => {
+    child.stderr?.on("data", (chunk) => {
       const text = chunk.toString();
-      ingestStream.write(prefix + text);
+      stream.write(prefix + text);
       process.stderr.write(prefix + text);
     });
-    runner.on("close", () => ingestStream.end());
-    await fs.appendFile(logPath, `[${new Date().toISOString()}] ingest supervisor started. phases=${phases}\n`, "utf8");
+    child.on("close", (code, signal) => {
+      stream.end();
+      const exitInfo = signal ? `signal:${signal}` : `code:${code}`;
+      void fs.appendFile(logPath, `[${new Date().toISOString()}] ingest ${label} ended (${exitInfo}). remainingMs=${Math.max(0, endAt - Date.now())}\n`, "utf8");
+      if (ingestStopRequested || stopRequested) return;
+      if (Date.now() >= endAt) return;
+      void sleep(ingestRestartDelayMs).then(() => {
+        if (!ingestStopRequested && !stopRequested && Date.now() < endAt) {
+          void launchIngest(true);
+        }
+      });
+    });
+    child.on("error", (error) => {
+      stream.end();
+      void fs.appendFile(logPath, `[${new Date().toISOString()}] ingest ${label} error: ${error.message}\n`, "utf8");
+      if (ingestStopRequested || stopRequested) return;
+      if (Date.now() >= endAt) return;
+      void sleep(ingestRestartDelayMs).then(() => {
+        if (!ingestStopRequested && !stopRequested && Date.now() < endAt) {
+          void launchIngest(true);
+        }
+      });
+    });
+  };
+
+  if (runIngest) {
+    await fs.appendFile(logPath, `[${new Date().toISOString()}] ingest supervisor starting. phases=${phases}\n`, "utf8");
+    void launchIngest(false);
   }
 
-  const endAt = Date.now() + durationMs;
   let cycle = 0;
-
   while (!stopRequested && Date.now() < endAt) {
     cycle += 1;
     const cycleStart = new Date();
-    const tasks: string[] = [];
+    const taskResults: LoopSummary["tasks"] = [];
+
+    const runCycleTasks: Promise<void>[] = [];
 
     if (runRefactor) {
-      tasks.push("npm:refactor:loop");
-      const taskStart = Date.now();
-      const res = await runCommand("npm", ["run", "refactor:loop"], {
-        cwd: repoRoot,
-        logFile: path.join(logDir, `cycle-${cycle}-refactor.log`),
-        label: `cycle-${cycle}-refactor`,
-      });
-      summary.tasks.push({
-        cycle,
-        startedAt: cycleStart.toISOString(),
-        endedAt: new Date().toISOString(),
-        command: "npm run refactor:loop",
-        exitCode: res.exitCode,
-        durationMs: Date.now() - taskStart,
-        output: res.output,
-      });
+      runCycleTasks.push(
+        (async () => {
+          const taskStart = Date.now();
+          const res = await runCommand("npm", ["run", "refactor:loop"], {
+            cwd: repoRoot,
+            logFile: path.join(logDir, `cycle-${cycle}-refactor.log`),
+            label: `cycle-${cycle}-refactor`,
+          });
+          taskResults.push({
+            cycle,
+            startedAt: cycleStart.toISOString(),
+            endedAt: new Date().toISOString(),
+            command: "npm run refactor:loop",
+            exitCode: res.exitCode,
+            durationMs: Date.now() - taskStart,
+            output: res.output,
+          });
+        })(),
+      );
     }
 
     if (runApiAudits) {
-      const taskStart = Date.now();
-      const auditCmd = "npm run api:contract-audit && npm run api:contract-sync-audit";
-      const child = spawn(process.platform === "win32" ? "cmd.exe" : "/bin/sh",
-        process.platform === "win32" ? ["/c", auditCmd] : ["-lc", auditCmd],
-        { cwd: repoRoot, shell: true, stdio: ["ignore", "pipe", "pipe"] });
+      runCycleTasks.push(
+        (async () => {
+          const taskStart = Date.now();
+          const chunks: string[] = [];
+          let exitCode = 0;
+          const logFile = path.join(logDir, `cycle-${cycle}-api-audit.log`);
+          const stream = createWriteStream(logFile, { flags: "a" });
+          const prefix = `[${new Date().toISOString()}][cycle-${cycle}-api-audit] `;
+          const emit = (target: "stdout" | "stderr", text: string) => {
+            chunks.push(`${target}: ${text}`);
+            stream.write(prefix + text);
+            if (target === "stderr") {
+              process.stderr.write(prefix + text);
+            } else {
+              process.stdout.write(prefix + text);
+            }
+          };
 
-      const childProcess = child as ChildProcessWithoutNullStreams;
-      const chunks: string[] = [];
-      const logFile = path.join(logDir, `cycle-${cycle}-api-audit.log`);
-      const stream = createWriteStream(logFile, { flags: "a" });
-      const prefix = `[${new Date().toISOString()}][cycle-${cycle}-api-audit] `;
-      childProcess.stdout?.on("data", (chunk) => {
-        const text = chunk.toString();
-        chunks.push(`stdout: ${text}`);
-        stream.write(prefix + text);
-        process.stdout.write(prefix + text);
-      });
-      childProcess.stderr?.on("data", (chunk) => {
-        const text = chunk.toString();
-        chunks.push(`stderr: ${text}`);
-        stream.write(prefix + text);
-        process.stderr.write(prefix + text);
-      });
+          const audit1 = await runCommand("npm", ["run", "api:contract-audit"], {
+            cwd: repoRoot,
+            logFile: path.join(logDir, `cycle-${cycle}-api-contract-audit.log`),
+            label: `cycle-${cycle}-api-contract-audit`,
+          });
+          if (audit1.output) emit("stdout", audit1.output);
+          const audit2 = await runCommand("npm", ["run", "api:contract-sync-audit"], {
+            cwd: repoRoot,
+            logFile: path.join(logDir, `cycle-${cycle}-api-contract-sync-audit.log`),
+            label: `cycle-${cycle}-api-contract-sync-audit`,
+          });
+          if (audit2.output) emit("stdout", audit2.output);
+          exitCode = audit1.exitCode === 0 ? audit2.exitCode : audit1.exitCode;
+          stream.end();
 
-      const exitCode = await new Promise<number>((resolve, reject) => {
-        childProcess.on("error", reject);
-        childProcess.on("close", (code) => resolve(code ?? 0));
-      });
-      stream.end();
+          taskResults.push({
+            cycle,
+            startedAt: cycleStart.toISOString(),
+            endedAt: new Date().toISOString(),
+            command: "npm run api:contract-audit && npm run api:contract-sync-audit",
+            exitCode,
+            durationMs: Date.now() - taskStart,
+            output: chunks.join(""),
+          });
 
-      summary.tasks.push({
-        cycle,
-        startedAt: cycleStart.toISOString(),
-        endedAt: new Date().toISOString(),
-        command: auditCmd,
-        exitCode,
-        durationMs: Date.now() - taskStart,
-        output: chunks.join(""),
-      });
-
-      if (exitCode !== 0) {
-        await fs.appendFile(logPath, `[${new Date().toISOString()}] api audit failed cycle=${cycle}, exit=${exitCode}.\n`, "utf8");
-      }
+          if (exitCode !== 0) {
+            await fs.appendFile(logPath, `[${new Date().toISOString()}] api audit failed cycle=${cycle}, exit=${exitCode}.\n`, "utf8");
+          }
+        })(),
+      );
     }
+
+    await Promise.all(runCycleTasks);
+    summary.tasks.push(...taskResults);
 
     try {
       const check = await runHealthCheck(healthProbe);
@@ -312,19 +373,14 @@ async function main() {
     }
   }
 
-  if (children.length > 0) {
-    for (const child of children) {
-      if (!child.killed) {
-        child.kill("SIGINT");
-        await sleep(500);
-      }
-      if (!child.killed) {
-        child.kill("SIGKILL");
-      }
-    }
+  ingestStopRequested = true;
+  if (activeIngest && !activeIngest.killed) {
+    activeIngest.kill("SIGINT");
     await sleep(500);
+    if (!activeIngest.killed) {
+      activeIngest.kill("SIGKILL");
+    }
   }
-
   summary.endedAt = new Date().toISOString();
   await fs.writeFile(reportPath, JSON.stringify(summary, null, 2), "utf8");
   await fs.appendFile(logPath, `[${summary.endedAt}] autonomous loop done. completedCycles=${summary.completedCycles} stopReason=${summary.stopReason}\n`, "utf8");

@@ -445,3 +445,5 @@
 
 - 상태 증거: `apps/web/logs/autonomous/autonomous-ops-*.json`
 - 병렬 루프: 병렬 수집(A/B/C) + 주기적 refactor loop + API 계약 감사 + health probe + 작업 로그
+
+- 2026-03-04: autonomous-ops-loop.ts hardened for 5h continuity. Ingest worker is supervised, and any unexpected exit now auto-restarts with remaining duration; no-op cycle fallback. ops:autonomous:5h kept as long-run trigger.
