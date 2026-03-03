@@ -427,3 +427,21 @@
   - 실행 커맨드: `npm run ingest:top20:loop`
   - 종료: `Ctrl+C` (현재 사이클 완료 후 종료)
 
+### 15) 5시간 무인 고도화 실행(검토 → 개선 → 정리 → 기록)
+
+- [x] 자동 루프 스크립트 추가: `apps/web/scripts/autonomous-ops-loop.ts`
+- [x] 운영용 NPM 스크립트 추가
+  - `npm run ops:autonomous`
+  - `npm run ops:autonomous:5h`
+- [x] 로그/리포트 경로 정비: `apps/web/logs/autonomous/`
+- [ ] `--autoCommit=true` 정책 판단 기준(허용 범위/승인 조건)을 PR 단위로 추가 정의
+- [ ] 5시간 루프 실행 후 `reports/*` 요약과 `api-contract-sync` 상태를 `Project` 문서에 동기화
+
+실행 명령(무인):
+- `npm run ops:autonomous:5h`
+- (선택) `npm run ops:autonomous -- --durationMinutes=300 --cycleMinutes=20 --autoCommit=true`
+
+자동 종료: `durationMinutes` 경계 또는 `Ctrl+C`
+
+- 상태 증거: `apps/web/logs/autonomous/autonomous-ops-*.json`
+- 병렬 루프: 병렬 수집(A/B/C) + 주기적 refactor loop + API 계약 감사 + health probe + 작업 로그

@@ -137,3 +137,8 @@
 - 문서 동기화:
   - 상태 변경 발생 시 `PROJECT_STATUS_NEXT_ACTIONS.md` 11/12 섹션과 동시 갱신.
 
+## #autonomous_ops (2026-03-04)
+- 현재 상태: 5시간 무인 실행 루프 엔진이 `apps/web/scripts/autonomous-ops-loop.ts`로 활성화됨.
+- 운영 모드: `ops:autonomous`(기본 300분), `ops:autonomous:5h`(명시 실행).
+- 1시간 단위로 상태를 health/API audit/운영로그로 갱신하고, 변경이 확인되면 별도 수동 승인 후 커밋.
+- 기본 규칙: 자동 커밋은 기본 비활성(`--autoCommit=false`). 필요 시 명시 플래그로만 허용.

@@ -198,3 +198,20 @@
 
 
 
+
+## 12.10 5시간 무인 고도화 오퍼레이터 (Autonomous Ops 5h+)
+
+목적: 사용자 개입 없이 5시간(300분) 동안 수집 병렬 루프 + 문서/품질 셀프 체크를 반복하고 증거 로그를 남긴다.
+
+실행 규칙
+- 기본 실행: `npm run ops:autonomous` (`durationMinutes=300`, `cycleMinutes=20`, `phases=A,B,C`, `ingest/refactor/apiAudits` 동작)
+- 5시간 정밀 실행: `npm run ops:autonomous:5h`
+- 권장 시작 전: 운영 중간 작업과 충돌이 없음을 확인하고 배포 동작은 별도 배포명령으로 분리
+- 산출물: `apps/web/logs/autonomous/*`, `apps/web/reports/*`
+- 제약: 배포/푸시 자동화는 기본 off. 자동 커밋은 `--autoCommit=false` 기본값.
+- 강제 종료: `Ctrl+C` 또는 작업 신호 발생 시 현재 사이클 종료 후 정리 종료
+
+로그 규약
+- 루프 로그: `apps/web/logs/autonomous/autonomous-ops-<timestamp>.log`
+- 사이클별 로그: `apps/web/logs/autonomous/cycle-<N>-refactor.log`, `cycle-<N>-api-audit.log`
+- 요약 리포트: `apps/web/logs/autonomous/autonomous-ops-<timestamp>.json`
