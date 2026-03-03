@@ -29,6 +29,19 @@ const DEFAULT_DURATION_MINUTES = 300;
 const DEFAULT_CYCLE_MINUTES = 20;
 const DEFAULT_HEALTH_URL = "https://revieweverything-web-piwpiw99.vercel.app/api/health";
 const DEFAULT_INGEST_PHASES = "A,B,C";
+const REVIEW_WORKLIST_FILE = "AUTONOMOUS_REVIEW_WORKLIST.md";
+const REVIEW_TOPICS = [
+  "Top20 플랫폼 수집 정책 검토: list/detail 패턴 점검 항목화",
+  "DB 스키마 정합성: Campaign/Creator/Reward/Platform 키 중복 기준 점검",
+  "자동로그인 재시도 정책: 에러 코드별 실패 라벨/표시 메시지 매핑 검토",
+  "운영 화면 알림 우선순위: 경고/실패/완료 토스트 문안 정합성 검토",
+  "크롤러 안전성: robots/약관 변경 대응 플래그 업데이트 체크리스트",
+  "배치 모니터링: cycle별 ingest 실패율 임계치 알림 기준 조정안",
+  "중복 제거 정책: 업체명 정규화/카테고리/지역 정합성 규칙 보강",
+  "실행 로그 표준화: 로그 템플릿, 종료 사유, 재시작 이력 기록 포맷 정비",
+  "운영 승인 루틴: agent:review 통과 후 배포 전 로컬 검증 강화",
+  "TOP20 확장 소스: punycode/회원 전용 도메인/로그인 의존 항목 정리",
+];
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -51,6 +64,10 @@ function parsePositiveInt(raw: string | undefined, fallback: number) {
 function boolValue(raw: string | undefined, fallback: boolean) {
   if (raw === undefined) return fallback;
   return String(raw).toLowerCase() === "true";
+}
+
+function formatKoreanDate(date: Date) {
+  return `${date.toLocaleString("ko-KR", { timeZone: "Asia/Seoul", hour12: false })}`;
 }
 
 async function runCommand(
@@ -127,15 +144,46 @@ async function runGitCommit(cwd: string): Promise<boolean> {
   return true;
 }
 
-async function runHealthCheck(url: string): Promise<{ status: number; ok: boolean; bodyPreview: string }> {
+async function runHealthCheck(url: string): Promise<{ status: number; ok: boolean; url: string; bodyPreview: string }> {
   const response = await fetch(url, { redirect: "manual", cache: "no-store", headers: { "User-Agent": "autonomous-ops-loop/1.0" } });
   const status = response.status;
   const text = await response.text();
   return {
     status,
     ok: response.ok,
+    url,
     bodyPreview: text.slice(0, 200).replace(/\r?\n/g, " "),
   };
+}
+
+async function appendReviewWorklist(input: {
+  cwd: string;
+  cycle: number;
+  cycleMinutes: number;
+  runAt: Date;
+  completedCycles: number;
+  logPath: string;
+}) {
+  const worklistPath = path.join(input.cwd, "docs", REVIEW_WORKLIST_FILE);
+  const startIndex = Math.max(0, input.completedCycles % REVIEW_TOPICS.length);
+  const selected = REVIEW_TOPICS.slice(startIndex, startIndex + 3);
+  if (selected.length < 3) {
+    selected.push(...REVIEW_TOPICS.slice(0, 3 - selected.length));
+  }
+
+  const section = [
+    `## [${formatKoreanDate(input.runAt)}] 리뷰 작업리스트 사이클 ${input.cycle}`,
+    `- 주기: ${input.cycleMinutes}분`,
+    "- 검토 항목",
+    ...selected.map((item, index) => `  - [ ] ${item} (우선순위 ${index + 1})`),
+    "- 증분 메모: 자동 수집/디비 반영 전 검토 대상만 식별, 즉시 구현은 다음 사이클 배분",
+    "",
+  ].join("\n");
+
+  await fs.appendFile(worklistPath, `\n${section}`, "utf8");
+  await fs.appendFile(input.logPath, `[${new Date().toISOString()}] review worklist written: ${worklistPath}\n`, "utf8");
+
+  return section;
 }
 
 async function main() {
@@ -143,10 +191,12 @@ async function main() {
   const durationMinutes = parsePositiveInt(args.durationMinutes, DEFAULT_DURATION_MINUTES);
   const cycleMinutes = parsePositiveInt(args.cycleMinutes, DEFAULT_CYCLE_MINUTES);
   const autoCommit = boolValue(args.autoCommit, false);
-  const runIngest = boolValue(args.ingest, true);
-  const runRefactor = boolValue(args.refactor, true);
-  const runApiAudits = boolValue(args.apiAudits, true);
+  const reviewOnly = boolValue(args.reviewOnly, false);
+  const runIngest = reviewOnly ? false : boolValue(args.ingest, true);
+  const runRefactor = reviewOnly ? false : boolValue(args.refactor, true);
+  const runApiAudits = reviewOnly ? false : boolValue(args.apiAudits, true);
   const healthProbe = args.healthUrl || DEFAULT_HEALTH_URL;
+  const runHealth = reviewOnly ? boolValue(args.healthCheck, false) : boolValue(args.healthCheck, true);
   const phases = (args.phases || DEFAULT_INGEST_PHASES).toUpperCase();
   const ingestRestartDelayMs = parsePositiveInt(args.ingestRestartDelayMs, 20_000);
   const repoRoot = path.resolve(process.cwd());
@@ -159,7 +209,7 @@ async function main() {
   const endAt = Date.now() + durationMs;
 
   mkdirSync(logDir, { recursive: true });
-  await fs.appendFile(logPath, `[${startedAt.toISOString()}] autonomous loop started. duration=${durationMinutes}m cycle=${cycleMinutes}m\n`, "utf8");
+  await fs.appendFile(logPath, `[${startedAt.toISOString()}] autonomous loop started. duration=${durationMinutes}m cycle=${cycleMinutes}m reviewOnly=${reviewOnly}\n`, "utf8");
 
   const summary: LoopSummary = {
     startedAt: startedAt.toISOString(),
@@ -262,7 +312,6 @@ async function main() {
     cycle += 1;
     const cycleStart = new Date();
     const taskResults: LoopSummary["tasks"] = [];
-
     const runCycleTasks: Promise<void>[] = [];
 
     if (runRefactor) {
@@ -338,22 +387,49 @@ async function main() {
       );
     }
 
+    if (reviewOnly) {
+      runCycleTasks.push(
+        (async () => {
+          const taskStart = Date.now();
+          const section = await appendReviewWorklist({
+            cwd: repoRoot,
+            cycle,
+            cycleMinutes,
+            runAt: cycleStart,
+            completedCycles: summary.completedCycles,
+            logPath,
+          });
+          taskResults.push({
+            cycle,
+            startedAt: cycleStart.toISOString(),
+            endedAt: new Date().toISOString(),
+            command: "review-worklist",
+            exitCode: 0,
+            durationMs: Date.now() - taskStart,
+            output: section,
+          });
+        })(),
+      );
+    }
+
     await Promise.all(runCycleTasks);
     summary.tasks.push(...taskResults);
 
-    try {
-      const check = await runHealthCheck(healthProbe);
-      summary.healthChecks.push({
-        timestamp: new Date().toISOString(),
-        status: check.status,
-        ok: check.ok,
-        url: healthProbe,
-        bodyPreview: check.bodyPreview,
-      });
-      await fs.appendFile(logPath, `[${new Date().toISOString()}] health ${healthProbe} -> ${check.status} ok=${check.ok}\n`, "utf8");
-    } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      await fs.appendFile(logPath, `[${new Date().toISOString()}] health check error: ${message}\n`, "utf8");
+    if (runHealth) {
+      try {
+        const check = await runHealthCheck(healthProbe);
+        summary.healthChecks.push({
+          timestamp: new Date().toISOString(),
+          status: check.status,
+          ok: check.ok,
+          url: check.url,
+          bodyPreview: check.bodyPreview,
+        });
+        await fs.appendFile(logPath, `[${new Date().toISOString()}] health ${healthProbe} -> ${check.status} ok=${check.ok}\n`, "utf8");
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        await fs.appendFile(logPath, `[${new Date().toISOString()}] health check error: ${message}\n`, "utf8");
+      }
     }
 
     if (autoCommit) {
@@ -381,6 +457,7 @@ async function main() {
       activeIngest.kill("SIGKILL");
     }
   }
+
   summary.endedAt = new Date().toISOString();
   await fs.writeFile(reportPath, JSON.stringify(summary, null, 2), "utf8");
   await fs.appendFile(logPath, `[${summary.endedAt}] autonomous loop done. completedCycles=${summary.completedCycles} stopReason=${summary.stopReason}\n`, "utf8");

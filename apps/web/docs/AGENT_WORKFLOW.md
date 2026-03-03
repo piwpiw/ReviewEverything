@@ -206,6 +206,7 @@
 실행 규칙
 - 기본 실행: `npm run ops:autonomous` (`durationMinutes=300`, `cycleMinutes=20`, `phases=A,B,C`, `ingest/refactor/apiAudits` 동작)
 - 5시간 정밀 실행: `npm run ops:autonomous:5h`
+- 운영/수집 비활성화, 검토 작업리스트 전용: `npm run ops:review-list`, `npm run ops:review-list:5h`
 - 권장 시작 전: 운영 중간 작업과 충돌이 없음을 확인하고 배포 동작은 별도 배포명령으로 분리
 - 산출물: `apps/web/logs/autonomous/*`, `apps/web/reports/*`
 - 제약: 배포/푸시 자동화는 기본 off. 자동 커밋은 `--autoCommit=false` 기본값.

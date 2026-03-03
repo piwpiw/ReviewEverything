@@ -42,7 +42,9 @@
         "ingest:top20:agents": "tsx ./scripts/run-top20-agents.ts",
         "ingest:top20:agents:3h": "tsx ./scripts/run-top20-agents.ts --durationMinutes=180 --interval=20 --phases=A,B,C",
         "ops:autonomous": "tsx ./scripts/autonomous-ops-loop.ts",
-        "ops:autonomous:5h": "tsx ./scripts/autonomous-ops-loop.ts --durationMinutes=300 --cycleMinutes=20 --autoCommit=true"
+        "ops:autonomous:5h": "tsx ./scripts/autonomous-ops-loop.ts --durationMinutes=300 --cycleMinutes=20 --autoCommit=true",
+        "ops:review-list": "tsx ./scripts/autonomous-ops-loop.ts --reviewOnly=true",
+        "ops:review-list:5h": "tsx ./scripts/autonomous-ops-loop.ts --reviewOnly=true --durationMinutes=300 --cycleMinutes=20 --autoCommit=false"
     },
     "dependencies": {
         "@notionhq/client": "^5.11.0",
