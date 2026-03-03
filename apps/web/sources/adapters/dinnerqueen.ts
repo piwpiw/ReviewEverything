@@ -22,7 +22,7 @@ export class DinnerQueenAdapter implements IPlatformAdapter {
 
   async fetchList(page: number): Promise<ScrapedCampaign[]> {
     console.log(`[DinnerQueen] Page ${page}`);
-    await sleep(1200 + Math.random() * 800);
+    await sleep(3500 + Math.random() * 2500);
 
     try {
       const { data } = await fetchWithRetry(

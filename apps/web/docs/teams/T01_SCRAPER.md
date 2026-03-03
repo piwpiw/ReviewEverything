@@ -1,40 +1,45 @@
-# T01_SCRAPER — Data Acquisition Agent
+# T01_SCRAPER — Data Acquisition Team
 
 ## Mission
-고정된 로직을 넘어, MCP와 동적 선택자(Skill)를 결합하여 7개 이상의 리뷰 플랫폼에서 **메인 이미지와 홍보 문구(Rich Data)**를 포함한 극한의 데이터를 탄력적으로 수집한다.
 
----
+- Improve reliability and recoverability of `revu`, `reviewnote`, and other acquisition adapters from source through DB write.
+- Keep crawler throughput stable under block/DOM change and ensure admin can observe concrete run causes.
 
-## 1. Domain Scope (책임 영역)
-- **어댑터**: `sources/adapters/*.ts` (Rich Data 수집: 메인 이미지, 요약 문구 필수 파싱)
-- **플랫폼 관리**: `sources/registry.ts`
-- **HTTP 통신**: `lib/fetcher.ts` (fetchWithRetry)
+## Scope
 
----
+- `sources/adapters/*`
+- `sources/registry.ts`
+- `lib/fetcher.ts`
+- `lib/ingest.ts`
+- `sources/normalize.ts`
+- `lib/backgroundWorker.ts`
 
-## 2. Agent Roles
-- `adapter-architect`: `SelectorAutoDiscovery`를 사용하여 사이트 구조 변경 방어 및 자율 룰 수정.
-- `stealth-operator`: 봇 감지 우회를 위한 WAF 바이패스 (랜덤 딜레이, User-Agent 위장).
-- `retry-handler`: 지수 백오프 기반 실패 복구 (최대 3회), Fallback 페이로드 발생.
+## Strategy
 
----
+- Fetch layer: separate retry rules by status code, honor Retry-After, and apply capped exponential + jitter backoff.
+- Ingestion layer: track run quality with three counters: fetch failure, processing failure, and duplicate skip.
+- Normalize layer: make URL handling and upsert/snapshot writes safer with transaction boundaries.
+- Worker layer: use platform-scoped exponential retry interval when a run fails transiently.
 
-## 3. Advanced Skills & MCP Integration
-- **`Puppeteer / Browser MCP`**: CSR(Client Side Rendering) 전용 페이지나 캡차(Captcha)가 존재하는 복잡한 플랫폼에서 시각적 렌더링을 통한 데이터 추출 수행.
-- **`SelectorAutoDiscovery Skill`**: 플랫폼의 DOM 구조가 변경되어 파싱 에러가 발생하면, AI가 인접 텍스트 문맥을 분석해 새로운 CSS Selector를 자율 탐색.
-- **`Filesystem MCP`**: 오류가 발생한 원시 HTML 코드를 `/tmp`에 캐싱하여 T02 및 인간 디버깅에 즉시 제공.
+## Execution Protocol
 
----
+1. Update fetch layer retry classification (`403`, `429`, `5xx`, network errors) and timeouts.
+2. Prevent run-level duplicate `original_id` writes in one pass.
+3. Strengthen run logs for root-cause hints (`fetchFailures`, `duplicateItems`, `processErrors`).
+4. Improve snapshot/campaign write consistency in normalize with transactionized create/update.
+5. Adjust worker retry policy to exponential delay instead of fixed delay.
+6. Add failure-class routing (fetch/quality/logic) and tie it to worker backoff selection.
 
-## 4. Execution Protocol & Automation Hooks
-1. **Trigger**: `AGENT_WORKFLOW`의 "수집" 라우팅 또는 크론.
-2. **Execute**: 7개 플랫폼 비동기 병렬 스크래핑.
-   - 봇 차단 시 `stealth-operator`가 핑거프린트 교체 후 재시도.
-3. **Hook [DATA_READY]**: 수집에 성공하는 즉시 해당 데이터 청크를 T02_NORMALIZER에 이벤트 기반으로 자동 전달.
-4. **Fallback**: 완전 실패 플랫폼은 T10에 로그를 보내고 빈 스키마로 우회 처리하여 파이프라인 단절 방지.
+## Quality Indicators
 
----
+- Valid-item ratio below threshold must be reported as quality warning and stored in run logs.
+- Consecutive fetch failures should stop the run earlier than silent skip loops.
+- Duplicate IDs should not inflate snapshots or churn campaign rows.
+- Failed run reasons should map to clear operational action: retry, wait, or adapter review.
+- Fetch failures should preserve retry intent (`rate_limit`/`network`/`timeout`) and not be mixed with structural quality regressions.
 
-## 5. Done Definition
-- 7개 어댑터 중 5개 이상의 유효한 결과물 도출.
-- DOM 파싱 및 네트워크 예외가 수집 프로세스 전체를 다운시키지 않고 완벽히 격리(Try-Catch)됨.
+## Done Definition
+
+- Core retry paths changed and deployed without broad behavior breakage.
+- `RUNNING` and `FAILED` reasons become sufficiently diagnosable from `/api/admin/runs`.
+- Data loss risk reduced by safer transaction flow and fallback URL handling.

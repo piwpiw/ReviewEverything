@@ -21,7 +21,7 @@ export class SeouloppaAdapter implements IPlatformAdapter {
 
   async fetchList(page: number): Promise<ScrapedCampaign[]> {
     console.log(`[Seouloppa] Page ${page}`);
-    await sleep(1400 + Math.random() * 600);
+    await sleep(4000 + Math.random() * 3000);
 
     try {
       const { data } = await fetchWithRetry(`${this.baseUrl}${this.listUrl}?page=${page}`, {
@@ -36,14 +36,17 @@ export class SeouloppaAdapter implements IPlatformAdapter {
       const $ = cheerio.load(String(data || ""));
       const campaigns: ScrapedCampaign[] = [];
 
-      // SeoulOppa confirmed structure: .item or .cp_listbox li or similar
-      const listItems = $(".item, .list_item, li.cp_item, .cp_listbox li");
+      // SeoulOppa: Browsers see .item, but raw HTML might be different. Let's try more broad patterns.
+      const listItems = $(".item, [class*='item'], .cp_listbox li, .list_box li, .campaign_item");
+      console.log(`[Seouloppa] Found ${listItems.length} candidate items.`);
       listItems.each((i, el) => {
-        if (i >= 60) return;
+        if (i >= 50) return;
         const $el = $(el);
-        // Find title link that HAS text or a strong tag with text
-        const titleLink = $el.find("a").filter((_, aEl) => $(aEl).find("strong").length > 0 || $(aEl).text().trim().length > 5).first();
-        if (titleLink.length === 0) return;
+        let titleLink = $el.find("a").filter((_, aEl) => $(aEl).find("strong").length > 0 || $(aEl).text().trim().length > 5).first();
+        if (titleLink.length === 0) {
+          titleLink = $el.find("a").first(); // Fallback to the first <a> if the filtered one isn't found
+        }
+        if (titleLink.length === 0) return; // If still no titleLink, then return
 
         const titleText = titleLink.text().trim();
         const href = titleLink.attr("href") || "";

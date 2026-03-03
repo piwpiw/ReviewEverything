@@ -37,6 +37,15 @@ export type QualitySnapshot = {
       sent: number;
       failed: number;
       successRate: number;
+      pending: number;
+    };
+    reminders: {
+      total: number;
+      created24h: number;
+      pending: number;
+      sent: number;
+      failed: number;
+      successRate: number;
     };
     dataFreshness: {
       lastCampaignUpdateAt: string | null;
@@ -48,6 +57,7 @@ export type QualitySnapshot = {
     notificationSuccessMin: number;
     freshnessMaxMinutes: number;
     staleRunningJobMaxMinutes: number;
+    reminderPendingMax: number;
   };
   alerts: OpsAlert[];
 };
@@ -58,6 +68,7 @@ const THRESHOLDS = {
   notificationSuccessMin: 95,
   freshnessMaxMinutes: 180,
   staleRunningJobMaxMinutes: 30,
+  reminderPendingMax: 500,
 } as const;
 
 function rate(success: number, total: number): number {
@@ -107,7 +118,7 @@ export async function getQualitySnapshot(): Promise<QualitySnapshot> {
         where: { created_at: { gte: since } },
         select: { status: true },
       }),
-      db.notificationDelivery.findMany({
+        db.notificationDelivery.findMany({
         where: { created_at: { gte: since } },
         select: { status: true },
       }),
@@ -131,7 +142,8 @@ export async function getQualitySnapshot(): Promise<QualitySnapshot> {
       metrics: {
         ingest: { total: 0, success: 0, failed: 0, successRate: 0 },
         jobs: { total: 0, completed: 0, failed: 0, pending: 0, running: 0, completionRate: 0 },
-        notifications: { total: 0, sent: 0, failed: 0, successRate: 0 },
+        notifications: { total: 0, sent: 0, failed: 0, pending: 0, successRate: 0 },
+        reminders: { total: 0, created24h: 0, pending: 0, sent: 0, failed: 0, successRate: 0 },
         dataFreshness: { lastCampaignUpdateAt: null, ageMinutes: null },
       },
       thresholds: THRESHOLDS,
@@ -163,7 +175,15 @@ export async function getQualitySnapshot(): Promise<QualitySnapshot> {
   const notificationTotal = deliveries.length;
   const notificationSent = deliveries.filter((d) => d.status === 'SENT').length;
   const notificationFailed = deliveries.filter((d) => d.status === 'FAILED').length;
+  const notificationPending = deliveries.filter((d) => d.status === 'PENDING').length;
   const notificationSuccessRate = rate(notificationSent, notificationTotal);
+
+  const reminderTotal = deliveries.length;
+  const reminderSent = deliveries.filter((d) => d.status === 'SENT').length;
+  const reminderFailed = deliveries.filter((d) => d.status === 'FAILED').length;
+  const reminderPending = deliveries.filter((d) => d.status === 'PENDING').length;
+  const reminderCreated24h = reminderTotal;
+  const reminderSuccessRate = rate(reminderSent, reminderTotal);
 
   const latestUpdateAt = latestCampaign?.updated_at ?? null;
   const freshnessAgeMinutes = latestUpdateAt ? minutesBetween(latestUpdateAt, now) : null;
@@ -192,6 +212,19 @@ export async function getQualitySnapshot(): Promise<QualitySnapshot> {
         'Notification success rate below target',
         `Last ${HOURS_WINDOW}h success rate is ${notificationSuccessRate}% (target ${THRESHOLDS.notificationSuccessMin}%+)`,
         '/system',
+      ),
+    );
+  }
+
+  if (reminderPending > THRESHOLDS.reminderPendingMax) {
+    alerts.push(
+      buildAlert(
+        'reminder-queue-backlog',
+        'warn',
+        'notification',
+        'Reminder delivery backlog is high',
+        `Pending reminders: ${reminderPending}. Queue threshold: ${THRESHOLDS.reminderPendingMax}.`,
+        '/admin',
       ),
     );
   }
@@ -264,7 +297,16 @@ export async function getQualitySnapshot(): Promise<QualitySnapshot> {
         total: notificationTotal,
         sent: notificationSent,
         failed: notificationFailed,
+        pending: notificationPending,
         successRate: notificationSuccessRate,
+      },
+      reminders: {
+        total: reminderTotal,
+        created24h: reminderCreated24h,
+        pending: reminderPending,
+        sent: reminderSent,
+        failed: reminderFailed,
+        successRate: reminderSuccessRate,
       },
       dataFreshness: {
         lastCampaignUpdateAt: latestUpdateAt ? latestUpdateAt.toISOString() : null,

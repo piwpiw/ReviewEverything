@@ -185,7 +185,11 @@ function toAbsoluteUrl(rawUrl: string, origin: string): string {
   if (normalized.startsWith("/")) {
     return normalizeTrackedUrl(`${origin}${normalized}`);
   }
-  return normalizeTrackedUrl(new URL(normalized, origin).toString());
+  try {
+    return normalizeTrackedUrl(new URL(normalized, origin).toString());
+  } catch {
+    return normalizeTrackedUrl(`${origin.replace(/\/+$/, "")}/campaign/${Date.now()}`);
+  }
 }
 
 function normalizeTrackedUrl(raw: string): string {
@@ -251,9 +255,16 @@ export async function processAndDedupeCampaign(platformId: number, item: Scraped
     return "https://platform.example";
   })();
 
-  const campaignUrl = toAbsoluteUrl(item.url, fallbackBase);
   const keywordForMap = `${title} ${[depth1, depth2].filter(Boolean).join(" ")}`.trim();
   const shopUrl = toShopUrl(item.shop_url, keywordForMap || "campaign");
+  let campaignUrl: string;
+  try {
+    campaignUrl = toAbsoluteUrl(item.url, fallbackBase);
+  } catch {
+    campaignUrl = `${fallbackBase.replace(/\/+$/, "")}/campaign/${encodeURIComponent(
+      `${platformId}-${item.original_id}`,
+    )}`;
+  }
 
   const baseData = {
     title,
@@ -293,61 +304,74 @@ export async function processAndDedupeCampaign(platformId: number, item: Scraped
 
   if (!existing) {
     try {
-      const created = await db.campaign.create({
-        data: {
-          platform_id: platformId,
-          original_id: item.original_id,
-          ...baseData,
-          snapshots: {
-            create: {
-              recruit_count: recruitCount,
-              applicant_count: applicantCount,
-              competition_rate: competitionRate,
+      const created = await db.$transaction(async (tx) => {
+        const inserted = await tx.campaign.create({
+          data: {
+            platform_id: platformId,
+            original_id: item.original_id,
+            ...baseData,
+            snapshots: {
+              create: {
+                recruit_count: recruitCount,
+                applicant_count: applicantCount,
+                competition_rate: competitionRate,
+              },
             },
           },
-        },
+        });
+        return inserted;
       });
       return { status: "created", id: created.id };
     } catch (err: unknown) {
       if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === "P2002") {
         const duplicated = await db.campaign.findFirst({
-          where: { platform_id: platformId, url: campaignUrl },
+          where: {
+            platform_id: platformId,
+            OR: [{ original_id: item.original_id }, { url: campaignUrl }],
+          },
           include: { snapshots: { orderBy: { scraped_at: "desc" }, take: 1 } },
         });
         if (!duplicated) throw err;
 
-        await db.campaign.update({ where: { id: duplicated.id }, data: baseData });
-        if (duplicated.recruit_count !== recruitCount || duplicated.applicant_count !== applicantCount) {
-          await db.campaignSnapshot.create({
-            data: {
-              campaign_id: duplicated.id,
-              recruit_count: recruitCount,
-              applicant_count: applicantCount,
-              competition_rate: competitionRate,
-            },
-          });
-          return { status: "updated_with_snapshot", id: duplicated.id };
-        }
-        return { status: "updated", id: duplicated.id };
+        await db.$transaction(async (tx) => {
+          await tx.campaign.update({ where: { id: duplicated.id }, data: baseData });
+          if (duplicated.recruit_count !== recruitCount || duplicated.applicant_count !== applicantCount) {
+            await tx.campaignSnapshot.create({
+              data: {
+                campaign_id: duplicated.id,
+                recruit_count: recruitCount,
+                applicant_count: applicantCount,
+                competition_rate: competitionRate,
+              },
+            });
+          }
+        });
+
+        return duplicated.recruit_count !== recruitCount || duplicated.applicant_count !== applicantCount
+          ? { status: "updated_with_snapshot", id: duplicated.id }
+          : { status: "updated", id: duplicated.id };
       }
       throw err;
     }
   }
 
-  await db.campaign.update({ where: { id: existing.id }, data: baseData });
-  const latest = existing.snapshots[0];
-  if (!latest || latest.recruit_count !== recruitCount || latest.applicant_count !== applicantCount) {
-    await db.campaignSnapshot.create({
-      data: {
-        campaign_id: existing.id,
-        recruit_count: recruitCount,
-        applicant_count: applicantCount,
-        competition_rate: competitionRate,
-      },
-    });
-    return { status: "updated_with_snapshot", id: existing.id };
-  }
+  await db.$transaction(async (tx) => {
+    await tx.campaign.update({ where: { id: existing.id }, data: baseData });
+    const latest = existing.snapshots[0];
+    if (!latest || latest.recruit_count !== recruitCount || latest.applicant_count !== applicantCount) {
+      await tx.campaignSnapshot.create({
+        data: {
+          campaign_id: existing.id,
+          recruit_count: recruitCount,
+          applicant_count: applicantCount,
+          competition_rate: competitionRate,
+        },
+      });
+    }
+  });
 
-  return { status: "updated", id: existing.id };
+  return existing.snapshots[0] &&
+    (existing.snapshots[0].recruit_count !== recruitCount || existing.snapshots[0].applicant_count !== applicantCount)
+    ? { status: "updated_with_snapshot", id: existing.id }
+    : { status: "updated", id: existing.id };
 }
-

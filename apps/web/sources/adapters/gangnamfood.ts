@@ -20,7 +20,7 @@ export class GangnamFoodAdapter implements IPlatformAdapter {
 
   async fetchList(page: number): Promise<ScrapedCampaign[]> {
     console.log(`[GangnamFood] Page ${page}`);
-    await sleep(1000 + Math.random() * 500);
+    await sleep(3000 + Math.random() * 2000);
 
     try {
       // Use the AJAX endpoint found by the subagent

@@ -90,6 +90,24 @@ jobs:
             echo "scope=fast" >> "${GITHUB_OUTPUT}"
           fi
 
+  deploy_target:
+    needs: scope
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Deploy target configuration gate
+        run: node scripts/deploy-target-check.js
+
   lint:
     needs: scope
     if: needs.scope.outputs.has_non_docs == 'true'
@@ -295,7 +313,7 @@ jobs:
           retention-days: 14
 
   summary:
-    needs: [scope, lint, typecheck, smoke, test, api_contract, api_sync]
+    needs: [scope, deploy_target, lint, typecheck, smoke, test, api_contract, api_sync]
     if: always()
     permissions:
       contents: read
@@ -333,11 +351,13 @@ jobs:
           if [ -f reports/api-contract-sync-audit.md ]; then
             API_SYNC_RESULT=$(node -e "const fs=require('fs');const text=fs.readFileSync('reports/api-contract-sync-audit.md','utf8');const m=text.match(/Result:\\s*(PASS|FAIL)/i);process.stdout.write(m?m[1].toUpperCase():'UNKNOWN')")
           fi
+          echo "Deploy target config gate: ${{ needs.deploy_target.result }}" >> "$GITHUB_STEP_SUMMARY"
           echo "Docs-only changes detected. Lint/typecheck/test/api-smoke gates are skipped for faster deployment cycle." >> "$GITHUB_STEP_SUMMARY"
           echo "- API sync drift: ${API_SYNC_RESULT}" >> "$GITHUB_STEP_SUMMARY"
           cat <<EOF > reports/ci-summary.md
           # CI Summary
           - Scope: docs-only
+          - Deploy target config gate: ${{ needs.deploy_target.result }}
           - Gates skipped: lint, typecheck, test, api:contract-audit, smoke
           - API sync drift: ${API_SYNC_RESULT}
           EOF
@@ -391,7 +411,7 @@ jobs:
           retention-days: 14
 
   enforce:
-    needs: [scope, lint, typecheck, smoke, test, api_contract, api_sync, summary]
+    needs: [scope, deploy_target, lint, typecheck, smoke, test, api_contract, api_sync, summary]
     if: always()
     runs-on: ubuntu-latest
     steps:
@@ -399,6 +419,11 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+
+          if [ "${{ needs.deploy_target.result }}" != "success" ]; then
+            echo "Deploy target configuration gate failed."
+            exit 1
+          fi
 
           if [ "${{ needs.scope.outputs.has_non_docs }}" != "true" ]; then
             if [ "${{ needs.api_sync.result }}" != "success" ]; then
@@ -466,6 +491,7 @@ jobs:
               .slice(0, 40)
               .join("\n");
             const gateSummary = [
+              "deploy_target: ${{ needs.deploy_target.result }}",
               "lint: ${{ needs.lint.result }}",
               "typecheck: ${{ needs.typecheck.result }}",
               "smoke: ${{ needs.smoke.result }}",

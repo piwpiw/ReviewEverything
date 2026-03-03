@@ -8,25 +8,71 @@ import { MrBlogAdapter } from "./adapters/mrblog";
 import { GangnamFoodAdapter } from "./adapters/gangnamfood";
 import { GenericAdapter, GenericSpec } from "./adapters/generic";
 
-export const PLATFORM_CATALOG = [
-  { key: "revu", name: "Revu", sourceKey: "revu", maxPagesPerRun: 10, supportsPagination: true, canRunInParallel: true, is_active: true },
-  { key: "reviewnote", name: "Reviewnote", sourceKey: "reviewnote", maxPagesPerRun: 10, supportsPagination: true, canRunInParallel: true, is_active: true },
-  { key: "dinnerqueen", name: "DinnerQueen", sourceKey: "dinnerqueen", maxPagesPerRun: 10, supportsPagination: true, canRunInParallel: true, is_active: true },
-  { key: "reviewplace", name: "ReviewPlace", sourceKey: "reviewplace", maxPagesPerRun: 10, supportsPagination: true, canRunInParallel: true, is_active: true },
-  { key: "seouloppa", name: "Seouloppa", sourceKey: "seouloppa", maxPagesPerRun: 10, supportsPagination: true, canRunInParallel: true, is_active: true },
-  { key: "mrblog", name: "MrBlog", sourceKey: "mrblog", maxPagesPerRun: 8, supportsPagination: true, canRunInParallel: false, is_active: true },
-  { key: "gangnamfood", name: "GangnamFood", sourceKey: "gangnamfood", maxPagesPerRun: 8, supportsPagination: true, canRunInParallel: false, is_active: true },
-  { key: "4blog", name: "4blog", sourceKey: "4blog", is_active: true },
+export type CrawlPhase = "A" | "B" | "C";
+
+export interface PlatformCatalogEntry {
+  key: string;
+  name: string;
+  sourceKey: string;
+  maxPagesPerRun?: number;
+  supportsPagination?: boolean;
+  canRunInParallel?: boolean;
+  is_active: boolean;
+  listUrl?: string;
+  detailUrl?: string;
+  crawlPhase?: CrawlPhase;
+  baseUrl?: string;
+}
+
+const normalizeSourceKey = (value: string) => value.toLowerCase().replace(/[^a-z0-9]/g, "");
+
+export const PLATFORM_CATALOG: PlatformCatalogEntry[] = [
+  { key: "revu", name: "Revu", sourceKey: "revu", maxPagesPerRun: 10, supportsPagination: true, canRunInParallel: true, is_active: true, crawlPhase: "A", listUrl: "/campaigns" },
+  { key: "reviewnote", name: "Reviewnote", sourceKey: "reviewnote", maxPagesPerRun: 10, supportsPagination: true, canRunInParallel: true, is_active: true, crawlPhase: "A", listUrl: "/campaigns", detailUrl: "/campaign/" },
+  { key: "dinnerqueen", name: "DinnerQueen", sourceKey: "dinnerqueen", maxPagesPerRun: 10, supportsPagination: true, canRunInParallel: true, is_active: true, crawlPhase: "A", listUrl: "/campaigns" },
+  { key: "reviewplace", name: "ReviewPlace", sourceKey: "reviewplace", maxPagesPerRun: 10, supportsPagination: true, canRunInParallel: true, is_active: true, crawlPhase: "A", listUrl: "/campaigns" },
+  { key: "seouloppa", name: "Seouloppa", sourceKey: "seouloppa", maxPagesPerRun: 10, supportsPagination: true, canRunInParallel: true, is_active: true, crawlPhase: "A", listUrl: "/campaign/list.php" },
+  { key: "mrblog", name: "MrBlog", sourceKey: "mrblog", maxPagesPerRun: 8, supportsPagination: true, canRunInParallel: false, is_active: true, crawlPhase: "B", listUrl: "/campaign/list.php" },
+  { key: "gangnamfood", name: "GangnamFood", sourceKey: "gangnamfood", maxPagesPerRun: 8, supportsPagination: true, canRunInParallel: false, is_active: true, crawlPhase: "B", listUrl: "/campaign/list.php" },
+  { key: "4blog", name: "4blog", sourceKey: "4blog", is_active: true, crawlPhase: "B", supportsPagination: true, canRunInParallel: true },
   { key: "pimble", name: "Pimble", sourceKey: "pimble", is_active: true },
-  { key: "assaview", name: "Assaview", sourceKey: "assaview", is_active: true },
+  { key: "assaview", name: "Assaview", sourceKey: "assaview", is_active: true, crawlPhase: "C", supportsPagination: true, canRunInParallel: true },
   { key: "cometoplay", name: "Cometoplay", sourceKey: "cometoplay", is_active: true },
   { key: "mobble", name: "Mobble", sourceKey: "mobble", is_active: true },
   { key: "pickmee", name: "Pickmee", sourceKey: "pickmee", is_active: true },
-  { key: "ringble", name: "Ringble", sourceKey: "ringble", is_active: true },
+  { key: "ringble", name: "Ringble", sourceKey: "ringble", is_active: true, crawlPhase: "B", supportsPagination: true, canRunInParallel: true },
   { key: "chehumview", name: "Chehumview", sourceKey: "chehumview", is_active: true },
   { key: "dailyview", name: "Dailyview", sourceKey: "dailyview", is_active: true },
   { key: "blogreview", name: "Blogreview", sourceKey: "blogreview", is_active: true },
-] as const;
+];
+
+export const TOP20_PHASE_CATALOG: Record<CrawlPhase, string[]> = {
+  A: PLATFORM_CATALOG.filter((entry) => entry.crawlPhase === "A").map((entry) => entry.sourceKey),
+  B: PLATFORM_CATALOG.filter((entry) => entry.crawlPhase === "B").map((entry) => entry.sourceKey),
+  C: PLATFORM_CATALOG.filter((entry) => entry.crawlPhase === "C").map((entry) => entry.sourceKey),
+};
+
+export function resolveCrawlerPhases(value?: string | string[] | null): CrawlPhase[] {
+  if (!value) return [];
+  const list = Array.isArray(value) ? value : String(value).split(",");
+  return Array.from(
+    new Set(
+      list
+        .map((item) => String(item).trim().toUpperCase())
+        .filter((phase): phase is CrawlPhase => phase === "A" || phase === "B" || phase === "C"),
+    ),
+  );
+}
+
+export function getSourceKeysByIngestPhases(phases?: string[] | CrawlPhase[]) {
+  const normalized = resolveCrawlerPhases(phases);
+  if (normalized.length === 0) return [];
+  return Array.from(new Set(normalized.flatMap((phase) => TOP20_PHASE_CATALOG[phase].map((key) => key))));
+}
+
+export function normalizePlatformKey(value: string) {
+  return normalizeSourceKey(value);
+}
 
 const GENERIC_SPECS: Record<string, GenericSpec> = {
   "4blog": {

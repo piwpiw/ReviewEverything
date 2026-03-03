@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 
 const { spawnSync } = require('node:child_process');
+const fs = require('node:fs');
+const path = require('node:path');
 
 function runCommand(command, args = [], options = {}) {
   const result = spawnSync(command, args, {
@@ -45,6 +47,7 @@ function parseArgs() {
     includeSmoke: args.includes('--smoke'),
     noPush: args.includes('--no-push'),
     noBuild: args.includes('--skip-build'),
+    skipVerify: args.includes('--skip-verify'),
     waitForDeploy: !args.includes('--no-wait'),
   };
 
@@ -92,21 +95,41 @@ function ensureCleanGitState() {
   return false;
 }
 
-function getDeploymentUrl(logText) {
-  const lines = logText.split(/\r?\n/).reverse();
-  const urlLine = lines.find((line) => /https?:\/\//.test(line) && /\.(vercel\.app|now\.sh)/i.test(line));
-
-  if (urlLine) {
-    const match = urlLine.match(/https?:\/\/[^\s]+/);
-    if (match) return match[0];
+function getCanonicalAliasUrl() {
+  const configPath = path.join(process.cwd(), '.vercel', 'project.json');
+  if (!fs.existsSync(configPath)) {
+    console.error(`[release] missing deploy config: ${configPath}`);
+    process.exit(1);
   }
 
-  return null;
+  let config;
+  try {
+    config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+  } catch (error) {
+    console.error(`[release] invalid deploy config JSON: ${error.message}`);
+    process.exit(1);
+  }
+
+  const alias = typeof config.canonicalAlias === 'string' ? config.canonicalAlias.trim() : '';
+  if (!alias) {
+    console.error('[release] canonicalAlias is missing in .vercel/project.json');
+    process.exit(1);
+  }
+
+  const normalized = alias.replace(/^https?:\/\//i, '').replace(/\/+$/, '');
+  return `https://${normalized}`;
 }
 
 function run() {
   const options = parseArgs();
   console.log('[release] start');
+
+  if (!options.skipVerify) {
+    runCommand('npm', ['run', 'verify:local'], { cwd: process.cwd() });
+  } else {
+    runCommand('npm', ['run', 'deploy:target-check'], { cwd: process.cwd() });
+    console.log('[release] --skip-verify enabled. Skipping local build verification.');
+  }
 
   const branch = getCurrentBranch();
   if (!branch) {
@@ -126,7 +149,7 @@ function run() {
     runCommand('npm', ['run', 'test:ci'], { cwd: process.cwd() });
   }
 
-  if (!options.noBuild) {
+  if (!options.noBuild && options.skipVerify) {
     runCommand('npm', ['run', 'build'], { cwd: process.cwd(), shell: true, stdio: 'inherit' });
   }
 
@@ -153,18 +176,16 @@ function run() {
     process.exit(1);
   }
 
-  const deployArgs = ['--prod', '--yes'];
-  if (options.fastMode && options.waitForDeploy) {
-    deployArgs.push('--no-wait');
+  if (!options.waitForDeploy) {
+    console.log('[release] --no-wait is ignored because deploy:prod:auto enforces completion and alias sync.');
   }
-  const deployOutput = runCapture('vercel', deployArgs, { cwd: process.cwd() });
 
-  const url = getDeploymentUrl(deployOutput) || 'https://vercel.com/dashboard';
+  runCommand('npm', ['run', 'deploy:prod:auto'], { cwd: process.cwd() });
+  const url = getCanonicalAliasUrl();
 
   console.log(`\n[release] deploy command finished`);
   console.log(`- branch: ${branch}`);
   console.log(`- production URL: ${url}`);
-  console.log(`- raw output: ${deployOutput.split('\n').slice(-6).join('\n')}`);
 
   if (options.includeSmoke) {
     console.log('[release] smoke check skipped in this environment. Set SMOKE_BASE_URL for verification.');

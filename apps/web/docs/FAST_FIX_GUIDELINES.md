@@ -4,6 +4,8 @@
 - Do only what is needed to pass the specific failure.
 - Verify root cause before changing formatting/locale/encoding.
 - If a fix is repeated, convert it into a script or checklist item.
+- If a user requests code changes, local verification must run first: `npm run verify:local`.
+  - `--skip-verify` is only allowed for explicit release automation scenarios and must be documented in the ticket.
 
 ## 2) Parallel First
 - Run these in parallel whenever possible:
@@ -19,14 +21,21 @@
 
 ## 4) Deployment Hygiene
 - Local flow:
-  - `npm run check`
-  - `npm run build`
+  - `npm run verify:local` (mandatory before deploy/release)
+  - `npm run deploy:env-check` (required for deploy path)
+- `npm run release` path:
+  - Default behavior runs `npm run verify:local` before lint/typecheck/build/deploy.
+  - `--skip-verify` skips `verify:local` and runs `deploy:target-check` only.
 - Deployment command:
 - `npm run deploy:prod:auto` must run from `apps/web` package and is hard-locked by `scripts/deploy-auto.ps1` to project name from `apps/web/.vercel/project.json` (`web-gpxvjl5mg-piwpiw99-5213s-projects`).
-  - Script uses `vercel deploy --prebuilt --prod --yes` when `.next` exists to skip remote build; if no prebuilt artifacts, it safely falls back to remote build.
+  - Canonical verification is fixed to one alias: `canonicalAlias` in `apps/web/.vercel/project.json` (currently `revieweverything-web-piwpiw99.vercel.app`). Missing canonical alias is treated as deploy failure.
+  - `VERCEL_CANONICAL_ALIAS` or `VERCEL_TARGET_DOMAIN` can override only if they are fixed aliases, not deployment URLs.
+  - Script uses remote build by default (`vercel deploy --prod --yes`).
+  - `VERCEL_USE_PREBUILT=1` is required to enable `vercel deploy --prebuilt --prod --yes`, and it only runs when `.vercel/output/config.json` exists.
   - Any project mismatch is treated as deployment failure (no fallback/override).
 - CI flow:
   - standard install flags: `npm ci --no-audit --no-fund --prefer-offline`
+  - deploy target config gate runs on every change (including docs-only): `node scripts/deploy-target-check.js`
   - keep artifact names stable (`ci-reports-*`) for issue automation
   - summary from failure issues should include run links and top lines
 
@@ -66,7 +75,7 @@
 - Branch A (Infra/Runtime): verify deployment checks and runtime contracts.
   - `render.yaml` parity: add required env var presence checks in local pre-deploy flow.
   - Confirm `/api/health` semantics for Render health probes.
-  - Run `npm run deploy:env-check` before `npm run predeploy:local`.
+- Run `npm run deploy:env-check` before `npm run predeploy:local`.
 - Branch B (Code Quality): reduce highest-impact warnings only.
   - Prioritize files with highest warning density and direct user impact.
   - Re-check after each branch to keep rollback boundaries clear.

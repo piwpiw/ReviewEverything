@@ -6,6 +6,7 @@ import ScraperStatusTable from "@/components/ScraperStatusTable";
 import CsvUploadFallback from "@/components/CsvUploadFallback";
 import PlatformManager from "@/components/PlatformManager";
 import AnalyticsDashboard from "@/components/AnalyticsDashboard";
+import ReviewerManager from "@/components/ReviewerManager";
 
 type IngestStatus = "idle" | "running" | "success" | "error";
 type HealthStatus = "ok" | "error" | "checking";
@@ -174,20 +175,34 @@ export default function AdminDashboard() {
     addLog(`수집 요청: ${targetLabel} (${targets.length}개)`);
 
     try {
-      for (const target of targets) {
-        addLog(`POST /api/admin/ingest platform=${target.name}`);
-        const res = await fetch("/api/admin/ingest", {
+      const requests = targets.map((target) =>
+        fetch("/api/admin/ingest", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ platform_id: target.id }),
-        });
-        if (!res.ok) {
-          const message = await readApiErrorMessage(res);
-          if (isSetupIssue(res.status, message)) setRequiresAdminConfig(true);
-          throw new Error(message);
-        }
+        })
+          .then(async (res) => {
+            if (!res.ok) {
+              const message = await readApiErrorMessage(res);
+              if (isSetupIssue(res.status, message)) setRequiresAdminConfig(true);
+              return { target: target.name, ok: false, message };
+            }
+            return { target: target.name, ok: true, message: null as string | null };
+          })
+          .catch((error: unknown) => {
+            const message = error instanceof Error ? error.message : "요청 실패";
+            return { target: target.name, ok: false, message };
+          }),
+      );
 
-        addLog(`${target.name} 수집 요청 승인`);
+      const results = await Promise.all(requests);
+      const failure = results.find((result) => !result.ok);
+      if (failure) {
+        throw new Error(failure.message || `${failure.target} 수집 요청 실패`);
+      }
+
+      for (const result of results) {
+        addLog(`${result.target} 수집 요청 승인`);
       }
 
       setIngestStatus("success");
@@ -501,6 +516,11 @@ export default function AdminDashboard() {
         <section id="platforms" className="rounded-2xl bg-slate-900/50 border border-slate-800 p-6">
           <h2 className="text-lg font-black text-white mb-4">플랫폼 관리</h2>
           <PlatformManager />
+        </section>
+
+        <section id="reviewers" className="rounded-2xl bg-slate-900/50 border border-slate-800 p-6">
+          <h2 className="text-lg font-black text-white mb-4">체험단 목록 관리</h2>
+          <ReviewerManager />
         </section>
       </main>
     </div>

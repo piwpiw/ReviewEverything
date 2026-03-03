@@ -16,14 +16,20 @@
 - `GET /api/campaigns/:id`
 - `GET /api/campaigns/:id/related`
 - `GET /api/analytics`
-- `GET /api/cron` (query: `runNow`, `limit`)
+- `GET /api/cron` (query: `runNow`, `limit`, `phases`, `phase`, `platform_keys`)
 - `POST /api/admin/ingest`
+- `GET /api/admin/creators`
+- `POST /api/admin/creators`
+- `PATCH /api/admin/creators/:id`
+- `DELETE /api/admin/creators/:id`
+- `GET /api/admin/creators/autologin` (후보 정렬/상태 정책 조회). 응답 필드: `failure_code`, `failure_label` 포함.
 - `GET /api/admin/runs`
 - `GET /api/admin/quality`
 - `GET /api/admin/alerts`
 - `POST /api/admin/alerts/actions` (`ack`, `snooze`)
 - `GET /api/health`
 - `POST /api/jobs` (internal endpoint, `CRON_SECRET` required)
+  - 예시 body: `{"runNow":true,"phases":["A","B","C"],"limit":12,"platform_keys":["reviewnote","revu"]}`
 - `GET /api/me/revenue`
 - `GET /api/me/board`
 - `GET /api/me/pro`
@@ -69,6 +75,11 @@ Note:
   - `POST /api/jobs` (internal)
 - `T10_OBSERVABILITY`
   - `GET /api/health`
+  - `GET /api/admin/creators`
+  - `POST /api/admin/creators`
+  - `PATCH /api/admin/creators/:id`
+  - `DELETE /api/admin/creators/:id`
+  - `GET /api/admin/creators/autologin`
   - `GET /api/admin/runs`
   - `GET /api/admin/quality`
   - `GET /api/admin/alerts`

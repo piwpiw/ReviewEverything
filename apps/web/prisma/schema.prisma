@@ -21,6 +21,46 @@ model Platform {
   platformStats  PlatformStats[]
 }
 
+model Reviewer {
+  id                  Int                     @id @default(autoincrement())
+  display_name        String
+  handle              String?
+  profile_url         String?
+  notes               String?                 @db.Text
+  is_active           Boolean                 @default(true)
+  auto_signin_enabled Boolean                @default(true)
+  status_note         String?
+  created_at          DateTime                @default(now()) @db.Timestamptz(6)
+  updated_at          DateTime                @default(now()) @updatedAt @db.Timestamptz(6)
+
+  authCredentials     ReviewerAuthCredential[]
+
+  @@index([is_active])
+}
+
+model ReviewerAuthCredential {
+  id            Int      @id @default(autoincrement())
+  reviewer_id   Int
+  provider      String
+  account_label String?
+  profile_name  String?
+  auth_mode     String   @default("oauth")
+  auth_hint     String?
+  connection_state String @default("disconnected")
+  is_auto_login Boolean  @default(true)
+  is_primary    Boolean  @default(false)
+  last_checked_at DateTime? @db.Timestamptz(6)
+  last_error_message String? @db.Text
+  expires_at    DateTime? @db.Timestamptz(6)
+  created_at    DateTime @default(now()) @db.Timestamptz(6)
+  updated_at    DateTime @default(now()) @updatedAt @db.Timestamptz(6)
+
+  reviewer Reviewer @relation(fields: [reviewer_id], references: [id], onDelete: Cascade)
+
+  @@unique([reviewer_id, provider], name: "uniq_reviewer_provider")
+  @@index([provider, connection_state])
+}
+
 model Campaign {
   id             Int       @id @default(autoincrement())
   platform_id    Int

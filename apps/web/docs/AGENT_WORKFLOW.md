@@ -62,6 +62,7 @@
 - 구현 API(라우트 존재):
   - `GET /api/campaigns`, `GET /api/analytics`, `GET /api/cron`, `POST /api/admin/ingest`, `GET /api/admin/runs`, `GET /api/health`
   - `GET /api/campaigns/:id`, `GET /api/campaigns/:id/related`
+  - `GET /api/admin/creators`, `POST /api/admin/creators`, `PATCH /api/admin/creators/:id`, `DELETE /api/admin/creators/:id`, `GET /api/admin/creators/autologin`
   - `GET /api/admin/quality`, `GET /api/admin/alerts`, `POST /api/admin/alerts/actions`, `POST /api/jobs` (`CRON_SECRET`)
   - `GET /api/me/revenue`, `GET /api/me/board`, `GET /api/me/pro`, `POST /api/me/pro`, `GET /api/me/curation`, `GET /api/me/schedules`, `POST /api/me/schedules`, `PATCH /api/me/schedules/:id`, `DELETE /api/me/schedules/:id`, `GET /api/me/notifications`, `POST /api/me/notifications`, `PATCH /api/me/notifications`, `DELETE /api/me/notifications/:id`, `POST /api/me/notifications/test`, `GET /api/me/notification-channels`, `GET /api/me/notification-preferences`, `PUT /api/me/notification-preferences`
 - 계획/API 미구현:
@@ -154,8 +155,17 @@
 - 문서/마크다운 변경은 `scope=docs`로 분류해 문서만 정합성 확인.
 - 앱/컴포넌트/라이브러리 변경은 `scope=fast`로 분류해 `lint + typecheck + smoke` 우선 실행.
 - 그 외 변경은 `scope=full`으로 `lint + typecheck + test + api:contract-audit + smoke` 실행.
+- [필수 규칙] 사용자 수정 요청이 발생하면 배포/릴리즈 전에 로컬 검증(`npm run verify:local`)을 항상 먼저 실행한다.
+  `--skip-verify`는 운영 자동화 명령에서만 허용되며, 사용 사유는 배포 티켓에 남겨야 한다.
+- 단, 운영 자동화에서 `npm run release -- --skip-verify` 사용 시 예외 허용(사유/근거를 배포 티켓에 기록).
 - Vercel 배포는 `scope=docs`에서 빌드/배포를 스킵.
 - 동일 브랜치 병렬 실행은 이전 실행을 즉시 취소.
+- 체험단/외부 채널 인증 자동화 작업은 `기획-데이터-운영` 3개 분기 병렬로 진행한다.
+  - 분기 A (기획): 계정 스키마/보안 토큰 정책 합의, 자동로그인 실패 정책 정의.
+  - 분기 B (데이터): `/api/admin/creators*` API 및 운영 증빙 데이터 구조 정합성.
+  - 분기 C (운영): 관리자 화면/배치 라우트가 체험단 변경을 즉시 반영하도록 UX 테스트 추가.
+- 운영 감사 로그 룰: `POST/PATCH/DELETE /api/admin/creators`는 `admin_audit` 로그 emit이 선결으로 동작해야 하며, 실패 코드(`REAUTH_REQUIRED`, `NOT_CONNECTED`, `LOGIN_ERROR`, `CONNECTED`)는 토스트/운영 메시지 규격과 일치해야 한다.
+- `GET /api/admin/creators/autologin`은 `failure_code`와 `failure_label`을 함께 제공해 UI 라벨과 모니터링 규격이 동기화되어야 한다.
 
 ---
 
@@ -169,6 +179,8 @@
 - `TEAM_CONTEXT.md`: `#api_contract_audit`, `#metadata` 및 진행 중인 스트림 상태 업데이트.
 - `PROJECT_STATUS.md`: 완료된 마일스톤 체크 및 실제 구현된 기능 목록 업데이트.
 - `PROJECT_STATUS_NEXT_ACTIONS.md`: 백로그 항목 체크오프 및 다음 우선순위 액션 정의.
+- `SCRAPERS.md`/`CRAWLER_TOP20_RESEARCH_SPECS.md`: 수집 플랜(우선순위/병렬도/실패 라벨) 변경 시 즉시 동기화.
+- 운영 감사 항목: `CREATOR_CREATE/UPDATE/DELETE` 로그, 실패 코드북(`REAUTH_REQUIRED` 등) 동작 여부를 다음 문서에 함께 정리해 동기화한다.
 
 ### 11.2 고도화 (Premium Sophistication)
 결과물이 '단순 동작'을 넘어 '프리미엄' 수준이 되도록 고도화 작업을 병행한다.
@@ -178,6 +190,7 @@
 - **타입 고도화**: `any` 타입을 구체적인 인터페이스로 교체하여 빌드 안정성 확보.
 
 ### 11.3 최종 검증 (Final QA)
+- `npm run verify:local`을 수정 직후 가장 먼저 실행해 로컬 빌드/타깃 정합성을 확인.
 - `npm run deploy:env-check` → `npm run agent:review` 또는 `npm run agent:qa` 순으로 실행해 린트, 타입, 테스트 통과를 확인.
 - apps/web/reports 산출물은 배포 전/후 동일 키로 덮어쓰기 하여 스모크/스캔 혼합을 방지.
 - 반복 경고 정리 작업은 최우선 파일 2~3개 원칙으로 분할해 병렬 병행 큐로 처리.

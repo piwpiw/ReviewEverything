@@ -100,6 +100,24 @@ npm test        # Run Vitest suite
 npx prisma studio   # Direct database management
 ```
 
+### Worker/배치 병렬성 튜닝(운영 권장)
+
+`lib/backgroundWorker.ts`의 병렬 실행은 아래 env로 직접 조절할 수 있습니다.
+
+- `INGEST_JOB_CONCURRENCY` (기본 4): INGEST job 집합의 총 동시성 슬롯
+- `INGEST_REMINDER_JOB_CONCURRENCY` (기본 2): `REMINDER_SCAN` 우선 job 동시성 슬롯
+- `NOTIFICATION_DISPATCH_CONCURRENCY` (기본 6): 알림 전송 큐(`PENDING` 배달)의 동시 발송 슬롯
+- `REMINDER_DELIVERY_CREATE_BATCH` (기본 200): 리마인더 생성 배치 크기
+- `REMINDER_DELIVERY_CREATE_CONCURRENCY` (기본 2): 리마인더 생성 배치 동시성
+- `INGEST_JOB_WEIGHT_DIVISOR` (기본 4): `maxPagesPerRun` 가중치 계산 분모
+- `INGEST_JOB_WEIGHT_MIN` (기본 1): 슬롯 가중치 하한
+- `INGEST_JOB_WEIGHT_MAX` (기본 4): 슬롯 가중치 상한
+
+운영 가이드 예시
+- 1차 트러블슈팅: `INGEST_JOB_CONCURRENCY=6`, `NOTIFICATION_DISPATCH_CONCURRENCY=8`
+- 부하 급등 시: `INGEST_JOB_WEIGHT_MAX=3`, `INGEST_REMINDER_JOB_CONCURRENCY=2`
+- 안정화 우선: `INGEST_REMINDER_JOB_CONCURRENCY=1`, `NOTIFICATION_DISPATCH_CONCURRENCY=4`
+
 ### Fresh Supabase DB bootstrap (first time)
 If the Supabase `Table Editor` shows no tables, it means the migration set has not been applied.
 
@@ -144,7 +162,34 @@ Optional flags:
 - `--no-push`: run locally without pushing
 - `--auto-commit` is enabled for `release`, can be replaced in `release:dry-run`
 - `--message="..."` custom commit message
+- `--skip-verify`: release 전용 빠른 실행. `deploy:target-check`만 수행하고 `verify:local`은 건너뜀.
 
 Prerequisites:
 - Vercel CLI installed and available in PATH (`npm i -g vercel`)
 - `VERCEL_TOKEN` if required by your deployment environment
+
+## TOP20 멀티 에이전트 수집 런북
+
+### TOP20 위상별 즉시 실행
+
+- `npm run ingest:top20 -- --phases=A,B,C --limit=12`
+- `npm run ingest:top20 -- --phases=A --platform_keys=reviewnote,revu,dinnerqueen`
+
+### 3시간 지속 병렬 루프
+
+- `npm run ingest:top20:loop`
+- 기본 동작: A/B/C 병렬 실행, 20분 간격, 3시간(180분) 자동 종료
+- 종료: `Ctrl+C`(현재 사이클 완료 후 즉시 종료)
+
+### API 수동 트리거
+
+- `GET /api/cron?runNow=true&phases=A,B,C&limit=12`
+- `POST /api/jobs` with body: `{"runNow":true,"phases":["A","C"],"limit":12}`
+
+로그 저장:
+- `npm run ingest:top20 -- --phases=A,B,C --log_file=./logs/top20-runner.log`
+
+### 3시간 멀티 에이전트 동시 구동
+
+- `npm run ingest:top20:agents:3h`
+- 내부적으로 `A/B/C`를 각각 독립 프로세스로 동시에 구동하고 로그를 분리(`./logs/top20-agents/agent-*.log`) 기록

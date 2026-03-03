@@ -15,7 +15,7 @@ export class RevuAdapter implements IPlatformAdapter {
 
   async fetchList(page: number): Promise<ScrapedCampaign[]> {
     console.log(`[Revu] Page ${page}`);
-    await sleep(800 + Math.random() * 400);
+    await sleep(3000 + Math.random() * 2000);
 
     try {
       if (page === 1) {

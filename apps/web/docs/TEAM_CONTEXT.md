@@ -11,7 +11,7 @@
   "system_status": "AMBER",
   "priority_teams": ["T01", "T03", "T04", "T08", "T10"],
   "frozen_scopes": [],
-  "last_updated": "2026-03-01T09:30:00Z",
+  "last_updated": "2026-03-03T09:00:00Z",
   "automation_level": "AUTONOMOUS"
 }
 -->
@@ -48,7 +48,9 @@
   - `scope=docs`: docs-only 정합성 점검.
   - `scope=fast`: `lint`, `typecheck`, `smoke`.
   - `scope=full`: `lint`, `typecheck`, `test`, `api:contract-audit`, `api:contract-sync-audit`, `smoke`.
+- `[LOCAL_VERIFICATION_FIRST]`: 사용자 요청으로 인한 기능/문서 변경은 배포/릴리즈 이전에 `npm run verify:local`을 선실행한다.
 - `[DATA_APPEND]`: 스냅샷 행 삭제 금지.
+- `[OPS_PARALLELISM]`: 알림 생성/발송은 각각 `REMINDER_DELIVERY_CREATE_BATCH`, `REMINDER_DELIVERY_CREATE_CONCURRENCY`, `NOTIFICATION_DISPATCH_CONCURRENCY`, `INGEST_REMINDER_JOB_CONCURRENCY`로 운영 병렬도 조절.
 
 ---
 
@@ -59,7 +61,7 @@
 
 ## #api_contract_audit
 - 기준 문서 우선순위: `API.md` -> `ARCHITECTURE.md` -> `TEAM_CONTEXT.md` -> `AGENT_WORKFLOW.md` -> `PROJECT_STATUS.md`
-- 구현된 API: GET /api/campaigns, GET /api/analytics, GET /api/campaigns/:id, GET /api/campaigns/:id/related, GET /api/cron, POST /api/admin/ingest, GET /api/admin/runs, GET /api/admin/quality, GET /api/admin/alerts, POST /api/admin/alerts/actions, POST /api/jobs (`CRON_SECRET`), GET /api/health, GET /api/me/revenue, GET /api/me/board, GET /api/me/pro, POST /api/me/pro, GET /api/me/curation, GET /api/me/schedules, POST /api/me/schedules, PATCH/DELETE /api/me/schedules/:id, GET /api/me/notifications, POST /api/me/notifications, PATCH /api/me/notifications, DELETE /api/me/notifications/:id, POST /api/me/notifications/test, GET /api/me/notification-channels, GET /api/me/notification-preferences, PUT /api/me/notification-preferences
+- 구현된 API: GET /api/campaigns, GET /api/analytics, GET /api/campaigns/:id, GET /api/campaigns/:id/related, GET /api/cron, POST /api/admin/ingest, GET /api/admin/creators, POST /api/admin/creators, PATCH /api/admin/creators/:id, DELETE /api/admin/creators/:id, GET /api/admin/creators/autologin, GET /api/admin/runs, GET /api/admin/quality, GET /api/admin/alerts, POST /api/admin/alerts/actions, POST /api/jobs (`CRON_SECRET`), GET /api/health, GET /api/me/revenue, GET /api/me/board, GET /api/me/pro, POST /api/me/pro, GET /api/me/curation, GET /api/me/schedules, POST /api/me/schedules, PATCH/DELETE /api/me/schedules/:id, GET /api/me/notifications, POST /api/me/notifications, PATCH /api/me/notifications, DELETE /api/me/notifications/:id, POST /api/me/notifications/test, GET /api/me/notification-channels, GET /api/me/notification-preferences, PUT /api/me/notification-preferences
 - 미구현(계획): 없음
 - 정기 점검: 항목 변경 시 API.md/ARCHITECTURE.md/TEAM_CONTEXT.md/AGENT_WORKFLOW.md/PROJECT_STATUS.md 동시 갱신.
 - 운영 규정: 배포 전 `PROJECT_STATUS_NEXT_ACTIONS.md` `12.9 API 정합성 즉시 점검`이 최신 상태여야 한다.
@@ -82,6 +84,13 @@
 - 정합성 감사 기준에서는 구현 상태 키워드를 `implemented`/`planned`로 공통 표기한다.
 - `implemented`/`planned` 값은 증거(라우트 존재성, 화면 AC, 동작 증빙)로 고정하고, 서로 충돌 시 즉시 정합성 이슈로 분류한다.
 - 운영 지침 실행 시 `npm run api:contract-sync-audit`으로 12.9 체크리포트를 갱신하고, 실패 항목은 같은 PR에서 먼저 정정한다.
+- `admin_audit` 로그: 생성/수정/삭제 작업은 actor + 타임스탬프 + 민감정보 마스킹 메타로 남겨야 하며, 실패 코드북(`REAUTH_REQUIRED`, `NOT_CONNECTED`, `LOGIN_ERROR`, `CONNECTED`)은 정책 문서와 동일해야 한다.
+- `failure_codebook`(운영 기준):
+  - `REAUTH_REQUIRED`: 인증 필요 상태(재로그인/권한 갱신 요구).
+  - `NOT_CONNECTED`: 연결 해제 또는 비활성 상태.
+  - `LOGIN_ERROR`: 인증 처리 실패(권한/토큰/시스템 에러).
+  - `CONNECTED`: 최근 상태 정상이 확인됨.
+  - `CREATOR_*` 감사 이벤트에서 codebook/라벨을 남길 때 동시 출력하고 운영 알림 문안과 정합성 유지.
 
 ## #deploy_speed_profile (2026-03-01)
 - 1단 분기: 문서/마크다운 변경(`apps/web/docs/**`, `*.md`)은 `docs-only`로 분류해 경량 게이트로 처리.

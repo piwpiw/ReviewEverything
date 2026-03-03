@@ -314,3 +314,116 @@
 - T04: run/retry/lock 자동화
 - T09: 크롤링 회귀 게이트
 - T10: 수집 SLA 관측 및 경보
+
+### 14.7 수집 데이터 고도화(연구 반영)
+
+- 목표: 실패 유형을 구분해 수집 품질을 유지하면서 플랫폼 단위 자동 복구 속도를 높인다.
+- 적용 상태:
+  - [x] `fetchWithRetry`에서 403/429/5xx/네트워크 실패를 상태코드별로 구분.
+  - [x] run 단계에서 `original_id` 중복 제거와 `duplicates/processFailures/fetchFailures` 집계 반영.
+  - [x] BACKOFF 기준을 고정 15분에서 지수 백오프(최대 90분)로 전환.
+  - [x] URL 폴백 및 스냅샷 작성 트랜잭션 처리 강화.
+- 다음 액션:
+  - [ ] 플랫폼 어댑터 내부 `catch { return [] }` 정책을 정리해 실패 원인 라벨 전달.
+  - [x] `IngestRun.error_log`에 실패 원인 축약 라벨(예: `fetch_failure` `quality_gate`)과 집계 버킷 출력 반영.
+  - [ ] `INGEST_EMPTY_DUPS_STOP_THRESHOLD`/`INGEST_MAX_CONSECUTIVE_FETCH_ERRORS` 운영 임계치 반영 가이드 운영 문서 추가.
+  - [ ] 24시간 리허설로 `low_valid_item_rate` vs `page_fetch_retry_exhausted` 경보 분리 검증.
+ - [ ] `extractFetchFailureCode` 라벨을 알림/재시도 정책으로 연동 후 경보 노이즈 감소 효과 측정.
+
+### 14.8 수집 확장(블로그 체험단 TOP20 Research 적용)
+
+- 목표: 제공된 연구 기반 TOP20 후보군을 대형군/중형군/롱테일로 분리해, 1개월 내 수집 소스 커버리지를 확장한다.
+- 근거 문서: `docs/CRAWLER_TOP20_RESEARCH_SPECS.md`
+- 실행 방식:
+- [ ] 1단계 대형군(리뷰노트/레뷰/디너의여왕/리뷰플레이스/서울오빠) 5개 파일럿 완료 후 일일 정상성 지표 기록.
+- [ ] 2단계 중형군(링블/티블/포블로그/미블/클라우드리뷰/모블) 6개 파싱 안정성 검증.
+- [ ] 3단계 롱테일(강남맛집/슈퍼멤버스/아싸뷰/스타일C/체험단닷컴/리뷰윙/놀러와체험단/체험뷰) 순차 투입.
+- [x] 수집 워커 `runJobs`를 배치 병렬 처리(기본 동시성: `INGEST_JOB_CONCURRENCY`)로 전환 및 `canRunInParallel=false` 플랫폼 직렬 가드 적용.
+- [x] 수집 대상은 `maxPagesPerRun` 가중치 기반 정렬로 병렬 슬롯 우선순위를 조절해 처리량을 우선 확보.
+- [x] 병렬 배치가 가중치 슬롯(`maxPagesPerRun`) 기반으로 동작하도록 전환해 대형 수집의 과점유를 완화.
+- [x] 수집 job 적재를 배치화(`createMany`)하여 `enqueueIngestJobs`의 DB 왕복 횟수를 축소.
+- [x] 가중치 산정 식에 `INGEST_JOB_WEIGHT_DIVISOR/MIN/MAX` 환경 변수 조정을 추가해 운영에서 즉시 튜닝 가능.
+- [ ] 플랫폼별 실패 원인 라벨(`parser_change`, `rate_limit`, `auth_required`)을 `IngestRun.error_log`와 `/api/admin/quality` 경보와 동기화.
+- [x] `REMINDER_SCAN` 우선 조회 및 `NOTIFICATION_DISPATCH_CONCURRENCY` 기반 알림 병렬 발송 반영.
+- [x] `INGEST_REMINDER_JOB_CONCURRENCY` 추가로 알림 스캔 job 병렬 슬롯을 별도 튜닝 가능하도록 적용.
+- [x] `createReminderDeliveries`를 선조회 + `createMany` 배치(병렬 동시성 조절)로 변경해 리마인더 생성량 병목 완화.
+  - [ ] 수집 품질 리스크 상위 30%를 `quality_gate` 큐로 이동시키고, 리버전스 스케줄 적용.
+- 운영 지표:
+  - 24시간 수집 성공률 95% 이상 유지(전체 Top20 평균)
+  - 각 플랫폼당 1일 1회 이상 성공 run 존재(파일럿군)
+  - 3회 연속 fetch 실패 시 자동 중단(현재 정책 반영값)
+- 품질 관측: `/api/admin/quality`에서 알림 큐 백로그, 스냅샷 신선도, 실패 지표를 24시간 윈도우로 추적해 임계 초과 시 즉시 경보.
+
+## 14) 체험단 목록/자동로그인 고도화 (즉시 병렬 실행)
+
+### 14.1 실행 목표
+- 관리자 화면에서 체험단 목록을 생성/수정/삭제/연결 상태 편집할 수 있게 하고, 사이트 연동 토글을 즉시 반영한다.
+- 네이버/인스타그램/유튜브(및 추가 외부 채널) 계정 연동 상태를 한 화면에서 확인 가능한 스텝으로 정리한다.
+- 운영 재실행 시 `creator.auto_signin_enabled`와 각 채널 `authCredential.connection_state`를 기준으로 자동 로그인 후보를 우선 정렬한다.
+
+### 14.2 병렬 작업 큐 (동시 투입)
+- [ ] Branch A (데이터/스키마): `Reviewer` + `ReviewerAuthCredential` 모델 고도화, 마이그레이션 및 API 라우트 설계.
+- [ ] Branch B (운영 UI): `/admin`에 체험단 목록/연결 상태 관리 화면을 추가하고 검색/필터/일괄 편집 UX를 완성.
+- [ ] Branch C (인증 자동화): OAuth/토큰/토큰 만료 정책, 재인증 플로우, 보안 감사 로그 규칙 정의.
+
+### 14.3 액션 체크리스트
+- [x] 새 엔드포인트(`GET/POST/PATCH/DELETE /api/admin/creators`)를 `API.md`/`TEAM_CONTEXT.md`/`AGENT_WORKFLOW.md`에 implemented로 정렬.
+- [x] 체험단 자동로그인 전환 조건(`status/auto_signin/provider state`)을 운영 체크리스트로 문서화.
+- [x] `/admin`에서 체험단 추가/수정/삭제/연결 상태 변경 1회 동작 테스트 로그(요청/응답/반영 시간) 보존.
+
+### 14.4 병렬 실행 설계 (즉시 착수)
+
+- 목표: 체험단 단체 CRUD 속도 최적화 + 사이트 자동로그인 후보 선별 정확도 개선 + 운영 안정성 확보를 한 번에 수렴.
+- 실행 원칙: 분기별 독립 배치, 병합 기준은 API 계약/동기화/로컬 검증 순으로 충족.
+- 사용자 기준 우선순위: 체험단 추가/수정/삭제 반복 작업 속도 2회 클릭 이내 종료 + 연결 상태 시각화를 우선.
+
+### 14.5 작업 항목(병렬 큐)
+
+1. [A] 데이터/스키마 정합성
+   - 구현 항목: `Reviewer`/`ReviewerAuthCredential` 유효성(상태/시간 값/일차제약) 정규화 + migration 안정화 + 롤백 스크립트.
+   - 산출물: 마이그레이션 제약 문서 1건, seed 재적용 절차 1건.
+   - 완료 기준: `api:contract-audit`에서 구현/문서 drift 0건.
+
+2. [A] API 인터페이스 확장
+   - 구현 항목: 다건 입력/부분 업데이트/커넥션 상태 전이 API 보강(필요 시 `PATCH` body 정합 스키마 분리).
+   - 산출물: creators API 명세 v2, 실패코드 매핑(연결 끊김/인증 필요/권한 부족).
+   - 완료 기준: `GET /api/admin/creators` 응답에서 auto-login 후보 정렬이 `auto_signin_enabled`, `connection_state`, `updated_at` 기준으로 재현.
+   - [x] `GET /api/admin/creators` 응답 정렬/필터/상태 메트릭을 v2로 정합화.
+
+3. [B] 운영 UI 고도화
+   - 구현 항목: `/admin` 체험단 섹션에 필터/일괄 적용/정렬/상태 배치 토글 추가.
+   - 산출물: 체험단 표 상태 열(상태, 자동로그인, 마지막 검증, 마지막 실패) 1페이지.
+   - 완료 기준: 리스트 내 편집→저장→반영 시간 1초 이내 체감과 연결 상태 즉시 라벨 갱신.
+   - [x] `/admin`에 체험단 목록 생성/수정/삭제/일괄 토글/필터/정렬 UI를 탑재.
+
+4. [B] 인증 자동화 정책
+   - 구현 항목: 자동로그인 후보 정책(우선 provider, 오류 state, 토큰 유효성) 문서 + 실행 순서 엔진 설계.
+   - 산출물: 자동로그인 실행 플랜(의사결정 트리), 실패시 fallback 정책 1개.
+  - 완료 기준: `체험단 자동로그인` 토글 On만으로 1차 후보 3개 이내 정렬/표시.
+  - [x] `GET /api/admin/creators/autologin`에 provider 우선순위/오류 코드/의사결정 근거 응답을 포함.
+
+5. [C] 보안/감사·운영
+   - 구현 항목: 토큰/크리덴셜 갱신 로그 정책 + 민감정보 마스킹 기준 + 재인증 알림 스텝.
+   - 산출물: 보안 운영 체크리스트, 접근 실패 1건당 대응 라벨/코드(예: `needs_reauth`, `expired`, `invalid`) 정의.
+   - 완료 기준: 로그 누락 없이 상태 전이 1일간 추적 가능, 운영 알림 템플릿 표준화.
+
+### 14.6 즉시 착수 체크리스트 (병렬 배치)
+
+- [ ] [A] 마이그레이션/스키마 drift 0점: schema-implementation sync lock 확인 후 다음 배포에서 실행.
+- [x] [A] API 응답 정합: creators GET/POST/PATCH/DELETE 응답 shape 고정.
+- [ ] [B] `/admin` 편집 플로우: 생성/수정/삭제 3개 동작 통합 시나리오 1개 문서화.
+- [x] 실패 사유 코드북: `REAUTH_REQUIRED`, `NOT_CONNECTED`, `LOGIN_ERROR`, `CONNECTED` 기준치로 토스트/감사 로그 메시지 정합.
+- [x] [B] 자동로그인 정책 문구: 기능 라벨/툴팁/오류 메시지 일괄 고정.
+- [x] [C] 보안 로그: 실패 사유 코드북 적용 및 로그 저장 포맷 고정.
+- [ ] 병렬 통합 점검: 브랜치 병합 전 `AGENT_WORKFLOW` + `TEAM_CONTEXT` + `API.md` 12.9 규칙 동기화.
+
+### 14.9 실행 자료
+
+- Top20 수집 확장 기준 문서: `docs/CRAWLER_TOP20_RESEARCH_SPECS.md`
+- `PLATFORM_CATALOG` 확장 전 사전 점검 항목: robots/약관/로그인 영역 분기 + 샘플 3개 페이지 스모크.
+- 실행 승인 조건(예비): Top20 중 1단계 성공률 95% 이상 확인 후 2단계 투입.
+
+- [x] 스케줄러 phase 분기 실행: cron/jobs에서 TOP20 A/B/C 단계별 배치 키(phase/platform_keys)로 동시에 구동하고, 병렬 실행 로그를 3시간 루프 기준으로 저장
+  - 실행 커맨드: `npm run ingest:top20:loop`
+  - 종료: `Ctrl+C` (현재 사이클 완료 후 종료)
+
