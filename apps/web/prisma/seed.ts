@@ -1,7 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { KUCOOK_TAXONOMY_SEEDS } from "./kucook-taxonomy";
 
-const prisma = new PrismaClient() as PrismaClient & { [key: string]: any };
+const prisma = new PrismaClient();
 
 async function seedTaxonomy() {
   for (const term of KUCOOK_TAXONOMY_SEEDS.filter((item) => !item.parentSlug)) {
