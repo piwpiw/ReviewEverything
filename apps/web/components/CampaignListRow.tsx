@@ -92,9 +92,9 @@ export default function CampaignListRow({ campaign, rank }: { campaign: Campaign
   };
 
   return (
-    <article className="rounded-[1.35rem] border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-3 shadow-sm hover:shadow-md transition-all">
-      <div className="grid grid-cols-1 lg:grid-cols-[180px_1fr_180px] gap-3 items-stretch">
-        <div className="relative h-[108px] md:h-[116px] rounded-xl overflow-hidden border border-slate-100 dark:border-slate-800 bg-slate-100 dark:bg-slate-800">
+    <article className="rounded-[1.1rem] border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-2.5 shadow-sm hover:shadow-md transition-all">
+      <div className="grid grid-cols-1 lg:grid-cols-[160px_1fr_164px] gap-2.5 items-stretch">
+        <div className="relative h-[96px] md:h-[102px] rounded-xl overflow-hidden border border-slate-100 dark:border-slate-800 bg-slate-100 dark:bg-slate-800">
           <Image src={imageUrl} alt={campaign.title || "캠페인"} fill className="object-cover" unoptimized />
           <div className="absolute top-2 left-2 flex items-center gap-1.5">
             <span className={`inline-flex items-center rounded-md border px-2 py-1 text-[10px] font-black ${platformDisplay.badgeClassName}`}>
@@ -108,7 +108,7 @@ export default function CampaignListRow({ campaign, rank }: { campaign: Campaign
           ) : null}
         </div>
 
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-1.5">
           <div className="flex items-center flex-wrap gap-1.5 text-[10px] font-black">
             <span className={`inline-flex items-center rounded-md border px-2 py-1 ${platformDisplay.badgeClassName}`}>
               {platformDisplay.label}
@@ -123,23 +123,23 @@ export default function CampaignListRow({ campaign, rank }: { campaign: Campaign
           </div>
 
           <Link href={`/campaigns/${campaign.id}`} className="group">
-            <h3 className="text-[15px] md:text-base font-black text-slate-900 dark:text-white leading-snug line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-300">
+            <h3 className="text-[14px] md:text-[15px] font-black text-slate-900 dark:text-white leading-snug line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-300">
               {campaign.title || "캠페인"}
             </h3>
           </Link>
 
-          <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-300">
+          <div className="flex items-center gap-1.5 text-[11px] text-slate-500 dark:text-slate-300">
             <MapPin className="w-3.5 h-3.5" />
             <span className="truncate">{locationText}</span>
           </div>
 
           {campaign.brief_desc ? (
-            <p className="text-[11px] text-slate-600 dark:text-slate-300 line-clamp-1 rounded-lg bg-slate-50 dark:bg-slate-800/70 px-2.5 py-1.5">
+            <p className="text-[10px] text-slate-600 dark:text-slate-300 line-clamp-1 rounded-lg bg-slate-50 dark:bg-slate-800/70 px-2 py-1">
               {campaign.brief_desc}
             </p>
           ) : null}
 
-          <div className="grid grid-cols-3 gap-1.5 mt-auto">
+          <div className="grid grid-cols-3 gap-1 mt-auto">
             <div className="rounded-lg border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/60 p-1.5 text-center">
               <p className="text-[9px] text-slate-500">보상</p>
               <p className="text-[12px] font-black text-blue-600 dark:text-blue-300">{reward > 0 ? `${(reward / 10000).toFixed(1)}만` : "미정"}</p>
@@ -158,10 +158,10 @@ export default function CampaignListRow({ campaign, rank }: { campaign: Campaign
           </div>
         </div>
 
-        <div className="grid grid-cols-2 lg:grid-cols-1 gap-1.5">
+        <div className="grid grid-cols-2 lg:grid-cols-1 gap-1">
           <Link
             href={`/campaigns/${campaign.id}`}
-            className="h-9 rounded-xl bg-slate-900 dark:bg-blue-600 text-white text-[11px] font-black flex items-center justify-center hover:opacity-90"
+            className="h-8 rounded-xl bg-slate-900 dark:bg-blue-600 text-white text-[10px] font-black flex items-center justify-center hover:opacity-90"
           >
             상세 확인
           </Link>
@@ -171,7 +171,7 @@ export default function CampaignListRow({ campaign, rank }: { campaign: Campaign
             target="_blank"
             rel="noopener noreferrer"
             onClick={(e) => void handleOutbound(e, shopUrl ? "shop" : "campaign")}
-            className="h-9 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-[11px] font-black flex items-center justify-center gap-1.5 hover:border-blue-400 hover:text-blue-500"
+            className="h-8 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-[10px] font-black flex items-center justify-center gap-1.5 hover:border-blue-400 hover:text-blue-500"
           >
             {shopUrl ? <Store className="w-3.5 h-3.5" /> : <ExternalLink className="w-3.5 h-3.5" />}
             {shopUrl ? "스토어 이동" : primaryUrl ? "원문 이동" : "원문 검색"}
@@ -182,7 +182,7 @@ export default function CampaignListRow({ campaign, rank }: { campaign: Campaign
             target="_blank"
             rel="noopener noreferrer"
             onClick={(e) => void handleOutbound(e, "campaign")}
-            className="col-span-2 lg:col-span-1 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-[11px] font-black flex items-center justify-center"
+            className="col-span-2 lg:col-span-1 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-[10px] font-black flex items-center justify-center"
           >
             제목 기반 빠른 탐색
           </a>

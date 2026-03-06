@@ -146,17 +146,17 @@ export default function HeroSearch({ defaultValue }: { defaultValue: string }) {
           onFocus={() => setIsFocused(true)}
           onChange={(event) => setQ(event.target.value)}
           placeholder="검색어를 입력하세요. 예: 서울 강남, 제주 펜션"
-          className="w-full pl-14 pr-36 py-5 rounded-[1.75rem] bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-slate-800 text-base font-bold outline-none ring-offset-4 dark:ring-offset-slate-950 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 dark:focus:border-blue-500 transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500 shadow-2xl shadow-slate-900/5 dark:shadow-blue-900/10 text-slate-900 dark:text-white"
+          className="w-full pl-12 pr-28 py-4 rounded-[1.35rem] bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-slate-800 text-sm md:text-base font-bold outline-none ring-offset-4 dark:ring-offset-slate-950 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 dark:focus:border-blue-500 transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500 shadow-2xl shadow-slate-900/5 dark:shadow-blue-900/10 text-slate-900 dark:text-white"
         />
         <div
-          className={`absolute left-5 top-1/2 -translate-y-1/2 transition-colors ${
+          className={`absolute left-4 top-1/2 -translate-y-1/2 transition-colors ${
             isFocused ? "text-blue-600 dark:text-blue-500" : "text-slate-300 dark:text-slate-600"
           }`}
         >
-          <Search className="w-6 h-6 stroke-[2.5]" />
+          <Search className="w-5 h-5 stroke-[2.5]" />
         </div>
 
-        <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
+        <div className="absolute right-2.5 top-1/2 -translate-y-1/2 flex items-center gap-1.5">
           {q && (
             <button
               type="button"
@@ -169,7 +169,7 @@ export default function HeroSearch({ defaultValue }: { defaultValue: string }) {
           )}
           <button
             type="submit"
-            className="bg-slate-900 dark:bg-blue-600 hover:bg-blue-600 dark:hover:bg-blue-500 text-white px-6 py-2.5 rounded-2xl font-black text-sm transition-all shadow-xl dark:shadow-blue-900/20 active:scale-95"
+            className="bg-slate-900 dark:bg-blue-600 hover:bg-blue-600 dark:hover:bg-blue-500 text-white px-4 py-2 rounded-xl font-black text-xs md:text-sm transition-all shadow-xl dark:shadow-blue-900/20 active:scale-95"
           >
             검색
           </button>
@@ -182,10 +182,10 @@ export default function HeroSearch({ defaultValue }: { defaultValue: string }) {
             initial={{ opacity: 0, y: 10, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 10, scale: 0.98 }}
-            className="absolute top-[110%] left-0 right-0 bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl rounded-[2.5rem] border border-slate-200/50 dark:border-slate-800/50 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.1)] dark:shadow-[0_32px_64px_-16px_rgba(0,0,0,0.5)] overflow-hidden p-8 flex flex-col gap-8"
+            className="absolute top-[106%] left-0 right-0 bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl rounded-[1.75rem] border border-slate-200/50 dark:border-slate-800/50 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.1)] dark:shadow-[0_32px_64px_-16px_rgba(0,0,0,0.5)] overflow-hidden p-5 flex flex-col gap-5"
           >
             {(correction || resultCountText || loadingSuggest) && (
-              <div className="rounded-2xl border border-blue-100 bg-blue-50 p-4 text-sm text-blue-700 dark:border-blue-900/40 dark:bg-blue-950/40 dark:text-blue-300">
+              <div className="rounded-2xl border border-blue-100 bg-blue-50 p-3 text-sm text-blue-700 dark:border-blue-900/40 dark:bg-blue-950/40 dark:text-blue-300">
                 {loadingSuggest ? (
                   <div className="flex items-center gap-2">
                     <Loader2 className="h-4 w-4 animate-spin" />
@@ -220,7 +220,7 @@ export default function HeroSearch({ defaultValue }: { defaultValue: string }) {
                       key={term}
                       type="button"
                       onClick={() => applySearch(term)}
-                      className="px-4 py-2 bg-blue-50 dark:bg-blue-950/40 hover:bg-blue-100 dark:hover:bg-blue-900/40 rounded-xl text-sm font-bold text-slate-700 dark:text-slate-200 border border-blue-100 dark:border-blue-900 transition-colors"
+                      className="px-3 py-1.5 bg-blue-50 dark:bg-blue-950/40 hover:bg-blue-100 dark:hover:bg-blue-900/40 rounded-xl text-xs md:text-sm font-bold text-slate-700 dark:text-slate-200 border border-blue-100 dark:border-blue-900 transition-colors"
                     >
                       {term}
                     </button>
@@ -286,13 +286,13 @@ export default function HeroSearch({ defaultValue }: { defaultValue: string }) {
                 <Clock className="w-4 h-4 text-amber-500 dark:text-amber-400" />
                 <span className="text-[10px] font-black uppercase tracking-widest">카테고리 바로가기</span>
               </div>
-              <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
                 {CATEGORIES.map((cat) => (
                   <button
                     key={cat.name}
                     type="button"
                     onClick={() => applySearch(cat.name)}
-                    className="flex flex-col items-center gap-2 p-4 rounded-3xl bg-slate-50 dark:bg-slate-800/50 hover:bg-white dark:hover:bg-slate-800 hover:shadow-xl hover:shadow-slate-200/50 dark:hover:shadow-black/20 transition-all border border-transparent hover:border-slate-100 dark:hover:border-slate-700 group/cat"
+                    className="flex flex-col items-center gap-1.5 p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 hover:bg-white dark:hover:bg-slate-800 hover:shadow-xl hover:shadow-slate-200/50 dark:hover:shadow-black/20 transition-all border border-transparent hover:border-slate-100 dark:hover:border-slate-700 group/cat"
                   >
                     <span className="text-2xl group-hover/cat:scale-110 transition-transform">{cat.icon}</span>
                     <span className="text-[11px] font-extrabold text-slate-900 dark:text-white">{cat.name}</span>

@@ -157,8 +157,8 @@ export default function CampaignCard({ campaign, rank }: { campaign: Campaign; r
   const locationText = `${campaign.region_depth1 || ""}${campaign.region_depth2 ? ` ${campaign.region_depth2}` : ""}`.trim() || "지역 미지정";
 
   return (
-    <article className="relative overflow-hidden rounded-[1.35rem] border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm hover:shadow-md transition-all duration-300">
-      <div className="relative h-[112px] overflow-hidden bg-slate-100 dark:bg-slate-800">
+    <article className="relative overflow-hidden rounded-[1.1rem] border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm hover:shadow-md transition-all duration-300">
+      <div className="relative h-[96px] overflow-hidden bg-slate-100 dark:bg-slate-800">
         <Image src={imageUrl} alt={campaign.title || "캠페인 이미지"} fill className="object-cover" unoptimized />
         <div className={`absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r ${typeColor}`} />
 
@@ -192,8 +192,8 @@ export default function CampaignCard({ campaign, rank }: { campaign: Campaign; r
         </button>
       </div>
 
-      <div className="p-3 flex flex-col gap-2">
-        <div className="flex items-center gap-2 text-[10px] font-black text-slate-500 dark:text-slate-400">
+      <div className="p-2.5 flex flex-col gap-1.5">
+        <div className="flex items-center gap-1.5 text-[10px] font-black text-slate-500 dark:text-slate-400">
           <span className="truncate max-w-[42%]">{platformDisplay.label}</span>
           <span className="text-slate-300">/</span>
           <span>{campaignTypeName}</span>
@@ -201,23 +201,23 @@ export default function CampaignCard({ campaign, rank }: { campaign: Campaign; r
         </div>
 
         <Link href={`/campaigns/${campaign.id}`}>
-          <h3 className="line-clamp-2 text-[14px] font-black leading-snug text-slate-900 dark:text-white">
+          <h3 className="line-clamp-2 text-[13px] font-black leading-snug text-slate-900 dark:text-white">
             {campaign.title || "캠페인"}
           </h3>
         </Link>
 
-        <div className="flex items-center gap-1.5 text-[11px] text-slate-500 dark:text-slate-300">
+        <div className="flex items-center gap-1 text-[10px] text-slate-500 dark:text-slate-300">
           <MapPin className="w-3.5 h-3.5" />
           <span className="truncate">{locationText}</span>
         </div>
 
         {campaign.brief_desc ? (
-          <p className="line-clamp-1 rounded-lg bg-blue-50 dark:bg-blue-900/20 px-2 py-1 text-[10px] font-bold text-blue-700 dark:text-blue-300">
+          <p className="line-clamp-1 rounded-lg bg-blue-50 dark:bg-blue-900/20 px-2 py-1 text-[9px] font-bold text-blue-700 dark:text-blue-300">
             {campaign.brief_desc}
           </p>
         ) : null}
 
-        <div className="grid grid-cols-3 gap-1.5 text-center">
+        <div className="grid grid-cols-3 gap-1 text-center">
           <div className="rounded-lg border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/70 px-1.5 py-1">
             <p className="text-[9px] text-slate-500">보상</p>
             <p className="text-[11px] font-black text-blue-600 dark:text-blue-300">{reward > 0 ? `${(reward / 10000).toFixed(1)}만` : "미정"}</p>
@@ -232,18 +232,18 @@ export default function CampaignCard({ campaign, rank }: { campaign: Campaign; r
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-1.5 pt-1">
+        <div className="grid grid-cols-2 gap-1 pt-0.5">
           <button
             type="button"
             onClick={(e) => void handleOutbound(e, shopUrl ? "shop" : "campaign")}
-            className="h-8 rounded-lg bg-slate-100 dark:bg-slate-800 text-[11px] font-black text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 flex items-center justify-center gap-1"
+            className="h-7 rounded-lg bg-slate-100 dark:bg-slate-800 text-[10px] font-black text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 flex items-center justify-center gap-1"
           >
             {shopUrl ? <Store className="w-3.5 h-3.5" /> : <ShoppingBag className="w-3.5 h-3.5" />}
             {shopUrl ? "스토어" : "원문"}
           </button>
           <Link
             href={`/campaigns/${campaign.id}`}
-            className="h-8 rounded-lg bg-slate-900 dark:bg-blue-600 text-white text-[11px] font-black hover:opacity-90 flex items-center justify-center"
+            className="h-7 rounded-lg bg-slate-900 dark:bg-blue-600 text-white text-[10px] font-black hover:opacity-90 flex items-center justify-center"
           >
             상세
           </Link>
@@ -253,7 +253,7 @@ export default function CampaignCard({ campaign, rank }: { campaign: Campaign; r
             target="_blank"
             rel="noopener noreferrer"
             onClick={(e) => void handleOutbound(e, "campaign")}
-            className="col-span-2 h-8 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-[11px] font-black text-center hover:border-blue-400 hover:text-blue-500 flex items-center justify-center gap-1"
+            className="col-span-2 h-7 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-[10px] font-black text-center hover:border-blue-400 hover:text-blue-500 flex items-center justify-center gap-1"
           >
             <ExternalLink className="w-3 h-3" />
             {primaryUrl ? "원문으로 이동" : "원문 검색으로 이동"}

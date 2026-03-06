@@ -1,10 +1,10 @@
 {
   "version": 3,
   "mode": "full",
-  "generatedAt": "2026-03-05T07:14:33.422Z",
+  "generatedAt": "2026-03-06T02:01:14.506Z",
   "root": "D:/BohemianStudio/ReviewEverything/apps/web",
-  "totalFiles": 267,
-  "totalBytes": 10158428,
+  "totalFiles": 273,
+  "totalBytes": 10119672,
   "files": [
     {
       "path": ".agent/skills/README.md",
@@ -132,9 +132,9 @@
     {
       "path": "app/admin/page.tsx",
       "ext": ".tsx",
-      "size": 26390,
-      "mtime": "2026-03-04T23:27:35.352Z",
-      "hash": "356f7e07b16a",
+      "size": 26950,
+      "mtime": "2026-03-05T08:52:56.132Z",
+      "hash": "f9536862fd87",
       "tags": [
         "app",
         "code"
@@ -145,12 +145,12 @@
         "tsx",
         "classname",
         "div",
-        "message",
         "border",
+        "message",
         "font-black",
+        "span",
         "status",
         "error",
-        "span",
         "text-white",
         "수집",
         "res",
@@ -158,7 +158,7 @@
         "section",
         "string",
         "usestate",
-        "length"
+        "flex"
       ]
     },
     {
@@ -395,9 +395,9 @@
     {
       "path": "app/api/admin/platforms/[id]/route.ts",
       "ext": ".ts",
-      "size": 964,
-      "mtime": "2026-03-02T05:52:09.078Z",
-      "hash": "9b9b51480a72",
+      "size": 1099,
+      "mtime": "2026-03-06T01:17:25.118Z",
+      "hash": "7d42adbc0fc8",
       "tags": [
         "app",
         "code"
@@ -414,23 +414,23 @@
         "params",
         "parsedid",
         "platform",
-        "message",
+        "unknown",
+        "geterrormessage",
         "req",
         "routecontext",
-        "any",
         "catch",
         "delete",
         "is_active",
-        "parseint",
-        "request"
+        "message",
+        "parseint"
       ]
     },
     {
       "path": "app/api/admin/platforms/route.ts",
       "ext": ".ts",
-      "size": 1937,
-      "mtime": "2026-03-02T17:05:23.023Z",
-      "hash": "79cda200a999",
+      "size": 2076,
+      "mtime": "2026-03-06T01:17:01.255Z",
+      "hash": "36db878aff8d",
       "tags": [
         "app",
         "code"
@@ -441,21 +441,21 @@
         "app",
         "platforms",
         "route",
-        "url",
         "error",
+        "url",
         "platform",
         "json",
         "name",
         "nextresponse",
+        "unknown",
         "urllist",
         "urlobj",
         "catch",
         "formattedname",
+        "geterrormessage",
         "hasadapter",
         "hostname",
-        "message",
-        "results",
-        "status"
+        "results"
       ]
     },
     {
@@ -527,9 +527,9 @@
     {
       "path": "app/api/analytics/log/route.ts",
       "ext": ".ts",
-      "size": 799,
-      "mtime": "2026-03-02T04:26:03.155Z",
-      "hash": "e29a2c1c64f5",
+      "size": 925,
+      "mtime": "2026-03-06T01:17:01.255Z",
+      "hash": "64a489e6d068",
       "tags": [
         "app",
         "code"
@@ -546,15 +546,15 @@
         "nextresponse",
         "campaignid",
         "platform",
+        "unknown",
         "userid",
+        "geterrormessage",
         "parseint",
         "req",
         "status",
-        "any",
         "campaign_id",
         "catch",
-        "console",
-        "create"
+        "console"
       ]
     },
     {
@@ -1513,9 +1513,9 @@
     {
       "path": "app/map/page.tsx",
       "ext": ".tsx",
-      "size": 1611,
-      "mtime": "2026-03-05T05:02:45.707Z",
-      "hash": "a39721cfc98e",
+      "size": 1615,
+      "mtime": "2026-03-06T00:32:03.380Z",
+      "hash": "fa123b79f19b",
       "tags": [
         "app",
         "code"
@@ -1534,19 +1534,19 @@
         "permission_denied",
         "redirect",
         "value",
+        "view",
         "지도",
         "category",
         "filterkeys",
-        "hasquerypayload",
-        "max_comp"
+        "hasquerypayload"
       ]
     },
     {
       "path": "app/me/calendar/page.tsx",
       "ext": ".tsx",
-      "size": 6383,
-      "mtime": "2026-03-04T23:23:35.840Z",
-      "hash": "12d8536a1e20",
+      "size": 6730,
+      "mtime": "2026-03-05T08:53:32.830Z",
+      "hash": "bd183b29147c",
       "tags": [
         "app",
         "code"
@@ -1560,13 +1560,13 @@
         "div",
         "focus-visible",
         "font-black",
+        "캘린더",
         "link",
+        "일정",
         "inline-flex",
         "items-center",
         "text-sm",
         "text-xs",
-        "일정",
-        "캘린더",
         "border",
         "hover",
         "section",
@@ -1576,9 +1576,9 @@
     {
       "path": "app/me/console/page.tsx",
       "ext": ".tsx",
-      "size": 16536,
-      "mtime": "2026-03-04T23:29:48.507Z",
-      "hash": "60ad438a242b",
+      "size": 16506,
+      "mtime": "2026-03-06T00:39:57.106Z",
+      "hash": "33146e1cb2d6",
       "tags": [
         "app",
         "code"
@@ -1590,19 +1590,19 @@
         "classname",
         "dark",
         "div",
-        "status",
         "font-black",
+        "status",
         "span",
         "string",
         "error",
-        "수집",
         "name",
+        "수집",
         "platform",
+        "border",
         "number",
         "type",
-        "border",
         "text-sm",
-        "usestate"
+        "실행"
       ]
     },
     {
@@ -1639,9 +1639,9 @@
     {
       "path": "app/me/notifications/page.tsx",
       "ext": ".tsx",
-      "size": 20301,
-      "mtime": "2026-03-04T23:27:04.452Z",
-      "hash": "48b9387b1fe3",
+      "size": 20975,
+      "mtime": "2026-03-05T08:53:05.931Z",
+      "hash": "58cb53b4a0ed",
       "tags": [
         "app",
         "code"
@@ -1654,25 +1654,25 @@
         "div",
         "dark",
         "status",
+        "flex",
         "string",
         "payload",
+        "span",
         "filter",
-        "flex",
+        "button",
         "items-center",
         "res",
-        "span",
-        "all",
-        "button",
-        "entry",
-        "error"
+        "border",
+        "focus-visible",
+        "all"
       ]
     },
     {
       "path": "app/me/page.tsx",
       "ext": ".tsx",
-      "size": 13159,
-      "mtime": "2026-03-05T05:02:29.285Z",
-      "hash": "d5922dc335e8",
+      "size": 12429,
+      "mtime": "2026-03-06T00:38:21.179Z",
+      "hash": "0a355842f92b",
       "tags": [
         "app",
         "code"
@@ -1686,16 +1686,16 @@
         "focus-visible",
         "userid",
         "href",
-        "font-black",
         "border",
+        "font-black",
         "link",
         "section",
         "border-slate-200",
         "icon",
-        "label",
         "text-slate-500",
         "text-xs",
-        "hover"
+        "hover",
+        "border-slate-700"
       ]
     },
     {
@@ -1892,9 +1892,9 @@
     {
       "path": "app/trending/page.tsx",
       "ext": ".tsx",
-      "size": 10882,
-      "mtime": "2026-03-04T23:26:45.364Z",
-      "hash": "008bcba13053",
+      "size": 11098,
+      "mtime": "2026-03-06T00:39:22.950Z",
+      "hash": "3050af70aa92",
       "tags": [
         "app",
         "code"
@@ -1907,18 +1907,18 @@
         "div",
         "item",
         "dark",
-        "section",
         "focus-visible",
-        "title",
         "font-black",
-        "items-center",
-        "link",
-        "실시간",
-        "string",
+        "section",
         "text-xs",
+        "items-center",
+        "실시간",
+        "link",
+        "text-white",
+        "string",
         "usestate",
-        "campaigns",
-        "error"
+        "button",
+        "campaigns"
       ]
     },
     {
@@ -2063,9 +2063,9 @@
     {
       "path": "components/CampaignCard.tsx",
       "ext": ".tsx",
-      "size": 11311,
-      "mtime": "2026-03-04T08:58:40.447Z",
-      "hash": "0e2ae0b01e54",
+      "size": 11629,
+      "mtime": "2026-03-06T00:35:18.017Z",
+      "hash": "c5c4f65c1537",
       "tags": [
         "code"
       ],
@@ -2079,24 +2079,24 @@
         "dark",
         "label",
         "div",
-        "color",
         "span",
         "text-",
+        "color",
         "font-black",
         "rounded-lg",
         "number",
         "flex",
+        "items-center",
         "link",
-        "target",
-        "bg-slate-800"
+        "target"
       ]
     },
     {
       "path": "components/CampaignList.tsx",
       "ext": ".tsx",
-      "size": 12279,
-      "mtime": "2026-03-04T08:59:26.725Z",
-      "hash": "83797f38e9d3",
+      "size": 12281,
+      "mtime": "2026-03-06T00:37:54.762Z",
+      "hash": "a80a835e0ec3",
       "tags": [
         "code"
       ],
@@ -2125,9 +2125,9 @@
     {
       "path": "components/CampaignListRow.tsx",
       "ext": ".tsx",
-      "size": 8555,
-      "mtime": "2026-03-04T08:57:46.631Z",
-      "hash": "78efcd897b9a",
+      "size": 8886,
+      "mtime": "2026-03-06T00:35:58.326Z",
+      "hash": "e10e664fe979",
       "tags": [
         "code"
       ],
@@ -2137,20 +2137,20 @@
         "tsx",
         "campaign",
         "classname",
-        "dark",
         "string",
+        "dark",
         "div",
         "span",
-        "font-black",
         "text-",
+        "font-black",
         "items-center",
+        "border",
         "link",
         "number",
         "target",
-        "bg-slate-800",
         "date",
         "flex",
-        "rounded-lg"
+        "gap-1"
       ]
     },
     {
@@ -2559,9 +2559,9 @@
     {
       "path": "components/PlatformManager.tsx",
       "ext": ".tsx",
-      "size": 13113,
-      "mtime": "2026-03-04T08:28:01.794Z",
-      "hash": "1ffffb6347ae",
+      "size": 14305,
+      "mtime": "2026-03-06T00:36:37.001Z",
+      "hash": "e0443b0e1732",
       "tags": [
         "code"
       ],
@@ -2574,17 +2574,17 @@
         "platform",
         "error",
         "font-black",
+        "text-",
+        "border",
         "res",
         "플랫폼",
-        "border",
-        "type",
         "flex",
-        "platforms",
-        "px-6",
-        "py-4",
-        "text-",
         "is_active",
-        "message"
+        "type",
+        "platforms",
+        "px-4",
+        "uppercase",
+        "items-center"
       ]
     },
     {
@@ -2714,9 +2714,9 @@
     {
       "path": "components/SearchGuidePanel.tsx",
       "ext": ".tsx",
-      "size": 4209,
-      "mtime": "2026-03-04T09:54:13.747Z",
-      "hash": "2873b2ce66d6",
+      "size": 4267,
+      "mtime": "2026-03-06T00:31:43.319Z",
+      "hash": "bed270d5d292",
       "tags": [
         "code"
       ],
@@ -2729,7 +2729,6 @@
         "div",
         "font-black",
         "text-sm",
-        "지역",
         "border",
         "font-bold",
         "mt-2",
@@ -2737,6 +2736,7 @@
         "rounded-2xl",
         "text-slate-200",
         "text-slate-700",
+        "지역",
         "border-slate-200",
         "p-4",
         "text-slate-400"
@@ -2776,9 +2776,9 @@
     {
       "path": "components/StatsBanner.tsx",
       "ext": ".tsx",
-      "size": 5609,
-      "mtime": "2026-03-02T13:00:05.855Z",
-      "hash": "6e4ee8adfdfe",
+      "size": 5243,
+      "mtime": "2026-03-06T00:40:02.373Z",
+      "hash": "13cbc157ba97",
       "tags": [
         "code"
       ],
@@ -2788,20 +2788,20 @@
         "tsx",
         "div",
         "classname",
-        "count",
-        "dark",
         "motion",
-        "name",
+        "dark",
         "span",
-        "font-black",
         "stats",
-        "campaign_type",
-        "flex",
-        "item",
+        "font-black",
         "mt-1",
         "text-",
-        "totalcampaigns",
-        "variants"
+        "alive",
+        "count",
+        "item",
+        "variants",
+        "display",
+        "flex",
+        "items-center"
       ]
     },
     {
@@ -2986,9 +2986,9 @@
     {
       "path": "docs/AGENT_WORKFLOW.md",
       "ext": ".md",
-      "size": 13872,
-      "mtime": "2026-03-05T01:42:04.869Z",
-      "hash": "8474e04d9f12",
+      "size": 14149,
+      "mtime": "2026-03-05T22:18:38.338Z",
+      "hash": "e593a32ed7d2",
       "tags": [
         "doc"
       ],
@@ -2998,28 +2998,28 @@
         "workflow",
         "api",
         "get",
-        "운영",
-        "admin",
         "npm",
         "run",
-        "배포",
-        "실행",
-        "문서",
-        "실패",
+        "운영",
+        "admin",
         "ops",
+        "실행",
+        "배포",
         "autonomous",
-        "post",
-        "t09",
-        "t10",
-        "정합성"
+        "문서",
+        "시간",
+        "실패",
+        "화면",
+        "고도화",
+        "post"
       ]
     },
     {
       "path": "docs/API.md",
       "ext": ".md",
-      "size": 3840,
-      "mtime": "2026-03-03T09:29:29.179Z",
-      "hash": "d3e8896a6682",
+      "size": 4368,
+      "mtime": "2026-03-06T00:23:40.676Z",
+      "hash": "1d97fc995ec6",
       "tags": [
         "doc"
       ],
@@ -3031,16 +3031,16 @@
         "post",
         "notifications",
         "creators",
-        "schedules",
-        "campaigns",
         "delete",
         "patch",
+        "platforms",
+        "schedules",
+        "analytics",
+        "campaigns",
         "alerts",
         "implemented",
         "notification-preferences",
-        "pro",
-        "문서",
-        "응답"
+        "pro"
       ]
     },
     {
@@ -3075,9 +3075,9 @@
     {
       "path": "docs/AUTONOMOUS_HOURLY_REPORT.md",
       "ext": ".md",
-      "size": 41469,
-      "mtime": "2026-03-04T06:17:23.129Z",
-      "hash": "0954ae39ca2c",
+      "size": 43679,
+      "mtime": "2026-03-05T22:26:31.718Z",
+      "hash": "5b20132534ba",
       "tags": [
         "doc"
       ],
@@ -3092,8 +3092,8 @@
         "점검",
         "정책",
         "운영",
-        "알림",
         "항목",
+        "알림",
         "중복",
         "우선순위",
         "로그",
@@ -3101,7 +3101,7 @@
         "보강",
         "기준",
         "top20",
-        "포맷"
+        "실행"
       ]
     },
     {
@@ -3543,9 +3543,9 @@
     {
       "path": "docs/PROJECT_STATUS_NEXT_ACTIONS.md",
       "ext": ".md",
-      "size": 39244,
-      "mtime": "2026-03-04T00:17:03.066Z",
-      "hash": "251dbd18818f",
+      "size": 44367,
+      "mtime": "2026-03-06T00:40:31.743Z",
+      "hash": "e132a9f2654b",
       "tags": [
         "doc"
       ],
@@ -3557,27 +3557,27 @@
         "status",
         "api",
         "get",
-        "상태",
         "admin",
+        "상태",
         "실행",
         "운영",
         "확인",
-        "실패",
-        "화면",
-        "수집",
-        "post",
-        "반영",
         "완료",
+        "화면",
         "추가",
-        "문서"
+        "문서",
+        "실패",
+        "run",
+        "반영",
+        "post"
       ]
     },
     {
       "path": "docs/PROJECT_STATUS.md",
       "ext": ".md",
-      "size": 30012,
-      "mtime": "2026-03-02T03:10:43.985Z",
-      "hash": "622261654c4e",
+      "size": 29962,
+      "mtime": "2026-03-06T00:25:10.116Z",
+      "hash": "f711abf742db",
       "tags": [
         "doc"
       ],
@@ -3635,6 +3635,38 @@
       ]
     },
     {
+      "path": "docs/ROLE_BASED_TEST_SCENARIOS.md",
+      "ext": ".md",
+      "size": 4599,
+      "mtime": "2026-03-05T15:39:16.696Z",
+      "hash": "e9ad1b736407",
+      "tags": [
+        "doc"
+      ],
+      "terms": [
+        "based",
+        "docs",
+        "role",
+        "scenarios",
+        "test",
+        "manual",
+        "partial",
+        "npm",
+        "run",
+        "fail",
+        "auto",
+        "quality",
+        "user",
+        "api",
+        "designer",
+        "acceptance",
+        "developer",
+        "pass",
+        "planner",
+        "error"
+      ]
+    },
+    {
       "path": "docs/SCRAPERS.md",
       "ext": ".md",
       "size": 8049,
@@ -3667,9 +3699,9 @@
     {
       "path": "docs/SESSION_HANDOFF.md",
       "ext": ".md",
-      "size": 5517,
-      "mtime": "2026-03-05T04:52:33.736Z",
-      "hash": "d0bb5b73d5e2",
+      "size": 5724,
+      "mtime": "2026-03-06T01:26:40.267Z",
+      "hash": "b2fdd706c96d",
       "tags": [
         "doc"
       ],
@@ -3678,20 +3710,21 @@
         "handoff",
         "session",
         "session_handoff",
+        "gemini",
+        "완료",
         "claude",
         "codex",
-        "gemini",
+        "app",
+        "tsx",
         "고도화",
         "세션",
-        "완료",
+        "실행",
         "작업",
         "화면",
-        "구현",
-        "권장",
-        "단계",
-        "실행",
-        "agent",
-        "검증"
+        "pass",
+        "push",
+        "감사",
+        "단계"
       ]
     },
     {
@@ -3792,9 +3825,9 @@
     {
       "path": "docs/teams/T03_DATABASE.md",
       "ext": ".md",
-      "size": 2000,
-      "mtime": "2026-02-28T16:38:24.548Z",
-      "hash": "315bd6d44381",
+      "size": 1998,
+      "mtime": "2026-03-06T00:24:12.475Z",
+      "hash": "fb0fef3c9e0f",
       "tags": [
         "doc"
       ],
@@ -3817,8 +3850,8 @@
         "조회",
         "준수",
         "analyze",
-        "api",
-        "lib"
+        "lib",
+        "queryoptimize"
       ]
     },
     {
@@ -3951,9 +3984,9 @@
     {
       "path": "docs/teams/T08_MANAGER.md",
       "ext": ".md",
-      "size": 3772,
-      "mtime": "2026-03-02T03:31:51.665Z",
-      "hash": "7a1206809438",
+      "size": 3774,
+      "mtime": "2026-03-06T00:24:07.086Z",
+      "hash": "92f09a339e92",
       "tags": [
         "doc"
       ],
@@ -3971,13 +4004,13 @@
         "patch",
         "pro",
         "데이터",
+        "매니저",
         "수익",
         "캠페인",
         "화면",
         "auth",
         "implemented",
-        "mcp",
-        "planned"
+        "mcp"
       ]
     },
     {
@@ -4373,6 +4406,36 @@
       ]
     },
     {
+      "path": "lib/platformDisplay.ts",
+      "ext": ".ts",
+      "size": 2744,
+      "mtime": "2026-03-06T00:34:36.179Z",
+      "hash": "2f67e3d904bd",
+      "tags": [
+        "code"
+      ],
+      "terms": [
+        "lib",
+        "platformdisplay",
+        "dark",
+        "key",
+        "string",
+        "badgeclassname",
+        "dotcolor",
+        "label",
+        "shortlabel",
+        "value",
+        "fallbacklabel",
+        "meta",
+        "platformdisplaymeta",
+        "강남맛집",
+        "디너의여왕",
+        "레뷰",
+        "리뷰노트",
+        "미분류"
+      ]
+    },
+    {
       "path": "lib/queryBuilder.ts",
       "ext": ".ts",
       "size": 4242,
@@ -4594,32 +4657,57 @@
       ]
     },
     {
-      "path": "middleware.ts",
-      "ext": ".ts",
-      "size": 4103,
-      "mtime": "2026-03-04T07:51:34.477Z",
-      "hash": "d270bcfcf29e",
+      "path": "logs/autonomous/autonomous-ops-2026-03-05T22-24-02-111Z.json",
+      "ext": ".json",
+      "size": 243,
+      "mtime": "2026-03-05T22:25:02.121Z",
+      "hash": "ddca2fe90b5f",
       "tags": [
-        "code"
+        "config"
       ],
       "terms": [
-        "middleware",
-        "admin",
-        "nextresponse",
-        "api",
-        "headers",
-        "next",
-        "status",
-        "관리자",
-        "admin_password",
-        "adminpassword",
-        "authheader",
-        "basic",
-        "decoded",
-        "html",
-        "new",
-        "pathname",
-        "separatorindex"
+        "autonomous",
+        "json",
+        "logs",
+        "ops",
+        "t22",
+        "completedcycles",
+        "cycleminutes",
+        "duration",
+        "durationminutes",
+        "endedat",
+        "healthchecks",
+        "ingestrestarts",
+        "startedat",
+        "stopreason",
+        "tasks"
+      ]
+    },
+    {
+      "path": "logs/autonomous/autonomous-ops-2026-03-05T22-25-31-711Z.json",
+      "ext": ".json",
+      "size": 243,
+      "mtime": "2026-03-05T22:26:31.720Z",
+      "hash": "7cdc146c9411",
+      "tags": [
+        "config"
+      ],
+      "terms": [
+        "autonomous",
+        "json",
+        "logs",
+        "ops",
+        "t22",
+        "completedcycles",
+        "cycleminutes",
+        "duration",
+        "durationminutes",
+        "endedat",
+        "healthchecks",
+        "ingestrestarts",
+        "startedat",
+        "stopreason",
+        "tasks"
       ]
     },
     {
@@ -4707,9 +4795,9 @@
     {
       "path": "package.json",
       "ext": ".json",
-      "size": 4830,
-      "mtime": "2026-03-05T07:13:53.449Z",
-      "hash": "f32bff378e2e",
+      "size": 6208,
+      "mtime": "2026-03-06T01:45:40.137Z",
+      "hash": "f30067b47a7d",
       "tags": [
         "config"
       ],
@@ -4718,20 +4806,20 @@
         "package",
         "scripts",
         "tsx",
-        "node",
         "run",
+        "node",
         "npm",
         "refactor",
-        "full",
-        "release",
-        "workspace",
-        "api",
-        "auto",
-        "deploy",
-        "prisma",
-        "vitest",
         "autonomous-ops-loop",
-        "bench"
+        "durationminutes",
+        "ops",
+        "autocommit",
+        "cycleminutes",
+        "ingest",
+        "api",
+        "bench",
+        "deploy",
+        "full"
       ]
     },
     {
@@ -4761,6 +4849,35 @@
         "status",
         "created",
         "data"
+      ]
+    },
+    {
+      "path": "proxy.ts",
+      "ext": ".ts",
+      "size": 4098,
+      "mtime": "2026-03-06T01:15:31.797Z",
+      "hash": "d50e01174e22",
+      "tags": [
+        "code"
+      ],
+      "terms": [
+        "proxy",
+        "admin",
+        "nextresponse",
+        "api",
+        "headers",
+        "next",
+        "status",
+        "관리자",
+        "admin_password",
+        "adminpassword",
+        "authheader",
+        "basic",
+        "decoded",
+        "html",
+        "new",
+        "pathname",
+        "separatorindex"
       ]
     },
     {
@@ -4797,21 +4914,22 @@
     {
       "path": "README.md",
       "ext": ".md",
-      "size": 9528,
-      "mtime": "2026-03-03T09:31:48.646Z",
-      "hash": "0e9a26f6b873",
+      "size": 10007,
+      "mtime": "2026-03-06T01:15:31.799Z",
+      "hash": "69269ae959e6",
       "tags": [
         "doc"
       ],
       "terms": [
         "readme",
         "run",
-        "prisma",
         "npm",
+        "prisma",
         "api",
         "기본",
-        "app",
         "ingest",
+        "app",
+        "ops",
         "postgres",
         "supabase",
         "tsx",
@@ -4819,16 +4937,45 @@
         "npx",
         "top20",
         "vercel",
-        "admin",
-        "logic"
+        "admin"
+      ]
+    },
+    {
+      "path": "reports/agent-qa-summary.md",
+      "ext": ".md",
+      "size": 274,
+      "mtime": "2026-03-06T01:15:12.384Z",
+      "hash": "7e897a35a2e2",
+      "tags": [
+        "report",
+        "doc"
+      ],
+      "terms": [
+        "agent",
+        "reports",
+        "summary",
+        "pass",
+        "api-contract-audit",
+        "build",
+        "duration",
+        "gate",
+        "generated",
+        "lint",
+        "report",
+        "result",
+        "smoke",
+        "step",
+        "t01",
+        "test",
+        "typecheck"
       ]
     },
     {
       "path": "reports/agent-review-summary.md",
       "ext": ".md",
       "size": 194,
-      "mtime": "2026-03-02T01:48:17.463Z",
-      "hash": "129211104ba4",
+      "mtime": "2026-03-06T01:12:22.467Z",
+      "hash": "f31a1977e871",
       "tags": [
         "report",
         "doc"
@@ -4838,9 +4985,8 @@
         "reports",
         "review",
         "summary",
-        "skipped",
+        "pass",
         "duration",
-        "fail",
         "gate",
         "generated",
         "lint",
@@ -4855,9 +5001,9 @@
     {
       "path": "reports/api-contract-audit.md",
       "ext": ".md",
-      "size": 6716,
-      "mtime": "2026-03-04T05:57:23.666Z",
-      "hash": "4b712ff373f9",
+      "size": 1677,
+      "mtime": "2026-03-06T02:01:09.462Z",
+      "hash": "658128ae4deb",
       "tags": [
         "report",
         "doc"
@@ -4867,29 +5013,29 @@
         "audit",
         "contract",
         "reports",
-        "implemented",
-        "fail",
-        "route",
-        "actual",
-        "planned",
         "admin",
-        "but",
-        "exists",
-        "not",
-        "untracked_route",
-        "app",
-        "documented",
-        "missing",
-        "stale_implemented",
-        "analytics"
+        "analytics",
+        "campaigns",
+        "creators",
+        "notifications",
+        "routes",
+        "alerts",
+        "platforms",
+        "schedules",
+        "stats",
+        "actions",
+        "actual",
+        "autologin",
+        "board",
+        "cron"
       ]
     },
     {
       "path": "reports/api-contract-sync-audit.md",
       "ext": ".md",
-      "size": 598,
-      "mtime": "2026-03-02T03:18:53.936Z",
-      "hash": "44e8fc81296d",
+      "size": 1745,
+      "mtime": "2026-03-06T02:01:10.234Z",
+      "hash": "c6238a7c55cc",
       "tags": [
         "report",
         "doc"
@@ -4900,21 +5046,21 @@
         "contract",
         "reports",
         "sync",
-        "planned",
-        "documents",
-        "failures",
-        "implemented",
-        "pass",
-        "route",
-        "계획",
-        "미구현",
-        "없음",
+        "admin",
+        "analytics",
+        "campaigns",
+        "creators",
+        "notifications",
+        "alerts",
+        "platforms",
+        "routes",
+        "schedules",
+        "stats",
+        "docs",
+        "actions",
         "actual",
-        "agent_workflow",
-        "aligned",
-        "api-gap",
-        "architecture",
-        "are"
+        "app",
+        "autologin"
       ]
     },
     {
@@ -4942,9 +5088,9 @@
     {
       "path": "reports/eslint.json",
       "ext": ".json",
-      "size": 140615,
-      "mtime": "2026-03-02T15:39:47.486Z",
-      "hash": "743bc71bfded",
+      "size": 251147,
+      "mtime": "2026-03-06T02:01:01.899Z",
+      "hash": "98b8d3bc558a",
       "tags": [
         "report",
         "config"
@@ -4954,21 +5100,21 @@
         "json",
         "reports",
         "type",
-        "messageid",
-        "text",
-        "desc",
+        "string",
+        "filepath",
+        "bohemianstudio",
+        "revieweverything",
+        "errorcount",
+        "fatalerrorcount",
+        "fixableerrorcount",
+        "fixablewarningcount",
+        "messages",
+        "suppressedmessages",
+        "useddeprecatedrules",
+        "warningcount",
         "classname",
-        "use",
-        "unknown",
-        "any",
-        "fix",
-        "instead",
-        "never",
-        "range",
-        "you",
-        "div",
-        "message",
-        "campaign"
+        "messageid",
+        "error"
       ]
     },
     {
@@ -5005,9 +5151,9 @@
     {
       "path": "reports/page-improvements.md",
       "ext": ".md",
-      "size": 10446,
-      "mtime": "2026-03-05T02:48:09.151Z",
-      "hash": "228c396ebb5a",
+      "size": 12403,
+      "mtime": "2026-03-06T00:06:58.132Z",
+      "hash": "422ca13b53f6",
       "tags": [
         "report",
         "doc"
@@ -5024,21 +5170,53 @@
         "요소",
         "핵심",
         "헤딩",
-        "가독성",
-        "구조",
-        "기본",
-        "대비",
-        "대응",
-        "동작",
-        "라벨"
+        "app",
+        "tsx",
+        "에러",
+        "파일",
+        "재시도",
+        "라벨",
+        "목록"
+      ]
+    },
+    {
+      "path": "reports/PROJECT_SCORECARD_2026-03-06.md",
+      "ext": ".md",
+      "size": 2636,
+      "mtime": "2026-03-05T15:35:20.346Z",
+      "hash": "a4e1943893e4",
+      "tags": [
+        "report",
+        "doc"
+      ],
+      "terms": [
+        "project",
+        "reports",
+        "scorecard",
+        "npm",
+        "run",
+        "fail",
+        "api",
+        "score",
+        "test",
+        "but",
+        "audit",
+        "contract",
+        "env",
+        "evidence",
+        "lint",
+        "pass",
+        "quality",
+        "reliability",
+        "role-based"
       ]
     },
     {
       "path": "reports/refactor-analysis.json",
       "ext": ".json",
-      "size": 8825,
-      "mtime": "2026-03-04T05:57:23.807Z",
-      "hash": "37e818731ade",
+      "size": 8674,
+      "mtime": "2026-03-06T00:33:59.220Z",
+      "hash": "ca1fd0d579b8",
       "tags": [
         "report",
         "config"
@@ -5061,17 +5239,17 @@
         "mockresolvedvalue",
         "campaign",
         "create",
-        "app",
         "api",
-        "campaigns"
+        "app",
+        "catch"
       ]
     },
     {
       "path": "reports/refactor-apply.json",
       "ext": ".json",
       "size": 176,
-      "mtime": "2026-03-04T05:57:23.922Z",
-      "hash": "8611a123baee",
+      "mtime": "2026-03-06T00:33:59.332Z",
+      "hash": "4ce8cdaed9ab",
       "tags": [
         "report",
         "config"
@@ -5088,7 +5266,7 @@
         "no-change",
         "reason",
         "results",
-        "t05",
+        "t00",
         "touched",
         "tsx"
       ]
@@ -5130,8 +5308,8 @@
       "path": "reports/smoke.json",
       "ext": ".json",
       "size": 134,
-      "mtime": "2026-03-04T05:58:22.657Z",
-      "hash": "70768f500817",
+      "mtime": "2026-03-06T01:14:36.268Z",
+      "hash": "20a94e578598",
       "tags": [
         "report",
         "config"
@@ -5145,15 +5323,15 @@
         "reason",
         "skipped",
         "smoke_base_url_or_vercel_url_not_set",
-        "t05"
+        "t01"
       ]
     },
     {
       "path": "reports/workspace-index-full.json",
       "ext": ".json",
-      "size": 274758,
-      "mtime": "2026-03-05T07:14:23.617Z",
-      "hash": "c212d95c7fed",
+      "size": 281204,
+      "mtime": "2026-03-06T01:44:46.439Z",
+      "hash": "9db9d8a8c212",
       "tags": [
         "report",
         "config"
@@ -5184,9 +5362,9 @@
     {
       "path": "reports/workspace-index-lean.json",
       "ext": ".json",
-      "size": 169671,
-      "mtime": "2026-03-05T07:14:31.612Z",
-      "hash": "3590e0f8f6a3",
+      "size": 172330,
+      "mtime": "2026-03-06T02:01:12.906Z",
+      "hash": "b83a17f84129",
       "tags": [
         "report",
         "config"
@@ -5204,8 +5382,8 @@
         "tmp",
         "docs",
         "components",
-        "scripts",
         "path",
+        "scripts",
         "ext",
         "tags",
         "hash",
@@ -5217,9 +5395,9 @@
     {
       "path": "reports/workspace-index.json",
       "ext": ".json",
-      "size": 169671,
-      "mtime": "2026-03-05T07:14:31.612Z",
-      "hash": "798807951d7f",
+      "size": 172330,
+      "mtime": "2026-03-06T02:01:12.906Z",
+      "hash": "b66caa381fcc",
       "tags": [
         "report",
         "config"
@@ -5236,8 +5414,8 @@
         "tmp",
         "docs",
         "components",
-        "scripts",
         "path",
+        "scripts",
         "ext",
         "tags",
         "hash",
@@ -5250,9 +5428,9 @@
     {
       "path": "reports/workspace-index.md",
       "ext": ".md",
-      "size": 2182,
-      "mtime": "2026-03-05T07:14:31.617Z",
-      "hash": "8a3610417cfa",
+      "size": 2183,
+      "mtime": "2026-03-06T02:01:12.913Z",
+      "hash": "4b7355b45b30",
       "tags": [
         "report",
         "doc"
@@ -5280,9 +5458,9 @@
     {
       "path": "reports/workspace-search-bench.json",
       "ext": ".json",
-      "size": 200751,
-      "mtime": "2026-03-05T07:14:04.154Z",
-      "hash": "36b2b9358068",
+      "size": 5809,
+      "mtime": "2026-03-06T01:45:18.570Z",
+      "hash": "93ee02b45a77",
       "tags": [
         "report",
         "config"
@@ -5293,29 +5471,29 @@
         "reports",
         "search",
         "workspace",
-        "app",
-        "tsx",
-        "api",
-        "route",
-        "tmp",
-        "docs",
-        "components",
-        "path",
-        "scripts",
-        "ext",
-        "tags",
-        "hash",
-        "mtime",
-        "size",
-        "terms"
+        "full",
+        "lean",
+        "mode",
+        "candidates",
+        "elapsedms",
+        "executedmode",
+        "matches",
+        "query",
+        "selectedmode",
+        "usedfallback",
+        "usedindex",
+        "usedindexmode",
+        "workspace-index-full",
+        "auto",
+        "workspace-index-lean"
       ]
     },
     {
       "path": "reports/workspace-search-bench.md",
       "ext": ".md",
-      "size": 173,
-      "mtime": "2026-03-05T07:14:04.155Z",
-      "hash": "13208edc291f",
+      "size": 2873,
+      "mtime": "2026-03-06T01:45:18.573Z",
+      "hash": "812c7c50cd4a",
       "tags": [
         "report",
         "doc"
@@ -5325,18 +5503,22 @@
         "reports",
         "search",
         "workspace",
-        "auto",
-        "admin",
-        "benchmark",
-        "candidates",
+        "full",
         "elapsed",
-        "generated",
-        "index",
+        "lean",
+        "candidates",
+        "executed",
+        "fallback",
         "matches",
-        "modes",
-        "queries",
-        "summary",
-        "t07"
+        "index",
+        "json",
+        "selected",
+        "workspace-index-full",
+        "avg",
+        "auto",
+        "count",
+        "min",
+        "workspace-index-lean"
       ]
     },
     {
@@ -5403,9 +5585,9 @@
     {
       "path": "scripts/api-contract-audit.js",
       "ext": ".js",
-      "size": 5491,
-      "mtime": "2026-03-01T01:25:09.371Z",
-      "hash": "443e9407c6c4",
+      "size": 5180,
+      "mtime": "2026-03-05T15:38:23.774Z",
+      "hash": "c2f60bbb36d7",
       "tags": [
         "script",
         "code"
@@ -5423,21 +5605,21 @@
         "routes",
         "docs",
         "failures",
-        "line",
-        "match",
         "actual",
+        "join",
         "length",
-        "has",
-        "jobs",
-        "join"
+        "line",
+        "path",
+        "entry",
+        "new"
       ]
     },
     {
       "path": "scripts/api-contract-sync-audit.js",
       "ext": ".js",
-      "size": 9260,
-      "mtime": "2026-03-01T03:28:12.133Z",
-      "hash": "8cb1eef5b9ad",
+      "size": 8124,
+      "mtime": "2026-03-06T00:25:03.097Z",
+      "hash": "37370303f693",
       "tags": [
         "script",
         "code"
@@ -5453,24 +5635,24 @@
         "report",
         "implemented",
         "planned",
-        "failures",
         "path",
-        "has",
+        "failures",
+        "routes",
         "join",
-        "line",
-        "actual",
-        "fail",
-        "name",
         "new",
-        "routes"
+        "set",
+        "status",
+        "name",
+        "actual",
+        "fail"
       ]
     },
     {
       "path": "scripts/autonomous-ops-loop.ts",
       "ext": ".ts",
-      "size": 28690,
-      "mtime": "2026-03-04T01:21:16.903Z",
-      "hash": "3c8cadb14891",
+      "size": 28601,
+      "mtime": "2026-03-05T22:25:23.321Z",
+      "hash": "db9d6f6df90a",
       "tags": [
         "script",
         "code"
@@ -5501,9 +5683,9 @@
     {
       "path": "scripts/benchmark-workspace-search.ts",
       "ext": ".ts",
-      "size": 5735,
-      "mtime": "2026-03-05T07:11:39.445Z",
-      "hash": "ef8b2ba8e2ee",
+      "size": 12658,
+      "mtime": "2026-03-05T09:04:15.161Z",
+      "hash": "ad072111a4c2",
       "tags": [
         "script",
         "code"
@@ -5513,22 +5695,22 @@
         "scripts",
         "search",
         "workspace",
+        "row",
+        "number",
         "string",
         "mode",
-        "item",
-        "json",
-        "index",
-        "number",
-        "join",
-        "queries",
-        "query",
+        "value",
+        "config",
         "report",
-        "full",
-        "matches",
-        "path",
-        "searchresult",
-        "candidates",
-        "reports"
+        "guard",
+        "failures",
+        "item",
+        "querycount",
+        "enabled",
+        "fallback",
+        "maxelapsedms",
+        "bucket",
+        "full"
       ]
     },
     {
@@ -6014,9 +6196,9 @@
     {
       "path": "scripts/search-workspace.ts",
       "ext": ".ts",
-      "size": 9775,
-      "mtime": "2026-03-05T07:11:33.513Z",
-      "hash": "b484b5c4d903",
+      "size": 12363,
+      "mtime": "2026-03-05T08:05:46.696Z",
+      "hash": "3336772b4de0",
       "tags": [
         "script",
         "code"
@@ -6026,21 +6208,21 @@
         "search",
         "workspace",
         "string",
+        "path",
         "candidates",
         "query",
-        "path",
         "length",
-        "primarysearch",
         "console",
-        "matches",
+        "searchresult",
+        "mode",
+        "lean",
         "log",
+        "full",
+        "matches",
+        "alias",
         "index",
-        "relpath",
-        "score",
-        "boolean",
-        "byscore",
-        "candidatescore",
-        "limit"
+        "source",
+        "indexmode"
       ]
     },
     {
@@ -6235,9 +6417,9 @@
     {
       "path": "sources/adapters/_shared.ts",
       "ext": ".ts",
-      "size": 2046,
-      "mtime": "2026-03-02T16:57:24.627Z",
-      "hash": "644c88aeccb6",
+      "size": 2157,
+      "mtime": "2026-03-06T00:52:24.470Z",
+      "hash": "0a8412b304e6",
       "tags": [
         "code"
       ],
@@ -6259,8 +6441,8 @@
         "img",
         "match",
         "new",
-        "absoluteurl",
-        "boolean"
+        "resolve",
+        "absoluteurl"
       ]
     },
     {
@@ -6509,9 +6691,9 @@
     {
       "path": "sources/normalize.ts",
       "ext": ".ts",
-      "size": 13332,
-      "mtime": "2026-03-03T02:11:22.249Z",
-      "hash": "6609c1f60020",
+      "size": 14453,
+      "mtime": "2026-03-06T00:50:35.610Z",
+      "hash": "a08b30a48c78",
       "tags": [
         "code"
       ],
@@ -6524,16 +6706,16 @@
         "containsany",
         "keywords",
         "normalized",
+        "add",
         "raw",
         "normalizetext",
         "recruitcount",
         "url",
+        "value",
+        "values",
         "applicantcount",
         "campaign",
-        "category",
-        "duplicated",
-        "existing",
-        "value"
+        "category"
       ]
     },
     {
@@ -6912,9 +7094,9 @@
     {
       "path": "tests/dedupe.test.ts",
       "ext": ".ts",
-      "size": 6837,
-      "mtime": "2026-02-28T17:03:43.859Z",
-      "hash": "3b6c3e83f003",
+      "size": 7010,
+      "mtime": "2026-03-06T00:50:09.673Z",
+      "hash": "d0b3941d7c31",
       "tags": [
         "code"
       ],
@@ -6943,9 +7125,9 @@
     {
       "path": "tests/ingest.fixture.test.ts",
       "ext": ".ts",
-      "size": 8157,
-      "mtime": "2026-03-02T16:48:41.297Z",
-      "hash": "441f90c2c7cd",
+      "size": 8211,
+      "mtime": "2026-03-06T00:51:28.230Z",
+      "hash": "34aeb16da943",
       "tags": [
         "code"
       ],
@@ -7006,9 +7188,9 @@
     {
       "path": "tests/queryBuilder.test.ts",
       "ext": ".ts",
-      "size": 3623,
-      "mtime": "2026-03-02T15:24:03.147Z",
-      "hash": "c98fb2ad9d99",
+      "size": 3814,
+      "mtime": "2026-03-06T01:17:01.255Z",
+      "hash": "7273a2a773ae",
       "tags": [
         "code"
       ],
@@ -7025,13 +7207,13 @@
         "where",
         "campaign_type",
         "platform_id",
+        "string",
         "clause",
         "limit",
-        "any",
+        "orderby",
+        "sort",
         "applies",
-        "filter",
-        "keyword",
-        "orclauses"
+        "contains"
       ]
     },
     {
@@ -8162,9 +8344,9 @@
     {
       "path": "WORKSPACE_SEARCH_GUIDE.md",
       "ext": ".md",
-      "size": 1914,
-      "mtime": "2026-03-05T07:12:34.463Z",
-      "hash": "87b6c7268684",
+      "size": 1702,
+      "mtime": "2026-03-05T09:04:06.428Z",
+      "hash": "09a0e7344a5f",
       "tags": [
         "doc"
       ],
@@ -8172,20 +8354,20 @@
         "guide",
         "search",
         "workspace",
-        "run",
         "npm",
+        "run",
         "full",
-        "index",
-        "lean",
-        "json",
-        "reports",
         "bench",
-        "keyword",
-        "mode",
+        "json",
+        "lean",
+        "reports",
         "workspace-search",
-        "only",
-        "build",
-        "default"
+        "auto",
+        "keyword",
+        "우선",
+        "자동",
+        "모드",
+        "벤치"
       ]
     }
   ],
@@ -8218,16 +8400,16 @@
       "app/api/me/schedules/route.ts",
       "app/error.tsx",
       "app/me/console/page.tsx",
-      "app/me/notifications/page.tsx",
       "app/system/page.tsx",
-      "app/trending/page.tsx",
       "components/PlatformManager.tsx",
       "components/ReviewerManager.tsx",
+      "docs/ROLE_BASED_TEST_SCENARIOS.md",
       "lib/backgroundWorker.ts",
       "lib/db.ts",
       "lib/fetcher.ts",
       "lib/ingest.ts",
       "lib/notificationSender.ts",
+      "reports/eslint.json",
       "scripts/aggregate-stats.ts",
       "scripts/clean-tmp-artifacts.js",
       "scripts/deploy-env-check.js",
@@ -8312,17 +8494,18 @@
       "docs/NOTES_AGENT_QUEUE.md",
       "docs/PROJECT_STATUS.md",
       "docs/PROJECT_STATUS_NEXT_ACTIONS.md",
+      "docs/ROLE_BASED_TEST_SCENARIOS.md",
       "docs/SCRAPERS.md",
       "docs/TEAM_CONTEXT.md",
-      "docs/teams/T03_DATABASE.md",
       "docs/teams/T04_WORKER.md",
       "docs/teams/T05_NOTIFIER.md",
       "docs/teams/T06_ANALYTICS.md",
       "docs/teams/T07_FRONTEND.md",
       "docs/teams/T08_MANAGER.md",
       "docs/teams/T10_OBSERVABILITY.md",
-      "middleware.ts",
       "package.json",
+      "proxy.ts",
+      "reports/PROJECT_SCORECARD_2026-03-06.md",
       "reports/api-contract-audit.md",
       "reports/api-contract-sync-audit.md",
       "reports/refactor-analysis.json",
@@ -8331,7 +8514,6 @@
       "reports/workspace-index-lean.json",
       "reports/workspace-index.json",
       "reports/workspace-index.md",
-      "reports/workspace-search-bench.json",
       "scripts/api-contract-audit.js",
       "scripts/api-contract-sync-audit.js",
       "scripts/smoke.js",
@@ -8406,16 +8588,17 @@
       "app/trending/layout.tsx",
       "app/trending/page.tsx",
       "docs/FAST_FIX_GUIDELINES.md",
+      "docs/SESSION_HANDOFF.md",
       "next-env.d.ts",
-      "reports/api-contract-audit.md",
+      "reports/api-contract-sync-audit.md",
       "reports/page-improvements.en.md",
+      "reports/page-improvements.md",
       "reports/refactor-analysis.json",
       "reports/refactor-apply.json",
       "reports/workspace-index-full.json",
       "reports/workspace-index-lean.json",
       "reports/workspace-index.json",
       "reports/workspace-index.md",
-      "reports/workspace-search-bench.json",
       "scripts/refactor/refactor-safe.js",
       "tmp/test_revu_keys_app.ts"
     ],
@@ -8479,13 +8662,14 @@
       "components/ThemeToggle.tsx",
       "components/WorkspaceHubNav.tsx",
       "docs/EVOLUTION_LOG.md",
+      "docs/SESSION_HANDOFF.md",
       "package.json",
+      "reports/page-improvements.md",
       "reports/refactor-apply.json",
       "reports/workspace-index-full.json",
       "reports/workspace-index-lean.json",
       "reports/workspace-index.json",
       "reports/workspace-index.md",
-      "reports/workspace-search-bench.json",
       "scripts/derive-page-improvements.ts",
       "scripts/guard.js"
     ],
@@ -8593,10 +8777,12 @@
       "lib/campaignLinks.ts",
       "lib/geo/campaignGeo.ts",
       "lib/ingest.ts",
+      "lib/platformDisplay.ts",
       "lib/runtimeEnv.ts",
       "lib/search/queryEnhancer.ts",
       "lib/search/searchUtils.ts",
       "lib/useFavorites.ts",
+      "reports/eslint.json",
       "scripts/autonomous-ops-loop.ts",
       "scripts/benchmark-workspace-search.ts",
       "scripts/build-workspace-index.ts",
@@ -8611,7 +8797,65 @@
       "sources/normalize.ts",
       "sources/registry.ts",
       "sources/scraperHealth.ts",
-      "sources/types.ts"
+      "sources/types.ts",
+      "tests/queryBuilder.test.ts"
+    ],
+    "json": [
+      "WORKSPACE_SEARCH_GUIDE.md",
+      "app/api/admin/alerts/actions/route.ts",
+      "app/api/admin/alerts/route.ts",
+      "app/api/admin/analytics/stats/route.ts",
+      "app/api/admin/creators/[id]/route.ts",
+      "app/api/admin/ingest/route.ts",
+      "app/api/admin/platforms/[id]/route.ts",
+      "app/api/admin/platforms/route.ts",
+      "app/api/admin/quality/route.ts",
+      "app/api/analytics/log/route.ts",
+      "app/api/analytics/route.ts",
+      "app/api/campaigns/[id]/related/route.ts",
+      "app/api/campaigns/[id]/route.ts",
+      "app/api/cron/route.ts",
+      "app/api/jobs/route.ts",
+      "app/api/me/notification-preferences/route.ts",
+      "app/api/me/notifications/[id]/route.ts",
+      "app/api/me/notifications/route.ts",
+      "app/api/me/pro/route.ts",
+      "app/api/me/schedules/[id]/route.ts",
+      "app/api/me/schedules/route.ts",
+      "app/api/public/stats/route.ts",
+      "docs/AGENT_PROTOCOLS.md",
+      "lib/useFavorites.ts",
+      "logs/autonomous/autonomous-ops-2026-03-03T16-10-04-089Z.json",
+      "logs/autonomous/autonomous-ops-2026-03-04T01-17-22-612Z.json",
+      "logs/autonomous/autonomous-ops-2026-03-05T22-24-02-111Z.json",
+      "logs/autonomous/autonomous-ops-2026-03-05T22-25-31-711Z.json",
+      "package-lock.json",
+      "package.json",
+      "public/manifest.json",
+      "reports/eslint.json",
+      "reports/refactor-analysis.json",
+      "reports/refactor-apply.json",
+      "reports/smoke.json",
+      "reports/workspace-index-full.json",
+      "reports/workspace-index-lean.json",
+      "reports/workspace-index.json",
+      "reports/workspace-search-bench.json",
+      "reports/workspace-search-bench.md",
+      "scripts/build-workspace-index.ts",
+      "scripts/deploy-target-check.js",
+      "scripts/smoke.js",
+      "test-cron-api.ts",
+      "test-extract.ts",
+      "test-revu-api.ts",
+      "tmp/pw/package-lock.json",
+      "tmp/pw/package.json",
+      "tmp/test_revu_api.ts",
+      "tmp/test_revu_final.ts",
+      "tmp/test_revu_key_x.ts",
+      "tmp/test_revu_keys.ts",
+      "tmp/test_revu_keys_app.ts",
+      "tsconfig.json",
+      "vercel.json"
     ],
     "log": [
       "app/api/analytics/log/route.ts",
@@ -8668,61 +8912,6 @@
       "tmp/verify_dq_adapter.ts",
       "tmp/verify_reviewnote.ts",
       "tmp/verify_revu.ts"
-    ],
-    "json": [
-      "WORKSPACE_SEARCH_GUIDE.md",
-      "app/api/admin/alerts/actions/route.ts",
-      "app/api/admin/alerts/route.ts",
-      "app/api/admin/analytics/stats/route.ts",
-      "app/api/admin/creators/[id]/route.ts",
-      "app/api/admin/ingest/route.ts",
-      "app/api/admin/platforms/[id]/route.ts",
-      "app/api/admin/platforms/route.ts",
-      "app/api/admin/quality/route.ts",
-      "app/api/analytics/log/route.ts",
-      "app/api/analytics/route.ts",
-      "app/api/campaigns/[id]/related/route.ts",
-      "app/api/campaigns/[id]/route.ts",
-      "app/api/cron/route.ts",
-      "app/api/jobs/route.ts",
-      "app/api/me/notification-preferences/route.ts",
-      "app/api/me/notifications/[id]/route.ts",
-      "app/api/me/notifications/route.ts",
-      "app/api/me/pro/route.ts",
-      "app/api/me/schedules/[id]/route.ts",
-      "app/api/me/schedules/route.ts",
-      "app/api/public/stats/route.ts",
-      "docs/AGENT_PROTOCOLS.md",
-      "lib/useFavorites.ts",
-      "logs/autonomous/autonomous-ops-2026-03-03T16-10-04-089Z.json",
-      "logs/autonomous/autonomous-ops-2026-03-04T01-17-22-612Z.json",
-      "package-lock.json",
-      "package.json",
-      "public/manifest.json",
-      "reports/eslint.json",
-      "reports/refactor-analysis.json",
-      "reports/refactor-apply.json",
-      "reports/smoke.json",
-      "reports/workspace-index-full.json",
-      "reports/workspace-index-lean.json",
-      "reports/workspace-index.json",
-      "reports/workspace-search-bench.json",
-      "scripts/benchmark-workspace-search.ts",
-      "scripts/build-workspace-index.ts",
-      "scripts/deploy-target-check.js",
-      "scripts/smoke.js",
-      "test-cron-api.ts",
-      "test-extract.ts",
-      "test-revu-api.ts",
-      "tmp/pw/package-lock.json",
-      "tmp/pw/package.json",
-      "tmp/test_revu_api.ts",
-      "tmp/test_revu_final.ts",
-      "tmp/test_revu_key_x.ts",
-      "tmp/test_revu_keys.ts",
-      "tmp/test_revu_keys_app.ts",
-      "tsconfig.json",
-      "vercel.json"
     ],
     "classname": [
       "app/admin/layout.tsx",
@@ -8824,7 +9013,6 @@
       "components/StatsBanner.tsx",
       "components/SystemSectionNav.tsx",
       "components/WorkspaceHubNav.tsx",
-      "reports/eslint.json",
       "tmp/find_dq_selector.ts",
       "tmp/verify_reviewnote.ts"
     ],
@@ -8833,7 +9021,6 @@
       "app/api/admin/alerts/actions/route.ts",
       "app/api/admin/creators/[id]/route.ts",
       "app/api/admin/ingest/route.ts",
-      "app/api/admin/platforms/route.ts",
       "app/api/admin/quality/route.ts",
       "app/api/admin/runs/route.ts",
       "app/api/analytics/log/route.ts",
@@ -8856,8 +9043,9 @@
       "lib/backgroundWorker.ts",
       "lib/fetcher.ts",
       "lib/ingest.ts",
-      "middleware.ts",
       "prisma/seed.ts",
+      "proxy.ts",
+      "scripts/api-contract-sync-audit.js",
       "scripts/refactor/multi-agent-loop.js",
       "scripts/release.js",
       "scripts/smoke.js",
@@ -8875,54 +9063,13 @@
       "tmp/test_revu_keys.ts",
       "tmp/test_revu_keys_app.ts"
     ],
-    "docs": [
-      "docs/AGENT_MIGRATION_GUIDE.md",
-      "docs/AGENT_PROTOCOLS.md",
-      "docs/AGENT_WORKFLOW.md",
-      "docs/API.md",
-      "docs/ARCHITECTURE.md",
-      "docs/AUTONOMOUS_HOURLY_REPORT.md",
-      "docs/AUTONOMOUS_REVIEW_WORKLIST.md",
-      "docs/AUTONOMOUS_WORK_POOL.md",
-      "docs/CODING_RULES.md",
-      "docs/COMMAND_CENTER.md",
-      "docs/CONTEXT_ENGINE.md",
-      "docs/COST_RULES.md",
-      "docs/CRAWLER_TOP20_RESEARCH_SPECS.md",
-      "docs/DEPLOY_GUARDRAILS.md",
-      "docs/EVOLUTION_LOG.md",
-      "docs/FAST_FIX_GUIDELINES.md",
-      "docs/FUTURE_PHASE4_B2B2C_DIRECT_SPONSORSHIP.md",
-      "docs/NOTES_AGENT_QUEUE.md",
-      "docs/PAGE_SPECS.md",
-      "docs/PROJECT_STATUS.md",
-      "docs/PROJECT_STATUS_NEXT_ACTIONS.md",
-      "docs/REFAC_CHECKLIST.md",
-      "docs/SCRAPERS.md",
-      "docs/SESSION_HANDOFF.md",
-      "docs/TEAM_CONTEXT.md",
-      "docs/platforms-2026-expansion.md",
-      "docs/teams/T01_SCRAPER.md",
-      "docs/teams/T02_NORMALIZER.md",
-      "docs/teams/T03_DATABASE.md",
-      "docs/teams/T04_WORKER.md",
-      "docs/teams/T05_NOTIFIER.md",
-      "docs/teams/T06_ANALYTICS.md",
-      "docs/teams/T07_FRONTEND.md",
-      "docs/teams/T08_MANAGER.md",
-      "docs/teams/T09_VALIDATION.md",
-      "docs/teams/T10_OBSERVABILITY.md",
-      "next-env.d.ts",
-      "reports/workspace-index-full.json",
-      "reports/workspace-index-lean.json",
-      "reports/workspace-index.json",
-      "reports/workspace-search-bench.json",
-      "scripts/api-contract-audit.js"
-    ],
     "test": [
       "app/api/me/notifications/test/route.ts",
+      "docs/ROLE_BASED_TEST_SCENARIOS.md",
       "docs/teams/T02_NORMALIZER.md",
       "lib/campaignLinks.ts",
+      "reports/PROJECT_SCORECARD_2026-03-06.md",
+      "reports/agent-qa-summary.md",
       "reports/agent-review-summary.md",
       "reports/refactor-analysis.json",
       "scripts/agent-gate.js",
@@ -8963,6 +9110,51 @@
       "tmp/test_weble.ts",
       "vitest.config.ts"
     ],
+    "docs": [
+      "docs/AGENT_MIGRATION_GUIDE.md",
+      "docs/AGENT_PROTOCOLS.md",
+      "docs/AGENT_WORKFLOW.md",
+      "docs/API.md",
+      "docs/ARCHITECTURE.md",
+      "docs/AUTONOMOUS_HOURLY_REPORT.md",
+      "docs/AUTONOMOUS_REVIEW_WORKLIST.md",
+      "docs/AUTONOMOUS_WORK_POOL.md",
+      "docs/CODING_RULES.md",
+      "docs/COMMAND_CENTER.md",
+      "docs/CONTEXT_ENGINE.md",
+      "docs/COST_RULES.md",
+      "docs/CRAWLER_TOP20_RESEARCH_SPECS.md",
+      "docs/DEPLOY_GUARDRAILS.md",
+      "docs/EVOLUTION_LOG.md",
+      "docs/FAST_FIX_GUIDELINES.md",
+      "docs/FUTURE_PHASE4_B2B2C_DIRECT_SPONSORSHIP.md",
+      "docs/NOTES_AGENT_QUEUE.md",
+      "docs/PAGE_SPECS.md",
+      "docs/PROJECT_STATUS.md",
+      "docs/PROJECT_STATUS_NEXT_ACTIONS.md",
+      "docs/REFAC_CHECKLIST.md",
+      "docs/ROLE_BASED_TEST_SCENARIOS.md",
+      "docs/SCRAPERS.md",
+      "docs/SESSION_HANDOFF.md",
+      "docs/TEAM_CONTEXT.md",
+      "docs/platforms-2026-expansion.md",
+      "docs/teams/T01_SCRAPER.md",
+      "docs/teams/T02_NORMALIZER.md",
+      "docs/teams/T03_DATABASE.md",
+      "docs/teams/T04_WORKER.md",
+      "docs/teams/T05_NOTIFIER.md",
+      "docs/teams/T06_ANALYTICS.md",
+      "docs/teams/T07_FRONTEND.md",
+      "docs/teams/T08_MANAGER.md",
+      "docs/teams/T09_VALIDATION.md",
+      "docs/teams/T10_OBSERVABILITY.md",
+      "next-env.d.ts",
+      "reports/api-contract-sync-audit.md",
+      "reports/workspace-index-full.json",
+      "reports/workspace-index-lean.json",
+      "reports/workspace-index.json",
+      "scripts/api-contract-audit.js"
+    ],
     "campaigns": [
       "README.md",
       "app/api/campaigns/[id]/related/route.ts",
@@ -8979,7 +9171,8 @@
       "docs/ARCHITECTURE.md",
       "docs/PROJECT_STATUS.md",
       "lib/analytics.ts",
-      "reports/refactor-analysis.json",
+      "reports/api-contract-audit.md",
+      "reports/api-contract-sync-audit.md",
       "reports/refactor-apply.json",
       "reports/screen-api-sync-checklist.md",
       "scripts/refactor/refactor-safe.js",
@@ -9046,57 +9239,12 @@
       "docs/FAST_FIX_GUIDELINES.md",
       "reports/workspace-index-full.json",
       "reports/workspace-index-lean.json",
-      "reports/workspace-index.json",
-      "reports/workspace-search-bench.json"
-    ],
-    "route": [
-      "app/api/admin/alerts/actions/route.ts",
-      "app/api/admin/alerts/route.ts",
-      "app/api/admin/analytics/stats/route.ts",
-      "app/api/admin/creators/[id]/route.ts",
-      "app/api/admin/creators/autologin/route.ts",
-      "app/api/admin/creators/route.ts",
-      "app/api/admin/ingest/route.ts",
-      "app/api/admin/platforms/[id]/route.ts",
-      "app/api/admin/platforms/route.ts",
-      "app/api/admin/quality/route.ts",
-      "app/api/admin/runs/route.ts",
-      "app/api/analytics/log/route.ts",
-      "app/api/analytics/route.ts",
-      "app/api/campaigns/[id]/related/route.ts",
-      "app/api/campaigns/[id]/route.ts",
-      "app/api/campaigns/route.ts",
-      "app/api/cron/route.ts",
-      "app/api/health/route.ts",
-      "app/api/jobs/route.ts",
-      "app/api/me/board/route.ts",
-      "app/api/me/curation/route.ts",
-      "app/api/me/notification-channels/route.ts",
-      "app/api/me/notification-preferences/route.ts",
-      "app/api/me/notifications/[id]/route.ts",
-      "app/api/me/notifications/route.ts",
-      "app/api/me/notifications/test/route.ts",
-      "app/api/me/pro/route.ts",
-      "app/api/me/revenue/route.ts",
-      "app/api/me/schedules/[id]/route.ts",
-      "app/api/me/schedules/route.ts",
-      "app/api/public/stats/route.ts",
-      "app/api/search/suggest/route.ts",
-      "reports/api-contract-audit.md",
-      "reports/api-contract-sync-audit.md",
-      "reports/workspace-index-full.json",
-      "reports/workspace-index-lean.json",
-      "reports/workspace-index.json",
-      "reports/workspace-index.md",
-      "reports/workspace-search-bench.json",
-      "scripts/api-contract-audit.js",
-      "scripts/api-contract-sync-audit.js"
+      "reports/workspace-index.json"
     ],
     "tmp": [
       "reports/workspace-index-full.json",
       "reports/workspace-index-lean.json",
       "reports/workspace-index.json",
-      "reports/workspace-search-bench.json",
       "scripts/clean-tmp-artifacts.js",
       "tmp/analyze_dq.ts",
       "tmp/analyze_dq_text.ts",
@@ -9134,8 +9282,47 @@
       "tmp/verify_reviewnote.ts",
       "tmp/verify_revu.ts"
     ],
+    "route": [
+      "app/api/admin/alerts/actions/route.ts",
+      "app/api/admin/alerts/route.ts",
+      "app/api/admin/analytics/stats/route.ts",
+      "app/api/admin/creators/[id]/route.ts",
+      "app/api/admin/creators/autologin/route.ts",
+      "app/api/admin/creators/route.ts",
+      "app/api/admin/ingest/route.ts",
+      "app/api/admin/platforms/[id]/route.ts",
+      "app/api/admin/platforms/route.ts",
+      "app/api/admin/quality/route.ts",
+      "app/api/admin/runs/route.ts",
+      "app/api/analytics/log/route.ts",
+      "app/api/analytics/route.ts",
+      "app/api/campaigns/[id]/related/route.ts",
+      "app/api/campaigns/[id]/route.ts",
+      "app/api/campaigns/route.ts",
+      "app/api/cron/route.ts",
+      "app/api/health/route.ts",
+      "app/api/jobs/route.ts",
+      "app/api/me/board/route.ts",
+      "app/api/me/curation/route.ts",
+      "app/api/me/notification-channels/route.ts",
+      "app/api/me/notification-preferences/route.ts",
+      "app/api/me/notifications/[id]/route.ts",
+      "app/api/me/notifications/route.ts",
+      "app/api/me/notifications/test/route.ts",
+      "app/api/me/pro/route.ts",
+      "app/api/me/revenue/route.ts",
+      "app/api/me/schedules/[id]/route.ts",
+      "app/api/me/schedules/route.ts",
+      "app/api/public/stats/route.ts",
+      "app/api/search/suggest/route.ts",
+      "reports/workspace-index-full.json",
+      "reports/workspace-index-lean.json",
+      "reports/workspace-index.json",
+      "reports/workspace-index.md",
+      "scripts/api-contract-audit.js",
+      "scripts/api-contract-sync-audit.js"
+    ],
     "length": [
-      "app/admin/page.tsx",
       "app/api/admin/alerts/route.ts",
       "app/api/admin/quality/route.ts",
       "app/api/campaigns/route.ts",
@@ -9179,7 +9366,6 @@
       "reports/workspace-index-full.json",
       "reports/workspace-index-lean.json",
       "reports/workspace-index.json",
-      "reports/workspace-search-bench.json",
       "scripts/agent-gate.js",
       "scripts/aggregate-stats.ts",
       "scripts/api-contract-audit.js",
@@ -9271,11 +9457,11 @@
       "docs/TEAM_CONTEXT.md",
       "docs/teams/T01_SCRAPER.md",
       "docs/teams/T10_OBSERVABILITY.md",
-      "middleware.ts",
+      "proxy.ts",
       "reports/api-contract-audit.md",
+      "reports/api-contract-sync-audit.md",
       "reports/screen-api-sync-checklist.md",
       "reports/workspace-index.md",
-      "reports/workspace-search-bench.md",
       "test-cron-api.ts"
     ],
     "dark": [
@@ -9308,7 +9494,8 @@
       "components/SortBar.tsx",
       "components/StatsBanner.tsx",
       "components/ThemeToggle.tsx",
-      "components/WorkspaceHubNav.tsx"
+      "components/WorkspaceHubNav.tsx",
+      "lib/platformDisplay.ts"
     ],
     "font-black": [
       "app/admin/page.tsx",
@@ -9355,7 +9542,6 @@
       "docs/teams/T02_NORMALIZER.md",
       "lib/analytics.ts",
       "prisma/seed.ts",
-      "reports/eslint.json",
       "reports/refactor-analysis.json",
       "scripts/revu-test.js",
       "sources/normalize.ts",
@@ -9370,35 +9556,6 @@
       "tmp/test_mrblog.ts",
       "tmp/test_reviewnote.ts",
       "tmp/verify_revu.ts"
-    ],
-    "name": [
-      "app/api/admin/analytics/stats/route.ts",
-      "app/api/admin/ingest/route.ts",
-      "app/api/admin/platforms/route.ts",
-      "app/api/admin/runs/route.ts",
-      "app/api/campaigns/route.ts",
-      "app/api/me/pro/route.ts",
-      "app/api/public/stats/route.ts",
-      "app/me/console/page.tsx",
-      "components/AnalyticsDashboard.tsx",
-      "components/HeroSearch.tsx",
-      "components/StatsBanner.tsx",
-      "lib/runtimeEnv.ts",
-      "prisma/seed.ts",
-      "public/manifest.json",
-      "scripts/agent-gate.js",
-      "scripts/api-contract-sync-audit.js",
-      "scripts/clean-tmp-artifacts.js",
-      "scripts/refactor/validator.js",
-      "scripts/run-top20-agents.ts",
-      "scripts/seed.ts",
-      "scripts/start-ingestion.ts",
-      "scripts/sync-platforms.ts",
-      "sources/adapters/reviewnote.ts",
-      "sources/registry.ts",
-      "sources/scraperHealth.ts",
-      "test-scrapers.ts",
-      "tmp/pw/package.json"
     ],
     "item": [
       "app/api/admin/creators/[id]/route.ts",
@@ -9428,6 +9585,62 @@
       "tmp/test_dq.ts",
       "tmp/test_reviewplace.ts"
     ],
+    "lib": [
+      "app/api/admin/alerts/route.ts",
+      "app/api/admin/quality/route.ts",
+      "docs/ARCHITECTURE.md",
+      "docs/teams/T01_SCRAPER.md",
+      "docs/teams/T03_DATABASE.md",
+      "lib/adminAudit.ts",
+      "lib/adminOps.ts",
+      "lib/alertState.ts",
+      "lib/analytics.ts",
+      "lib/backgroundWorker.ts",
+      "lib/campaignLinks.ts",
+      "lib/db.ts",
+      "lib/fetcher.ts",
+      "lib/geo/campaignGeo.ts",
+      "lib/ingest.ts",
+      "lib/notificationSender.ts",
+      "lib/platformDisplay.ts",
+      "lib/queryBuilder.ts",
+      "lib/runtimeEnv.ts",
+      "lib/search/queryEnhancer.ts",
+      "lib/search/searchUtils.ts",
+      "lib/useFavorites.ts",
+      "lib/utils.ts",
+      "test-cron.ts",
+      "test-revu.ts",
+      "tmp/check_revu.ts"
+    ],
+    "name": [
+      "app/api/admin/analytics/stats/route.ts",
+      "app/api/admin/ingest/route.ts",
+      "app/api/admin/platforms/route.ts",
+      "app/api/admin/runs/route.ts",
+      "app/api/campaigns/route.ts",
+      "app/api/me/pro/route.ts",
+      "app/api/public/stats/route.ts",
+      "app/me/console/page.tsx",
+      "components/AnalyticsDashboard.tsx",
+      "components/HeroSearch.tsx",
+      "lib/runtimeEnv.ts",
+      "prisma/seed.ts",
+      "public/manifest.json",
+      "scripts/agent-gate.js",
+      "scripts/api-contract-sync-audit.js",
+      "scripts/clean-tmp-artifacts.js",
+      "scripts/refactor/validator.js",
+      "scripts/run-top20-agents.ts",
+      "scripts/seed.ts",
+      "scripts/start-ingestion.ts",
+      "scripts/sync-platforms.ts",
+      "sources/adapters/reviewnote.ts",
+      "sources/registry.ts",
+      "sources/scraperHealth.ts",
+      "test-scrapers.ts",
+      "tmp/pw/package.json"
+    ],
     "data": [
       "app/api/admin/runs/route.ts",
       "app/api/analytics/route.ts",
@@ -9455,60 +9668,6 @@
       "tmp/test_weble.ts",
       "tmp/verify_dq_adapter.ts"
     ],
-    "lib": [
-      "app/api/admin/alerts/route.ts",
-      "app/api/admin/quality/route.ts",
-      "docs/ARCHITECTURE.md",
-      "docs/teams/T01_SCRAPER.md",
-      "docs/teams/T03_DATABASE.md",
-      "lib/adminAudit.ts",
-      "lib/adminOps.ts",
-      "lib/alertState.ts",
-      "lib/analytics.ts",
-      "lib/backgroundWorker.ts",
-      "lib/campaignLinks.ts",
-      "lib/db.ts",
-      "lib/fetcher.ts",
-      "lib/geo/campaignGeo.ts",
-      "lib/ingest.ts",
-      "lib/notificationSender.ts",
-      "lib/queryBuilder.ts",
-      "lib/runtimeEnv.ts",
-      "lib/search/queryEnhancer.ts",
-      "lib/search/searchUtils.ts",
-      "lib/useFavorites.ts",
-      "lib/utils.ts",
-      "test-cron.ts",
-      "test-revu.ts",
-      "tmp/check_revu.ts"
-    ],
-    "message": [
-      "app/admin/page.tsx",
-      "app/api/admin/alerts/actions/route.ts",
-      "app/api/admin/alerts/route.ts",
-      "app/api/admin/creators/[id]/route.ts",
-      "app/api/admin/ingest/route.ts",
-      "app/api/admin/platforms/[id]/route.ts",
-      "app/api/admin/platforms/route.ts",
-      "app/api/admin/quality/route.ts",
-      "app/api/admin/runs/route.ts",
-      "app/api/analytics/route.ts",
-      "app/api/cron/route.ts",
-      "app/api/health/route.ts",
-      "app/api/jobs/route.ts",
-      "components/PlatformManager.tsx",
-      "lib/backgroundWorker.ts",
-      "lib/ingest.ts",
-      "reports/eslint.json",
-      "scripts/ci/summarize-failures.js",
-      "scripts/clean-tmp-artifacts.js",
-      "scripts/release.js",
-      "scripts/sync-platforms.ts",
-      "sources/adapters/mrblog.ts",
-      "sources/scraperHealth.ts",
-      "tmp/check_revu.ts",
-      "tmp/test_weble.ts"
-    ],
     "nextresponse": [
       "app/api/admin/alerts/actions/route.ts",
       "app/api/admin/alerts/route.ts",
@@ -9534,7 +9693,7 @@
       "app/api/me/schedules/[id]/route.ts",
       "app/api/me/schedules/route.ts",
       "app/api/public/stats/route.ts",
-      "middleware.ts"
+      "proxy.ts"
     ],
     "get": [
       "app/api/admin/creators/autologin/route.ts",
@@ -9637,6 +9796,30 @@
       "tmp/test_revu_keys_app.ts",
       "tmp/test_revu_list.ts"
     ],
+    "message": [
+      "app/admin/page.tsx",
+      "app/api/admin/alerts/actions/route.ts",
+      "app/api/admin/alerts/route.ts",
+      "app/api/admin/creators/[id]/route.ts",
+      "app/api/admin/ingest/route.ts",
+      "app/api/admin/platforms/[id]/route.ts",
+      "app/api/admin/quality/route.ts",
+      "app/api/admin/runs/route.ts",
+      "app/api/analytics/route.ts",
+      "app/api/cron/route.ts",
+      "app/api/health/route.ts",
+      "app/api/jobs/route.ts",
+      "lib/backgroundWorker.ts",
+      "lib/ingest.ts",
+      "scripts/ci/summarize-failures.js",
+      "scripts/clean-tmp-artifacts.js",
+      "scripts/release.js",
+      "scripts/sync-platforms.ts",
+      "sources/adapters/mrblog.ts",
+      "sources/scraperHealth.ts",
+      "tmp/check_revu.ts",
+      "tmp/test_weble.ts"
+    ],
     "span": [
       "app/admin/page.tsx",
       "app/business/page.tsx",
@@ -9661,29 +9844,6 @@
       "components/SortBar.tsx",
       "components/StatsBanner.tsx"
     ],
-    "any": [
-      "app/api/admin/platforms/[id]/route.ts",
-      "app/api/analytics/log/route.ts",
-      "docs/teams/T02_NORMALIZER.md",
-      "public/manifest.json",
-      "reports/eslint.json",
-      "reports/refactor-analysis.json",
-      "tests/dedupe.test.ts",
-      "tests/queryBuilder.test.ts",
-      "tmp/check_db.ts",
-      "tmp/check_dq.ts",
-      "tmp/check_revu.ts",
-      "tmp/find_links.ts",
-      "tmp/test_dq.ts",
-      "tmp/test_gangnam.ts",
-      "tmp/test_mrblog.ts",
-      "tmp/test_reviewnote_live.ts",
-      "tmp/test_reviewplace.ts",
-      "tmp/test_revu_final.ts",
-      "tmp/test_revu_keys.ts",
-      "tmp/test_revu_keys_app.ts",
-      "tmp/verify_revu.ts"
-    ],
     "href": [
       "app/me/page.tsx",
       "app/not-found.tsx",
@@ -9706,6 +9866,29 @@
       "tmp/find_dq_selector.ts",
       "tmp/find_links.ts",
       "tmp/verify_reviewnote.ts"
+    ],
+    "items-center": [
+      "app/campaigns/[id]/page.tsx",
+      "app/me/calendar/page.tsx",
+      "app/me/notifications/page.tsx",
+      "app/page.tsx",
+      "app/system/page.tsx",
+      "app/trending/page.tsx",
+      "components/AICuration.tsx",
+      "components/AnalyticsDashboard.tsx",
+      "components/CampaignCard.tsx",
+      "components/CampaignList.tsx",
+      "components/CampaignListRow.tsx",
+      "components/CampaignQuickActions.tsx",
+      "components/Header.tsx",
+      "components/HeroSearch.tsx",
+      "components/ManagerDashboard.tsx",
+      "components/PWAPrompt.tsx",
+      "components/PlatformManager.tsx",
+      "components/ProUpgradeSection.tsx",
+      "components/SortBar.tsx",
+      "components/StatsBanner.tsx",
+      "components/SystemSectionNav.tsx"
     ],
     "link": [
       "app/business/apply/page.tsx",
@@ -9730,6 +9913,52 @@
       "scripts/guard.js",
       "tmp/verify_reviewnote.ts"
     ],
+    "new": [
+      "app/api/admin/runs/route.ts",
+      "app/api/me/revenue/route.ts",
+      "app/api/me/schedules/route.ts",
+      "components/MapView.tsx",
+      "lib/alertState.ts",
+      "lib/backgroundWorker.ts",
+      "lib/db.ts",
+      "lib/ingest.ts",
+      "prisma/seed.ts",
+      "proxy.ts",
+      "scripts/api-contract-audit.js",
+      "scripts/api-contract-sync-audit.js",
+      "scripts/autonomous-ops-loop.ts",
+      "scripts/build-workspace-index.ts",
+      "scripts/revu-test.js",
+      "sources/adapters/_shared.ts",
+      "sources/registry.ts",
+      "test-db.ts",
+      "test-scrapers.ts",
+      "tests/ingest.fixture.test.ts",
+      "tests/queryBuilder.test.ts"
+    ],
+    "reports": [
+      "WORKSPACE_SEARCH_GUIDE.md",
+      "docs/teams/T10_OBSERVABILITY.md",
+      "reports/PROJECT_SCORECARD_2026-03-06.md",
+      "reports/agent-qa-summary.md",
+      "reports/agent-review-summary.md",
+      "reports/api-contract-audit.md",
+      "reports/api-contract-sync-audit.md",
+      "reports/ci-summary.md",
+      "reports/eslint.json",
+      "reports/page-improvements.en.md",
+      "reports/page-improvements.md",
+      "reports/refactor-analysis.json",
+      "reports/refactor-apply.json",
+      "reports/screen-api-sync-checklist.md",
+      "reports/smoke.json",
+      "reports/workspace-index-full.json",
+      "reports/workspace-index-lean.json",
+      "reports/workspace-index.json",
+      "reports/workspace-index.md",
+      "reports/workspace-search-bench.json",
+      "reports/workspace-search-bench.md"
+    ],
     "url": [
       "app/api/admin/platforms/route.ts",
       "app/api/me/pro/route.ts",
@@ -9753,6 +9982,28 @@
       "tmp/test_revu_keys_app.ts",
       "tmp/test_weble.ts"
     ],
+    "border": [
+      "app/admin/page.tsx",
+      "app/business/apply/page.tsx",
+      "app/business/page.tsx",
+      "app/campaigns/[id]/page.tsx",
+      "app/error.tsx",
+      "app/me/calendar/page.tsx",
+      "app/me/console/page.tsx",
+      "app/me/notifications/page.tsx",
+      "app/me/page.tsx",
+      "app/me/settings/page.tsx",
+      "app/system/page.tsx",
+      "components/AddToScheduleButton.tsx",
+      "components/CampaignListRow.tsx",
+      "components/CsvUploadFallback.tsx",
+      "components/ManagerDashboard.tsx",
+      "components/PlatformManager.tsx",
+      "components/ReviewerManager.tsx",
+      "components/SearchGuidePanel.tsx",
+      "components/SystemSectionNav.tsx",
+      "components/WorkspaceHubNav.tsx"
+    ],
     "cheerio": [
       "scripts/revu-test.js",
       "sources/adapters/dinnerqueen.ts",
@@ -9775,93 +10026,8 @@
       "tmp/verify_reviewnote.ts",
       "tmp/verify_revu.ts"
     ],
-    "new": [
-      "app/api/admin/runs/route.ts",
-      "app/api/me/revenue/route.ts",
-      "app/api/me/schedules/route.ts",
-      "components/MapView.tsx",
-      "lib/alertState.ts",
-      "lib/backgroundWorker.ts",
-      "lib/db.ts",
-      "lib/ingest.ts",
-      "middleware.ts",
-      "prisma/seed.ts",
-      "scripts/api-contract-sync-audit.js",
-      "scripts/autonomous-ops-loop.ts",
-      "scripts/build-workspace-index.ts",
-      "scripts/revu-test.js",
-      "sources/adapters/_shared.ts",
-      "sources/registry.ts",
-      "test-db.ts",
-      "test-scrapers.ts",
-      "tests/ingest.fixture.test.ts",
-      "tests/queryBuilder.test.ts"
-    ],
-    "path": [
-      "reports/workspace-index-full.json",
-      "reports/workspace-index-lean.json",
-      "reports/workspace-index.json",
-      "reports/workspace-search-bench.json",
-      "scripts/agent-gate.js",
-      "scripts/api-contract-sync-audit.js",
-      "scripts/autonomous-ops-loop.ts",
-      "scripts/benchmark-workspace-search.ts",
-      "scripts/build-workspace-index.ts",
-      "scripts/ci/summarize-failures.js",
-      "scripts/clean-tmp-artifacts.js",
-      "scripts/deploy-env-check.js",
-      "scripts/deploy-target-check.js",
-      "scripts/derive-page-improvements.ts",
-      "scripts/guard.js",
-      "scripts/refactor/analyzer.js",
-      "scripts/refactor/refactor-safe.js",
-      "scripts/search-workspace.ts",
-      "vercel.json",
-      "vitest.config.ts"
-    ],
-    "reports": [
-      "WORKSPACE_SEARCH_GUIDE.md",
-      "docs/teams/T10_OBSERVABILITY.md",
-      "reports/agent-review-summary.md",
-      "reports/api-contract-audit.md",
-      "reports/api-contract-sync-audit.md",
-      "reports/ci-summary.md",
-      "reports/eslint.json",
-      "reports/page-improvements.en.md",
-      "reports/page-improvements.md",
-      "reports/refactor-analysis.json",
-      "reports/refactor-apply.json",
-      "reports/screen-api-sync-checklist.md",
-      "reports/smoke.json",
-      "reports/workspace-index-full.json",
-      "reports/workspace-index-lean.json",
-      "reports/workspace-index.json",
-      "reports/workspace-index.md",
-      "reports/workspace-search-bench.json",
-      "reports/workspace-search-bench.md",
-      "scripts/benchmark-workspace-search.ts"
-    ],
-    "border": [
-      "app/admin/page.tsx",
-      "app/business/apply/page.tsx",
-      "app/business/page.tsx",
-      "app/campaigns/[id]/page.tsx",
-      "app/error.tsx",
-      "app/me/calendar/page.tsx",
-      "app/me/console/page.tsx",
-      "app/me/page.tsx",
-      "app/me/settings/page.tsx",
-      "app/system/page.tsx",
-      "components/AddToScheduleButton.tsx",
-      "components/CsvUploadFallback.tsx",
-      "components/ManagerDashboard.tsx",
-      "components/PlatformManager.tsx",
-      "components/ReviewerManager.tsx",
-      "components/SearchGuidePanel.tsx",
-      "components/SystemSectionNav.tsx",
-      "components/WorkspaceHubNav.tsx"
-    ],
     "flex": [
+      "app/admin/page.tsx",
       "app/campaigns/[id]/page.tsx",
       "app/me/notifications/page.tsx",
       "app/page.tsx",
@@ -9881,26 +10047,6 @@
       "components/SortBar.tsx",
       "components/StatsBanner.tsx"
     ],
-    "items-center": [
-      "app/campaigns/[id]/page.tsx",
-      "app/me/calendar/page.tsx",
-      "app/me/notifications/page.tsx",
-      "app/page.tsx",
-      "app/system/page.tsx",
-      "app/trending/page.tsx",
-      "components/AICuration.tsx",
-      "components/AnalyticsDashboard.tsx",
-      "components/CampaignList.tsx",
-      "components/CampaignListRow.tsx",
-      "components/CampaignQuickActions.tsx",
-      "components/Header.tsx",
-      "components/HeroSearch.tsx",
-      "components/ManagerDashboard.tsx",
-      "components/PWAPrompt.tsx",
-      "components/ProUpgradeSection.tsx",
-      "components/SortBar.tsx",
-      "components/SystemSectionNav.tsx"
-    ],
     "key": [
       "app/map/page.tsx",
       "app/page.tsx",
@@ -9911,6 +10057,7 @@
       "components/SortBar.tsx",
       "components/WorkspaceHubNav.tsx",
       "lib/adminAudit.ts",
+      "lib/platformDisplay.ts",
       "scripts/deploy-env-check.js",
       "scripts/deploy-target-check.js",
       "scripts/refactor/validator.js",
@@ -9920,6 +10067,86 @@
       "tmp/test_revu_key_x.ts",
       "tmp/test_revu_keys.ts",
       "tmp/test_revu_keys_app.ts"
+    ],
+    "path": [
+      "reports/workspace-index-full.json",
+      "reports/workspace-index-lean.json",
+      "reports/workspace-index.json",
+      "scripts/agent-gate.js",
+      "scripts/api-contract-audit.js",
+      "scripts/api-contract-sync-audit.js",
+      "scripts/autonomous-ops-loop.ts",
+      "scripts/build-workspace-index.ts",
+      "scripts/ci/summarize-failures.js",
+      "scripts/clean-tmp-artifacts.js",
+      "scripts/deploy-env-check.js",
+      "scripts/deploy-target-check.js",
+      "scripts/derive-page-improvements.ts",
+      "scripts/guard.js",
+      "scripts/refactor/analyzer.js",
+      "scripts/refactor/refactor-safe.js",
+      "scripts/search-workspace.ts",
+      "vercel.json",
+      "vitest.config.ts"
+    ],
+    "run": [
+      "README.md",
+      "WORKSPACE_SEARCH_GUIDE.md",
+      "components/ScraperStatusTable.tsx",
+      "docs/AGENT_WORKFLOW.md",
+      "docs/CRAWLER_TOP20_RESEARCH_SPECS.md",
+      "docs/FAST_FIX_GUIDELINES.md",
+      "docs/PROJECT_STATUS_NEXT_ACTIONS.md",
+      "docs/ROLE_BASED_TEST_SCENARIOS.md",
+      "docs/SCRAPERS.md",
+      "docs/teams/T01_SCRAPER.md",
+      "package.json",
+      "reports/PROJECT_SCORECARD_2026-03-06.md",
+      "reports/workspace-index.md",
+      "scripts/agent-gate.js",
+      "scripts/refactor/multi-agent-loop.js",
+      "scripts/refactor/validator.js",
+      "scripts/release.js",
+      "scripts/run-top20-agents.ts",
+      "scripts/run-top20-phases.ts"
+    ],
+    "any": [
+      "docs/teams/T02_NORMALIZER.md",
+      "public/manifest.json",
+      "reports/refactor-analysis.json",
+      "tests/dedupe.test.ts",
+      "tmp/check_db.ts",
+      "tmp/check_dq.ts",
+      "tmp/check_revu.ts",
+      "tmp/find_links.ts",
+      "tmp/test_dq.ts",
+      "tmp/test_gangnam.ts",
+      "tmp/test_mrblog.ts",
+      "tmp/test_reviewnote_live.ts",
+      "tmp/test_reviewplace.ts",
+      "tmp/test_revu_final.ts",
+      "tmp/test_revu_keys.ts",
+      "tmp/test_revu_keys_app.ts",
+      "tmp/verify_revu.ts"
+    ],
+    "catch": [
+      "app/api/admin/ingest/route.ts",
+      "app/api/admin/platforms/[id]/route.ts",
+      "app/api/admin/platforms/route.ts",
+      "app/api/analytics/log/route.ts",
+      "app/api/analytics/route.ts",
+      "app/api/campaigns/[id]/route.ts",
+      "reports/refactor-analysis.json",
+      "scripts/sync-platforms.ts",
+      "test-db.ts",
+      "test-revu-api.ts",
+      "test-scrapers.ts",
+      "tmp/check_db.ts",
+      "tmp/check_dq.ts",
+      "tmp/check_revu.ts",
+      "tmp/test_action_log.ts",
+      "tmp/test_mrblog.ts",
+      "tmp/test_reviewnote_live.ts"
     ],
     "revu": [
       "scripts/revu-test.js",
@@ -9940,24 +10167,24 @@
       "tmp/test_revu_list.ts",
       "tmp/verify_revu.ts"
     ],
-    "text": [
-      "lib/notificationSender.ts",
-      "reports/eslint.json",
-      "reports/page-improvements.en.md",
-      "reports/refactor-analysis.json",
-      "scripts/ci/summarize-failures.js",
-      "scripts/sync_notion_index.js",
-      "sources/adapters/gangnamfood.ts",
-      "sources/adapters/generic.ts",
-      "sources/adapters/mrblog.ts",
-      "sources/adapters/seouloppa.ts",
-      "sources/normalize.ts",
-      "test-rn.ts",
-      "tmp/analyze_dq.ts",
-      "tmp/analyze_dq_text.ts",
-      "tmp/analyze_html.ts",
-      "tmp/check_mrblog.ts",
-      "tmp/dump_pages.ts"
+    "value": [
+      "app/api/admin/creators/[id]/route.ts",
+      "app/api/cron/route.ts",
+      "app/map/page.tsx",
+      "components/AddToScheduleButton.tsx",
+      "components/CampaignList.tsx",
+      "components/FilterBar.tsx",
+      "components/ReviewerManager.tsx",
+      "lib/adminAudit.ts",
+      "lib/campaignLinks.ts",
+      "lib/fetcher.ts",
+      "lib/geo/campaignGeo.ts",
+      "lib/platformDisplay.ts",
+      "lib/runtimeEnv.ts",
+      "scripts/benchmark-workspace-search.ts",
+      "scripts/deploy-env-check.js",
+      "sources/adapters/_shared.ts",
+      "sources/normalize.ts"
     ],
     "운영": [
       "TEAM_CONTEXT.md",
@@ -9976,24 +10203,6 @@
       "docs/SCRAPERS.md",
       "docs/TEAM_CONTEXT.md",
       "docs/teams/T10_OBSERVABILITY.md"
-    ],
-    "catch": [
-      "app/api/admin/ingest/route.ts",
-      "app/api/admin/platforms/[id]/route.ts",
-      "app/api/admin/platforms/route.ts",
-      "app/api/analytics/log/route.ts",
-      "app/api/analytics/route.ts",
-      "app/api/campaigns/[id]/route.ts",
-      "scripts/sync-platforms.ts",
-      "test-db.ts",
-      "test-revu-api.ts",
-      "test-scrapers.ts",
-      "tmp/check_db.ts",
-      "tmp/check_dq.ts",
-      "tmp/check_revu.ts",
-      "tmp/test_action_log.ts",
-      "tmp/test_mrblog.ts",
-      "tmp/test_reviewnote_live.ts"
     ],
     "date": [
       "app/api/admin/analytics/stats/route.ts",
@@ -10031,24 +10240,6 @@
       "scripts/start-ingestion.ts",
       "scripts/sync-platforms.ts"
     ],
-    "run": [
-      "README.md",
-      "WORKSPACE_SEARCH_GUIDE.md",
-      "components/ScraperStatusTable.tsx",
-      "docs/AGENT_WORKFLOW.md",
-      "docs/CRAWLER_TOP20_RESEARCH_SPECS.md",
-      "docs/FAST_FIX_GUIDELINES.md",
-      "docs/SCRAPERS.md",
-      "docs/teams/T01_SCRAPER.md",
-      "package.json",
-      "reports/workspace-index.md",
-      "scripts/agent-gate.js",
-      "scripts/refactor/multi-agent-loop.js",
-      "scripts/refactor/validator.js",
-      "scripts/release.js",
-      "scripts/run-top20-agents.ts",
-      "scripts/run-top20-phases.ts"
-    ],
     "sources": [
       "docs/teams/T01_SCRAPER.md",
       "sources/adapters/_shared.ts",
@@ -10066,6 +10257,24 @@
       "sources/types.ts",
       "test-scrapers.ts",
       "tests/ingest.fixture.test.ts"
+    ],
+    "text": [
+      "lib/notificationSender.ts",
+      "reports/page-improvements.en.md",
+      "reports/refactor-analysis.json",
+      "scripts/ci/summarize-failures.js",
+      "scripts/sync_notion_index.js",
+      "sources/adapters/gangnamfood.ts",
+      "sources/adapters/generic.ts",
+      "sources/adapters/mrblog.ts",
+      "sources/adapters/seouloppa.ts",
+      "sources/normalize.ts",
+      "test-rn.ts",
+      "tmp/analyze_dq.ts",
+      "tmp/analyze_dq_text.ts",
+      "tmp/analyze_html.ts",
+      "tmp/check_mrblog.ts",
+      "tmp/dump_pages.ts"
     ],
     "includes": [
       "lib/useFavorites.ts",
@@ -10087,7 +10296,6 @@
     "label": [
       "app/api/me/curation/route.ts",
       "app/campaigns/[id]/page.tsx",
-      "app/me/page.tsx",
       "app/page.tsx",
       "components/AddToScheduleButton.tsx",
       "components/AdminSectionNav.tsx",
@@ -10099,41 +10307,8 @@
       "components/SortBar.tsx",
       "components/SystemSectionNav.tsx",
       "components/WorkspaceHubNav.tsx",
+      "lib/platformDisplay.ts",
       "scripts/deploy-target-check.js"
-    ],
-    "title": [
-      "app/campaigns/[id]/page.tsx",
-      "app/me/layout.tsx",
-      "app/system/layout.tsx",
-      "app/trending/page.tsx",
-      "lib/geo/campaignGeo.ts",
-      "scripts/derive-page-improvements.ts",
-      "sources/adapters/gangnamfood.ts",
-      "sources/adapters/generic.ts",
-      "sources/adapters/reviewnote.ts",
-      "sources/adapters/reviewplace.ts",
-      "tmp/analyze_dq.ts",
-      "tmp/dump_pages.ts",
-      "tmp/test_gangnam.ts",
-      "tmp/verify_reviewnote.ts",
-      "tmp/verify_revu.ts"
-    ],
-    "value": [
-      "app/api/admin/creators/[id]/route.ts",
-      "app/api/cron/route.ts",
-      "app/map/page.tsx",
-      "components/AddToScheduleButton.tsx",
-      "components/CampaignList.tsx",
-      "components/FilterBar.tsx",
-      "components/ReviewerManager.tsx",
-      "lib/adminAudit.ts",
-      "lib/campaignLinks.ts",
-      "lib/fetcher.ts",
-      "lib/geo/campaignGeo.ts",
-      "lib/runtimeEnv.ts",
-      "scripts/deploy-env-check.js",
-      "sources/adapters/_shared.ts",
-      "sources/normalize.ts"
     ],
     "adapters": [
       "app/api/health/route.ts",
@@ -10168,7 +10343,7 @@
       "tmp/test_revu_list.ts"
     ],
     "html": [
-      "middleware.ts",
+      "proxy.ts",
       "scripts/revu-test.js",
       "test-extract.ts",
       "test-revu.ts",
@@ -10182,6 +10357,22 @@
       "tmp/test_revu_list.ts",
       "tmp/verify_reviewnote.ts",
       "tmp/verify_revu.ts"
+    ],
+    "notifications": [
+      "app/api/me/notifications/[id]/route.ts",
+      "app/api/me/notifications/route.ts",
+      "app/api/me/notifications/test/route.ts",
+      "app/me/notifications/page.tsx",
+      "components/MeSectionNav.tsx",
+      "docs/API.md",
+      "docs/PROJECT_STATUS.md",
+      "docs/TEAM_CONTEXT.md",
+      "docs/teams/T05_NOTIFIER.md",
+      "docs/teams/T08_MANAGER.md",
+      "reports/api-contract-audit.md",
+      "reports/api-contract-sync-audit.md",
+      "reports/screen-api-sync-checklist.md",
+      "scripts/smoke.js"
     ],
     "teams": [
       "docs/ARCHITECTURE.md",
@@ -10199,6 +10390,37 @@
       "docs/teams/T09_VALIDATION.md",
       "docs/teams/T10_OBSERVABILITY.md"
     ],
+    "title": [
+      "app/campaigns/[id]/page.tsx",
+      "app/me/layout.tsx",
+      "app/system/layout.tsx",
+      "lib/geo/campaignGeo.ts",
+      "scripts/derive-page-improvements.ts",
+      "sources/adapters/gangnamfood.ts",
+      "sources/adapters/generic.ts",
+      "sources/adapters/reviewnote.ts",
+      "sources/adapters/reviewplace.ts",
+      "tmp/analyze_dq.ts",
+      "tmp/dump_pages.ts",
+      "tmp/test_gangnam.ts",
+      "tmp/verify_reviewnote.ts",
+      "tmp/verify_revu.ts"
+    ],
+    "count": [
+      "app/api/me/board/route.ts",
+      "app/api/me/revenue/route.ts",
+      "app/api/public/stats/route.ts",
+      "components/NavFavoritesBadge.tsx",
+      "components/StatsBanner.tsx",
+      "reports/workspace-search-bench.md",
+      "scripts/aggregate-stats.ts",
+      "test-cron.ts",
+      "test-db.ts",
+      "tmp/analyze_html.ts",
+      "tmp/check_db.ts",
+      "tmp/test_action_log.ts",
+      "tmp/test_revu.js"
+    ],
     "find": [
       "sources/adapters/gangnamfood.ts",
       "sources/adapters/generic.ts",
@@ -10214,6 +10436,20 @@
       "tmp/test_gangnam.ts",
       "tmp/verify_reviewnote.ts"
     ],
+    "실행": [
+      "app/me/console/page.tsx",
+      "components/ScraperStatusTable.tsx",
+      "docs/AGENT_WORKFLOW.md",
+      "docs/ARCHITECTURE.md",
+      "docs/AUTONOMOUS_HOURLY_REPORT.md",
+      "docs/CRAWLER_TOP20_RESEARCH_SPECS.md",
+      "docs/PROJECT_STATUS_NEXT_ACTIONS.md",
+      "docs/SCRAPERS.md",
+      "docs/SESSION_HANDOFF.md",
+      "docs/TEAM_CONTEXT.md",
+      "docs/teams/T04_WORKER.md",
+      "docs/teams/T09_VALIDATION.md"
+    ],
     "agent": [
       ".agent/skills/README.md",
       ".agent/workflows/README.md",
@@ -10221,26 +10457,12 @@
       "docs/AGENT_PROTOCOLS.md",
       "docs/AGENT_WORKFLOW.md",
       "docs/NOTES_AGENT_QUEUE.md",
-      "docs/SESSION_HANDOFF.md",
       "docs/teams/T02_NORMALIZER.md",
+      "reports/agent-qa-summary.md",
       "reports/agent-review-summary.md",
       "scripts/agent-gate.js",
       "scripts/refactor/multi-agent-loop.js",
       "scripts/run-top20-agents.ts"
-    ],
-    "count": [
-      "app/api/me/board/route.ts",
-      "app/api/me/revenue/route.ts",
-      "app/api/public/stats/route.ts",
-      "components/NavFavoritesBadge.tsx",
-      "components/StatsBanner.tsx",
-      "scripts/aggregate-stats.ts",
-      "test-cron.ts",
-      "test-db.ts",
-      "tmp/analyze_html.ts",
-      "tmp/check_db.ts",
-      "tmp/test_action_log.ts",
-      "tmp/test_revu.js"
     ],
     "hover": [
       "app/business/apply/page.tsx",
@@ -10256,46 +10478,19 @@
       "components/ThemeToggle.tsx",
       "components/WorkspaceHubNav.tsx"
     ],
-    "index": [
-      "WORKSPACE_SEARCH_GUIDE.md",
-      "reports/workspace-index-full.json",
-      "reports/workspace-index-lean.json",
-      "reports/workspace-index.json",
-      "reports/workspace-index.md",
-      "reports/workspace-search-bench.md",
-      "scripts/benchmark-workspace-search.ts",
-      "scripts/build-workspace-index.ts",
-      "scripts/search-workspace.ts",
-      "scripts/sync_notion_index.js",
-      "tmp/find_key.ts",
-      "tmp/pw/package.json"
-    ],
-    "notifications": [
-      "app/api/me/notifications/[id]/route.ts",
-      "app/api/me/notifications/route.ts",
-      "app/api/me/notifications/test/route.ts",
-      "app/me/notifications/page.tsx",
-      "components/MeSectionNav.tsx",
-      "docs/API.md",
-      "docs/PROJECT_STATUS.md",
-      "docs/TEAM_CONTEXT.md",
-      "docs/teams/T05_NOTIFIER.md",
-      "docs/teams/T08_MANAGER.md",
-      "reports/screen-api-sync-checklist.md",
-      "scripts/smoke.js"
-    ],
-    "수집": [
-      "app/admin/layout.tsx",
-      "app/admin/page.tsx",
-      "app/me/console/page.tsx",
-      "app/system/layout.tsx",
-      "docs/AUTONOMOUS_REVIEW_WORKLIST.md",
-      "docs/CRAWLER_TOP20_RESEARCH_SPECS.md",
-      "docs/PROJECT_STATUS.md",
-      "docs/PROJECT_STATUS_NEXT_ACTIONS.md",
-      "docs/SCRAPERS.md",
-      "docs/platforms-2026-expansion.md",
-      "logs/autonomous/autonomous-ops-2026-03-03T16-10-04-089Z.json"
+    "result": [
+      "lib/notificationSender.ts",
+      "reports/agent-qa-summary.md",
+      "reports/agent-review-summary.md",
+      "scripts/agent-gate.js",
+      "scripts/ci/summarize-failures.js",
+      "scripts/release.js",
+      "scripts/start-ingestion.ts",
+      "sources/scraperHealth.ts",
+      "tests/dedupe.test.ts",
+      "tests/ingest.fixture.test.ts",
+      "tests/normalize.test.ts",
+      "tests/queryBuilder.test.ts"
     ],
     "category": [
       "app/api/campaigns/[id]/related/route.ts",
@@ -10323,18 +10518,31 @@
       "tmp/test_revu_api.ts",
       "tmp/test_weble.ts"
     ],
-    "result": [
-      "lib/notificationSender.ts",
-      "reports/agent-review-summary.md",
-      "scripts/agent-gate.js",
-      "scripts/ci/summarize-failures.js",
-      "scripts/release.js",
+    "npm": [
+      "README.md",
+      "WORKSPACE_SEARCH_GUIDE.md",
+      "docs/AGENT_WORKFLOW.md",
+      "docs/CRAWLER_TOP20_RESEARCH_SPECS.md",
+      "docs/FAST_FIX_GUIDELINES.md",
+      "docs/ROLE_BASED_TEST_SCENARIOS.md",
+      "package.json",
+      "reports/PROJECT_SCORECARD_2026-03-06.md",
+      "reports/workspace-index.md",
+      "scripts/refactor/validator.js",
+      "scripts/release.js"
+    ],
+    "platforms": [
+      "app/api/admin/platforms/[id]/route.ts",
+      "app/api/admin/platforms/route.ts",
+      "components/AdminSectionNav.tsx",
+      "components/PlatformManager.tsx",
+      "docs/API.md",
+      "docs/platforms-2026-expansion.md",
+      "reports/api-contract-audit.md",
+      "reports/api-contract-sync-audit.md",
       "scripts/start-ingestion.ts",
-      "sources/scraperHealth.ts",
-      "tests/dedupe.test.ts",
-      "tests/ingest.fixture.test.ts",
-      "tests/normalize.test.ts",
-      "tests/queryBuilder.test.ts"
+      "scripts/sync-platforms.ts",
+      "tmp/check_db.ts"
     ],
     "type": [
       "app/api/campaigns/route.ts",
@@ -10349,19 +10557,6 @@
       "reports/eslint.json",
       "scripts/sync_notion_index.js"
     ],
-    "workspace": [
-      "WORKSPACE_SEARCH_GUIDE.md",
-      "package.json",
-      "reports/workspace-index-full.json",
-      "reports/workspace-index-lean.json",
-      "reports/workspace-index.json",
-      "reports/workspace-index.md",
-      "reports/workspace-search-bench.json",
-      "reports/workspace-search-bench.md",
-      "scripts/benchmark-workspace-search.ts",
-      "scripts/build-workspace-index.ts",
-      "scripts/search-workspace.ts"
-    ],
     "상태": [
       "app/admin/layout.tsx",
       "docs/PAGE_SPECS.md",
@@ -10374,17 +10569,17 @@
       "docs/teams/T10_OBSERVABILITY.md",
       "reports/page-improvements.md"
     ],
-    "실행": [
-      "components/ScraperStatusTable.tsx",
-      "docs/AGENT_WORKFLOW.md",
-      "docs/ARCHITECTURE.md",
+    "수집": [
+      "app/admin/layout.tsx",
+      "app/admin/page.tsx",
+      "app/me/console/page.tsx",
+      "app/system/layout.tsx",
+      "docs/AUTONOMOUS_REVIEW_WORKLIST.md",
       "docs/CRAWLER_TOP20_RESEARCH_SPECS.md",
-      "docs/PROJECT_STATUS_NEXT_ACTIONS.md",
+      "docs/PROJECT_STATUS.md",
       "docs/SCRAPERS.md",
-      "docs/SESSION_HANDOFF.md",
-      "docs/TEAM_CONTEXT.md",
-      "docs/teams/T04_WORKER.md",
-      "docs/teams/T09_VALIDATION.md"
+      "docs/platforms-2026-expansion.md",
+      "logs/autonomous/autonomous-ops-2026-03-03T16-10-04-089Z.json"
     ],
     "알림": [
       "app/api/me/pro/route.ts",
@@ -10410,6 +10605,18 @@
       "tmp/find_dq_selector.ts",
       "tmp/find_links.ts"
     ],
+    "button": [
+      "app/error.tsx",
+      "app/me/notifications/page.tsx",
+      "app/trending/page.tsx",
+      "components/CampaignList.tsx",
+      "components/HeroSearch.tsx",
+      "components/PWAPrompt.tsx",
+      "components/ProUpgradeSection.tsx",
+      "components/ReviewerManager.tsx",
+      "components/ThemeToggle.tsx",
+      "reports/page-improvements.en.md"
+    ],
     "children": [
       "app/admin/layout.tsx",
       "app/business/apply/layout.tsx",
@@ -10422,29 +10629,41 @@
       "components/ThemeProvider.tsx",
       "scripts/sync_notion_index.js"
     ],
-    "filter": [
-      "app/api/admin/alerts/route.ts",
-      "app/api/campaigns/route.ts",
-      "app/api/health/route.ts",
-      "app/api/jobs/route.ts",
-      "app/api/search/suggest/route.ts",
+    "focus-visible": [
+      "app/business/apply/page.tsx",
+      "app/business/page.tsx",
+      "app/layout.tsx",
+      "app/me/calendar/page.tsx",
       "app/me/notifications/page.tsx",
-      "lib/adminOps.ts",
-      "lib/search/queryEnhancer.ts",
-      "scripts/revu-test.js",
-      "tests/queryBuilder.test.ts"
+      "app/me/page.tsx",
+      "app/me/settings/page.tsx",
+      "app/page.tsx",
+      "app/system/page.tsx",
+      "app/trending/page.tsx"
     ],
-    "join": [
-      "scripts/api-contract-audit.js",
-      "scripts/api-contract-sync-audit.js",
-      "scripts/autonomous-ops-loop.ts",
+    "full": [
+      "WORKSPACE_SEARCH_GUIDE.md",
+      "package.json",
+      "reports/workspace-index-full.json",
+      "reports/workspace-index.md",
+      "reports/workspace-search-bench.json",
+      "reports/workspace-search-bench.md",
       "scripts/benchmark-workspace-search.ts",
       "scripts/build-workspace-index.ts",
-      "scripts/ci/summarize-failures.js",
-      "scripts/deploy-env-check.js",
-      "scripts/guard.js",
-      "scripts/refactor/analyzer.js",
-      "scripts/refactor/refactor-safe.js"
+      "scripts/search-workspace.ts",
+      "tmp/analyze_dq_text.ts"
+    ],
+    "index": [
+      "reports/workspace-index-full.json",
+      "reports/workspace-index-lean.json",
+      "reports/workspace-index.json",
+      "reports/workspace-index.md",
+      "reports/workspace-search-bench.md",
+      "scripts/build-workspace-index.ts",
+      "scripts/search-workspace.ts",
+      "scripts/sync_notion_index.js",
+      "tmp/find_key.ts",
+      "tmp/pw/package.json"
     ],
     "metadata": [
       "app/admin/layout.tsx",
@@ -10464,9 +10683,9 @@
       "components/SortBar.tsx",
       "docs/PROJECT_STATUS_NEXT_ACTIONS.md",
       "lib/useFavorites.ts",
-      "middleware.ts",
       "next-env.d.ts",
       "next.config.ts",
+      "proxy.ts",
       "scripts/guard.js",
       "tsconfig.json"
     ],
@@ -10481,6 +10700,18 @@
       "docs/teams/T04_WORKER.md",
       "docs/teams/T08_MANAGER.md",
       "reports/screen-api-sync-checklist.md"
+    ],
+    "push": [
+      "app/me/settings/page.tsx",
+      "docs/SESSION_HANDOFF.md",
+      "lib/notificationSender.ts",
+      "scripts/api-contract-audit.js",
+      "scripts/api-contract-sync-audit.js",
+      "scripts/ci/summarize-failures.js",
+      "scripts/derive-page-improvements.ts",
+      "scripts/refactor/analyzer.js",
+      "scripts/start-ingestion.ts",
+      "scripts/sync_notion_index.js"
     ],
     "text-": [
       "app/campaigns/[id]/page.tsx",
@@ -10506,6 +10737,40 @@
       "components/ManagerDashboard.tsx",
       "scripts/smoke.js"
     ],
+    "workspace": [
+      "WORKSPACE_SEARCH_GUIDE.md",
+      "reports/workspace-index-full.json",
+      "reports/workspace-index-lean.json",
+      "reports/workspace-index.json",
+      "reports/workspace-index.md",
+      "reports/workspace-search-bench.json",
+      "reports/workspace-search-bench.md",
+      "scripts/benchmark-workspace-search.ts",
+      "scripts/build-workspace-index.ts",
+      "scripts/search-workspace.ts"
+    ],
+    "alerts": [
+      "app/api/admin/alerts/actions/route.ts",
+      "app/api/admin/alerts/route.ts",
+      "app/api/admin/quality/route.ts",
+      "docs/API.md",
+      "lib/adminOps.ts",
+      "lib/alertState.ts",
+      "reports/api-contract-audit.md",
+      "reports/api-contract-sync-audit.md",
+      "reports/screen-api-sync-checklist.md"
+    ],
+    "analytics": [
+      "app/api/admin/analytics/stats/route.ts",
+      "app/api/analytics/log/route.ts",
+      "app/api/analytics/route.ts",
+      "docs/API.md",
+      "docs/teams/T06_ANALYTICS.md",
+      "lib/analytics.ts",
+      "reports/api-contract-audit.md",
+      "reports/api-contract-sync-audit.md",
+      "reports/workspace-index.md"
+    ],
     "application": [
       "sources/adapters/seouloppa.ts",
       "test-cron-api.ts",
@@ -10516,6 +10781,17 @@
       "tmp/test_revu_keys_app.ts",
       "tmp/test_revu_list.ts",
       "tmp/test_weble.ts"
+    ],
+    "autonomous": [
+      "docs/AGENT_WORKFLOW.md",
+      "docs/AUTONOMOUS_HOURLY_REPORT.md",
+      "docs/AUTONOMOUS_REVIEW_WORKLIST.md",
+      "docs/AUTONOMOUS_WORK_POOL.md",
+      "logs/autonomous/autonomous-ops-2026-03-03T16-10-04-089Z.json",
+      "logs/autonomous/autonomous-ops-2026-03-04T01-17-22-612Z.json",
+      "logs/autonomous/autonomous-ops-2026-03-05T22-24-02-111Z.json",
+      "logs/autonomous/autonomous-ops-2026-03-05T22-25-31-711Z.json",
+      "scripts/autonomous-ops-loop.ts"
     ],
     "body": [
       "app/api/admin/alerts/actions/route.ts",
@@ -10528,28 +10804,6 @@
       "test-cron-api.ts",
       "tmp/test_revu.js"
     ],
-    "boolean": [
-      "app/api/admin/creators/route.ts",
-      "app/api/jobs/route.ts",
-      "app/api/me/notification-preferences/route.ts",
-      "app/me/settings/page.tsx",
-      "lib/campaignLinks.ts",
-      "lib/notificationSender.ts",
-      "scripts/search-workspace.ts",
-      "sources/adapters/_shared.ts",
-      "sources/types.ts"
-    ],
-    "button": [
-      "app/error.tsx",
-      "app/me/notifications/page.tsx",
-      "components/CampaignList.tsx",
-      "components/HeroSearch.tsx",
-      "components/PWAPrompt.tsx",
-      "components/ProUpgradeSection.tsx",
-      "components/ReviewerManager.tsx",
-      "components/ThemeToggle.tsx",
-      "reports/page-improvements.en.md"
-    ],
     "check": [
       "scripts/ci/summarize-failures.js",
       "scripts/deploy-env-check.js",
@@ -10561,21 +10815,43 @@
       "tmp/check_mrblog.ts",
       "tmp/check_revu.ts"
     ],
-    "focus-visible": [
-      "app/business/apply/page.tsx",
-      "app/business/page.tsx",
-      "app/layout.tsx",
-      "app/me/calendar/page.tsx",
-      "app/me/page.tsx",
-      "app/me/settings/page.tsx",
-      "app/page.tsx",
-      "app/system/page.tsx",
-      "app/trending/page.tsx"
+    "cron": [
+      "app/api/cron/route.ts",
+      "docs/ARCHITECTURE.md",
+      "docs/NOTES_AGENT_QUEUE.md",
+      "docs/SCRAPERS.md",
+      "docs/teams/T04_WORKER.md",
+      "reports/api-contract-audit.md",
+      "test-cron-api.ts",
+      "test-cron.ts",
+      "vercel.json"
+    ],
+    "env": [
+      "app/api/me/notification-channels/route.ts",
+      "docs/COMMAND_CENTER.md",
+      "lib/db.ts",
+      "lib/notificationSender.ts",
+      "lib/runtimeEnv.ts",
+      "next-env.d.ts",
+      "reports/PROJECT_SCORECARD_2026-03-06.md",
+      "scripts/deploy-env-check.js",
+      "scripts/wait-for-health.js"
+    ],
+    "filter": [
+      "app/api/admin/alerts/route.ts",
+      "app/api/campaigns/route.ts",
+      "app/api/health/route.ts",
+      "app/api/jobs/route.ts",
+      "app/api/search/suggest/route.ts",
+      "app/me/notifications/page.tsx",
+      "lib/adminOps.ts",
+      "lib/search/queryEnhancer.ts",
+      "scripts/revu-test.js"
     ],
     "headers": [
       "app/api/analytics/route.ts",
       "lib/fetcher.ts",
-      "middleware.ts",
+      "proxy.ts",
       "scripts/smoke.js",
       "test-cron-api.ts",
       "test-revu-api.ts",
@@ -10583,16 +10859,27 @@
       "tmp/check_revu.ts",
       "tmp/test_reviewnote_live.ts"
     ],
-    "npm": [
+    "join": [
+      "scripts/api-contract-audit.js",
+      "scripts/api-contract-sync-audit.js",
+      "scripts/autonomous-ops-loop.ts",
+      "scripts/build-workspace-index.ts",
+      "scripts/ci/summarize-failures.js",
+      "scripts/deploy-env-check.js",
+      "scripts/guard.js",
+      "scripts/refactor/analyzer.js",
+      "scripts/refactor/refactor-safe.js"
+    ],
+    "ops": [
       "README.md",
-      "WORKSPACE_SEARCH_GUIDE.md",
       "docs/AGENT_WORKFLOW.md",
-      "docs/CRAWLER_TOP20_RESEARCH_SPECS.md",
-      "docs/FAST_FIX_GUIDELINES.md",
+      "docs/TEAM_CONTEXT.md",
+      "logs/autonomous/autonomous-ops-2026-03-03T16-10-04-089Z.json",
+      "logs/autonomous/autonomous-ops-2026-03-04T01-17-22-612Z.json",
+      "logs/autonomous/autonomous-ops-2026-03-05T22-24-02-111Z.json",
+      "logs/autonomous/autonomous-ops-2026-03-05T22-25-31-711Z.json",
       "package.json",
-      "reports/workspace-index.md",
-      "scripts/refactor/validator.js",
-      "scripts/release.js"
+      "scripts/autonomous-ops-loop.ts"
     ],
     "platform_id": [
       "app/api/admin/ingest/route.ts",
@@ -10605,17 +10892,6 @@
       "tests/dedupe.test.ts",
       "tests/queryBuilder.test.ts"
     ],
-    "prisma": [
-      "README.md",
-      "docs/teams/T03_DATABASE.md",
-      "lib/db.ts",
-      "lib/queryBuilder.ts",
-      "package.json",
-      "prisma/seed.ts",
-      "scripts/deploy-env-check.js",
-      "scripts/seed.ts",
-      "test-db.ts"
-    ],
     "process": [
       "app/api/me/notification-channels/route.ts",
       "lib/db.ts",
@@ -10627,16 +10903,16 @@
       "scripts/release.js",
       "scripts/wait-for-health.js"
     ],
-    "push": [
-      "app/me/settings/page.tsx",
-      "lib/notificationSender.ts",
-      "scripts/api-contract-audit.js",
-      "scripts/api-contract-sync-audit.js",
-      "scripts/ci/summarize-failures.js",
-      "scripts/derive-page-improvements.ts",
-      "scripts/refactor/analyzer.js",
-      "scripts/start-ingestion.ts",
-      "scripts/sync_notion_index.js"
+    "schedules": [
+      "app/api/me/board/route.ts",
+      "app/api/me/schedules/[id]/route.ts",
+      "app/api/me/schedules/route.ts",
+      "docs/API.md",
+      "docs/PROJECT_STATUS.md",
+      "docs/teams/T08_MANAGER.md",
+      "reports/api-contract-audit.md",
+      "reports/api-contract-sync-audit.md",
+      "reports/screen-api-sync-checklist.md"
     ],
     "search": [
       "WORKSPACE_SEARCH_GUIDE.md",
@@ -10669,26 +10945,6 @@
       "docs/teams/T08_MANAGER.md",
       "lib/search/searchUtils.ts"
     ],
-    "cron": [
-      "app/api/cron/route.ts",
-      "docs/ARCHITECTURE.md",
-      "docs/NOTES_AGENT_QUEUE.md",
-      "docs/SCRAPERS.md",
-      "docs/teams/T04_WORKER.md",
-      "test-cron-api.ts",
-      "test-cron.ts",
-      "vercel.json"
-    ],
-    "env": [
-      "app/api/me/notification-channels/route.ts",
-      "docs/COMMAND_CENTER.md",
-      "lib/db.ts",
-      "lib/notificationSender.ts",
-      "lib/runtimeEnv.ts",
-      "next-env.d.ts",
-      "scripts/deploy-env-check.js",
-      "scripts/wait-for-health.js"
-    ],
     "failed": [
       "app/api/health/route.ts",
       "docs/teams/T04_WORKER.md",
@@ -10709,15 +10965,15 @@
       "tmp/analyze_dq.ts",
       "tmp/verify_dq_adapter.ts"
     ],
-    "implemented": [
-      "docs/API.md",
-      "docs/teams/T06_ANALYTICS.md",
-      "docs/teams/T08_MANAGER.md",
-      "docs/teams/T10_OBSERVABILITY.md",
-      "reports/api-contract-audit.md",
-      "reports/api-contract-sync-audit.md",
-      "scripts/api-contract-audit.js",
-      "scripts/api-contract-sync-audit.js"
+    "ingest": [
+      "README.md",
+      "app/api/admin/ingest/route.ts",
+      "docs/CRAWLER_TOP20_RESEARCH_SPECS.md",
+      "lib/ingest.ts",
+      "package.json",
+      "scripts/start-ingestion.ts",
+      "test-cron-api.ts",
+      "tests/ingest.fixture.test.ts"
     ],
     "map": [
       "app/api/public/stats/route.ts",
@@ -10749,15 +11005,15 @@
       "scripts/build-workspace-index.ts",
       "scripts/smoke.js"
     ],
-    "platforms": [
-      "app/api/admin/platforms/[id]/route.ts",
-      "app/api/admin/platforms/route.ts",
-      "components/AdminSectionNav.tsx",
-      "components/PlatformManager.tsx",
-      "docs/platforms-2026-expansion.md",
-      "scripts/start-ingestion.ts",
-      "scripts/sync-platforms.ts",
-      "tmp/check_db.ts"
+    "prisma": [
+      "README.md",
+      "docs/teams/T03_DATABASE.md",
+      "lib/db.ts",
+      "lib/queryBuilder.ts",
+      "prisma/seed.ts",
+      "scripts/deploy-env-check.js",
+      "scripts/seed.ts",
+      "test-db.ts"
     ],
     "results": [
       "app/api/admin/platforms/route.ts",
@@ -10779,6 +11035,16 @@
       "lib/geo/campaignGeo.ts",
       "lib/queryBuilder.ts"
     ],
+    "smoke": [
+      "docs/DEPLOY_GUARDRAILS.md",
+      "docs/teams/T09_VALIDATION.md",
+      "reports/agent-qa-summary.md",
+      "reports/ci-summary.md",
+      "reports/smoke.json",
+      "scripts/ci/summarize-failures.js",
+      "scripts/refactor/validator.js",
+      "scripts/smoke.js"
+    ],
     "text-sm": [
       "app/error.tsx",
       "app/me/calendar/page.tsx",
@@ -10799,6 +11065,16 @@
       "tmp/analyze_dq.ts",
       "tmp/analyze_html.ts"
     ],
+    "unknown": [
+      "app/api/admin/platforms/[id]/route.ts",
+      "app/api/admin/platforms/route.ts",
+      "app/api/analytics/log/route.ts",
+      "app/api/jobs/route.ts",
+      "app/api/me/notifications/route.ts",
+      "lib/db.ts",
+      "lib/fetcher.ts",
+      "sources/adapters/revu.ts"
+    ],
     "기준": [
       ".agents/skills/ROI_LOGIC.md",
       "TEAM_CONTEXT.md",
@@ -10817,15 +11093,6 @@
       "docs/PAGE_SPECS.md",
       "docs/REFAC_CHECKLIST.md"
     ],
-    "문서": [
-      "TEAM_CONTEXT.md",
-      "docs/AGENT_WORKFLOW.md",
-      "docs/API.md",
-      "docs/ARCHITECTURE.md",
-      "docs/PROJECT_STATUS_NEXT_ACTIONS.md",
-      "docs/TEAM_CONTEXT.md",
-      "docs/teams/T10_OBSERVABILITY.md"
-    ],
     "완료": [
       "docs/AGENT_PROTOCOLS.md",
       "docs/COMMAND_CENTER.md",
@@ -10835,41 +11102,41 @@
       "docs/SESSION_HANDOFF.md",
       "docs/teams/T05_NOTIFIER.md"
     ],
-    "alerts": [
-      "app/api/admin/alerts/actions/route.ts",
-      "app/api/admin/alerts/route.ts",
-      "app/api/admin/quality/route.ts",
-      "docs/API.md",
-      "lib/adminOps.ts",
-      "lib/alertState.ts",
-      "reports/screen-api-sync-checklist.md"
+    "boolean": [
+      "app/api/admin/creators/route.ts",
+      "app/api/jobs/route.ts",
+      "app/api/me/notification-preferences/route.ts",
+      "app/me/settings/page.tsx",
+      "lib/campaignLinks.ts",
+      "lib/notificationSender.ts",
+      "sources/types.ts"
     ],
-    "analytics": [
-      "app/api/admin/analytics/stats/route.ts",
-      "app/api/analytics/log/route.ts",
-      "app/api/analytics/route.ts",
-      "docs/teams/T06_ANALYTICS.md",
-      "lib/analytics.ts",
+    "config": [
+      "docs/FAST_FIX_GUIDELINES.md",
+      "next-env.d.ts",
+      "next.config.ts",
+      "scripts/benchmark-workspace-search.ts",
+      "scripts/deploy-target-check.js",
+      "tmp/check_db.ts",
+      "vitest.config.ts"
+    ],
+    "creators": [
+      "app/api/admin/creators/[id]/route.ts",
+      "app/api/admin/creators/autologin/route.ts",
+      "app/api/admin/creators/route.ts",
+      "docs/API.md",
       "reports/api-contract-audit.md",
+      "reports/api-contract-sync-audit.md",
       "reports/workspace-index.md"
     ],
-    "autonomous": [
-      "docs/AGENT_WORKFLOW.md",
-      "docs/AUTONOMOUS_HOURLY_REPORT.md",
-      "docs/AUTONOMOUS_REVIEW_WORKLIST.md",
-      "docs/AUTONOMOUS_WORK_POOL.md",
-      "logs/autonomous/autonomous-ops-2026-03-03T16-10-04-089Z.json",
-      "logs/autonomous/autonomous-ops-2026-03-04T01-17-22-612Z.json",
-      "scripts/autonomous-ops-loop.ts"
-    ],
-    "default": [
-      "WORKSPACE_SEARCH_GUIDE.md",
-      "app/campaigns/page.tsx",
-      "app/loading.tsx",
-      "app/trending/layout.tsx",
-      "components/MapViewCompat.tsx",
-      "next.config.ts",
-      "vitest.config.ts"
+    "fallback": [
+      "docs/COMMAND_CENTER.md",
+      "docs/PAGE_SPECS.md",
+      "reports/workspace-search-bench.md",
+      "scripts/benchmark-workspace-search.ts",
+      "scripts/wait-for-health.js",
+      "sources/adapters/_shared.ts",
+      "test-scrapers.ts"
     ],
     "file": [
       "components/CsvUploadFallback.tsx",
@@ -10880,15 +11147,6 @@
       "scripts/refactor/analyzer.js",
       "scripts/refactor/refactor-safe.js"
     ],
-    "full": [
-      "WORKSPACE_SEARCH_GUIDE.md",
-      "package.json",
-      "reports/workspace-index-full.json",
-      "reports/workspace-index.md",
-      "scripts/benchmark-workspace-search.ts",
-      "scripts/build-workspace-index.ts",
-      "tmp/analyze_dq_text.ts"
-    ],
     "icon": [
       "app/me/page.tsx",
       "components/AdminSectionNav.tsx",
@@ -10897,24 +11155,6 @@
       "components/MobileNav.tsx",
       "components/SystemSectionNav.tsx",
       "components/WorkspaceHubNav.tsx"
-    ],
-    "ingest": [
-      "README.md",
-      "app/api/admin/ingest/route.ts",
-      "docs/CRAWLER_TOP20_RESEARCH_SPECS.md",
-      "lib/ingest.ts",
-      "scripts/start-ingestion.ts",
-      "test-cron-api.ts",
-      "tests/ingest.fixture.test.ts"
-    ],
-    "limit": [
-      "app/api/admin/runs/route.ts",
-      "app/api/cron/route.ts",
-      "app/api/search/suggest/route.ts",
-      "docs/teams/T04_WORKER.md",
-      "lib/analytics.ts",
-      "scripts/search-workspace.ts",
-      "tests/queryBuilder.test.ts"
     ],
     "node": [
       "package-lock.json",
@@ -10961,15 +11201,6 @@
       "app/api/me/schedules/[id]/route.ts",
       "app/api/me/schedules/route.ts"
     ],
-    "schedules": [
-      "app/api/me/board/route.ts",
-      "app/api/me/schedules/[id]/route.ts",
-      "app/api/me/schedules/route.ts",
-      "docs/API.md",
-      "docs/PROJECT_STATUS.md",
-      "docs/teams/T08_MANAGER.md",
-      "reports/screen-api-sync-checklist.md"
-    ],
     "section": [
       "app/admin/page.tsx",
       "app/business/page.tsx",
@@ -10979,14 +11210,14 @@
       "app/trending/page.tsx",
       "tmp/check_mrblog.ts"
     ],
-    "smoke": [
-      "docs/DEPLOY_GUARDRAILS.md",
-      "docs/teams/T09_VALIDATION.md",
-      "reports/ci-summary.md",
-      "reports/smoke.json",
-      "scripts/ci/summarize-failures.js",
-      "scripts/refactor/validator.js",
-      "scripts/smoke.js"
+    "text-white": [
+      "app/admin/page.tsx",
+      "app/not-found.tsx",
+      "app/trending/page.tsx",
+      "components/AICuration.tsx",
+      "components/AnalyticsDashboard.tsx",
+      "components/PWAPrompt.tsx",
+      "components/ProUpgradeSection.tsx"
     ],
     "www": [
       "docs/CRAWLER_TOP20_RESEARCH_SPECS.md",
@@ -11013,6 +11244,22 @@
       "app/me/layout.tsx",
       "app/trending/layout.tsx"
     ],
+    "문서": [
+      "TEAM_CONTEXT.md",
+      "docs/AGENT_WORKFLOW.md",
+      "docs/ARCHITECTURE.md",
+      "docs/PROJECT_STATUS_NEXT_ACTIONS.md",
+      "docs/TEAM_CONTEXT.md",
+      "docs/teams/T10_OBSERVABILITY.md"
+    ],
+    "자동": [
+      "WORKSPACE_SEARCH_GUIDE.md",
+      "docs/AGENT_PROTOCOLS.md",
+      "docs/COMMAND_CENTER.md",
+      "docs/teams/T03_DATABASE.md",
+      "docs/teams/T07_FRONTEND.md",
+      "docs/teams/T09_VALIDATION.md"
+    ],
     "지도": [
       "app/campaigns/layout.tsx",
       "app/layout.tsx",
@@ -11028,6 +11275,14 @@
       "docs/CRAWLER_TOP20_RESEARCH_SPECS.md",
       "docs/platforms-2026-expansion.md",
       "public/manifest.json"
+    ],
+    "화면": [
+      "TEAM_CONTEXT.md",
+      "docs/AGENT_WORKFLOW.md",
+      "docs/PROJECT_STATUS_NEXT_ACTIONS.md",
+      "docs/SESSION_HANDOFF.md",
+      "docs/teams/T07_FRONTEND.md",
+      "docs/teams/T08_MANAGER.md"
     ],
     "absoluteurl": [
       "sources/adapters/_shared.ts",
@@ -11077,14 +11332,6 @@
       "scripts/run-top20-agents.ts",
       "scripts/run-top20-phases.ts"
     ],
-    "campaign_type": [
-      "app/api/public/stats/route.ts",
-      "app/map/page.tsx",
-      "components/MapViewCompat.tsx",
-      "components/StatsBanner.tsx",
-      "sources/types.ts",
-      "tests/queryBuilder.test.ts"
-    ],
     "channel": [
       "app/api/me/notification-channels/route.ts",
       "app/api/me/notifications/route.ts",
@@ -11101,12 +11348,12 @@
       "reports/workspace-index.md",
       "tmp/test_revu.ts"
     ],
-    "config": [
-      "docs/FAST_FIX_GUIDELINES.md",
-      "next-env.d.ts",
+    "default": [
+      "app/campaigns/page.tsx",
+      "app/loading.tsx",
+      "app/trending/layout.tsx",
+      "components/MapViewCompat.tsx",
       "next.config.ts",
-      "scripts/deploy-target-check.js",
-      "tmp/check_db.ts",
       "vitest.config.ts"
     ],
     "delete": [
@@ -11133,14 +11380,6 @@
       "tmp/test_dq.ts",
       "tmp/verify_dq_adapter.ts"
     ],
-    "ext": [
-      "reports/workspace-index-full.json",
-      "reports/workspace-index-lean.json",
-      "reports/workspace-index.json",
-      "reports/workspace-search-bench.json",
-      "scripts/build-workspace-index.ts",
-      "scripts/clean-tmp-artifacts.js"
-    ],
     "fetcher": [
       "lib/fetcher.ts",
       "test-extract.ts",
@@ -11157,6 +11396,14 @@
       "tmp/test_revu.ts",
       "tmp/test_revu_list.ts"
     ],
+    "implemented": [
+      "docs/API.md",
+      "docs/teams/T06_ANALYTICS.md",
+      "docs/teams/T08_MANAGER.md",
+      "docs/teams/T10_OBSERVABILITY.md",
+      "scripts/api-contract-audit.js",
+      "scripts/api-contract-sync-audit.js"
+    ],
     "lat": [
       "app/api/campaigns/route.ts",
       "components/CampaignQuickActions.tsx",
@@ -11165,13 +11412,29 @@
       "scripts/seed.ts",
       "sources/types.ts"
     ],
-    "line": [
-      "reports/refactor-analysis.json",
-      "scripts/api-contract-audit.js",
-      "scripts/api-contract-sync-audit.js",
-      "scripts/ci/summarize-failures.js",
-      "scripts/refactor/analyzer.js",
-      "scripts/sync_notion_index.js"
+    "lean": [
+      "WORKSPACE_SEARCH_GUIDE.md",
+      "reports/workspace-index-lean.json",
+      "reports/workspace-index.md",
+      "reports/workspace-search-bench.json",
+      "reports/workspace-search-bench.md",
+      "scripts/search-workspace.ts"
+    ],
+    "limit": [
+      "app/api/admin/runs/route.ts",
+      "app/api/cron/route.ts",
+      "app/api/search/suggest/route.ts",
+      "docs/teams/T04_WORKER.md",
+      "lib/analytics.ts",
+      "tests/queryBuilder.test.ts"
+    ],
+    "lint": [
+      "docs/FAST_FIX_GUIDELINES.md",
+      "reports/PROJECT_SCORECARD_2026-03-06.md",
+      "reports/agent-qa-summary.md",
+      "reports/agent-review-summary.md",
+      "scripts/agent-gate.js",
+      "scripts/refactor/validator.js"
     ],
     "lng": [
       "app/api/campaigns/route.ts",
@@ -11205,6 +11468,22 @@
       "docs/teams/T09_VALIDATION.md",
       "docs/teams/T10_OBSERVABILITY.md"
     ],
+    "mode": [
+      "lib/search/searchUtils.ts",
+      "reports/workspace-search-bench.json",
+      "scripts/agent-gate.js",
+      "scripts/benchmark-workspace-search.ts",
+      "scripts/build-workspace-index.ts",
+      "scripts/search-workspace.ts"
+    ],
+    "report": [
+      "docs/AUTONOMOUS_HOURLY_REPORT.md",
+      "reports/agent-qa-summary.md",
+      "reports/agent-review-summary.md",
+      "scripts/api-contract-audit.js",
+      "scripts/api-contract-sync-audit.js",
+      "scripts/benchmark-workspace-search.ts"
+    ],
     "rounded-xl": [
       "app/business/apply/page.tsx",
       "app/error.tsx",
@@ -11213,13 +11492,13 @@
       "components/AddToScheduleButton.tsx",
       "components/CsvUploadFallback.tsx"
     ],
-    "tags": [
-      "reports/workspace-index-full.json",
-      "reports/workspace-index-lean.json",
-      "reports/workspace-index.json",
-      "reports/workspace-search-bench.json",
-      "scripts/build-workspace-index.ts",
-      "sources/adapters/generic.ts"
+    "stats": [
+      "app/api/admin/analytics/stats/route.ts",
+      "app/api/public/stats/route.ts",
+      "components/StatsBanner.tsx",
+      "reports/api-contract-audit.md",
+      "reports/api-contract-sync-audit.md",
+      "scripts/aggregate-stats.ts"
     ],
     "tests": [
       "reports/ci-summary.md",
@@ -11228,14 +11507,6 @@
       "tests/ingest.fixture.test.ts",
       "tests/normalize.test.ts",
       "tests/queryBuilder.test.ts"
-    ],
-    "text-white": [
-      "app/admin/page.tsx",
-      "app/not-found.tsx",
-      "components/AICuration.tsx",
-      "components/AnalyticsDashboard.tsx",
-      "components/PWAPrompt.tsx",
-      "components/ProUpgradeSection.tsx"
     ],
     "text-xs": [
       "app/me/calendar/page.tsx",
@@ -11253,20 +11524,12 @@
       "scripts/run-top20-agents.ts",
       "scripts/run-top20-phases.ts"
     ],
-    "unknown": [
-      "app/api/jobs/route.ts",
-      "app/api/me/notifications/route.ts",
-      "lib/db.ts",
-      "lib/fetcher.ts",
-      "reports/eslint.json",
-      "sources/adapters/revu.ts"
-    ],
-    "자동": [
-      "docs/AGENT_PROTOCOLS.md",
-      "docs/COMMAND_CENTER.md",
-      "docs/teams/T03_DATABASE.md",
-      "docs/teams/T07_FRONTEND.md",
-      "docs/teams/T09_VALIDATION.md"
+    "시간": [
+      ".agents/skills/ROI_LOGIC.md",
+      "docs/AGENT_WORKFLOW.md",
+      "docs/SCRAPERS.md",
+      "docs/TEAM_CONTEXT.md",
+      "docs/teams/T06_ANALYTICS.md"
     ],
     "점검": [
       "docs/AUTONOMOUS_HOURLY_REPORT.md",
@@ -11275,26 +11538,12 @@
       "docs/SCRAPERS.md",
       "scripts/autonomous-ops-loop.ts"
     ],
-    "정합성": [
-      "docs/AGENT_WORKFLOW.md",
-      "docs/AUTONOMOUS_HOURLY_REPORT.md",
-      "docs/AUTONOMOUS_REVIEW_WORKLIST.md",
-      "docs/AUTONOMOUS_WORK_POOL.md",
-      "docs/TEAM_CONTEXT.md"
-    ],
     "중복": [
       "TEAM_CONTEXT.md",
       "docs/AUTONOMOUS_HOURLY_REPORT.md",
       "docs/AUTONOMOUS_REVIEW_WORKLIST.md",
       "docs/AUTONOMOUS_WORK_POOL.md",
       "docs/teams/T02_NORMALIZER.md"
-    ],
-    "화면": [
-      "TEAM_CONTEXT.md",
-      "docs/PROJECT_STATUS_NEXT_ACTIONS.md",
-      "docs/SESSION_HANDOFF.md",
-      "docs/teams/T07_FRONTEND.md",
-      "docs/teams/T08_MANAGER.md"
     ],
     "actual": [
       "reports/api-contract-audit.md",
@@ -11303,6 +11552,20 @@
       "scripts/api-contract-sync-audit.js",
       "test-cron.ts"
     ],
+    "audit": [
+      "reports/PROJECT_SCORECARD_2026-03-06.md",
+      "reports/api-contract-audit.md",
+      "reports/api-contract-sync-audit.md",
+      "scripts/api-contract-audit.js",
+      "scripts/api-contract-sync-audit.js"
+    ],
+    "campaign_type": [
+      "app/api/public/stats/route.ts",
+      "app/map/page.tsx",
+      "components/MapViewCompat.tsx",
+      "sources/types.ts",
+      "tests/queryBuilder.test.ts"
+    ],
     "content": [
       "scripts/guard.js",
       "scripts/refactor/analyzer.js",
@@ -11310,19 +11573,12 @@
       "scripts/sync_notion_index.js",
       "tmp/find_key.ts"
     ],
-    "create": [
-      "app/api/analytics/log/route.ts",
-      "prisma/seed.ts",
-      "reports/refactor-analysis.json",
-      "tests/dedupe.test.ts",
-      "tmp/test_action_log.ts"
-    ],
-    "creators": [
-      "app/api/admin/creators/[id]/route.ts",
-      "app/api/admin/creators/autologin/route.ts",
-      "app/api/admin/creators/route.ts",
-      "docs/API.md",
-      "reports/workspace-index.md"
+    "contract": [
+      "reports/PROJECT_SCORECARD_2026-03-06.md",
+      "reports/api-contract-audit.md",
+      "reports/api-contract-sync-audit.md",
+      "scripts/api-contract-audit.js",
+      "scripts/api-contract-sync-audit.js"
     ],
     "deploy": [
       "docs/DEPLOY_GUARDRAILS.md",
@@ -11331,15 +11587,8 @@
       "scripts/deploy-env-check.js",
       "scripts/deploy-target-check.js"
     ],
-    "desc": [
-      "app/api/campaigns/[id]/related/route.ts",
-      "app/api/campaigns/[id]/route.ts",
-      "lib/analytics.ts",
-      "lib/queryBuilder.ts",
-      "reports/eslint.json"
-    ],
     "entry": [
-      "app/me/notifications/page.tsx",
+      "scripts/api-contract-audit.js",
       "scripts/build-workspace-index.ts",
       "scripts/clean-tmp-artifacts.js",
       "scripts/refactor/analyzer.js",
@@ -11352,12 +11601,12 @@
       "tests/normalize.test.ts",
       "tests/queryBuilder.test.ts"
     ],
-    "fallback": [
-      "docs/COMMAND_CENTER.md",
-      "docs/PAGE_SPECS.md",
-      "scripts/wait-for-health.js",
-      "sources/adapters/_shared.ts",
-      "test-scrapers.ts"
+    "ext": [
+      "reports/workspace-index-full.json",
+      "reports/workspace-index-lean.json",
+      "reports/workspace-index.json",
+      "scripts/build-workspace-index.ts",
+      "scripts/clean-tmp-artifacts.js"
     ],
     "found": [
       "app/api/campaigns/[id]/route.ts",
@@ -11366,19 +11615,12 @@
       "tmp/find_key.ts",
       "tmp/verify_revu.ts"
     ],
-    "hash": [
-      "components/AdminSectionNav.tsx",
-      "reports/workspace-index-full.json",
-      "reports/workspace-index-lean.json",
-      "reports/workspace-index.json",
-      "reports/workspace-search-bench.json"
-    ],
-    "mode": [
-      "WORKSPACE_SEARCH_GUIDE.md",
-      "lib/search/searchUtils.ts",
-      "scripts/agent-gate.js",
-      "scripts/benchmark-workspace-search.ts",
-      "scripts/build-workspace-index.ts"
+    "line": [
+      "reports/refactor-analysis.json",
+      "scripts/api-contract-audit.js",
+      "scripts/ci/summarize-failures.js",
+      "scripts/refactor/analyzer.js",
+      "scripts/sync_notion_index.js"
     ],
     "nextrequest": [
       "app/api/campaigns/[id]/related/route.ts",
@@ -11401,19 +11643,19 @@
       "scripts/autonomous-ops-loop.ts",
       "sources/scraperHealth.ts"
     ],
-    "ops": [
-      "docs/AGENT_WORKFLOW.md",
-      "docs/TEAM_CONTEXT.md",
-      "logs/autonomous/autonomous-ops-2026-03-03T16-10-04-089Z.json",
-      "logs/autonomous/autonomous-ops-2026-03-04T01-17-22-612Z.json",
-      "scripts/autonomous-ops-loop.ts"
+    "pass": [
+      "docs/ROLE_BASED_TEST_SCENARIOS.md",
+      "docs/SESSION_HANDOFF.md",
+      "reports/PROJECT_SCORECARD_2026-03-06.md",
+      "reports/agent-qa-summary.md",
+      "reports/agent-review-summary.md"
     ],
-    "planned": [
-      "docs/teams/T08_MANAGER.md",
-      "reports/api-contract-audit.md",
-      "reports/api-contract-sync-audit.md",
-      "scripts/api-contract-audit.js",
-      "scripts/api-contract-sync-audit.js"
+    "quality": [
+      "app/api/admin/quality/route.ts",
+      "app/system/page.tsx",
+      "docs/ROLE_BASED_TEST_SCENARIOS.md",
+      "docs/teams/T01_SCRAPER.md",
+      "reports/PROJECT_SCORECARD_2026-03-06.md"
     ],
     "reason": [
       "app/api/me/notification-channels/route.ts",
@@ -11422,13 +11664,6 @@
       "reports/smoke.json",
       "scripts/refactor/refactor-safe.js"
     ],
-    "report": [
-      "docs/AUTONOMOUS_HOURLY_REPORT.md",
-      "reports/agent-review-summary.md",
-      "scripts/api-contract-audit.js",
-      "scripts/api-contract-sync-audit.js",
-      "scripts/benchmark-workspace-search.ts"
-    ],
     "reviewnote": [
       "sources/adapters/reviewnote.ts",
       "test-cron.ts",
@@ -11436,25 +11671,11 @@
       "tmp/test_reviewnote_live.ts",
       "tmp/verify_reviewnote.ts"
     ],
-    "size": [
-      "reports/workspace-index-full.json",
-      "reports/workspace-index-lean.json",
-      "reports/workspace-index.json",
-      "reports/workspace-search-bench.json",
-      "scripts/build-workspace-index.ts"
-    ],
-    "skipped": [
-      "reports/agent-review-summary.md",
-      "reports/smoke.json",
-      "scripts/clean-tmp-artifacts.js",
-      "scripts/run-top20-phases.ts",
-      "scripts/start-ingestion.ts"
-    ],
     "summary": [
       "lib/adminAudit.ts",
+      "reports/agent-qa-summary.md",
       "reports/agent-review-summary.md",
       "reports/ci-summary.md",
-      "reports/workspace-search-bench.md",
       "scripts/run-top20-phases.ts"
     ],
     "sync": [
@@ -11464,25 +11685,26 @@
       "scripts/sync-platforms.ts",
       "scripts/sync_notion_index.js"
     ],
+    "t01": [
+      "docs/teams/T01_SCRAPER.md",
+      "logs/autonomous/autonomous-ops-2026-03-04T01-17-22-612Z.json",
+      "reports/agent-qa-summary.md",
+      "reports/agent-review-summary.md",
+      "reports/smoke.json"
+    ],
+    "tags": [
+      "reports/workspace-index-full.json",
+      "reports/workspace-index-lean.json",
+      "reports/workspace-index.json",
+      "scripts/build-workspace-index.ts",
+      "sources/adapters/generic.ts"
+    ],
     "testrevuapi": [
       "tmp/test_revu_api.ts",
       "tmp/test_revu_final.ts",
       "tmp/test_revu_key_x.ts",
       "tmp/test_revu_keys.ts",
       "tmp/test_revu_keys_app.ts"
-    ],
-    "usestate": [
-      "app/admin/page.tsx",
-      "app/me/console/page.tsx",
-      "app/trending/page.tsx",
-      "components/CsvUploadFallback.tsx",
-      "components/NavStats.tsx"
-    ],
-    "검증": [
-      "TEAM_CONTEXT.md",
-      "docs/AUTONOMOUS_WORK_POOL.md",
-      "docs/FUTURE_PHASE4_B2B2C_DIRECT_SPONSORSHIP.md",
-      "docs/SESSION_HANDOFF.md"
     ],
     "검토": [
       "docs/AUTONOMOUS_HOURLY_REPORT.md",
@@ -11514,12 +11736,6 @@
       "docs/EVOLUTION_LOG.md",
       "docs/SCRAPERS.md"
     ],
-    "시간": [
-      ".agents/skills/ROI_LOGIC.md",
-      "docs/SCRAPERS.md",
-      "docs/TEAM_CONTEXT.md",
-      "docs/teams/T06_ANALYTICS.md"
-    ],
     "시스템": [
       "app/system/layout.tsx",
       "docs/CONTEXT_ENGINE.md",
@@ -11532,11 +11748,23 @@
       "docs/teams/T07_FRONTEND.md",
       "logs/autonomous/autonomous-ops-2026-03-03T16-10-04-089Z.json"
     ],
+    "정합성": [
+      "docs/AUTONOMOUS_HOURLY_REPORT.md",
+      "docs/AUTONOMOUS_REVIEW_WORKLIST.md",
+      "docs/AUTONOMOUS_WORK_POOL.md",
+      "docs/TEAM_CONTEXT.md"
+    ],
     "acc": [
       "app/api/admin/analytics/stats/route.ts",
       "lib/adminAudit.ts",
       "scripts/refactor/analyzer.js",
       "tmp/find_dq_selector.ts"
+    ],
+    "actions": [
+      "app/api/admin/alerts/actions/route.ts",
+      "docs/PROJECT_STATUS_NEXT_ACTIONS.md",
+      "reports/api-contract-audit.md",
+      "reports/api-contract-sync-audit.md"
     ],
     "active": [
       "components/MeSectionNav.tsx",
@@ -11574,11 +11802,11 @@
       "tests/ingest.fixture.test.ts",
       "tmp/test_revu_key_x.ts"
     ],
-    "audit": [
-      "reports/api-contract-audit.md",
-      "reports/api-contract-sync-audit.md",
-      "scripts/api-contract-audit.js",
-      "scripts/api-contract-sync-audit.js"
+    "auto": [
+      "WORKSPACE_SEARCH_GUIDE.md",
+      "docs/ROLE_BASED_TEST_SCENARIOS.md",
+      "reports/workspace-search-bench.json",
+      "reports/workspace-search-bench.md"
     ],
     "bench": [
       "WORKSPACE_SEARCH_GUIDE.md",
@@ -11586,10 +11814,16 @@
       "reports/workspace-search-bench.json",
       "reports/workspace-search-bench.md"
     ],
+    "bohemianstudio": [
+      "reports/eslint.json",
+      "tmp/analyze_dq_text.ts",
+      "tmp/check_dq.ts",
+      "tmp/test_reviewnote_live.ts"
+    ],
     "build": [
-      "WORKSPACE_SEARCH_GUIDE.md",
       "build_output.txt",
       "docs/FAST_FIX_GUIDELINES.md",
+      "reports/agent-qa-summary.md",
       "scripts/build-workspace-index.ts"
     ],
     "business": [
@@ -11600,8 +11834,8 @@
     ],
     "candidates": [
       "app/api/search/suggest/route.ts",
+      "reports/workspace-search-bench.json",
       "reports/workspace-search-bench.md",
-      "scripts/benchmark-workspace-search.ts",
       "scripts/search-workspace.ts"
     ],
     "classes": [
@@ -11616,22 +11850,40 @@
       "lib/db.ts",
       "test-db.ts"
     ],
-    "contract": [
-      "reports/api-contract-audit.md",
-      "reports/api-contract-sync-audit.md",
-      "scripts/api-contract-audit.js",
-      "scripts/api-contract-sync-audit.js"
+    "create": [
+      "prisma/seed.ts",
+      "reports/refactor-analysis.json",
+      "tests/dedupe.test.ts",
+      "tmp/test_action_log.ts"
+    ],
+    "desc": [
+      "app/api/campaigns/[id]/related/route.ts",
+      "app/api/campaigns/[id]/route.ts",
+      "lib/analytics.ts",
+      "lib/queryBuilder.ts"
+    ],
+    "duration": [
+      "logs/autonomous/autonomous-ops-2026-03-05T22-24-02-111Z.json",
+      "logs/autonomous/autonomous-ops-2026-03-05T22-25-31-711Z.json",
+      "reports/agent-qa-summary.md",
+      "reports/agent-review-summary.md"
+    ],
+    "durationminutes": [
+      "logs/autonomous/autonomous-ops-2026-03-05T22-24-02-111Z.json",
+      "logs/autonomous/autonomous-ops-2026-03-05T22-25-31-711Z.json",
+      "package.json",
+      "scripts/run-top20-agents.ts"
     ],
     "fail": [
-      "reports/agent-review-summary.md",
-      "reports/api-contract-audit.md",
+      "docs/ROLE_BASED_TEST_SCENARIOS.md",
+      "reports/PROJECT_SCORECARD_2026-03-06.md",
       "scripts/api-contract-sync-audit.js",
       "scripts/deploy-target-check.js"
     ],
     "failures": [
-      "reports/api-contract-sync-audit.md",
       "scripts/api-contract-audit.js",
       "scripts/api-contract-sync-audit.js",
+      "scripts/benchmark-workspace-search.ts",
       "scripts/ci/summarize-failures.js"
     ],
     "fetchlist": [
@@ -11640,17 +11892,35 @@
       "tmp/verify_dq_adapter.ts",
       "tmp/verify_reviewnote.ts"
     ],
+    "filepath": [
+      "reports/eslint.json",
+      "scripts/derive-page-improvements.ts",
+      "scripts/guard.js",
+      "scripts/refactor/refactor-safe.js"
+    ],
     "gap-2": [
       "components/AnalyticsDashboard.tsx",
       "components/HeroSearch.tsx",
       "components/ListSkeleton.tsx",
       "components/SystemSectionNav.tsx"
     ],
+    "gate": [
+      "reports/agent-qa-summary.md",
+      "reports/agent-review-summary.md",
+      "reports/ci-summary.md",
+      "scripts/agent-gate.js"
+    ],
     "getmissingenvvars": [
       "app/api/me/notifications/[id]/route.ts",
       "app/api/me/schedules/[id]/route.ts",
       "app/api/me/schedules/route.ts",
       "lib/runtimeEnv.ts"
+    ],
+    "hash": [
+      "components/AdminSectionNav.tsx",
+      "reports/workspace-index-full.json",
+      "reports/workspace-index-lean.json",
+      "reports/workspace-index.json"
     ],
     "health": [
       "app/api/health/route.ts",
@@ -11688,12 +11958,6 @@
       "scripts/derive-page-improvements.ts",
       "scripts/refactor/analyzer.js"
     ],
-    "lint": [
-      "docs/FAST_FIX_GUIDELINES.md",
-      "reports/agent-review-summary.md",
-      "scripts/agent-gate.js",
-      "scripts/refactor/validator.js"
-    ],
     "list": [
       "app/page.tsx",
       "reports/page-improvements.en.md",
@@ -11706,11 +11970,11 @@
       "test-rn.ts",
       "tmp/analyze_dq_text.ts"
     ],
-    "missing": [
-      "app/api/me/notification-channels/route.ts",
-      "lib/runtimeEnv.ts",
-      "reports/api-contract-audit.md",
-      "scripts/deploy-env-check.js"
+    "logs": [
+      "logs/autonomous/autonomous-ops-2026-03-03T16-10-04-089Z.json",
+      "logs/autonomous/autonomous-ops-2026-03-04T01-17-22-612Z.json",
+      "logs/autonomous/autonomous-ops-2026-03-05T22-24-02-111Z.json",
+      "logs/autonomous/autonomous-ops-2026-03-05T22-25-31-711Z.json"
     ],
     "motion": [
       "components/CampaignList.tsx",
@@ -11724,12 +11988,6 @@
       "tmp/dump_pages.ts",
       "tmp/test_mrblog.ts"
     ],
-    "mtime": [
-      "reports/workspace-index-full.json",
-      "reports/workspace-index-lean.json",
-      "reports/workspace-index.json",
-      "reports/workspace-search-bench.json"
-    ],
     "normalize": [
       "docs/teams/T01_SCRAPER.md",
       "docs/teams/T02_NORMALIZER.md",
@@ -11742,11 +12000,11 @@
       "sources/adapters/mrblog.ts",
       "sources/normalize.ts"
     ],
-    "not": [
+    "orderby": [
       "app/api/campaigns/[id]/related/route.ts",
-      "app/not-found.tsx",
-      "next-env.d.ts",
-      "reports/api-contract-audit.md"
+      "lib/analytics.ts",
+      "lib/queryBuilder.ts",
+      "tests/queryBuilder.test.ts"
     ],
     "package": [
       "package-lock.json",
@@ -11758,7 +12016,7 @@
       "components/AdminSectionNav.tsx",
       "components/MeSectionNav.tsx",
       "components/MobileNav.tsx",
-      "middleware.ts"
+      "proxy.ts"
     ],
     "pro": [
       "app/api/me/pro/route.ts",
@@ -11766,10 +12024,16 @@
       "docs/teams/T08_MANAGER.md",
       "reports/screen-api-sync-checklist.md"
     ],
+    "project": [
+      "docs/PROJECT_STATUS.md",
+      "docs/PROJECT_STATUS_NEXT_ACTIONS.md",
+      "reports/PROJECT_SCORECARD_2026-03-06.md",
+      "scripts/deploy-target-check.js"
+    ],
     "query": [
       "components/MobileNav.tsx",
       "lib/db.ts",
-      "scripts/benchmark-workspace-search.ts",
+      "reports/workspace-search-bench.json",
       "scripts/search-workspace.ts"
     ],
     "replace": [
@@ -11784,11 +12048,29 @@
       "components/NavStats.tsx",
       "components/PlatformManager.tsx"
     ],
-    "stats": [
-      "app/api/admin/analytics/stats/route.ts",
-      "app/api/public/stats/route.ts",
-      "components/StatsBanner.tsx",
-      "scripts/aggregate-stats.ts"
+    "routes": [
+      "reports/api-contract-audit.md",
+      "reports/api-contract-sync-audit.md",
+      "scripts/api-contract-audit.js",
+      "scripts/api-contract-sync-audit.js"
+    ],
+    "set": [
+      "app/api/search/suggest/route.ts",
+      "app/map/page.tsx",
+      "scripts/api-contract-sync-audit.js",
+      "scripts/build-workspace-index.ts"
+    ],
+    "size": [
+      "reports/workspace-index-full.json",
+      "reports/workspace-index-lean.json",
+      "reports/workspace-index.json",
+      "scripts/build-workspace-index.ts"
+    ],
+    "skipped": [
+      "reports/smoke.json",
+      "scripts/clean-tmp-artifacts.js",
+      "scripts/run-top20-phases.ts",
+      "scripts/start-ingestion.ts"
     ],
     "system": [
       "app/system/layout.tsx",
@@ -11796,29 +12078,35 @@
       "components/AdminSectionNav.tsx",
       "components/WorkspaceHubNav.tsx"
     ],
-    "terms": [
-      "reports/workspace-index-full.json",
-      "reports/workspace-index-lean.json",
-      "reports/workspace-index.json",
-      "reports/workspace-search-bench.json"
-    ],
     "tobe": [
       "tests/dedupe.test.ts",
       "tests/ingest.fixture.test.ts",
       "tests/normalize.test.ts",
       "tests/queryBuilder.test.ts"
     ],
-    "totalcampaigns": [
-      "app/api/public/stats/route.ts",
-      "components/AnalyticsDashboard.tsx",
-      "components/NavStats.tsx",
-      "components/StatsBanner.tsx"
+    "typecheck": [
+      "reports/agent-qa-summary.md",
+      "reports/agent-review-summary.md",
+      "reports/ci-summary.md",
+      "scripts/refactor/validator.js"
     ],
     "types": [
       "docs/NOTES_AGENT_QUEUE.md",
       "next-env.d.ts",
       "sources/types.ts",
       "tsconfig.json"
+    ],
+    "uppercase": [
+      "app/campaigns/[id]/page.tsx",
+      "components/AICuration.tsx",
+      "components/ManagerDashboard.tsx",
+      "components/PlatformManager.tsx"
+    ],
+    "usestate": [
+      "app/admin/page.tsx",
+      "app/trending/page.tsx",
+      "components/CsvUploadFallback.tsx",
+      "components/NavStats.tsx"
     ],
     "verify": [
       "docs/FAST_FIX_GUIDELINES.md",
@@ -11838,8 +12126,13 @@
       "app/system/layout.tsx",
       "components/WorkspaceHubNav.tsx"
     ],
-    "구현": [
-      ".agent/workflows/README.md",
+    "검증": [
+      "TEAM_CONTEXT.md",
+      "docs/AUTONOMOUS_WORK_POOL.md",
+      "docs/FUTURE_PHASE4_B2B2C_DIRECT_SPONSORSHIP.md"
+    ],
+    "고도화": [
+      "docs/AGENT_WORKFLOW.md",
       "docs/EVOLUTION_LOG.md",
       "docs/SESSION_HANDOFF.md"
     ],
@@ -11848,20 +12141,10 @@
       "docs/FUTURE_PHASE4_B2B2C_DIRECT_SPONSORSHIP.md",
       "docs/teams/T06_ANALYTICS.md"
     ],
-    "기본": [
-      "README.md",
-      "docs/SCRAPERS.md",
-      "reports/page-improvements.md"
-    ],
     "다음": [
       "TEAM_CONTEXT.md",
       "docs/AGENT_PROTOCOLS.md",
       "logs/autonomous/autonomous-ops-2026-03-03T16-10-04-089Z.json"
-    ],
-    "대비": [
-      ".agents/skills/ROI_LOGIC.md",
-      "docs/teams/T06_ANALYTICS.md",
-      "reports/page-improvements.md"
     ],
     "로그": [
       "docs/AUTONOMOUS_HOURLY_REPORT.md",
@@ -11943,20 +12226,25 @@
       "app/api/me/revenue/route.ts",
       "app/api/me/schedules/route.ts"
     ],
+    "alias": [
+      "scripts/deploy-target-check.js",
+      "scripts/search-workspace.ts",
+      "vitest.config.ts"
+    ],
     "apply": [
       "app/business/apply/layout.tsx",
       "app/business/apply/page.tsx",
       "reports/refactor-apply.json"
     ],
-    "architecture": [
-      "docs/AGENT_MIGRATION_GUIDE.md",
-      "docs/ARCHITECTURE.md",
-      "reports/api-contract-sync-audit.md"
-    ],
     "auth": [
       "app/api/admin/creators/autologin/route.ts",
       "app/api/admin/creators/route.ts",
       "docs/teams/T08_MANAGER.md"
+    ],
+    "autologin": [
+      "app/api/admin/creators/autologin/route.ts",
+      "reports/api-contract-audit.md",
+      "reports/api-contract-sync-audit.md"
     ],
     "base_url": [
       "prisma/seed.ts",
@@ -11968,11 +12256,6 @@
       "components/CampaignQuickActions.tsx",
       "components/PWAPrompt.tsx"
     ],
-    "bohemianstudio": [
-      "tmp/analyze_dq_text.ts",
-      "tmp/check_dq.ts",
-      "tmp/test_reviewnote_live.ts"
-    ],
     "border-slate-200": [
       "app/business/apply/page.tsx",
       "app/me/page.tsx",
@@ -11982,56 +12265,6 @@
       "app/api/analytics/log/route.ts",
       "app/api/me/schedules/route.ts",
       "tmp/test_action_log.ts"
-    ],
-    "campaign-item": [
-      "tmp/test_reviewnote.ts",
-      "tmp/test_revu_list.ts",
-      "tmp/verify_revu.ts"
-    ],
-    "card": [
-      "scripts/revu-test.js",
-      "tmp/analyze_dq_text.ts",
-      "tmp/test_revu.js"
-    ],
-    "cards": [
-      "tmp/analyze_dq.ts",
-      "tmp/analyze_dq_text.ts",
-      "tmp/test_revu.js"
-    ],
-    "chrome": [
-      "test-revu.ts",
-      "tmp/check_dq.ts",
-      "tmp/test_reviewnote_live.ts"
-    ],
-    "command": [
-      "docs/COMMAND_CENTER.md",
-      "scripts/refactor/multi-agent-loop.js",
-      "scripts/refactor/validator.js"
-    ],
-    "context": [
-      "TEAM_CONTEXT.md",
-      "docs/CONTEXT_ENGINE.md",
-      "docs/TEAM_CONTEXT.md"
-    ],
-    "cycle": [
-      "logs/autonomous/autonomous-ops-2026-03-03T16-10-04-089Z.json",
-      "scripts/autonomous-ops-loop.ts",
-      "scripts/run-top20-phases.ts"
-    ],
-    "deadline_date": [
-      "app/api/me/board/route.ts",
-      "app/api/me/schedules/[id]/route.ts",
-      "app/api/me/schedules/route.ts"
-    ],
-    "each": [
-      "tmp/analyze_dq_text.ts",
-      "tmp/check_mrblog.ts",
-      "tmp/dump_pages.ts"
-    ],
-    "entries": [
-      "lib/search/queryEnhancer.ts",
-      "scripts/clean-tmp-artifacts.js",
-      "sources/scraperHealth.ts"
     ]
   }
 }

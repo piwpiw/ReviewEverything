@@ -1,10 +1,10 @@
 {
   "version": 3,
   "mode": "lean",
-  "generatedAt": "2026-03-05T07:14:31.606Z",
+  "generatedAt": "2026-03-06T02:01:12.901Z",
   "root": "D:/BohemianStudio/ReviewEverything/apps/web",
-  "totalFiles": 250,
-  "totalBytes": 1608808,
+  "totalFiles": 254,
+  "totalBytes": 1640985,
   "files": [
     {
       "path": ".agent/skills/README.md",
@@ -94,9 +94,9 @@
     {
       "path": "app/admin/page.tsx",
       "ext": ".tsx",
-      "size": 26390,
-      "mtime": "2026-03-04T23:27:35.352Z",
-      "hash": "356f7e07b16a",
+      "size": 26950,
+      "mtime": "2026-03-05T08:52:56.132Z",
+      "hash": "f9536862fd87",
       "tags": [
         "app",
         "code"
@@ -107,10 +107,10 @@
         "tsx",
         "classname",
         "div",
-        "message",
         "border",
+        "message",
         "font-black",
-        "status"
+        "span"
       ]
     },
     {
@@ -287,9 +287,9 @@
     {
       "path": "app/api/admin/platforms/[id]/route.ts",
       "ext": ".ts",
-      "size": 964,
-      "mtime": "2026-03-02T05:52:09.078Z",
-      "hash": "9b9b51480a72",
+      "size": 1099,
+      "mtime": "2026-03-06T01:17:25.118Z",
+      "hash": "7d42adbc0fc8",
       "tags": [
         "app",
         "code"
@@ -311,9 +311,9 @@
     {
       "path": "app/api/admin/platforms/route.ts",
       "ext": ".ts",
-      "size": 1937,
-      "mtime": "2026-03-02T17:05:23.023Z",
-      "hash": "79cda200a999",
+      "size": 2076,
+      "mtime": "2026-03-06T01:17:01.255Z",
+      "hash": "36db878aff8d",
       "tags": [
         "app",
         "code"
@@ -324,8 +324,8 @@
         "app",
         "platforms",
         "route",
-        "url",
         "error",
+        "url",
         "platform",
         "json",
         "name",
@@ -383,9 +383,9 @@
     {
       "path": "app/api/analytics/log/route.ts",
       "ext": ".ts",
-      "size": 799,
-      "mtime": "2026-03-02T04:26:03.155Z",
-      "hash": "e29a2c1c64f5",
+      "size": 925,
+      "mtime": "2026-03-06T01:17:01.255Z",
+      "hash": "64a489e6d068",
       "tags": [
         "app",
         "code"
@@ -1085,9 +1085,9 @@
     {
       "path": "app/map/page.tsx",
       "ext": ".tsx",
-      "size": 1611,
-      "mtime": "2026-03-05T05:02:45.707Z",
-      "hash": "a39721cfc98e",
+      "size": 1615,
+      "mtime": "2026-03-06T00:32:03.380Z",
+      "hash": "fa123b79f19b",
       "tags": [
         "app",
         "code"
@@ -1100,16 +1100,15 @@
         "params",
         "searchparams",
         "campaign_type",
-        "set",
-        "key"
+        "set"
       ]
     },
     {
       "path": "app/me/calendar/page.tsx",
       "ext": ".tsx",
-      "size": 6383,
-      "mtime": "2026-03-04T23:23:35.840Z",
-      "hash": "12d8536a1e20",
+      "size": 6730,
+      "mtime": "2026-03-05T08:53:32.830Z",
+      "hash": "bd183b29147c",
       "tags": [
         "app",
         "code"
@@ -1123,15 +1122,15 @@
         "div",
         "focus-visible",
         "font-black",
-        "link"
+        "캘린더"
       ]
     },
     {
       "path": "app/me/console/page.tsx",
       "ext": ".tsx",
-      "size": 16536,
-      "mtime": "2026-03-04T23:29:48.507Z",
-      "hash": "60ad438a242b",
+      "size": 16506,
+      "mtime": "2026-03-06T00:39:57.106Z",
+      "hash": "33146e1cb2d6",
       "tags": [
         "app",
         "code"
@@ -1143,8 +1142,8 @@
         "classname",
         "dark",
         "div",
-        "status",
         "font-black",
+        "status",
         "span"
       ]
     },
@@ -1172,9 +1171,9 @@
     {
       "path": "app/me/notifications/page.tsx",
       "ext": ".tsx",
-      "size": 20301,
-      "mtime": "2026-03-04T23:27:04.452Z",
-      "hash": "48b9387b1fe3",
+      "size": 20975,
+      "mtime": "2026-03-05T08:53:05.931Z",
+      "hash": "58cb53b4a0ed",
       "tags": [
         "app",
         "code"
@@ -1187,16 +1186,16 @@
         "div",
         "dark",
         "status",
-        "string",
-        "payload"
+        "flex",
+        "string"
       ]
     },
     {
       "path": "app/me/page.tsx",
       "ext": ".tsx",
-      "size": 13159,
-      "mtime": "2026-03-05T05:02:29.285Z",
-      "hash": "d5922dc335e8",
+      "size": 12429,
+      "mtime": "2026-03-06T00:38:21.179Z",
+      "hash": "0a355842f92b",
       "tags": [
         "app",
         "code"
@@ -1347,9 +1346,9 @@
     {
       "path": "app/trending/page.tsx",
       "ext": ".tsx",
-      "size": 10882,
-      "mtime": "2026-03-04T23:26:45.364Z",
-      "hash": "008bcba13053",
+      "size": 11098,
+      "mtime": "2026-03-06T00:39:22.950Z",
+      "hash": "3050af70aa92",
       "tags": [
         "app",
         "code"
@@ -1362,8 +1361,8 @@
         "div",
         "item",
         "dark",
-        "section",
-        "focus-visible"
+        "focus-visible",
+        "font-black"
       ]
     },
     {
@@ -1468,9 +1467,9 @@
     {
       "path": "components/CampaignCard.tsx",
       "ext": ".tsx",
-      "size": 11311,
-      "mtime": "2026-03-04T08:58:40.447Z",
-      "hash": "0e2ae0b01e54",
+      "size": 11629,
+      "mtime": "2026-03-06T00:35:18.017Z",
+      "hash": "c5c4f65c1537",
       "tags": [
         "code"
       ],
@@ -1489,9 +1488,9 @@
     {
       "path": "components/CampaignList.tsx",
       "ext": ".tsx",
-      "size": 12279,
-      "mtime": "2026-03-04T08:59:26.725Z",
-      "hash": "83797f38e9d3",
+      "size": 12281,
+      "mtime": "2026-03-06T00:37:54.762Z",
+      "hash": "a80a835e0ec3",
       "tags": [
         "code"
       ],
@@ -1510,9 +1509,9 @@
     {
       "path": "components/CampaignListRow.tsx",
       "ext": ".tsx",
-      "size": 8555,
-      "mtime": "2026-03-04T08:57:46.631Z",
-      "hash": "78efcd897b9a",
+      "size": 8886,
+      "mtime": "2026-03-06T00:35:58.326Z",
+      "hash": "e10e664fe979",
       "tags": [
         "code"
       ],
@@ -1522,8 +1521,8 @@
         "tsx",
         "campaign",
         "classname",
-        "dark",
         "string",
+        "dark",
         "div",
         "span"
       ]
@@ -1804,9 +1803,9 @@
     {
       "path": "components/PlatformManager.tsx",
       "ext": ".tsx",
-      "size": 13113,
-      "mtime": "2026-03-04T08:28:01.794Z",
-      "hash": "1ffffb6347ae",
+      "size": 14305,
+      "mtime": "2026-03-06T00:36:37.001Z",
+      "hash": "e0443b0e1732",
       "tags": [
         "code"
       ],
@@ -1819,7 +1818,7 @@
         "platform",
         "error",
         "font-black",
-        "res"
+        "text-"
       ]
     },
     {
@@ -1909,9 +1908,9 @@
     {
       "path": "components/SearchGuidePanel.tsx",
       "ext": ".tsx",
-      "size": 4209,
-      "mtime": "2026-03-04T09:54:13.747Z",
-      "hash": "2873b2ce66d6",
+      "size": 4267,
+      "mtime": "2026-03-06T00:31:43.319Z",
+      "hash": "bed270d5d292",
       "tags": [
         "code"
       ],
@@ -1924,7 +1923,7 @@
         "div",
         "font-black",
         "text-sm",
-        "지역"
+        "border"
       ]
     },
     {
@@ -1951,9 +1950,9 @@
     {
       "path": "components/StatsBanner.tsx",
       "ext": ".tsx",
-      "size": 5609,
-      "mtime": "2026-03-02T13:00:05.855Z",
-      "hash": "6e4ee8adfdfe",
+      "size": 5243,
+      "mtime": "2026-03-06T00:40:02.373Z",
+      "hash": "13cbc157ba97",
       "tags": [
         "code"
       ],
@@ -1963,10 +1962,10 @@
         "tsx",
         "div",
         "classname",
-        "count",
-        "dark",
         "motion",
-        "name"
+        "dark",
+        "span",
+        "stats"
       ]
     },
     {
@@ -2097,9 +2096,9 @@
     {
       "path": "docs/AGENT_WORKFLOW.md",
       "ext": ".md",
-      "size": 13872,
-      "mtime": "2026-03-05T01:42:04.869Z",
-      "hash": "8474e04d9f12",
+      "size": 14149,
+      "mtime": "2026-03-05T22:18:38.338Z",
+      "hash": "e593a32ed7d2",
       "tags": [
         "doc"
       ],
@@ -2109,18 +2108,18 @@
         "workflow",
         "api",
         "get",
-        "운영",
-        "admin",
         "npm",
-        "run"
+        "run",
+        "운영",
+        "admin"
       ]
     },
     {
       "path": "docs/API.md",
       "ext": ".md",
-      "size": 3840,
-      "mtime": "2026-03-03T09:29:29.179Z",
-      "hash": "d3e8896a6682",
+      "size": 4368,
+      "mtime": "2026-03-06T00:23:40.676Z",
+      "hash": "1d97fc995ec6",
       "tags": [
         "doc"
       ],
@@ -2156,9 +2155,9 @@
     {
       "path": "docs/AUTONOMOUS_HOURLY_REPORT.md",
       "ext": ".md",
-      "size": 41469,
-      "mtime": "2026-03-04T06:17:23.129Z",
-      "hash": "0954ae39ca2c",
+      "size": 43679,
+      "mtime": "2026-03-05T22:26:31.718Z",
+      "hash": "5b20132534ba",
       "tags": [
         "doc"
       ],
@@ -2464,9 +2463,9 @@
     {
       "path": "docs/PROJECT_STATUS_NEXT_ACTIONS.md",
       "ext": ".md",
-      "size": 39244,
-      "mtime": "2026-03-04T00:17:03.066Z",
-      "hash": "251dbd18818f",
+      "size": 44367,
+      "mtime": "2026-03-06T00:40:31.743Z",
+      "hash": "e132a9f2654b",
       "tags": [
         "doc"
       ],
@@ -2478,8 +2477,8 @@
         "status",
         "api",
         "get",
-        "상태",
         "admin",
+        "상태",
         "실행",
         "운영"
       ]
@@ -2487,9 +2486,9 @@
     {
       "path": "docs/PROJECT_STATUS.md",
       "ext": ".md",
-      "size": 30012,
-      "mtime": "2026-03-02T03:10:43.985Z",
-      "hash": "622261654c4e",
+      "size": 29962,
+      "mtime": "2026-03-06T00:25:10.116Z",
+      "hash": "f711abf742db",
       "tags": [
         "doc"
       ],
@@ -2527,6 +2526,29 @@
       ]
     },
     {
+      "path": "docs/ROLE_BASED_TEST_SCENARIOS.md",
+      "ext": ".md",
+      "size": 4599,
+      "mtime": "2026-03-05T15:39:16.696Z",
+      "hash": "e9ad1b736407",
+      "tags": [
+        "doc"
+      ],
+      "terms": [
+        "based",
+        "docs",
+        "role",
+        "scenarios",
+        "test",
+        "manual",
+        "partial",
+        "npm",
+        "run",
+        "fail",
+        "auto"
+      ]
+    },
+    {
       "path": "docs/SCRAPERS.md",
       "ext": ".md",
       "size": 8049,
@@ -2549,9 +2571,9 @@
     {
       "path": "docs/SESSION_HANDOFF.md",
       "ext": ".md",
-      "size": 5517,
-      "mtime": "2026-03-05T04:52:33.736Z",
-      "hash": "d0bb5b73d5e2",
+      "size": 5724,
+      "mtime": "2026-03-06T01:26:40.267Z",
+      "hash": "b2fdd706c96d",
       "tags": [
         "doc"
       ],
@@ -2560,10 +2582,11 @@
         "handoff",
         "session",
         "session_handoff",
+        "gemini",
+        "완료",
         "claude",
         "codex",
-        "gemini",
-        "고도화"
+        "app"
       ]
     },
     {
@@ -2634,9 +2657,9 @@
     {
       "path": "docs/teams/T03_DATABASE.md",
       "ext": ".md",
-      "size": 2000,
-      "mtime": "2026-02-28T16:38:24.548Z",
-      "hash": "315bd6d44381",
+      "size": 1998,
+      "mtime": "2026-03-06T00:24:12.475Z",
+      "hash": "fb0fef3c9e0f",
       "tags": [
         "doc"
       ],
@@ -2743,9 +2766,9 @@
     {
       "path": "docs/teams/T08_MANAGER.md",
       "ext": ".md",
-      "size": 3772,
-      "mtime": "2026-03-02T03:31:51.665Z",
-      "hash": "7a1206809438",
+      "size": 3774,
+      "mtime": "2026-03-06T00:24:07.086Z",
+      "hash": "92f09a339e92",
       "tags": [
         "doc"
       ],
@@ -3026,6 +3049,26 @@
       ]
     },
     {
+      "path": "lib/platformDisplay.ts",
+      "ext": ".ts",
+      "size": 2744,
+      "mtime": "2026-03-06T00:34:36.179Z",
+      "hash": "2f67e3d904bd",
+      "tags": [
+        "code"
+      ],
+      "terms": [
+        "lib",
+        "platformdisplay",
+        "dark",
+        "key",
+        "string",
+        "badgeclassname",
+        "dotcolor",
+        "label"
+      ]
+    },
+    {
       "path": "lib/queryBuilder.ts",
       "ext": ".ts",
       "size": 4242,
@@ -3148,25 +3191,6 @@
       ]
     },
     {
-      "path": "middleware.ts",
-      "ext": ".ts",
-      "size": 4103,
-      "mtime": "2026-03-04T07:51:34.477Z",
-      "hash": "d270bcfcf29e",
-      "tags": [
-        "code"
-      ],
-      "terms": [
-        "middleware",
-        "admin",
-        "nextresponse",
-        "api",
-        "headers",
-        "next",
-        "status"
-      ]
-    },
-    {
       "path": "next-env.d.ts",
       "ext": ".ts",
       "size": 247,
@@ -3224,30 +3248,70 @@
       ]
     },
     {
+      "path": "proxy.ts",
+      "ext": ".ts",
+      "size": 4098,
+      "mtime": "2026-03-06T01:15:31.797Z",
+      "hash": "d50e01174e22",
+      "tags": [
+        "code"
+      ],
+      "terms": [
+        "proxy",
+        "admin",
+        "nextresponse",
+        "api",
+        "headers",
+        "next",
+        "status"
+      ]
+    },
+    {
       "path": "README.md",
       "ext": ".md",
-      "size": 9528,
-      "mtime": "2026-03-03T09:31:48.646Z",
-      "hash": "0e9a26f6b873",
+      "size": 10007,
+      "mtime": "2026-03-06T01:15:31.799Z",
+      "hash": "69269ae959e6",
       "tags": [
         "doc"
       ],
       "terms": [
         "readme",
         "run",
-        "prisma",
         "npm",
+        "prisma",
         "api",
         "기본",
-        "app"
+        "ingest"
+      ]
+    },
+    {
+      "path": "reports/agent-qa-summary.md",
+      "ext": ".md",
+      "size": 274,
+      "mtime": "2026-03-06T01:15:12.384Z",
+      "hash": "7e897a35a2e2",
+      "tags": [
+        "report",
+        "doc"
+      ],
+      "terms": [
+        "agent",
+        "reports",
+        "summary",
+        "pass",
+        "api-contract-audit",
+        "build",
+        "duration",
+        "gate"
       ]
     },
     {
       "path": "reports/agent-review-summary.md",
       "ext": ".md",
       "size": 194,
-      "mtime": "2026-03-02T01:48:17.463Z",
-      "hash": "129211104ba4",
+      "mtime": "2026-03-06T01:12:22.467Z",
+      "hash": "f31a1977e871",
       "tags": [
         "report",
         "doc"
@@ -3257,19 +3321,19 @@
         "reports",
         "review",
         "summary",
-        "skipped",
+        "pass",
         "duration",
-        "fail",
         "gate",
-        "generated"
+        "generated",
+        "lint"
       ]
     },
     {
       "path": "reports/api-contract-audit.md",
       "ext": ".md",
-      "size": 6716,
-      "mtime": "2026-03-04T05:57:23.666Z",
-      "hash": "4b712ff373f9",
+      "size": 1677,
+      "mtime": "2026-03-06T02:01:09.462Z",
+      "hash": "658128ae4deb",
       "tags": [
         "report",
         "doc"
@@ -3279,19 +3343,19 @@
         "audit",
         "contract",
         "reports",
-        "implemented",
-        "fail",
-        "route",
-        "actual",
-        "planned"
+        "admin",
+        "analytics",
+        "campaigns",
+        "creators",
+        "notifications"
       ]
     },
     {
       "path": "reports/api-contract-sync-audit.md",
       "ext": ".md",
-      "size": 598,
-      "mtime": "2026-03-02T03:18:53.936Z",
-      "hash": "44e8fc81296d",
+      "size": 1745,
+      "mtime": "2026-03-06T02:01:10.234Z",
+      "hash": "c6238a7c55cc",
       "tags": [
         "report",
         "doc"
@@ -3302,11 +3366,11 @@
         "contract",
         "reports",
         "sync",
-        "planned",
-        "documents",
-        "failures",
-        "implemented",
-        "pass"
+        "admin",
+        "analytics",
+        "campaigns",
+        "creators",
+        "notifications"
       ]
     },
     {
@@ -3353,9 +3417,9 @@
     {
       "path": "reports/page-improvements.md",
       "ext": ".md",
-      "size": 10446,
-      "mtime": "2026-03-05T02:48:09.151Z",
-      "hash": "228c396ebb5a",
+      "size": 12403,
+      "mtime": "2026-03-06T00:06:58.132Z",
+      "hash": "422ca13b53f6",
       "tags": [
         "report",
         "doc"
@@ -3369,6 +3433,28 @@
         "처리",
         "버튼",
         "설명"
+      ]
+    },
+    {
+      "path": "reports/PROJECT_SCORECARD_2026-03-06.md",
+      "ext": ".md",
+      "size": 2636,
+      "mtime": "2026-03-05T15:35:20.346Z",
+      "hash": "a4e1943893e4",
+      "tags": [
+        "report",
+        "doc"
+      ],
+      "terms": [
+        "project",
+        "reports",
+        "scorecard",
+        "npm",
+        "run",
+        "fail",
+        "api",
+        "score",
+        "test"
       ]
     },
     {
@@ -3397,9 +3483,9 @@
     {
       "path": "reports/workspace-index.md",
       "ext": ".md",
-      "size": 2183,
-      "mtime": "2026-03-05T07:14:23.623Z",
-      "hash": "a3094b60987b",
+      "size": 2184,
+      "mtime": "2026-03-06T01:44:46.444Z",
+      "hash": "07c34f93776f",
       "tags": [
         "report",
         "doc"
@@ -3419,9 +3505,9 @@
     {
       "path": "reports/workspace-search-bench.md",
       "ext": ".md",
-      "size": 173,
-      "mtime": "2026-03-05T07:14:04.155Z",
-      "hash": "13208edc291f",
+      "size": 2873,
+      "mtime": "2026-03-06T01:45:18.573Z",
+      "hash": "812c7c50cd4a",
       "tags": [
         "report",
         "doc"
@@ -3431,12 +3517,12 @@
         "reports",
         "search",
         "workspace",
-        "auto",
-        "admin",
-        "benchmark",
-        "candidates",
+        "full",
         "elapsed",
-        "generated"
+        "lean",
+        "candidates",
+        "executed",
+        "fallback"
       ]
     },
     {
@@ -3485,9 +3571,9 @@
     {
       "path": "scripts/api-contract-audit.js",
       "ext": ".js",
-      "size": 5491,
-      "mtime": "2026-03-01T01:25:09.371Z",
-      "hash": "443e9407c6c4",
+      "size": 5180,
+      "mtime": "2026-03-05T15:38:23.774Z",
+      "hash": "c2f60bbb36d7",
       "tags": [
         "script",
         "code"
@@ -3507,9 +3593,9 @@
     {
       "path": "scripts/api-contract-sync-audit.js",
       "ext": ".js",
-      "size": 9260,
-      "mtime": "2026-03-01T03:28:12.133Z",
-      "hash": "8cb1eef5b9ad",
+      "size": 8124,
+      "mtime": "2026-03-06T00:25:03.097Z",
+      "hash": "37370303f693",
       "tags": [
         "script",
         "code"
@@ -3530,9 +3616,9 @@
     {
       "path": "scripts/autonomous-ops-loop.ts",
       "ext": ".ts",
-      "size": 28690,
-      "mtime": "2026-03-04T01:21:16.903Z",
-      "hash": "3c8cadb14891",
+      "size": 28601,
+      "mtime": "2026-03-05T22:25:23.321Z",
+      "hash": "db9d6f6df90a",
       "tags": [
         "script",
         "code"
@@ -3553,9 +3639,9 @@
     {
       "path": "scripts/benchmark-workspace-search.ts",
       "ext": ".ts",
-      "size": 5735,
-      "mtime": "2026-03-05T07:11:39.445Z",
-      "hash": "ef8b2ba8e2ee",
+      "size": 12658,
+      "mtime": "2026-03-05T09:04:15.161Z",
+      "hash": "ad072111a4c2",
       "tags": [
         "script",
         "code"
@@ -3565,12 +3651,12 @@
         "scripts",
         "search",
         "workspace",
+        "row",
+        "number",
         "string",
         "mode",
-        "item",
-        "json",
-        "index",
-        "number"
+        "value",
+        "config"
       ]
     },
     {
@@ -3909,9 +3995,9 @@
     {
       "path": "scripts/search-workspace.ts",
       "ext": ".ts",
-      "size": 9775,
-      "mtime": "2026-03-05T07:11:33.513Z",
-      "hash": "b484b5c4d903",
+      "size": 12363,
+      "mtime": "2026-03-05T08:05:46.696Z",
+      "hash": "3336772b4de0",
       "tags": [
         "script",
         "code"
@@ -3921,11 +4007,11 @@
         "search",
         "workspace",
         "string",
+        "path",
         "candidates",
         "query",
-        "path",
         "length",
-        "primarysearch"
+        "console"
       ]
     },
     {
@@ -4061,9 +4147,9 @@
     {
       "path": "sources/adapters/_shared.ts",
       "ext": ".ts",
-      "size": 2046,
-      "mtime": "2026-03-02T16:57:24.627Z",
-      "hash": "644c88aeccb6",
+      "size": 2157,
+      "mtime": "2026-03-06T00:52:24.470Z",
+      "hash": "0a8412b304e6",
       "tags": [
         "code"
       ],
@@ -4249,9 +4335,9 @@
     {
       "path": "sources/normalize.ts",
       "ext": ".ts",
-      "size": 13332,
-      "mtime": "2026-03-03T02:11:22.249Z",
-      "hash": "6609c1f60020",
+      "size": 14453,
+      "mtime": "2026-03-06T00:50:35.610Z",
+      "hash": "a08b30a48c78",
       "tags": [
         "code"
       ],
@@ -4522,9 +4608,9 @@
     {
       "path": "tests/dedupe.test.ts",
       "ext": ".ts",
-      "size": 6837,
-      "mtime": "2026-02-28T17:03:43.859Z",
-      "hash": "3b6c3e83f003",
+      "size": 7010,
+      "mtime": "2026-03-06T00:50:09.673Z",
+      "hash": "d0b3941d7c31",
       "tags": [
         "code"
       ],
@@ -4543,9 +4629,9 @@
     {
       "path": "tests/ingest.fixture.test.ts",
       "ext": ".ts",
-      "size": 8157,
-      "mtime": "2026-03-02T16:48:41.297Z",
-      "hash": "441f90c2c7cd",
+      "size": 8211,
+      "mtime": "2026-03-06T00:51:28.230Z",
+      "hash": "34aeb16da943",
       "tags": [
         "code"
       ],
@@ -4586,9 +4672,9 @@
     {
       "path": "tests/queryBuilder.test.ts",
       "ext": ".ts",
-      "size": 3623,
-      "mtime": "2026-03-02T15:24:03.147Z",
-      "hash": "c98fb2ad9d99",
+      "size": 3814,
+      "mtime": "2026-03-06T01:17:01.255Z",
+      "hash": "7273a2a773ae",
       "tags": [
         "code"
       ],
@@ -5309,9 +5395,9 @@
     {
       "path": "WORKSPACE_SEARCH_GUIDE.md",
       "ext": ".md",
-      "size": 1914,
-      "mtime": "2026-03-05T07:12:34.463Z",
-      "hash": "87b6c7268684",
+      "size": 1702,
+      "mtime": "2026-03-05T09:04:06.428Z",
+      "hash": "09a0e7344a5f",
       "tags": [
         "doc"
       ],
@@ -5319,10 +5405,10 @@
         "guide",
         "search",
         "workspace",
-        "run",
         "npm",
+        "run",
         "full",
-        "index"
+        "bench"
       ]
     }
   ],
@@ -5375,7 +5461,8 @@
       "docs/teams/T07_FRONTEND.md",
       "docs/teams/T08_MANAGER.md",
       "docs/teams/T10_OBSERVABILITY.md",
-      "middleware.ts",
+      "proxy.ts",
+      "reports/PROJECT_SCORECARD_2026-03-06.md",
       "reports/api-contract-audit.md",
       "reports/api-contract-sync-audit.md",
       "reports/screen-api-sync-checklist.md",
@@ -5391,7 +5478,6 @@
       "tmp/test_weble.ts"
     ],
     "app": [
-      "README.md",
       "app/admin/layout.tsx",
       "app/admin/page.tsx",
       "app/api/admin/alerts/actions/route.ts",
@@ -5449,6 +5535,7 @@
       "app/system/page.tsx",
       "app/trending/layout.tsx",
       "app/trending/page.tsx",
+      "docs/SESSION_HANDOFF.md",
       "next-env.d.ts",
       "reports/workspace-index.md",
       "tmp/test_revu_keys_app.ts"
@@ -5525,6 +5612,7 @@
       "scripts/release.js",
       "scripts/revu-test.js",
       "scripts/run-top20-agents.ts",
+      "scripts/search-workspace.ts",
       "scripts/start-ingestion.ts",
       "test-cron-api.ts",
       "test-cron.ts",
@@ -5718,6 +5806,7 @@
       "docs/PROJECT_STATUS.md",
       "docs/PROJECT_STATUS_NEXT_ACTIONS.md",
       "docs/REFAC_CHECKLIST.md",
+      "docs/ROLE_BASED_TEST_SCENARIOS.md",
       "docs/SCRAPERS.md",
       "docs/SESSION_HANDOFF.md",
       "docs/TEAM_CONTEXT.md",
@@ -5732,44 +5821,6 @@
       "docs/teams/T08_MANAGER.md",
       "docs/teams/T09_VALIDATION.md",
       "docs/teams/T10_OBSERVABILITY.md"
-    ],
-    "route": [
-      "app/api/admin/alerts/actions/route.ts",
-      "app/api/admin/alerts/route.ts",
-      "app/api/admin/analytics/stats/route.ts",
-      "app/api/admin/creators/[id]/route.ts",
-      "app/api/admin/creators/autologin/route.ts",
-      "app/api/admin/creators/route.ts",
-      "app/api/admin/ingest/route.ts",
-      "app/api/admin/platforms/[id]/route.ts",
-      "app/api/admin/platforms/route.ts",
-      "app/api/admin/quality/route.ts",
-      "app/api/admin/runs/route.ts",
-      "app/api/analytics/log/route.ts",
-      "app/api/analytics/route.ts",
-      "app/api/campaigns/[id]/related/route.ts",
-      "app/api/campaigns/[id]/route.ts",
-      "app/api/campaigns/route.ts",
-      "app/api/cron/route.ts",
-      "app/api/health/route.ts",
-      "app/api/jobs/route.ts",
-      "app/api/me/board/route.ts",
-      "app/api/me/curation/route.ts",
-      "app/api/me/notification-channels/route.ts",
-      "app/api/me/notification-preferences/route.ts",
-      "app/api/me/notifications/[id]/route.ts",
-      "app/api/me/notifications/route.ts",
-      "app/api/me/notifications/test/route.ts",
-      "app/api/me/pro/route.ts",
-      "app/api/me/revenue/route.ts",
-      "app/api/me/schedules/[id]/route.ts",
-      "app/api/me/schedules/route.ts",
-      "app/api/public/stats/route.ts",
-      "app/api/search/suggest/route.ts",
-      "reports/api-contract-audit.md",
-      "reports/workspace-index.md",
-      "scripts/api-contract-audit.js",
-      "scripts/api-contract-sync-audit.js"
     ],
     "string": [
       "app/api/admin/creators/[id]/route.ts",
@@ -5791,6 +5842,7 @@
       "lib/alertState.ts",
       "lib/campaignLinks.ts",
       "lib/geo/campaignGeo.ts",
+      "lib/platformDisplay.ts",
       "lib/runtimeEnv.ts",
       "lib/search/queryEnhancer.ts",
       "lib/search/searchUtils.ts",
@@ -5808,6 +5860,45 @@
       "sources/adapters/revu.ts",
       "sources/normalize.ts",
       "sources/types.ts"
+    ],
+    "test": [
+      "app/api/me/notifications/test/route.ts",
+      "docs/ROLE_BASED_TEST_SCENARIOS.md",
+      "docs/teams/T02_NORMALIZER.md",
+      "reports/PROJECT_SCORECARD_2026-03-06.md",
+      "scripts/revu-test.js",
+      "test-cron-api.ts",
+      "test-cron.ts",
+      "test-db.ts",
+      "test-extract.ts",
+      "test-revu-api.ts",
+      "test-revu.ts",
+      "test-rn.ts",
+      "test-scrapers.ts",
+      "test_output.txt",
+      "tests/dedupe.test.ts",
+      "tests/ingest.fixture.test.ts",
+      "tests/normalize.test.ts",
+      "tests/queryBuilder.test.ts",
+      "tmp/pw/test.js",
+      "tmp/pw/test_playwright.js",
+      "tmp/test_action_log.ts",
+      "tmp/test_dq.ts",
+      "tmp/test_gangnam.ts",
+      "tmp/test_m_revu.ts",
+      "tmp/test_mrblog.ts",
+      "tmp/test_reviewnote.ts",
+      "tmp/test_reviewnote_live.ts",
+      "tmp/test_reviewplace.ts",
+      "tmp/test_revu.js",
+      "tmp/test_revu.ts",
+      "tmp/test_revu_api.ts",
+      "tmp/test_revu_final.ts",
+      "tmp/test_revu_key_x.ts",
+      "tmp/test_revu_keys.ts",
+      "tmp/test_revu_keys_app.ts",
+      "tmp/test_revu_list.ts",
+      "tmp/test_weble.ts"
     ],
     "log": [
       "app/api/analytics/log/route.ts",
@@ -5846,42 +5937,42 @@
       "tmp/verify_dq_adapter.ts",
       "tmp/verify_revu.ts"
     ],
-    "test": [
+    "route": [
+      "app/api/admin/alerts/actions/route.ts",
+      "app/api/admin/alerts/route.ts",
+      "app/api/admin/analytics/stats/route.ts",
+      "app/api/admin/creators/[id]/route.ts",
+      "app/api/admin/creators/autologin/route.ts",
+      "app/api/admin/creators/route.ts",
+      "app/api/admin/ingest/route.ts",
+      "app/api/admin/platforms/[id]/route.ts",
+      "app/api/admin/platforms/route.ts",
+      "app/api/admin/quality/route.ts",
+      "app/api/admin/runs/route.ts",
+      "app/api/analytics/log/route.ts",
+      "app/api/analytics/route.ts",
+      "app/api/campaigns/[id]/related/route.ts",
+      "app/api/campaigns/[id]/route.ts",
+      "app/api/campaigns/route.ts",
+      "app/api/cron/route.ts",
+      "app/api/health/route.ts",
+      "app/api/jobs/route.ts",
+      "app/api/me/board/route.ts",
+      "app/api/me/curation/route.ts",
+      "app/api/me/notification-channels/route.ts",
+      "app/api/me/notification-preferences/route.ts",
+      "app/api/me/notifications/[id]/route.ts",
+      "app/api/me/notifications/route.ts",
       "app/api/me/notifications/test/route.ts",
-      "docs/teams/T02_NORMALIZER.md",
-      "scripts/revu-test.js",
-      "test-cron-api.ts",
-      "test-cron.ts",
-      "test-db.ts",
-      "test-extract.ts",
-      "test-revu-api.ts",
-      "test-revu.ts",
-      "test-rn.ts",
-      "test-scrapers.ts",
-      "test_output.txt",
-      "tests/dedupe.test.ts",
-      "tests/ingest.fixture.test.ts",
-      "tests/normalize.test.ts",
-      "tests/queryBuilder.test.ts",
-      "tmp/pw/test.js",
-      "tmp/pw/test_playwright.js",
-      "tmp/test_action_log.ts",
-      "tmp/test_dq.ts",
-      "tmp/test_gangnam.ts",
-      "tmp/test_m_revu.ts",
-      "tmp/test_mrblog.ts",
-      "tmp/test_reviewnote.ts",
-      "tmp/test_reviewnote_live.ts",
-      "tmp/test_reviewplace.ts",
-      "tmp/test_revu.js",
-      "tmp/test_revu.ts",
-      "tmp/test_revu_api.ts",
-      "tmp/test_revu_final.ts",
-      "tmp/test_revu_key_x.ts",
-      "tmp/test_revu_keys.ts",
-      "tmp/test_revu_keys_app.ts",
-      "tmp/test_revu_list.ts",
-      "tmp/test_weble.ts"
+      "app/api/me/pro/route.ts",
+      "app/api/me/revenue/route.ts",
+      "app/api/me/schedules/[id]/route.ts",
+      "app/api/me/schedules/route.ts",
+      "app/api/public/stats/route.ts",
+      "app/api/search/suggest/route.ts",
+      "reports/workspace-index.md",
+      "scripts/api-contract-audit.js",
+      "scripts/api-contract-sync-audit.js"
     ],
     "tmp": [
       "scripts/clean-tmp-artifacts.js",
@@ -5983,7 +6074,8 @@
       "components/SortBar.tsx",
       "components/StatsBanner.tsx",
       "components/ThemeToggle.tsx",
-      "components/WorkspaceHubNav.tsx"
+      "components/WorkspaceHubNav.tsx",
+      "lib/platformDisplay.ts"
     ],
     "scripts": [
       "docs/teams/T09_VALIDATION.md",
@@ -6038,10 +6130,11 @@
       "docs/PROJECT_STATUS_NEXT_ACTIONS.md",
       "docs/TEAM_CONTEXT.md",
       "docs/teams/T10_OBSERVABILITY.md",
-      "middleware.ts",
+      "proxy.ts",
+      "reports/api-contract-audit.md",
+      "reports/api-contract-sync-audit.md",
       "reports/screen-api-sync-checklist.md",
       "reports/workspace-index.md",
-      "reports/workspace-search-bench.md",
       "test-cron-api.ts"
     ],
     "json": [
@@ -6060,7 +6153,6 @@
       "app/api/me/pro/route.ts",
       "app/api/me/schedules/[id]/route.ts",
       "app/api/me/schedules/route.ts",
-      "scripts/benchmark-workspace-search.ts",
       "scripts/deploy-target-check.js",
       "scripts/smoke.js",
       "test-cron-api.ts",
@@ -6068,7 +6160,6 @@
       "tmp/test_revu_final.ts"
     ],
     "status": [
-      "app/admin/page.tsx",
       "app/api/admin/runs/route.ts",
       "app/api/health/route.ts",
       "app/api/me/notifications/[id]/route.ts",
@@ -6083,7 +6174,7 @@
       "docs/PROJECT_STATUS_NEXT_ACTIONS.md",
       "lib/adminOps.ts",
       "lib/fetcher.ts",
-      "middleware.ts",
+      "proxy.ts",
       "scripts/smoke.js",
       "scripts/wait-for-health.js",
       "tmp/test_revu_final.ts",
@@ -6109,7 +6200,7 @@
       "app/api/me/schedules/[id]/route.ts",
       "app/api/me/schedules/route.ts",
       "app/api/public/stats/route.ts",
-      "middleware.ts"
+      "proxy.ts"
     ],
     "href": [
       "app/me/page.tsx",
@@ -6131,25 +6222,6 @@
       "tmp/find_links.ts",
       "tmp/verify_reviewnote.ts"
     ],
-    "item": [
-      "app/api/admin/creators/[id]/route.ts",
-      "app/api/admin/creators/route.ts",
-      "app/trending/page.tsx",
-      "components/AdminSectionNav.tsx",
-      "components/AnalyticsDashboard.tsx",
-      "components/Header.tsx",
-      "components/MeSectionNav.tsx",
-      "components/ReviewerManager.tsx",
-      "components/SystemSectionNav.tsx",
-      "lib/alertState.ts",
-      "lib/ingest.ts",
-      "scripts/benchmark-workspace-search.ts",
-      "sources/adapters/reviewnote.ts",
-      "sources/adapters/revu.ts",
-      "sources/normalize.ts",
-      "tmp/analyze_html.ts",
-      "tmp/dump_pages.ts"
-    ],
     "lib": [
       "lib/adminAudit.ts",
       "lib/adminOps.ts",
@@ -6162,6 +6234,7 @@
       "lib/geo/campaignGeo.ts",
       "lib/ingest.ts",
       "lib/notificationSender.ts",
+      "lib/platformDisplay.ts",
       "lib/queryBuilder.ts",
       "lib/runtimeEnv.ts",
       "lib/search/queryEnhancer.ts",
@@ -6207,6 +6280,24 @@
       "tmp/test_revu_keys_app.ts",
       "tmp/test_revu_list.ts"
     ],
+    "campaigns": [
+      "app/api/campaigns/[id]/related/route.ts",
+      "app/api/campaigns/[id]/route.ts",
+      "app/api/campaigns/route.ts",
+      "app/campaigns/[id]/page.tsx",
+      "app/campaigns/layout.tsx",
+      "app/campaigns/page.tsx",
+      "components/MapViewCompat.tsx",
+      "lib/analytics.ts",
+      "reports/api-contract-audit.md",
+      "reports/api-contract-sync-audit.md",
+      "sources/adapters/reviewnote.ts",
+      "test-extract.ts",
+      "tmp/test_revu_api.ts",
+      "tmp/test_weble.ts",
+      "tmp/verify_reviewnote.ts",
+      "tmp/verify_revu.ts"
+    ],
     "data": [
       "app/api/admin/runs/route.ts",
       "app/api/analytics/route.ts",
@@ -6224,6 +6315,42 @@
       "tmp/test_revu_final.ts",
       "tmp/test_revu_key_x.ts",
       "tmp/test_revu_list.ts"
+    ],
+    "font-black": [
+      "app/admin/page.tsx",
+      "app/business/apply/page.tsx",
+      "app/business/page.tsx",
+      "app/campaigns/[id]/page.tsx",
+      "app/me/calendar/page.tsx",
+      "app/me/console/page.tsx",
+      "app/not-found.tsx",
+      "app/page.tsx",
+      "app/trending/page.tsx",
+      "components/AICuration.tsx",
+      "components/AnalyticsDashboard.tsx",
+      "components/CampaignQuickActions.tsx",
+      "components/ManagerDashboard.tsx",
+      "components/PWAPrompt.tsx",
+      "components/PlatformManager.tsx",
+      "components/SearchGuidePanel.tsx"
+    ],
+    "item": [
+      "app/api/admin/creators/[id]/route.ts",
+      "app/api/admin/creators/route.ts",
+      "app/trending/page.tsx",
+      "components/AdminSectionNav.tsx",
+      "components/AnalyticsDashboard.tsx",
+      "components/Header.tsx",
+      "components/MeSectionNav.tsx",
+      "components/ReviewerManager.tsx",
+      "components/SystemSectionNav.tsx",
+      "lib/alertState.ts",
+      "lib/ingest.ts",
+      "sources/adapters/reviewnote.ts",
+      "sources/adapters/revu.ts",
+      "sources/normalize.ts",
+      "tmp/analyze_html.ts",
+      "tmp/dump_pages.ts"
     ],
     "revu": [
       "scripts/revu-test.js",
@@ -6243,23 +6370,6 @@
       "tmp/test_revu_list.ts",
       "tmp/verify_revu.ts"
     ],
-    "font-black": [
-      "app/admin/page.tsx",
-      "app/business/apply/page.tsx",
-      "app/business/page.tsx",
-      "app/campaigns/[id]/page.tsx",
-      "app/me/calendar/page.tsx",
-      "app/me/console/page.tsx",
-      "app/not-found.tsx",
-      "app/page.tsx",
-      "components/AICuration.tsx",
-      "components/AnalyticsDashboard.tsx",
-      "components/CampaignQuickActions.tsx",
-      "components/ManagerDashboard.tsx",
-      "components/PWAPrompt.tsx",
-      "components/PlatformManager.tsx",
-      "components/SearchGuidePanel.tsx"
-    ],
     "campaign": [
       "app/api/campaigns/[id]/related/route.ts",
       "app/api/campaigns/[id]/route.ts",
@@ -6276,21 +6386,21 @@
       "tmp/test_mrblog.ts",
       "tmp/test_reviewnote.ts"
     ],
-    "campaigns": [
-      "app/api/campaigns/[id]/related/route.ts",
-      "app/api/campaigns/[id]/route.ts",
-      "app/api/campaigns/route.ts",
-      "app/campaigns/[id]/page.tsx",
-      "app/campaigns/layout.tsx",
-      "app/campaigns/page.tsx",
-      "components/MapViewCompat.tsx",
-      "lib/analytics.ts",
-      "sources/adapters/reviewnote.ts",
-      "test-extract.ts",
-      "tmp/test_revu_api.ts",
-      "tmp/test_weble.ts",
-      "tmp/verify_reviewnote.ts",
-      "tmp/verify_revu.ts"
+    "run": [
+      "README.md",
+      "WORKSPACE_SEARCH_GUIDE.md",
+      "components/ScraperStatusTable.tsx",
+      "docs/AGENT_WORKFLOW.md",
+      "docs/CRAWLER_TOP20_RESEARCH_SPECS.md",
+      "docs/FAST_FIX_GUIDELINES.md",
+      "docs/ROLE_BASED_TEST_SCENARIOS.md",
+      "docs/teams/T01_SCRAPER.md",
+      "reports/PROJECT_SCORECARD_2026-03-06.md",
+      "scripts/agent-gate.js",
+      "scripts/refactor/multi-agent-loop.js",
+      "scripts/refactor/validator.js",
+      "scripts/run-top20-agents.ts",
+      "scripts/run-top20-phases.ts"
     ],
     "get": [
       "app/api/cron/route.ts",
@@ -6338,11 +6448,11 @@
       "docs/teams/T10_OBSERVABILITY.md"
     ],
     "key": [
-      "app/map/page.tsx",
       "components/AdminSectionNav.tsx",
       "components/CampaignList.tsx",
       "components/MeSectionNav.tsx",
       "components/SortBar.tsx",
+      "lib/platformDisplay.ts",
       "scripts/deploy-env-check.js",
       "scripts/deploy-target-check.js",
       "sources/registry.ts",
@@ -6350,20 +6460,6 @@
       "tmp/test_revu_key_x.ts",
       "tmp/test_revu_keys.ts",
       "tmp/test_revu_keys_app.ts"
-    ],
-    "run": [
-      "README.md",
-      "WORKSPACE_SEARCH_GUIDE.md",
-      "components/ScraperStatusTable.tsx",
-      "docs/AGENT_WORKFLOW.md",
-      "docs/CRAWLER_TOP20_RESEARCH_SPECS.md",
-      "docs/FAST_FIX_GUIDELINES.md",
-      "docs/teams/T01_SCRAPER.md",
-      "scripts/agent-gate.js",
-      "scripts/refactor/multi-agent-loop.js",
-      "scripts/refactor/validator.js",
-      "scripts/run-top20-agents.ts",
-      "scripts/run-top20-phases.ts"
     ],
     "adapters": [
       "app/api/health/route.ts",
@@ -6385,10 +6481,37 @@
       "docs/AGENT_PROTOCOLS.md",
       "docs/AGENT_WORKFLOW.md",
       "docs/NOTES_AGENT_QUEUE.md",
+      "reports/agent-qa-summary.md",
       "reports/agent-review-summary.md",
       "scripts/agent-gate.js",
       "scripts/refactor/multi-agent-loop.js",
       "scripts/run-top20-agents.ts"
+    ],
+    "notifications": [
+      "app/api/me/notifications/[id]/route.ts",
+      "app/api/me/notifications/route.ts",
+      "app/api/me/notifications/test/route.ts",
+      "app/me/notifications/page.tsx",
+      "docs/API.md",
+      "docs/PROJECT_STATUS.md",
+      "docs/teams/T05_NOTIFIER.md",
+      "docs/teams/T08_MANAGER.md",
+      "reports/api-contract-audit.md",
+      "reports/api-contract-sync-audit.md",
+      "reports/screen-api-sync-checklist.md"
+    ],
+    "reports": [
+      "reports/PROJECT_SCORECARD_2026-03-06.md",
+      "reports/agent-qa-summary.md",
+      "reports/agent-review-summary.md",
+      "reports/api-contract-audit.md",
+      "reports/api-contract-sync-audit.md",
+      "reports/ci-summary.md",
+      "reports/page-improvements.en.md",
+      "reports/page-improvements.md",
+      "reports/screen-api-sync-checklist.md",
+      "reports/workspace-index.md",
+      "reports/workspace-search-bench.md"
     ],
     "cheerio": [
       "scripts/revu-test.js",
@@ -6413,18 +6536,6 @@
       "tmp/find_links.ts",
       "tmp/test_revu_api.ts",
       "tmp/test_weble.ts"
-    ],
-    "name": [
-      "app/api/admin/platforms/route.ts",
-      "app/api/public/stats/route.ts",
-      "components/StatsBanner.tsx",
-      "scripts/agent-gate.js",
-      "scripts/run-top20-agents.ts",
-      "scripts/seed.ts",
-      "scripts/start-ingestion.ts",
-      "scripts/sync-platforms.ts",
-      "sources/scraperHealth.ts",
-      "test-scrapers.ts"
     ],
     "text": [
       "reports/page-improvements.en.md",
@@ -6460,17 +6571,6 @@
       "components/ThemeProvider.tsx",
       "scripts/sync_notion_index.js"
     ],
-    "count": [
-      "app/api/me/board/route.ts",
-      "app/api/me/revenue/route.ts",
-      "app/api/public/stats/route.ts",
-      "components/NavFavoritesBadge.tsx",
-      "components/StatsBanner.tsx",
-      "scripts/aggregate-stats.ts",
-      "test-cron.ts",
-      "test-db.ts",
-      "tmp/check_db.ts"
-    ],
     "find": [
       "sources/adapters/gangnamfood.ts",
       "sources/adapters/generic.ts",
@@ -6482,9 +6582,39 @@
       "tmp/find_key.ts",
       "tmp/find_links.ts"
     ],
+    "name": [
+      "app/api/admin/platforms/route.ts",
+      "app/api/public/stats/route.ts",
+      "scripts/agent-gate.js",
+      "scripts/run-top20-agents.ts",
+      "scripts/seed.ts",
+      "scripts/start-ingestion.ts",
+      "scripts/sync-platforms.ts",
+      "sources/scraperHealth.ts",
+      "test-scrapers.ts"
+    ],
+    "count": [
+      "app/api/me/board/route.ts",
+      "app/api/me/revenue/route.ts",
+      "app/api/public/stats/route.ts",
+      "components/NavFavoritesBadge.tsx",
+      "scripts/aggregate-stats.ts",
+      "test-cron.ts",
+      "test-db.ts",
+      "tmp/check_db.ts"
+    ],
+    "label": [
+      "app/api/me/curation/route.ts",
+      "components/CampaignCard.tsx",
+      "components/FilterBar.tsx",
+      "components/MeSectionNav.tsx",
+      "components/MobileNav.tsx",
+      "components/SortBar.tsx",
+      "components/SystemSectionNav.tsx",
+      "lib/platformDisplay.ts"
+    ],
     "link": [
       "app/error.tsx",
-      "app/me/calendar/page.tsx",
       "app/not-found.tsx",
       "app/page.tsx",
       "components/NavFavoritesBadge.tsx",
@@ -6492,28 +6622,6 @@
       "components/WorkspaceHubNav.tsx",
       "scripts/guard.js",
       "tmp/verify_reviewnote.ts"
-    ],
-    "notifications": [
-      "app/api/me/notifications/[id]/route.ts",
-      "app/api/me/notifications/route.ts",
-      "app/api/me/notifications/test/route.ts",
-      "app/me/notifications/page.tsx",
-      "docs/API.md",
-      "docs/PROJECT_STATUS.md",
-      "docs/teams/T05_NOTIFIER.md",
-      "docs/teams/T08_MANAGER.md",
-      "reports/screen-api-sync-checklist.md"
-    ],
-    "reports": [
-      "reports/agent-review-summary.md",
-      "reports/api-contract-audit.md",
-      "reports/api-contract-sync-audit.md",
-      "reports/ci-summary.md",
-      "reports/page-improvements.en.md",
-      "reports/page-improvements.md",
-      "reports/screen-api-sync-checklist.md",
-      "reports/workspace-index.md",
-      "reports/workspace-search-bench.md"
     ],
     "path": [
       "scripts/build-workspace-index.ts",
@@ -6525,6 +6633,16 @@
       "scripts/search-workspace.ts",
       "vitest.config.ts"
     ],
+    "span": [
+      "app/admin/page.tsx",
+      "app/campaigns/[id]/page.tsx",
+      "app/me/console/page.tsx",
+      "components/AnalyticsDashboard.tsx",
+      "components/CampaignListRow.tsx",
+      "components/ManagerDashboard.tsx",
+      "components/PWAPrompt.tsx",
+      "components/StatsBanner.tsx"
+    ],
     "운영": [
       "TEAM_CONTEXT.md",
       "app/admin/layout.tsx",
@@ -6533,6 +6651,24 @@
       "docs/FUTURE_PHASE4_B2B2C_DIRECT_SPONSORSHIP.md",
       "docs/PROJECT_STATUS_NEXT_ACTIONS.md",
       "docs/TEAM_CONTEXT.md"
+    ],
+    "analytics": [
+      "app/api/admin/analytics/stats/route.ts",
+      "app/api/analytics/log/route.ts",
+      "app/api/analytics/route.ts",
+      "docs/teams/T06_ANALYTICS.md",
+      "lib/analytics.ts",
+      "reports/api-contract-audit.md",
+      "reports/api-contract-sync-audit.md"
+    ],
+    "flex": [
+      "app/me/notifications/page.tsx",
+      "components/AICuration.tsx",
+      "components/AnalyticsDashboard.tsx",
+      "components/CampaignList.tsx",
+      "components/ManagerDashboard.tsx",
+      "components/PWAPrompt.tsx",
+      "components/ProUpgradeSection.tsx"
     ],
     "focus-visible": [
       "app/business/apply/page.tsx",
@@ -6552,15 +6688,6 @@
       "tmp/verify_reviewnote.ts",
       "tmp/verify_revu.ts"
     ],
-    "label": [
-      "app/api/me/curation/route.ts",
-      "components/CampaignCard.tsx",
-      "components/FilterBar.tsx",
-      "components/MeSectionNav.tsx",
-      "components/MobileNav.tsx",
-      "components/SortBar.tsx",
-      "components/SystemSectionNav.tsx"
-    ],
     "metadata": [
       "app/admin/layout.tsx",
       "app/business/apply/layout.tsx",
@@ -6569,6 +6696,15 @@
       "app/me/layout.tsx",
       "app/system/layout.tsx",
       "app/trending/layout.tsx"
+    ],
+    "npm": [
+      "README.md",
+      "WORKSPACE_SEARCH_GUIDE.md",
+      "docs/AGENT_WORKFLOW.md",
+      "docs/FAST_FIX_GUIDELINES.md",
+      "docs/ROLE_BASED_TEST_SCENARIOS.md",
+      "reports/PROJECT_SCORECARD_2026-03-06.md",
+      "scripts/refactor/validator.js"
     ],
     "platform": [
       "app/api/admin/ingest/route.ts",
@@ -6588,6 +6724,15 @@
       "scripts/benchmark-workspace-search.ts",
       "scripts/search-workspace.ts"
     ],
+    "value": [
+      "components/AddToScheduleButton.tsx",
+      "components/ReviewerManager.tsx",
+      "lib/adminAudit.ts",
+      "lib/campaignLinks.ts",
+      "lib/runtimeEnv.ts",
+      "scripts/benchmark-workspace-search.ts",
+      "sources/adapters/_shared.ts"
+    ],
     "check": [
       "scripts/deploy-env-check.js",
       "scripts/deploy-target-check.js",
@@ -6595,6 +6740,14 @@
       "tmp/check_dq.ts",
       "tmp/check_mrblog.ts",
       "tmp/check_revu.ts"
+    ],
+    "creators": [
+      "app/api/admin/creators/[id]/route.ts",
+      "app/api/admin/creators/autologin/route.ts",
+      "app/api/admin/creators/route.ts",
+      "docs/API.md",
+      "reports/api-contract-audit.md",
+      "reports/api-contract-sync-audit.md"
     ],
     "date": [
       "app/api/admin/analytics/stats/route.ts",
@@ -6620,14 +6773,6 @@
       "tmp/test_revu_final.ts",
       "tmp/test_revu_keys.ts"
     ],
-    "flex": [
-      "components/AICuration.tsx",
-      "components/AnalyticsDashboard.tsx",
-      "components/CampaignList.tsx",
-      "components/ManagerDashboard.tsx",
-      "components/PWAPrompt.tsx",
-      "components/ProUpgradeSection.tsx"
-    ],
     "icon": [
       "components/AdminSectionNav.tsx",
       "components/Header.tsx",
@@ -6644,14 +6789,6 @@
       "tmp/test_reviewplace.ts",
       "tmp/test_revu_list.ts"
     ],
-    "index": [
-      "WORKSPACE_SEARCH_GUIDE.md",
-      "reports/workspace-index.md",
-      "scripts/benchmark-workspace-search.ts",
-      "scripts/build-workspace-index.ts",
-      "scripts/sync_notion_index.js",
-      "tmp/find_key.ts"
-    ],
     "length": [
       "app/api/admin/quality/route.ts",
       "lib/adminOps.ts",
@@ -6664,25 +6801,9 @@
       "components/CampaignList.tsx",
       "docs/PROJECT_STATUS_NEXT_ACTIONS.md",
       "lib/useFavorites.ts",
-      "middleware.ts",
       "next-env.d.ts",
-      "next.config.ts"
-    ],
-    "payload": [
-      "app/api/admin/creators/[id]/route.ts",
-      "app/api/admin/creators/route.ts",
-      "app/api/health/route.ts",
-      "app/me/notifications/page.tsx",
-      "lib/notificationSender.ts",
-      "scripts/smoke.js"
-    ],
-    "span": [
-      "app/campaigns/[id]/page.tsx",
-      "app/me/console/page.tsx",
-      "components/AnalyticsDashboard.tsx",
-      "components/CampaignListRow.tsx",
-      "components/ManagerDashboard.tsx",
-      "components/PWAPrompt.tsx"
+      "next.config.ts",
+      "proxy.ts"
     ],
     "title": [
       "scripts/derive-page-improvements.ts",
@@ -6699,14 +6820,6 @@
       "tmp/test_mrblog.ts",
       "tmp/test_reviewplace.ts",
       "tmp/test_revu_api.ts"
-    ],
-    "value": [
-      "components/AddToScheduleButton.tsx",
-      "components/ReviewerManager.tsx",
-      "lib/adminAudit.ts",
-      "lib/campaignLinks.ts",
-      "lib/runtimeEnv.ts",
-      "sources/adapters/_shared.ts"
     ],
     "workspace": [
       "WORKSPACE_SEARCH_GUIDE.md",
@@ -6737,12 +6850,19 @@
       "tests/ingest.fixture.test.ts",
       "tmp/verify_dq_adapter.ts"
     ],
-    "analytics": [
-      "app/api/admin/analytics/stats/route.ts",
-      "app/api/analytics/log/route.ts",
-      "app/api/analytics/route.ts",
-      "docs/teams/T06_ANALYTICS.md",
-      "lib/analytics.ts"
+    "border": [
+      "app/admin/page.tsx",
+      "app/business/apply/page.tsx",
+      "app/system/page.tsx",
+      "components/ReviewerManager.tsx",
+      "components/SearchGuidePanel.tsx"
+    ],
+    "config": [
+      "next-env.d.ts",
+      "next.config.ts",
+      "scripts/benchmark-workspace-search.ts",
+      "scripts/deploy-target-check.js",
+      "vitest.config.ts"
     ],
     "cron": [
       "app/api/cron/route.ts",
@@ -6779,12 +6899,12 @@
       "scripts/autonomous-ops-loop.ts",
       "tests/queryBuilder.test.ts"
     ],
-    "npm": [
-      "README.md",
-      "WORKSPACE_SEARCH_GUIDE.md",
-      "docs/AGENT_WORKFLOW.md",
-      "docs/FAST_FIX_GUIDELINES.md",
-      "scripts/refactor/validator.js"
+    "payload": [
+      "app/api/admin/creators/[id]/route.ts",
+      "app/api/admin/creators/route.ts",
+      "app/api/health/route.ts",
+      "lib/notificationSender.ts",
+      "scripts/smoke.js"
     ],
     "platforms": [
       "app/api/admin/platforms/[id]/route.ts",
@@ -6846,23 +6966,11 @@
       "docs/AUTONOMOUS_WORK_POOL.md",
       "scripts/autonomous-ops-loop.ts"
     ],
-    "border": [
-      "app/admin/page.tsx",
-      "app/business/apply/page.tsx",
-      "app/system/page.tsx",
-      "components/ReviewerManager.tsx"
-    ],
     "business": [
       "app/business/apply/layout.tsx",
       "app/business/apply/page.tsx",
       "app/business/layout.tsx",
       "app/business/page.tsx"
-    ],
-    "config": [
-      "next-env.d.ts",
-      "next.config.ts",
-      "scripts/deploy-target-check.js",
-      "vitest.config.ts"
     ],
     "content": [
       "scripts/guard.js",
@@ -6876,12 +6984,6 @@
       "scripts/api-contract-audit.js",
       "scripts/api-contract-sync-audit.js"
     ],
-    "creators": [
-      "app/api/admin/creators/[id]/route.ts",
-      "app/api/admin/creators/autologin/route.ts",
-      "app/api/admin/creators/route.ts",
-      "docs/API.md"
-    ],
     "deploy": [
       "docs/DEPLOY_GUARDRAILS.md",
       "docs/FAST_FIX_GUIDELINES.md",
@@ -6894,11 +6996,23 @@
       "reports/ci-summary.md",
       "scripts/refactor/validator.js"
     ],
-    "implemented": [
-      "reports/api-contract-audit.md",
-      "reports/api-contract-sync-audit.md",
-      "scripts/api-contract-audit.js",
-      "scripts/api-contract-sync-audit.js"
+    "gate": [
+      "reports/agent-qa-summary.md",
+      "reports/agent-review-summary.md",
+      "reports/ci-summary.md",
+      "scripts/agent-gate.js"
+    ],
+    "index": [
+      "reports/workspace-index.md",
+      "scripts/build-workspace-index.ts",
+      "scripts/sync_notion_index.js",
+      "tmp/find_key.ts"
+    ],
+    "ingest": [
+      "README.md",
+      "app/api/admin/ingest/route.ts",
+      "lib/ingest.ts",
+      "tests/ingest.fixture.test.ts"
     ],
     "keys": [
       "lib/runtimeEnv.ts",
@@ -6911,12 +7025,6 @@
       "app/api/campaigns/[id]/route.ts",
       "app/api/me/schedules/[id]/route.ts",
       "app/map/page.tsx"
-    ],
-    "planned": [
-      "reports/api-contract-audit.md",
-      "reports/api-contract-sync-audit.md",
-      "scripts/api-contract-audit.js",
-      "scripts/api-contract-sync-audit.js"
     ],
     "refactor": [
       "scripts/refactor/analyzer.js",
@@ -6948,6 +7056,12 @@
       "reports/ci-summary.md",
       "scripts/smoke.js"
     ],
+    "stats": [
+      "app/api/admin/analytics/stats/route.ts",
+      "app/api/public/stats/route.ts",
+      "components/StatsBanner.tsx",
+      "scripts/aggregate-stats.ts"
+    ],
     "tests": [
       "tests/dedupe.test.ts",
       "tests/ingest.fixture.test.ts",
@@ -6963,6 +7077,11 @@
       "app/system/layout.tsx",
       "docs/CONTEXT_ENGINE.md",
       "docs/teams/T10_OBSERVABILITY.md"
+    ],
+    "완료": [
+      "docs/COMMAND_CENTER.md",
+      "docs/EVOLUTION_LOG.md",
+      "docs/SESSION_HANDOFF.md"
     ],
     "지도": [
       "app/layout.tsx",
@@ -6999,6 +7118,11 @@
       "app/api/jobs/route.ts",
       "tmp/test_revu.js"
     ],
+    "build": [
+      "build_output.txt",
+      "reports/agent-qa-summary.md",
+      "scripts/build-workspace-index.ts"
+    ],
     "button": [
       "components/HeroSearch.tsx",
       "components/ProUpgradeSection.tsx",
@@ -7034,10 +7158,10 @@
       "scripts/ci/summarize-failures.js",
       "scripts/refactor/analyzer.js"
     ],
-    "gate": [
-      "reports/agent-review-summary.md",
-      "reports/ci-summary.md",
-      "scripts/agent-gate.js"
+    "full": [
+      "WORKSPACE_SEARCH_GUIDE.md",
+      "reports/workspace-search-bench.md",
+      "scripts/build-workspace-index.ts"
     ],
     "handoff": [
       "docs/AGENT_MIGRATION_GUIDE.md",
@@ -7053,11 +7177,6 @@
       "reports/page-improvements.en.md",
       "reports/page-improvements.md",
       "scripts/derive-page-improvements.ts"
-    ],
-    "ingest": [
-      "app/api/admin/ingest/route.ts",
-      "lib/ingest.ts",
-      "tests/ingest.fixture.test.ts"
     ],
     "line": [
       "scripts/ci/summarize-failures.js",
@@ -7104,6 +7223,11 @@
       "app/api/admin/runs/route.ts",
       "app/api/public/stats/route.ts"
     ],
+    "project": [
+      "docs/PROJECT_STATUS.md",
+      "docs/PROJECT_STATUS_NEXT_ACTIONS.md",
+      "reports/PROJECT_SCORECARD_2026-03-06.md"
+    ],
     "push": [
       "scripts/api-contract-audit.js",
       "scripts/api-contract-sync-audit.js",
@@ -7139,10 +7263,10 @@
       "tmp/test_gangnam.ts",
       "tmp/verify_dq_adapter.ts"
     ],
-    "stats": [
-      "app/api/admin/analytics/stats/route.ts",
-      "app/api/public/stats/route.ts",
-      "scripts/aggregate-stats.ts"
+    "summary": [
+      "reports/agent-qa-summary.md",
+      "reports/agent-review-summary.md",
+      "reports/ci-summary.md"
     ],
     "t09_validation": [
       "docs/CODING_RULES.md",
@@ -7243,10 +7367,6 @@
       ".agent/skills/README.md",
       ".agent/workflows/README.md"
     ],
-    "완료": [
-      "docs/COMMAND_CENTER.md",
-      "docs/EVOLUTION_LOG.md"
-    ],
     "전체": [
       "components/FilterBar.tsx",
       "docs/COST_RULES.md"
@@ -7295,13 +7415,9 @@
       "prisma/seed.ts",
       "scripts/seed.ts"
     ],
-    "benchmark": [
-      "reports/workspace-search-bench.md",
-      "scripts/benchmark-workspace-search.ts"
-    ],
-    "build": [
-      "build_output.txt",
-      "scripts/build-workspace-index.ts"
+    "bench": [
+      "WORKSPACE_SEARCH_GUIDE.md",
+      "reports/workspace-search-bench.md"
     ],
     "campaign_type": [
       "app/api/public/stats/route.ts",
@@ -7327,6 +7443,10 @@
       "next.config.ts",
       "vitest.config.ts"
     ],
+    "duration": [
+      "reports/agent-qa-summary.md",
+      "reports/agent-review-summary.md"
+    ],
     "entries": [
       "lib/search/queryEnhancer.ts",
       "sources/scraperHealth.ts"
@@ -7336,12 +7456,12 @@
       "sources/adapters/reviewplace.ts"
     ],
     "fail": [
-      "reports/agent-review-summary.md",
-      "reports/api-contract-audit.md"
+      "docs/ROLE_BASED_TEST_SCENARIOS.md",
+      "reports/PROJECT_SCORECARD_2026-03-06.md"
     ],
-    "failures": [
-      "reports/api-contract-sync-audit.md",
-      "scripts/ci/summarize-failures.js"
+    "fallback": [
+      "reports/workspace-search-bench.md",
+      "sources/adapters/_shared.ts"
     ],
     "fetch": [
       "docs/teams/T01_SCRAPER.md",
@@ -7355,24 +7475,16 @@
       "components/AddToScheduleButton.tsx",
       "reports/page-improvements.en.md"
     ],
-    "full": [
-      "WORKSPACE_SEARCH_GUIDE.md",
-      "scripts/build-workspace-index.ts"
-    ],
     "fulltext": [
       "sources/adapters/dinnerqueen.ts",
       "sources/adapters/reviewplace.ts"
-    ],
-    "generated": [
-      "reports/agent-review-summary.md",
-      "reports/workspace-search-bench.md"
     ],
     "guide": [
       "WORKSPACE_SEARCH_GUIDE.md",
       "docs/AGENT_MIGRATION_GUIDE.md"
     ],
     "headers": [
-      "middleware.ts",
+      "proxy.ts",
       "tmp/check_revu.ts"
     ],
     "health": [
@@ -7382,6 +7494,10 @@
     "img": [
       "sources/adapters/dinnerqueen.ts",
       "tmp/analyze_dq.ts"
+    ],
+    "implemented": [
+      "scripts/api-contract-audit.js",
+      "scripts/api-contract-sync-audit.js"
     ],
     "input": [
       "lib/geo/campaignGeo.ts",
@@ -7394,6 +7510,10 @@
     "lat": [
       "app/api/campaigns/route.ts",
       "lib/geo/campaignGeo.ts"
+    ],
+    "lint": [
+      "reports/agent-review-summary.md",
+      "scripts/refactor/validator.js"
     ],
     "list": [
       "app/page.tsx",
@@ -7451,9 +7571,17 @@
       "scripts/wait-for-health.js",
       "sources/adapters/_shared.ts"
     ],
+    "pass": [
+      "reports/agent-qa-summary.md",
+      "reports/agent-review-summary.md"
+    ],
     "phase": [
       "app/api/jobs/route.ts",
       "scripts/run-top20-agents.ts"
+    ],
+    "planned": [
+      "scripts/api-contract-audit.js",
+      "scripts/api-contract-sync-audit.js"
     ],
     "platformid": [
       "lib/ingest.ts",
@@ -7462,10 +7590,6 @@
     "prismaclient": [
       "lib/db.ts",
       "test-db.ts"
-    ],
-    "project": [
-      "docs/PROJECT_STATUS.md",
-      "docs/PROJECT_STATUS_NEXT_ACTIONS.md"
     ],
     "provider": [
       "app/api/admin/creators/autologin/route.ts",
@@ -7491,10 +7615,6 @@
       "docs/SCRAPERS.md",
       "test-scrapers.ts"
     ],
-    "section": [
-      "app/business/page.tsx",
-      "app/trending/page.tsx"
-    ],
     "seed": [
       "prisma/seed.ts",
       "scripts/seed.ts"
@@ -7502,10 +7622,6 @@
     "skills": [
       ".agent/skills/README.md",
       ".agents/skills/ROI_LOGIC.md"
-    ],
-    "skipped": [
-      "reports/agent-review-summary.md",
-      "scripts/clean-tmp-artifacts.js"
     ],
     "source": [
       "app/api/me/pro/route.ts",
@@ -7518,10 +7634,6 @@
     "sponsorship": [
       "app/api/me/board/route.ts",
       "docs/FUTURE_PHASE4_B2B2C_DIRECT_SPONSORSHIP.md"
-    ],
-    "summary": [
-      "reports/agent-review-summary.md",
-      "reports/ci-summary.md"
     ],
     "system": [
       "app/system/layout.tsx",
@@ -7591,9 +7703,6 @@
     ],
     "경우": [
       "docs/CONTEXT_ENGINE.md"
-    ],
-    "고도화": [
-      "docs/SESSION_HANDOFF.md"
     ],
     "공식": [
       ".agents/skills/ROI_LOGIC.md"
@@ -7714,6 +7823,9 @@
     ],
     "에이전트": [
       "docs/AGENT_MIGRATION_GUIDE.md"
+    ],
+    "에이전트가": [
+      ".agent/skills/README.md"
     ]
   }
 }

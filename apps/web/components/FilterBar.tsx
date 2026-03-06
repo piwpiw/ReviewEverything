@@ -116,7 +116,7 @@ function Pill({
   return (
     <button
       onClick={onClick}
-      className={`relative rounded-lg px-4 py-2 text-xs font-black transition-all ${{
+      className={`relative rounded-lg px-3 py-1.5 text-[11px] font-black transition-all ${{
         ["bg-slate-900 text-white dark:bg-blue-600"]: active,
         ["bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-200"]: !active,
       }[active.toString()]}`}
@@ -242,15 +242,15 @@ export default function FilterBar() {
   }, [current]);
 
   return (
-    <section className="relative rounded-2xl border border-white/60 bg-white/95 p-4 dark:bg-slate-900/95">
-      <header className="mb-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+    <section className="relative rounded-2xl border border-white/60 bg-white/95 p-3 dark:bg-slate-900/95">
+      <header className="mb-3 flex flex-col gap-2.5 md:flex-row md:items-center md:justify-between">
         <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-xl bg-slate-900 text-white dark:bg-blue-600 flex items-center justify-center">
+          <div className="h-9 w-9 rounded-xl bg-slate-900 text-white dark:bg-blue-600 flex items-center justify-center">
             <Filter className="h-4 w-4" />
           </div>
           <div>
             <p className="text-xs font-black uppercase tracking-wide text-slate-400">필터 패널</p>
-            <p className="text-lg font-black text-slate-900 dark:text-white">
+            <p className="text-sm md:text-base font-black text-slate-900 dark:text-white">
               {isPending ? "필터 적용 중..." : "조건을 설정해 캠페인을 빠르게 찾으세요"}
             </p>
           </div>
@@ -259,7 +259,7 @@ export default function FilterBar() {
         <div className="flex flex-wrap items-center gap-2">
           <button
             onClick={isMapMode ? openListModeWithFilters : togglePanel}
-            className="rounded-xl bg-slate-900 px-5 py-2 text-sm font-black text-white dark:bg-blue-600"
+            className="rounded-xl bg-slate-900 px-4 py-2 text-xs font-black text-white dark:bg-blue-600"
           >
             {isPanelVisible ? "필터 닫기" : isMapMode ? "목록에서 필터 편집" : "필터 펼치기"}
           </button>
@@ -267,7 +267,7 @@ export default function FilterBar() {
           {!isMapMode && (
             <button
               onClick={saveCurrent}
-              className="rounded-xl bg-slate-900 px-5 py-2 text-sm font-black text-white dark:bg-blue-600"
+              className="rounded-xl bg-slate-900 px-4 py-2 text-xs font-black text-white dark:bg-blue-600"
             >
               <Sparkles className="mr-1 inline h-4 w-4" />
               현재 조건 저장
@@ -277,7 +277,7 @@ export default function FilterBar() {
           {activeCount > 0 ? (
             <button
               onClick={resetAll}
-              className="rounded-xl bg-rose-50 px-4 py-2 text-sm font-black text-rose-600 dark:bg-rose-900/20 dark:text-rose-300"
+              className="rounded-xl bg-rose-50 px-4 py-2 text-xs font-black text-rose-600 dark:bg-rose-900/20 dark:text-rose-300"
             >
               <X className="mr-1 inline h-4 w-4" />
               초기화({activeCount})
@@ -287,7 +287,7 @@ export default function FilterBar() {
       </header>
 
       {!isMapMode && recents.length > 0 ? (
-        <div className="mb-4 flex flex-wrap items-center gap-2">
+        <div className="mb-3 flex flex-wrap items-center gap-2">
           <span className="mr-2 text-xs font-black text-slate-400">최근 조건</span>
           {recents.map((item) => (
             <button
@@ -302,7 +302,7 @@ export default function FilterBar() {
       ) : null}
 
       {isPanelVisible ? (
-        <div className="max-h-[46vh] overflow-y-auto space-y-3 pr-1">
+        <div className="max-h-[40vh] overflow-y-auto space-y-2.5 pr-1">
           <div className="flex flex-wrap items-center gap-2">
             <span className="w-16 text-xs font-black text-slate-400">유형</span>
             {TYPES.map((item) => (
@@ -343,7 +343,7 @@ export default function FilterBar() {
           </div>
 
           <div className="grid gap-2 md:grid-cols-2">
-            <div className="rounded-2xl border border-slate-200 p-3 dark:border-slate-700">
+            <div className="rounded-2xl border border-slate-200 p-2.5 dark:border-slate-700">
               <label className="mb-2 block text-xs font-black text-slate-500">지역 1단계</label>
               <select
                 value={current.region1}
@@ -351,7 +351,7 @@ export default function FilterBar() {
                   const next = e.target.value;
                   setParam("region_depth1", next);
                 }}
-                className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-white"
+                className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs md:text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-white"
               >
                 <option value="">전체</option>
                 {regionDepth1Options.map((region) => (
@@ -361,7 +361,7 @@ export default function FilterBar() {
                 ))}
               </select>
             </div>
-            <div className="rounded-2xl border border-slate-200 p-3 dark:border-slate-700">
+            <div className="rounded-2xl border border-slate-200 p-2.5 dark:border-slate-700">
               <label className="mb-2 text-xs font-black text-slate-500">지역 2단계(시군구)</label>
               <select
                 value={current.region2}
@@ -369,7 +369,7 @@ export default function FilterBar() {
                   const next = e.target.value;
                   setParam("region_depth2", next);
                 }}
-                className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-white"
+                className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs md:text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-white"
                 disabled={!current.region1}
               >
                 <option value="">전체</option>
@@ -395,8 +395,8 @@ export default function FilterBar() {
             ))}
           </div>
 
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-            <div className="rounded-2xl border border-slate-200 p-4 dark:border-slate-700">
+          <div className="grid grid-cols-1 gap-2 md:grid-cols-3">
+            <div className="rounded-2xl border border-slate-200 p-3 dark:border-slate-700">
               <label className="mb-2 flex items-center text-xs font-black text-slate-500">
                 <Clock className="mr-2 h-3.5 w-3.5" />
                 최소 보상(만원)
@@ -405,27 +405,27 @@ export default function FilterBar() {
                 value={current.minReward}
                 onChange={(e) => setParam("min_reward", e.target.value)}
                 placeholder="0"
-                className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm dark:border-slate-700"
+                className="w-full rounded-xl border border-slate-200 px-3 py-2 text-xs md:text-sm dark:border-slate-700"
                 inputMode="numeric"
               />
             </div>
-            <div className="rounded-2xl border border-slate-200 p-4 dark:border-slate-700">
+            <div className="rounded-2xl border border-slate-200 p-3 dark:border-slate-700">
               <label className="mb-2 text-xs font-black text-slate-500">최대 경쟁률</label>
               <input
                 value={current.maxComp}
                 onChange={(e) => setParam("max_comp", e.target.value)}
                 placeholder="예: 10"
-                className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm dark:border-slate-700"
+                className="w-full rounded-xl border border-slate-200 px-3 py-2 text-xs md:text-sm dark:border-slate-700"
                 inputMode="numeric"
               />
             </div>
-            <div className="rounded-2xl border border-slate-200 p-4 dark:border-slate-700">
+            <div className="rounded-2xl border border-slate-200 p-3 dark:border-slate-700">
               <label className="mb-2 text-xs font-black text-slate-500">최대 D-Day</label>
               <input
                 value={current.maxDeadlineDays}
                 onChange={(e) => setParam("max_deadline_days", e.target.value)}
                 placeholder="예: 7"
-                className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm dark:border-slate-700"
+                className="w-full rounded-xl border border-slate-200 px-3 py-2 text-xs md:text-sm dark:border-slate-700"
                 inputMode="numeric"
               />
             </div>

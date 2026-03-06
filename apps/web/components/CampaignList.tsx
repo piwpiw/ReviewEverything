@@ -194,7 +194,7 @@ export default function CampaignList({
   }
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-3">
       {viewMode === "map" ? (
         <div className="flex items-center justify-between px-2">
           <p className="text-xs font-black text-slate-500 dark:text-slate-300">
@@ -256,8 +256,8 @@ export default function CampaignList({
             animate={{ opacity: 1 }}
             className={
               resolvedLayoutMode === "list"
-                ? "flex flex-col gap-3"
-                : "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 2xl:grid-cols-6 gap-2.5"
+                ? "flex flex-col gap-2.5"
+                : "grid grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 2xl:grid-cols-7 gap-2"
             }
           >
             {campaigns.map((campaign: any, i: number) =>

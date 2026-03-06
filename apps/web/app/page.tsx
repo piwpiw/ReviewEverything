@@ -77,33 +77,33 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
         <div className="absolute -top-32 -left-32 w-[500px] h-[500px] bg-indigo-200/30 dark:bg-blue-900/20 rounded-full blur-[120px] pointer-events-none" />
         <div className="absolute bottom-0 right-32 w-[600px] h-[400px] bg-pink-200/20 dark:bg-fuchsia-900/10 rounded-full blur-[150px] pointer-events-none" />
 
-        <div className="relative max-w-[1700px] mx-auto px-4 md:px-8 pt-20 pb-14 flex flex-col items-center text-center">
-          <div className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-white dark:bg-slate-900 shadow-2xl shadow-blue-900/5 mb-8 border border-slate-100 dark:border-slate-800 transition-all hover:scale-105">
+        <div className="relative max-w-[1700px] mx-auto px-4 md:px-8 pt-12 pb-8 flex flex-col items-center text-center">
+          <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-white dark:bg-slate-900 shadow-2xl shadow-blue-900/5 mb-5 border border-slate-100 dark:border-slate-800 transition-all hover:scale-105">
             <div className="w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center">
               <Sparkles className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400 fill-current" />
             </div>
             <span className="text-[11px] font-black text-slate-800 dark:text-white uppercase tracking-[0.2em]">ReviewEverything</span>
           </div>
 
-          <h1 className="text-4xl md:text-6xl font-black tracking-tighter leading-[1.1] mb-5 text-slate-900 dark:text-white max-w-5xl mx-auto">
+          <h1 className="text-3xl md:text-5xl font-black tracking-tighter leading-[1.05] mb-3 text-slate-900 dark:text-white max-w-5xl mx-auto">
             리뷰 캠페인을 한 화면에서 촘촘하게 정리하고
             <br className="hidden md:block" />
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400">
               카드와 리스트로 바로 전환해 운영하세요
             </span>
           </h1>
-          <p className="max-w-3xl text-slate-500 dark:text-slate-400 text-base md:text-lg font-bold leading-relaxed mb-10">
+          <p className="max-w-3xl text-slate-500 dark:text-slate-400 text-sm md:text-base font-bold leading-relaxed mb-6">
             플랫폼·매체·유형·지역·카테고리 검색 후, 같은 데이터셋을 카드/리스트/지도에서 즉시 비교할 수 있습니다.
           </p>
           <p className="sr-only">status: search-ready</p>
 
-          <div className="w-full max-w-2xl mx-auto mb-10 relative z-50">
+          <div className="w-full max-w-2xl mx-auto mb-6 relative z-50">
             <Suspense>
               <HeroSearch defaultValue={sp.q || ""} />
             </Suspense>
           </div>
 
-          <div className="w-full max-w-4xl mx-auto mb-8 relative z-40">
+          <div className="w-full max-w-4xl mx-auto mb-5 relative z-40">
             <SearchGuidePanel />
           </div>
 
@@ -115,9 +115,9 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
         </div>
       </section>
 
-      <section className="max-w-[1700px] mx-auto px-4 md:px-8 py-7 flex flex-col gap-5">
+      <section className="max-w-[1700px] mx-auto px-4 md:px-8 py-5 flex flex-col gap-4">
         <h2 className="sr-only">탐색 제어와 결과</h2>
-        <div className="relative z-20 lg:sticky lg:top-[64px] bg-background/95 backdrop-blur-xl -mx-4 px-4 py-2 border-b border-slate-100/50 dark:border-slate-800/50">
+        <div className="relative z-20 lg:sticky lg:top-[64px] bg-background/95 backdrop-blur-xl -mx-4 px-4 py-1.5 border-b border-slate-100/50 dark:border-slate-800/50">
           <Suspense fallback={<div className="h-24 skeleton rounded-3xl w-full" />}>
             <FilterBar />
           </Suspense>
@@ -248,4 +248,3 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
     </main>
   );
 }
-

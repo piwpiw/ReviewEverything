@@ -74,12 +74,16 @@ export default function StatsBanner() {
       <motion.div variants={item} className="relative min-w-[200px] overflow-hidden rounded-[1.75rem] bg-gradient-to-br from-blue-600 via-indigo-600 to-violet-700 px-6 py-4 text-white shadow-xl shadow-blue-500/30">
         <div className="pointer-events-none absolute inset-0 bg-[url('/noise.png')] opacity-10 mix-blend-overlay" />
         <div className="pointer-events-none absolute right-0 top-0 h-24 w-24 rounded-full bg-white/10 blur-2xl" />
-        <span className="relative z-10 text-[10px] font-black uppercase tracking-widest opacity-80">현재 체험 수</span>
+        <span className="relative z-10 text-[10px] font-black uppercase tracking-widest opacity-80">현재 체험단 수</span>
         <span className="relative z-10 mt-1 block text-3xl font-black tracking-tighter">
           {loaded ? (stats ? stats.totalCampaigns.toLocaleString() : "-") : "..."}
         </span>
         <span className="relative z-10 mt-1 block text-[11px] font-bold opacity-90">
-          {stats ? `${stats.totalCampaigns.toLocaleString()}개 캠페인` : loaded ? "실시간 집계 대기" : "집계 로딩 중"}
+          {stats
+            ? `${stats.totalCampaigns.toLocaleString()}개 캠페인 운영 중`
+            : loaded
+              ? "실시간 집계 대기 중"
+              : "집계 로딩 중"}
         </span>
       </motion.div>
 
@@ -114,7 +118,9 @@ export default function StatsBanner() {
 
       <motion.div variants={item} className="w-full text-center">
         <p className="text-sm font-black text-slate-700 dark:text-slate-200">
-          {platformCount > 0 ? `${platformCount}개 체험단 플랫폼을 한 화면에서 비교할 수 있습니다.` : "플랫폼 집계가 준비되면 여기에 표시됩니다."}
+          {platformCount > 0
+            ? `${platformCount}개 체험단 플랫폼을 한 화면에서 비교할 수 있습니다.`
+            : "플랫폼 집계가 준비되면 여기에 즉시 표시됩니다."}
         </p>
         <p className="mt-1 text-xs font-bold text-slate-500 dark:text-slate-400">검색 가이드를 참고해서 지역과 키워드를 입력해 주세요.</p>
       </motion.div>

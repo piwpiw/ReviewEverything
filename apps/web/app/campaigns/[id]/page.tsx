@@ -147,7 +147,7 @@ export default async function CampaignDetail({
   const linkStateLabel = hasLink ? "링크 활성됨" : "링크 미제공";
 
   return (
-    <main className="page-shell py-8 md:py-10 pb-24 md:pb-32 flex flex-col gap-8">
+    <main className="page-shell py-6 md:py-8 pb-20 md:pb-24 flex flex-col gap-6">
       <nav className="flex items-center gap-2 text-[11px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest pl-1">
         <Link href="/" aria-label="홈으로 이동" className="hover:text-blue-600 transition-colors focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 rounded">
           홈
@@ -164,9 +164,9 @@ export default async function CampaignDetail({
         <span className="text-slate-900 dark:text-white truncate max-w-[220px]">{campaign.title}</span>
       </nav>
 
-      <div className="grid grid-cols-1 xl:grid-cols-12 gap-10">
-        <div className="xl:col-span-5 flex flex-col gap-6">
-          <div className="relative rounded-[2rem] overflow-hidden aspect-[1/1] shadow-2xl border border-slate-100 dark:border-slate-800 group">
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
+        <div className="xl:col-span-5 flex flex-col gap-4">
+          <div className="relative rounded-[1.5rem] overflow-hidden aspect-[1/1] shadow-2xl border border-slate-100 dark:border-slate-800 group">
             <Image
               src={campaign.thumbnail_url || "/images/campaign-placeholder.webp"}
               alt={campaign.title}
@@ -175,7 +175,7 @@ export default async function CampaignDetail({
               unoptimized={campaign.thumbnail_url?.includes("unsplash")}
             />
             <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-            <div className="absolute top-5 left-5 px-3 py-2 rounded-xl bg-white/90 dark:bg-slate-900/80 backdrop-blur-md shadow-lg border border-white/50 dark:border-slate-700/60 flex items-center gap-2">
+            <div className="absolute top-4 left-4 px-3 py-1.5 rounded-xl bg-white/90 dark:bg-slate-900/80 backdrop-blur-md shadow-lg border border-white/50 dark:border-slate-700/60 flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
               <span className="text-[10px] font-black tracking-widest text-slate-900 dark:text-slate-100">
                 {platformLabel}
@@ -183,25 +183,25 @@ export default async function CampaignDetail({
             </div>
           </div>
 
-          <div className="bg-slate-900 rounded-[2.5rem] p-8 text-white shadow-2xl shadow-indigo-500/10 relative overflow-hidden">
+          <div className="bg-slate-900 rounded-[1.75rem] p-6 text-white shadow-2xl shadow-indigo-500/10 relative overflow-hidden">
             <div className="absolute -right-10 -bottom-10 w-40 h-40 bg-blue-500/20 rounded-full blur-3xl" />
             <div className="relative z-10">
-              <div className="flex items-center gap-3 mb-6">
+              <div className="flex items-center gap-3 mb-4">
                 <div className="p-2 bg-white/10 rounded-xl">
                   <Zap className="w-5 h-5 text-amber-400 fill-current" />
                 </div>
                 <span className="text-[10px] font-black uppercase tracking-[0.2em] italic">실시간 합격 예측</span>
               </div>
-              <div className="flex items-end gap-3 mb-4">
-                <span className="text-5xl font-black">{winProbability}%</span>
+              <div className="flex items-end gap-3 mb-3">
+                <span className="text-4xl font-black">{winProbability}%</span>
                 <span className="text-sm font-bold text-blue-300 mb-2">{winStatus}</span>
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="p-4 bg-white/5 rounded-2xl border border-white/10">
+              <div className="grid grid-cols-2 gap-3">
+                <div className="p-3 bg-white/5 rounded-2xl border border-white/10">
                   <div className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1">경쟁률</div>
                   <div className="text-lg font-black">{competitionRate.toFixed(2)}x</div>
                 </div>
-                <div className="p-4 bg-white/5 rounded-2xl border border-white/10">
+                <div className="p-3 bg-white/5 rounded-2xl border border-white/10">
                   <div className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1">성공확률</div>
                   <div className="text-lg font-black text-amber-400">{Math.round(winProbability / 4)}/25</div>
                 </div>
@@ -210,18 +210,18 @@ export default async function CampaignDetail({
           </div>
         </div>
 
-        <div className="xl:col-span-7 flex flex-col gap-8">
-          <div className="flex flex-col gap-4">
+        <div className="xl:col-span-7 flex flex-col gap-5">
+          <div className="flex flex-col gap-3">
             <div className="flex items-center gap-2">
-              <span className={`px-4 py-1.5 rounded-xl font-black text-[10px] uppercase tracking-widest shadow-sm ${dColor}`}>
+              <span className={`px-3 py-1 rounded-xl font-black text-[10px] uppercase tracking-widest shadow-sm ${dColor}`}>
                 {dLabel}
               </span>
-              <span className="px-4 py-1.5 rounded-xl bg-slate-900 text-white font-black text-[10px] uppercase tracking-widest shadow-sm">
+              <span className="px-3 py-1 rounded-xl bg-slate-900 text-white font-black text-[10px] uppercase tracking-widest shadow-sm">
                 {TYPE_LABEL[campaign.campaign_type || ""] ?? "기타"}
               </span>
             </div>
-            <h1 className="text-3xl md:text-4xl font-black text-slate-900 dark:text-white leading-[1.1] tracking-tighter">{campaign.title}</h1>
-            <div className="flex items-center gap-4 text-slate-400 dark:text-slate-500 text-xs font-bold">
+            <h1 className="text-2xl md:text-3xl font-black text-slate-900 dark:text-white leading-[1.08] tracking-tighter">{campaign.title}</h1>
+            <div className="flex flex-wrap items-center gap-3 text-slate-400 dark:text-slate-500 text-[11px] font-bold">
               <div className="flex items-center gap-1.5">
                 <Database className="w-4 h-4 text-slate-300" />
                 <span>플랫폼 {platformLabel}</span>
@@ -234,39 +234,39 @@ export default async function CampaignDetail({
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-100 dark:border-slate-800 shadow-sm group hover:border-blue-500 transition-colors">
-              <div className="flex items-center gap-4 mb-4">
-                <div className="p-2.5 bg-blue-50 dark:bg-blue-900/30 rounded-2xl text-blue-600 dark:text-blue-300">
-                  <Gift className="w-6 h-6" />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div className="bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-100 dark:border-slate-800 shadow-sm group hover:border-blue-500 transition-colors">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="p-2 bg-blue-50 dark:bg-blue-900/30 rounded-2xl text-blue-600 dark:text-blue-300">
+                  <Gift className="w-5 h-5" />
                 </div>
                 <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">보상</span>
               </div>
-              <div className="text-lg font-black text-slate-800 dark:text-slate-100 leading-tight">
+              <div className="text-base font-black text-slate-800 dark:text-slate-100 leading-tight">
                 {rewardLabel}
               </div>
             </div>
-            <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-100 dark:border-slate-800 shadow-sm group hover:border-emerald-500 transition-colors">
-              <div className="flex items-center gap-4 mb-4">
-                <div className="p-2.5 bg-emerald-50 dark:bg-emerald-900/30 rounded-2xl text-emerald-600 dark:text-emerald-300">
-                  <MapPin className="w-6 h-6" />
+            <div className="bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-100 dark:border-slate-800 shadow-sm group hover:border-emerald-500 transition-colors">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="p-2 bg-emerald-50 dark:bg-emerald-900/30 rounded-2xl text-emerald-600 dark:text-emerald-300">
+                  <MapPin className="w-5 h-5" />
                 </div>
                 <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">지역</span>
               </div>
-              <div className="text-lg font-black text-slate-800 dark:text-slate-100 leading-tight">
+              <div className="text-base font-black text-slate-800 dark:text-slate-100 leading-tight">
                 {locationLabel}
               </div>
             </div>
           </div>
 
-          <div className="bg-slate-50 dark:bg-slate-900 rounded-2xl p-6 border border-slate-100 dark:border-slate-800 flex flex-col gap-5">
+          <div className="bg-slate-50 dark:bg-slate-900 rounded-2xl p-4 border border-slate-100 dark:border-slate-800 flex flex-col gap-4">
             <div className="flex justify-between items-center">
               <span className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest flex items-center gap-2">
                 <TrendingUp className="w-4 h-4" />
                 캠페인 지표
               </span>
             </div>
-            <div className="grid grid-cols-3 gap-6">
+            <div className="grid grid-cols-3 gap-3">
               {[
                 { label: "모집 수", v: recruited.toLocaleString(), sub: "명", icon: Target },
                 { label: "지원 수", v: applicant.toLocaleString(), sub: "명", icon: Users },
@@ -277,7 +277,7 @@ export default async function CampaignDetail({
                     <metric.icon className="w-3.5 h-3.5 text-slate-300" />
                     <span className="text-[9px] font-black text-slate-400 uppercase">{metric.label}</span>
                   </div>
-                  <div className="text-2xl font-black text-slate-900 dark:text-white">
+                  <div className="text-xl font-black text-slate-900 dark:text-white">
                     {metric.v}
                     <span className="text-[10px] ml-1 opacity-40">{metric.sub}</span>
                   </div>
@@ -341,12 +341,12 @@ export default async function CampaignDetail({
         </div>
       </div>
 
-      <section className="mt-20">
-        <div className="flex items-center justify-between mb-8 px-2">
+      <section className="mt-12">
+        <div className="flex items-center justify-between mb-5 px-2">
           <h2 className="text-[10px] font-black text-slate-900 dark:text-slate-100 uppercase tracking-[0.3em]">관련 캠페인</h2>
           <Link href="/" className="text-[10px] font-black text-blue-600 hover:underline">전체 캠페인 보기</Link>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {related.length === 0 ? (
             <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-6 text-slate-500 dark:text-slate-300 text-sm">
               <p className="font-black text-slate-800 dark:text-white mb-2">현재 표시할 관련 캠페인이 없습니다.</p>
@@ -388,4 +388,3 @@ export default async function CampaignDetail({
     </main>
   );
 }
-

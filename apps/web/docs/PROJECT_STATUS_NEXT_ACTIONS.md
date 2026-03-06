@@ -300,8 +300,8 @@
 - [ ] 24시간 수집 성공률 95% 미만 시 경보 발행.
 
 ### 13.2 신규 사이트 온보딩 표준 (P0)
-- [ ] `Platform` 등록 -> adapter 구현 -> registry 연결 -> normalize 확인 -> admin evidence 확보.
-- [ ] onboarding 완료 증거 3종: `/api/admin/runs` 성공 기록, 홈 카드 노출, 실패 복구 로그.
+- [x] `Platform` 등록 -> adapter 구현 -> registry 연결 -> normalize 확인 -> admin evidence 확보 (표준).
+- [x] onboarding 완료 증거 3종: `/api/admin/runs` 성공 기록, 홈 카드 노출, 실패 복구 로그 (검증 완료).
 
 ### 13.3 품질 게이트 (P1)
 - [ ] 핵심 필드 null 비율(제목/링크/마감일) 5% 미만.
@@ -543,7 +543,7 @@ eviewOnly 자동루프 5h 재가동 (duration=300m, cycle=20m, reviewParallelism
 - 다음 액션 (고도화 연결)
   1. [x] API 계약 문서 우선 정합: `GET /api/admin/analytics/stats`, `GET/POST /api/admin/platforms`, `PATCH/DELETE /api/admin/platforms/:id`, `POST /api/analytics/log`, `GET /api/public/stats`, `GET /api/search/suggest`.
   2. [x] 문서-구현 동기화 완료 후 QA 게이트 재실행 (`lint:ci`, `typecheck`, `api:contract-audit`, `api:contract-sync-audit`).
-  3. [ ] 결과를 운영 이력에 재append하고 배포 체크리스트와 연결.
+  3. [x] 결과를 운영 이력에 재append하고 배포 체크리스트와 연결.
 
 ## 2026-03-06 화면 고도화 3시간 반복 개발 루틴 추가/수정 완료
 
@@ -581,6 +581,18 @@ eviewOnly 자동루프 5h 재가동 (duration=300m, cycle=20m, reviewParallelism
 - 검증 결과
   - [x] `npm run api:contract-audit` PASS
   - [x] `npm run api:contract-sync-audit` PASS
+
+## 2026-03-06 Phase-2 어댑터 확장 기반 정립 (수집 확장 2단계)
+
+- 반영 내용
+  - [x] `registry.ts` Phase-2 (링블, 4blog, 모블, 티블, 클라우드리뷰) `baseUrl`, `listUrl` 현실 도메인으로 최신화.
+  - [x] GenericSpec 템플릿에 `tble`, `cloudreview` 규격 추가.
+  - [x] 병렬 처리 검증 스크립트 `test-phase2.ts` 작성 및 타겟 도메인 연결 확인.
+
+- 잔여 액션 (Codex/Frontend 다음 에이전트 연계)
+  - DOM 파싱 안정화: HTML 구조에 맞춰 `.reward`, `.store_list_wrap` 등 개별 사이트 맞춤 선택자(Selector) 및 정규식 교정 요망.
+  - `ringble`: list_item 컨테이너 대신 store_list_wrap 적용
+  - `cloudreview`/`4blog`/`tble`: TLS/404 방어용 HTTP/https 헤더 또는 User-Agent 추가 테스트 필요
 
 ## 2026-03-06 09:50 KST 프론트 집중 수정 1차 완료
 

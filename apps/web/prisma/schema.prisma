@@ -8,52 +8,90 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
+enum TaxonomyKind {
+  CUISINE
+  REGION
+  DISH_TYPE
+  COURSE
+  PROTEIN
+  MAIN_INGREDIENT
+  COOKING_TECHNIQUE
+  FLAVOR
+  TEXTURE
+  TEMPERATURE
+  SERVICE_STYLE
+  DIETARY
+  ALLERGEN
+  OCCASION
+  BEVERAGE_PAIRING
+  PRICE_TIER
+}
+
+enum CorrelationType {
+  PAIRS_WITH
+  SIMILAR_TO
+  CONTRASTS_WITH
+  SUBSTITUTES_FOR
+  DERIVED_FROM
+  INFLUENCES
+  SIGNATURE_FOR
+  POPULAR_WITH
+  TREND_ALIGNS_WITH
+}
+
+enum CorrelationSourceType {
+  CURATED
+  IMPORTED
+  INFERRED
+  ANALYTICS
+}
+
 model Platform {
-  id         Int         @id @default(autoincrement())
-  name       String      @unique
+  id         Int      @id @default(autoincrement())
+  name       String   @unique
   base_url   String
-  is_active  Boolean     @default(true)
-  created_at DateTime    @default(now()) @db.Timestamptz(6)
-  
-  campaigns  Campaign[]
-  ingestRuns IngestRun[]
+  is_active  Boolean  @default(true)
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+
+  campaigns      Campaign[]
+  ingestRuns     IngestRun[]
   backgroundJobs BackgroundJob[]
   platformStats  PlatformStats[]
 }
 
 model Reviewer {
-  id                  Int                     @id @default(autoincrement())
+  id                  Int      @id @default(autoincrement())
   display_name        String
   handle              String?
   profile_url         String?
-  notes               String?                 @db.Text
-  is_active           Boolean                 @default(true)
-  auto_signin_enabled Boolean                @default(true)
+  notes               String?  @db.Text
+  is_active           Boolean  @default(true)
+  auto_signin_enabled Boolean  @default(true)
   status_note         String?
-  created_at          DateTime                @default(now()) @db.Timestamptz(6)
-  updated_at          DateTime                @default(now()) @updatedAt @db.Timestamptz(6)
+  created_at          DateTime @default(now()) @db.Timestamptz(6)
+  updated_at          DateTime @default(now()) @updatedAt @db.Timestamptz(6)
 
-  authCredentials     ReviewerAuthCredential[]
+  authCredentials ReviewerAuthCredential[]
 
   @@index([is_active])
 }
 
 model ReviewerAuthCredential {
-  id            Int      @id @default(autoincrement())
-  reviewer_id   Int
-  provider      String
-  account_label String?
-  profile_name  String?
-  auth_mode     String   @default("oauth")
-  auth_hint     String?
-  connection_state String @default("disconnected")
-  is_auto_login Boolean  @default(true)
-  is_primary    Boolean  @default(false)
-  last_checked_at DateTime? @db.Timestamptz(6)
-  last_error_message String? @db.Text
-  expires_at    DateTime? @db.Timestamptz(6)
-  created_at    DateTime @default(now()) @db.Timestamptz(6)
-  updated_at    DateTime @default(now()) @updatedAt @db.Timestamptz(6)
+  id                 Int       @id @default(autoincrement())
+  reviewer_id        Int
+  provider           String
+  account_label      String?
+  profile_name       String?
+  auth_mode          String    @default("oauth")
+  auth_hint          String?
+  connection_state   String    @default("disconnected")
+  is_auto_login      Boolean   @default(true)
+  is_primary         Boolean   @default(false)
+  last_checked_at    DateTime? @db.Timestamptz(6)
+  last_error_message String?   @db.Text
+  expires_at         DateTime? @db.Timestamptz(6)
+  created_at         DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at         DateTime  @default(now()) @updatedAt @db.Timestamptz(6)
 
   reviewer Reviewer @relation(fields: [reviewer_id], references: [id], onDelete: Cascade)
 
@@ -61,54 +99,399 @@ model ReviewerAuthCredential {
   @@index([provider, connection_state])
 }
 
+model Restaurant {
+  id            Int      @id @default(autoincrement())
+  name          String
+  slug          String   @unique
+  brand_name    String?
+  description   String?  @db.Text
+  country       String?
+  region_depth1 String?
+  region_depth2 String?
+  city          String?
+  district      String?
+  address       String?
+  latitude      Float?
+  longitude     Float?
+  price_band    String?
+  service_model String?
+  phone         String?
+  website_url   String?
+  source_ref    String?
+  metadata      Json?
+  created_at    DateTime @default(now()) @db.Timestamptz(6)
+  updated_at    DateTime @default(now()) @updatedAt @db.Timestamptz(6)
+
+  campaigns           Campaign[]
+  chefLinks           ChefRestaurant[]
+  dishLinks           RestaurantDish[]
+  taxonomyAssignments RestaurantTaxonomyAssignment[]
+
+  @@index([region_depth1, region_depth2, city])
+  @@index([price_band, service_model])
+}
+
+model Chef {
+  id              Int      @id @default(autoincrement())
+  name            String
+  slug            String   @unique
+  bio             String?  @db.Text
+  signature_style String?
+  career_years    Int?
+  nationality     String?
+  hometown        String?
+  source_ref      String?
+  metadata        Json?
+  created_at      DateTime @default(now()) @db.Timestamptz(6)
+  updated_at      DateTime @default(now()) @updatedAt @db.Timestamptz(6)
+
+  restaurantLinks     ChefRestaurant[]
+  dishes              Dish[]                   @relation("DishPrimaryChef")
+  taxonomyAssignments ChefTaxonomyAssignment[]
+
+  @@index([name])
+  @@index([signature_style])
+}
+
+model Dish {
+  id                  Int      @id @default(autoincrement())
+  name                String
+  slug                String   @unique
+  canonical_name      String?
+  description         String?  @db.Text
+  origin_region       String?
+  spice_level         Int?
+  complexity_level    Int?
+  serving_temperature String?
+  source_ref          String?
+  image_url           String?
+  metadata            Json?
+  primary_chef_id     Int?
+  created_at          DateTime @default(now()) @db.Timestamptz(6)
+  updated_at          DateTime @default(now()) @updatedAt @db.Timestamptz(6)
+
+  primaryChef          Chef?                    @relation("DishPrimaryChef", fields: [primary_chef_id], references: [id], onDelete: SetNull)
+  restaurantLinks      RestaurantDish[]
+  taxonomyAssignments  DishTaxonomyAssignment[]
+  ingredients          DishIngredient[]
+  outgoingCorrelations DishCorrelation[]        @relation("DishCorrelationSource")
+  incomingCorrelations DishCorrelation[]        @relation("DishCorrelationTarget")
+  campaigns            Campaign[]               @relation("CampaignRepresentativeDish")
+  metrics              DishAnalyticsSnapshot[]
+
+  @@index([canonical_name])
+  @@index([origin_region, serving_temperature])
+}
+
+model Ingredient {
+  id               Int      @id @default(autoincrement())
+  name             String
+  slug             String   @unique
+  canonical_name   String?
+  ingredient_group String?
+  description      String?  @db.Text
+  seasonality      String?
+  source_ref       String?
+  metadata         Json?
+  created_at       DateTime @default(now()) @db.Timestamptz(6)
+  updated_at       DateTime @default(now()) @updatedAt @db.Timestamptz(6)
+
+  dishLinks           DishIngredient[]
+  taxonomyAssignments IngredientTaxonomyAssignment[]
+
+  @@index([ingredient_group])
+  @@index([canonical_name])
+}
+
+model TaxonomyTerm {
+  id          Int          @id @default(autoincrement())
+  kind        TaxonomyKind
+  name        String
+  slug        String
+  icon_emoji  String?
+  icon_key    String?
+  badge_color String?
+  sort_order  Int          @default(0)
+  parent_id   Int?
+  depth       Int          @default(0)
+  description String?      @db.Text
+  aliases     Json?
+  metadata    Json?
+  created_at  DateTime     @default(now()) @db.Timestamptz(6)
+  updated_at  DateTime     @default(now()) @updatedAt @db.Timestamptz(6)
+
+  parent                TaxonomyTerm?                  @relation("TaxonomyHierarchy", fields: [parent_id], references: [id], onDelete: SetNull)
+  children              TaxonomyTerm[]                 @relation("TaxonomyHierarchy")
+  dishAssignments       DishTaxonomyAssignment[]
+  chefAssignments       ChefTaxonomyAssignment[]
+  restaurantAssignments RestaurantTaxonomyAssignment[]
+  ingredientAssignments IngredientTaxonomyAssignment[]
+  outgoingRelations     TaxonomyRelation[]             @relation("TaxonomyRelationSource")
+  incomingRelations     TaxonomyRelation[]             @relation("TaxonomyRelationTarget")
+  metrics               TaxonomyAnalyticsSnapshot[]
+
+  @@unique([kind, slug], name: "uniq_taxonomy_kind_slug")
+  @@index([kind, parent_id])
+}
+
+model RestaurantDish {
+  id                Int      @id @default(autoincrement())
+  restaurant_id     Int
+  dish_id           Int
+  menu_label        String?
+  course_label      String?
+  price             Int?
+  is_signature      Boolean  @default(false)
+  is_seasonal       Boolean  @default(false)
+  is_active         Boolean  @default(true)
+  availability_note String?
+  created_at        DateTime @default(now()) @db.Timestamptz(6)
+  updated_at        DateTime @default(now()) @updatedAt @db.Timestamptz(6)
+
+  restaurant Restaurant @relation(fields: [restaurant_id], references: [id], onDelete: Cascade)
+  dish       Dish       @relation(fields: [dish_id], references: [id], onDelete: Cascade)
+
+  @@unique([restaurant_id, dish_id], name: "uniq_restaurant_dish")
+  @@index([restaurant_id, is_signature])
+  @@index([dish_id, is_active])
+}
+
+model ChefRestaurant {
+  id            Int       @id @default(autoincrement())
+  chef_id       Int
+  restaurant_id Int
+  role          String    @default("EXECUTIVE_CHEF")
+  is_current    Boolean   @default(true)
+  start_date    DateTime? @db.Date
+  end_date      DateTime? @db.Date
+  notes         String?   @db.Text
+  created_at    DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at    DateTime  @default(now()) @updatedAt @db.Timestamptz(6)
+
+  chef       Chef       @relation(fields: [chef_id], references: [id], onDelete: Cascade)
+  restaurant Restaurant @relation(fields: [restaurant_id], references: [id], onDelete: Cascade)
+
+  @@unique([chef_id, restaurant_id, role], name: "uniq_chef_restaurant_role")
+  @@index([restaurant_id, is_current])
+  @@index([chef_id, is_current])
+}
+
+model DishIngredient {
+  id               Int      @id @default(autoincrement())
+  dish_id          Int
+  ingredient_id    Int
+  role             String   @default("PRIMARY")
+  amount_text      String?
+  unit             String?
+  is_core          Boolean  @default(true)
+  preparation_note String?
+  created_at       DateTime @default(now()) @db.Timestamptz(6)
+  updated_at       DateTime @default(now()) @updatedAt @db.Timestamptz(6)
+
+  dish       Dish       @relation(fields: [dish_id], references: [id], onDelete: Cascade)
+  ingredient Ingredient @relation(fields: [ingredient_id], references: [id], onDelete: Cascade)
+
+  @@unique([dish_id, ingredient_id, role], name: "uniq_dish_ingredient_role")
+  @@index([ingredient_id, is_core])
+}
+
+model DishTaxonomyAssignment {
+  id               Int                   @id @default(autoincrement())
+  dish_id          Int
+  taxonomy_term_id Int
+  relevance_score  Decimal               @default(1.0) @db.Decimal(5, 2)
+  is_primary       Boolean               @default(false)
+  source_type      CorrelationSourceType @default(CURATED)
+  notes            String?               @db.Text
+  created_at       DateTime              @default(now()) @db.Timestamptz(6)
+  updated_at       DateTime              @default(now()) @updatedAt @db.Timestamptz(6)
+
+  dish         Dish         @relation(fields: [dish_id], references: [id], onDelete: Cascade)
+  taxonomyTerm TaxonomyTerm @relation(fields: [taxonomy_term_id], references: [id], onDelete: Cascade)
+
+  @@unique([dish_id, taxonomy_term_id], name: "uniq_dish_taxonomy")
+  @@index([taxonomy_term_id, is_primary])
+}
+
+model ChefTaxonomyAssignment {
+  id               Int                   @id @default(autoincrement())
+  chef_id          Int
+  taxonomy_term_id Int
+  relevance_score  Decimal               @default(1.0) @db.Decimal(5, 2)
+  is_primary       Boolean               @default(false)
+  source_type      CorrelationSourceType @default(CURATED)
+  notes            String?               @db.Text
+  created_at       DateTime              @default(now()) @db.Timestamptz(6)
+  updated_at       DateTime              @default(now()) @updatedAt @db.Timestamptz(6)
+
+  chef         Chef         @relation(fields: [chef_id], references: [id], onDelete: Cascade)
+  taxonomyTerm TaxonomyTerm @relation(fields: [taxonomy_term_id], references: [id], onDelete: Cascade)
+
+  @@unique([chef_id, taxonomy_term_id], name: "uniq_chef_taxonomy")
+  @@index([taxonomy_term_id, is_primary])
+}
+
+model RestaurantTaxonomyAssignment {
+  id               Int                   @id @default(autoincrement())
+  restaurant_id    Int
+  taxonomy_term_id Int
+  relevance_score  Decimal               @default(1.0) @db.Decimal(5, 2)
+  is_primary       Boolean               @default(false)
+  source_type      CorrelationSourceType @default(CURATED)
+  notes            String?               @db.Text
+  created_at       DateTime              @default(now()) @db.Timestamptz(6)
+  updated_at       DateTime              @default(now()) @updatedAt @db.Timestamptz(6)
+
+  restaurant   Restaurant   @relation(fields: [restaurant_id], references: [id], onDelete: Cascade)
+  taxonomyTerm TaxonomyTerm @relation(fields: [taxonomy_term_id], references: [id], onDelete: Cascade)
+
+  @@unique([restaurant_id, taxonomy_term_id], name: "uniq_restaurant_taxonomy")
+  @@index([taxonomy_term_id, is_primary])
+}
+
+model IngredientTaxonomyAssignment {
+  id               Int                   @id @default(autoincrement())
+  ingredient_id    Int
+  taxonomy_term_id Int
+  relevance_score  Decimal               @default(1.0) @db.Decimal(5, 2)
+  is_primary       Boolean               @default(false)
+  source_type      CorrelationSourceType @default(CURATED)
+  notes            String?               @db.Text
+  created_at       DateTime              @default(now()) @db.Timestamptz(6)
+  updated_at       DateTime              @default(now()) @updatedAt @db.Timestamptz(6)
+
+  ingredient   Ingredient   @relation(fields: [ingredient_id], references: [id], onDelete: Cascade)
+  taxonomyTerm TaxonomyTerm @relation(fields: [taxonomy_term_id], references: [id], onDelete: Cascade)
+
+  @@unique([ingredient_id, taxonomy_term_id], name: "uniq_ingredient_taxonomy")
+  @@index([taxonomy_term_id, is_primary])
+}
+
+model DishCorrelation {
+  id               Int                   @id @default(autoincrement())
+  source_dish_id   Int
+  target_dish_id   Int
+  correlation_type CorrelationType
+  score            Decimal               @db.Decimal(5, 2)
+  confidence       Decimal               @default(0.50) @db.Decimal(5, 2)
+  source_type      CorrelationSourceType @default(CURATED)
+  rationale        String?               @db.Text
+  created_at       DateTime              @default(now()) @db.Timestamptz(6)
+  updated_at       DateTime              @default(now()) @updatedAt @db.Timestamptz(6)
+
+  sourceDish Dish @relation("DishCorrelationSource", fields: [source_dish_id], references: [id], onDelete: Cascade)
+  targetDish Dish @relation("DishCorrelationTarget", fields: [target_dish_id], references: [id], onDelete: Cascade)
+
+  @@unique([source_dish_id, target_dish_id, correlation_type], name: "uniq_dish_correlation")
+  @@index([target_dish_id, correlation_type])
+}
+
+model TaxonomyRelation {
+  id               Int                   @id @default(autoincrement())
+  source_term_id   Int
+  target_term_id   Int
+  correlation_type CorrelationType
+  score            Decimal               @db.Decimal(5, 2)
+  confidence       Decimal               @default(0.50) @db.Decimal(5, 2)
+  source_type      CorrelationSourceType @default(CURATED)
+  rationale        String?               @db.Text
+  created_at       DateTime              @default(now()) @db.Timestamptz(6)
+  updated_at       DateTime              @default(now()) @updatedAt @db.Timestamptz(6)
+
+  sourceTerm TaxonomyTerm @relation("TaxonomyRelationSource", fields: [source_term_id], references: [id], onDelete: Cascade)
+  targetTerm TaxonomyTerm @relation("TaxonomyRelationTarget", fields: [target_term_id], references: [id], onDelete: Cascade)
+
+  @@unique([source_term_id, target_term_id, correlation_type], name: "uniq_taxonomy_relation")
+  @@index([target_term_id, correlation_type])
+}
+
+model DishAnalyticsSnapshot {
+  id                 BigInt   @id @default(autoincrement())
+  dish_id            Int
+  metric_date        DateTime @db.Date
+  mention_count      Int      @default(0)
+  restaurant_count   Int      @default(0)
+  menu_count         Int      @default(0)
+  avg_price          Int?
+  popularity_score   Decimal? @db.Decimal(10, 2)
+  satisfaction_score Decimal? @db.Decimal(10, 2)
+  created_at         DateTime @default(now()) @db.Timestamptz(6)
+
+  dish Dish @relation(fields: [dish_id], references: [id], onDelete: Cascade)
+
+  @@unique([dish_id, metric_date], name: "uniq_dish_metric_date")
+  @@index([metric_date])
+}
+
+model TaxonomyAnalyticsSnapshot {
+  id               BigInt   @id @default(autoincrement())
+  taxonomy_term_id Int
+  metric_date      DateTime @db.Date
+  dish_count       Int      @default(0)
+  restaurant_count Int      @default(0)
+  chef_count       Int      @default(0)
+  popularity_score Decimal? @db.Decimal(10, 2)
+  created_at       DateTime @default(now()) @db.Timestamptz(6)
+
+  taxonomyTerm TaxonomyTerm @relation(fields: [taxonomy_term_id], references: [id], onDelete: Cascade)
+
+  @@unique([taxonomy_term_id, metric_date], name: "uniq_taxonomy_metric_date")
+  @@index([metric_date])
+}
+
 model Campaign {
-  id             Int       @id @default(autoincrement())
-  platform_id    Int
-  original_id    String    // 플랫폼별 고유 번호
-  
+  id                     Int    @id @default(autoincrement())
+  platform_id            Int
+  restaurant_id          Int?
+  representative_dish_id Int?
+  original_id            String // 플랫폼별 고유 번호
+
   // Basic Info
-  title          String
-  brand_name     String?   // 분석용 브랜드명 (추후 AI/Regex로 추출)
-  campaign_type  String?   // VST, SHP, PRS
-  media_type     String?   // BP, IP, YP, RS, SH, TK, CL
-  
+  title         String
+  brand_name    String? // 분석용 브랜드명 (추후 AI/Regex로 추출)
+  campaign_type String? // VST, SHP, PRS
+  media_type    String? // BP, IP, YP, RS, SH, TK, CL
+
   // Classification
-  category       String?
-  sub_category   String?
-  region_depth1  String?
-  region_depth2  String?
-  location       String?   // 검색용 전체 주소
-  lat            Float?
-  lng            Float?
-  
+  category      String?
+  sub_category  String?
+  region_depth1 String?
+  region_depth2 String?
+  location      String? // 검색용 전체 주소
+  lat           Float?
+  lng           Float?
+
   // Financial & Conversion
-  reward_text    String?
-  reward_value   Int?      @default(0) // 정규화된 가치
-  shop_url       String?   
-  thumbnail_url  String?
-  url            String    @unique
-  brief_desc     String?   @db.Text
-  tags           String?
-  
+  reward_text   String?
+  reward_value  Int?    @default(0) // 정규화된 가치
+  shop_url      String?
+  thumbnail_url String?
+  url           String  @unique
+  brief_desc    String? @db.Text
+  tags          String?
+
   // Real-time Stats (Denormalized for fast reading)
-  recruit_count   Int      @default(0)
-  applicant_count Int      @default(0)
+  recruit_count    Int     @default(0)
+  applicant_count  Int     @default(0)
   competition_rate Decimal @default(0.0) @db.Decimal(10, 2)
-  
+
   // Life-cycle
   apply_end_date DateTime? @db.Timestamptz(6)
   created_at     DateTime  @default(now()) @db.Timestamptz(6)
   updated_at     DateTime  @default(now()) @db.Timestamptz(6)
 
-  platform  Platform           @relation(fields: [platform_id], references: [id], onDelete: Cascade)
-  snapshots CampaignSnapshot[]
-  userSchedules UserSchedule[]
-  actionLogs    UserActionLog[]
+  platform           Platform           @relation(fields: [platform_id], references: [id], onDelete: Cascade)
+  restaurant         Restaurant?        @relation(fields: [restaurant_id], references: [id], onDelete: SetNull)
+  representativeDish Dish?              @relation("CampaignRepresentativeDish", fields: [representative_dish_id], references: [id], onDelete: SetNull)
+  snapshots          CampaignSnapshot[]
+  userSchedules      UserSchedule[]
+  actionLogs         UserActionLog[]
 
   @@unique([platform_id, original_id])
   @@index([platform_id, campaign_type, media_type])
   @@index([category, region_depth1])
   @@index([competition_rate, apply_end_date])
+  @@index([restaurant_id, representative_dish_id])
   @@index([created_at])
 }
 
@@ -128,13 +511,13 @@ model CampaignSnapshot {
 
 // [MARKETING] Daily aggregate for business intelligence
 model PlatformStats {
-  id             Int      @id @default(autoincrement())
-  platform_id    Int
-  date           DateTime @db.Date
-  total_campaigns Int
+  id               Int      @id @default(autoincrement())
+  platform_id      Int
+  date             DateTime @db.Date
+  total_campaigns  Int
   total_recruits   Int
   total_applicants Int
-  avg_competition  Decimal @db.Decimal(10, 2)
+  avg_competition  Decimal  @db.Decimal(10, 2)
 
   platform Platform @relation(fields: [platform_id], references: [id], onDelete: Cascade)
 
@@ -146,8 +529,8 @@ model UserActionLog {
   id          BigInt   @id @default(autoincrement())
   user_id     Int?
   campaign_id Int?
-  action      String   // 'VIEW', 'CLICK', 'FAVORITE', 'SHARE'
-  platform    String?  // 'WEB', 'APP', 'IOS', 'ANDROID'
+  action      String // 'VIEW', 'CLICK', 'FAVORITE', 'SHARE'
+  platform    String? // 'WEB', 'APP', 'IOS', 'ANDROID'
   created_at  DateTime @default(now()) @db.Timestamptz(6)
 
   user     User?     @relation(fields: [user_id], references: [id], onDelete: SetNull)
@@ -159,21 +542,21 @@ model UserActionLog {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
-  nickname  String?
-  notify_kakao_enabled Boolean @default(true)
-  notify_telegram_enabled Boolean @default(false)
-  notify_push_enabled Boolean @default(true)
-  created_at DateTime @default(now()) @db.Timestamptz(6)
+  id                      Int      @id @default(autoincrement())
+  email                   String   @unique
+  nickname                String?
+  notify_kakao_enabled    Boolean  @default(true)
+  notify_telegram_enabled Boolean  @default(false)
+  notify_push_enabled     Boolean  @default(true)
+  created_at              DateTime @default(now()) @db.Timestamptz(6)
 
-  schedules      UserSchedule[]
-  actionLogs     UserActionLog[]
-  deliveries     NotificationDelivery[]
+  schedules  UserSchedule[]
+  actionLogs UserActionLog[]
+  deliveries NotificationDelivery[]
 }
 
 model UserSchedule {
-  id                Int      @id @default(autoincrement())
+  id                Int       @id @default(autoincrement())
   user_id           Int
   campaign_id       Int?
   custom_title      String?
@@ -186,21 +569,21 @@ model UserSchedule {
   memo              String?
   created_at        DateTime  @default(now()) @db.Timestamptz(6)
 
-  user              User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  campaign          Campaign? @relation(fields: [campaign_id], references: [id], onDelete: SetNull)
-  deliveries        NotificationDelivery[]
+  user       User                   @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  campaign   Campaign?              @relation(fields: [campaign_id], references: [id], onDelete: SetNull)
+  deliveries NotificationDelivery[]
 
   @@index([user_id, status])
   @@index([deadline_date])
 }
 
 model NotificationDelivery {
-  id               Int      @id @default(autoincrement())
-  user_id          Int
-  user_schedule_id Int
-  channel          String   @default("push")
-  status           String   @default("PENDING")
-  due_days         Int
+  id                 Int       @id @default(autoincrement())
+  user_id            Int
+  user_schedule_id   Int
+  channel            String    @default("push")
+  status             String    @default("PENDING")
+  due_days           Int
   sent_at            DateTime? @db.Timestamptz(6)
   created_at         DateTime  @default(now()) @db.Timestamptz(6)
   updated_at         DateTime  @default(now()) @updatedAt @db.Timestamptz(6)
@@ -218,7 +601,7 @@ model NotificationDelivery {
 model IngestRun {
   id              Int       @id @default(autoincrement())
   platform_id     Int
-  status          String 
+  status          String
   records_added   Int       @default(0)
   records_updated Int       @default(0)
   error_log       String?
@@ -229,10 +612,10 @@ model IngestRun {
 }
 
 model BackgroundJob {
-  id          Int      @id @default(autoincrement())
-  type        String
-  platform_id Int?
-  payload     String?
+  id           Int       @id @default(autoincrement())
+  type         String
+  platform_id  Int?
+  payload      String?
   status       String    @default("PENDING")
   attempts     Int       @default(0)
   max_attempts Int       @default(3)

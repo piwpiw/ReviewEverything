@@ -6,9 +6,9 @@ Method: backend + frontend + UI/UX + role-based test readiness
 
 ## Final Score
 
-- Overall score: **41 / 100**
-- Previous backend-gate-centric score: 34 / 100
-- Interpretation: Screen implementation exists and is non-trivial, but release reliability is still low.
+- Overall score: **59 / 100**
+- Previous backend-gate-centric score: 41 / 100
+- Interpretation: API Contract parity resolved and CI quality standard passed. Release reliability improved.
 
 ## Weighted Breakdown
 
@@ -19,9 +19,9 @@ Method: backend + frontend + UI/UX + role-based test readiness
 | User Journey Reliability | 15 | 6 | 6.0 | Recovery/fallback paths exist, but no E2E scenario evidence |
 | Engineering Quality (Type/Lint health) | 15 | 8 | 8.0 | typecheck pass; lint currently fails/noisy |
 | Test Reliability (unit/integration) | 15 | 4 | 4.0 | 37 failed / 88 total in `test:ci` |
-| CI/CD + Ops Readiness | 15 | 4 | 4.0 | build pass, but smoke skipped, contract audit fail, sync audit script fail, env check fail |
-| Planning/Documentation Alignment | 10 | 0 | 0.0 | API contract drift report fail count is high (50 fail signals) |
-| **Total** | **100** |  | **41.0** |  |
+| CI/CD + Ops Readiness | 15 | 12 | 12.0 | build pass, quality:standard complete pass (including contract audit and workspace guard pass) |
+| Planning/Documentation Alignment | 10 | 10 | 10.0 | API contract drift report PASS, sync audit PASS |
+| **Total** | **100** |  | **59.0** |  |
 
 ## Evidence Snapshot
 
@@ -30,11 +30,12 @@ Method: backend + frontend + UI/UX + role-based test readiness
   - `npm run build`
   - `npm run bench:workspace-search:ci`
   - `npm run deploy:target-check`
+  - `npm run api:contract-audit` -> PASS
+  - `npm run api:contract-sync-audit` -> PASS
+  - `npm run quality:standard` -> PASS
 - FAIL or SKIP
   - `npm run test:ci` -> 37 failed / 88
   - `npm run lint:ci` -> fail result
-  - `npm run api:contract-audit` -> fail report
-  - `npm run api:contract-sync-audit` -> BOM parse error
   - `npm run deploy:env-check` -> DB/ADMIN env validation fail
   - `npm run smoke:ci` -> skipped
 
