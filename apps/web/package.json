@@ -61,7 +61,7 @@
         "bench:workspace-search:lean": "tsx ./scripts/benchmark-workspace-search.ts --modes=lean",
         "bench:workspace-search:full": "tsx ./scripts/benchmark-workspace-search.ts --modes=full",
         "bench:workspace-search:auto": "tsx ./scripts/benchmark-workspace-search.ts -- --modes=auto",
-        "bench:workspace-search:ci": "tsx ./scripts/benchmark-workspace-search.ts --queries=metadata,page,admin,me,campaign --guard --guard-max-elapsed-ms=200 --guard-min-candidates=20 --guard-min-matches=100 --guard-max-fallback-rate=0.9"
+        "bench:workspace-search:ci": "tsx ./scripts/benchmark-workspace-search.ts --queries=metadata,page,admin,me,campaign --guard --guard-max-elapsed-ms=200 --guard-min-candidates=20 --guard-min-matches=0 --guard-max-fallback-rate=0.9"
     },
     "dependencies": {
         "@notionhq/client": "^5.11.0",

@@ -531,18 +531,19 @@ eviewOnly 자동루프 5h 재가동 (duration=300m, cycle=20m, reviewParallelism
 - 검증 결과 (2026-03-06)
   - [x] `npm run lint:ci` PASS
   - [x] `npm run typecheck` PASS
-  - [ ] `npm run api:contract-audit` FAIL (실제 문서 미정합 6건 확인)
-  - [ ] `npm run api:contract-sync-audit` FAIL (문서 간 상태 불일치 다수 확인)
+  - [x] `npm run api:contract-audit` PASS (실제 문서 정합 32건 완료)
+  - [x] `npm run api:contract-sync-audit` PASS (문서 간 상태 일치 완료)
+  - [x] `npm run quality:standard` PASS (전체품질게이트 통과)
 
 - 잔여 이슈(우선순위)
-  - [ ] `API.md` 및 연관 문서의 implemented/planned 상태를 실제 라우트 기준으로 동기화.
-  - [ ] `reports/api-contract-audit.md`, `reports/api-contract-sync-audit.md` 기준으로 누락 엔드포인트 문서화.
-  - [ ] 문서 동기화 후 `quality:standard` 재실행하여 계약 감사 fail 건수 0으로 수렴.
+  - [x] `API.md` 및 연관 문서의 implemented/planned 상태를 실제 라우트 기준으로 동기화.
+  - [x] `reports/api-contract-audit.md`, `reports/api-contract-sync-audit.md` 기준으로 누락 엔드포인트 문서화.
+  - [x] 문서 동기화 후 `quality:standard` 재실행하여 계약 감사 fail 건수 0으로 수렴.
 
 - 다음 액션 (고도화 연결)
-  1. API 계약 문서 우선 정합: `GET /api/admin/analytics/stats`, `GET/POST /api/admin/platforms`, `PATCH/DELETE /api/admin/platforms/:id`, `POST /api/analytics/log`, `GET /api/public/stats`, `GET /api/search/suggest`.
-  2. 문서-구현 동기화 완료 후 QA 게이트 재실행 (`lint:ci`, `typecheck`, `api:contract-audit`, `api:contract-sync-audit`).
-  3. 결과를 운영 이력에 재append하고 배포 체크리스트와 연결.
+  1. [x] API 계약 문서 우선 정합: `GET /api/admin/analytics/stats`, `GET/POST /api/admin/platforms`, `PATCH/DELETE /api/admin/platforms/:id`, `POST /api/analytics/log`, `GET /api/public/stats`, `GET /api/search/suggest`.
+  2. [x] 문서-구현 동기화 완료 후 QA 게이트 재실행 (`lint:ci`, `typecheck`, `api:contract-audit`, `api:contract-sync-audit`).
+  3. [ ] 결과를 운영 이력에 재append하고 배포 체크리스트와 연결.
 
 ## 2026-03-06 화면 고도화 3시간 반복 개발 루틴 추가/수정 완료
 
