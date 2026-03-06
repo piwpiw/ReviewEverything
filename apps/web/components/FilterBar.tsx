@@ -11,19 +11,19 @@ const RECENT_KEY = "re_recent_filters";
 
 const PLATFORMS = [
   { id: "", label: "전체" },
-  { id: "1", label: "Revu" },
-  { id: "2", label: "Reviewnote" },
-  { id: "3", label: "DinnerQueen" },
-  { id: "4", label: "ReviewPlace" },
-  { id: "5", label: "Seouloppa" },
-  { id: "6", label: "MrBlog" },
-  { id: "7", label: "GangnamFood" },
-  { id: "8", label: "TastyTalk" },
-  { id: "9", label: "Fooding" },
-  { id: "10", label: "StyleReview" },
-  { id: "11", label: "CreatorWave" },
-  { id: "12", label: "TasteNow" },
-  { id: "13", label: "NaverMap" },
+  { id: "1", label: "레뷰" },
+  { id: "2", label: "리뷰노트" },
+  { id: "3", label: "디너의여왕" },
+  { id: "4", label: "리뷰플레이스" },
+  { id: "5", label: "서울오빠" },
+  { id: "6", label: "미블" },
+  { id: "7", label: "강남맛집" },
+  { id: "8", label: "티블" },
+  { id: "9", label: "링블" },
+  { id: "10", label: "스타일C" },
+  { id: "11", label: "클라우드리뷰" },
+  { id: "12", label: "모블" },
+  { id: "13", label: "네이버 기반" },
 ];
 
 const TYPES = [
@@ -242,7 +242,7 @@ export default function FilterBar() {
   }, [current]);
 
   return (
-    <section className="relative rounded-3xl border border-white/60 bg-white/90 p-6 dark:bg-slate-900/90">
+    <section className="relative rounded-2xl border border-white/60 bg-white/95 p-4 dark:bg-slate-900/95">
       <header className="mb-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div className="flex items-center gap-3">
           <div className="h-10 w-10 rounded-xl bg-slate-900 text-white dark:bg-blue-600 flex items-center justify-center">
@@ -302,7 +302,7 @@ export default function FilterBar() {
       ) : null}
 
       {isPanelVisible ? (
-        <div className="max-h-[48vh] overflow-y-auto space-y-4 pr-1">
+        <div className="max-h-[46vh] overflow-y-auto space-y-3 pr-1">
           <div className="flex flex-wrap items-center gap-2">
             <span className="w-16 text-xs font-black text-slate-400">유형</span>
             {TYPES.map((item) => (
@@ -455,3 +455,4 @@ export default function FilterBar() {
     </section>
   );
 }
+

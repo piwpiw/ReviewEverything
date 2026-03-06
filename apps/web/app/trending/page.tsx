@@ -1,10 +1,9 @@
 ﻿"use client";
 
 import Image from "next/image";
-import { motion } from "framer-motion";
-import { ArrowRight, Flame, Clock, Target, ChevronRight, TrendingUp, Trophy, RefreshCw } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { AlertTriangle, ChevronRight, RefreshCw, SearchX, Sparkles, TrendingUp } from "lucide-react";
 
 type CampaignSnapshot = {
   recruit_count?: number;
@@ -21,70 +20,25 @@ type TrendingCampaign = {
   trend_score?: number | null;
 };
 
-const TRENDING_MOCK: TrendingCampaign[] = [
-  {
-    id: 1,
-    title: "[리뷰단] 2차 추첨 이벤트, 포인트 1200원 보상",
-    reward_text: "1,200원, 최대 보상",
-    snapshots: [{ recruit_count: 2, applicant_count: 1540 }],
-  },
-  {
-    id: 2,
-    title: "[체험단] 신제품 체험 리워드 1건 (D-1 마감)",
-    reward_text: "상금 709,000원",
-    snapshots: [{ recruit_count: 5, applicant_count: 2310 }],
-  },
-  {
-    id: 3,
-    title: "[미식] 2개월 연속 참여자 대기, 즉시 지급",
-    reward_text: "적립금 350,000원(2개월)",
-    snapshots: [{ recruit_count: 3, applicant_count: 855 }],
-  },
-];
-
-const HONEYPOT_MOCK: TrendingCampaign[] = [
-  {
-    id: 10,
-    title: "[마감 임박] 30건 한정 모집 마감 임박",
-    reward_text: "상금 200,000원",
-    image_url: "https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?w=400",
-  },
-  {
-    id: 11,
-    title: "[체험단] 신규 리뷰어 특별 보너스",
-    reward_text: "보너스 60,000원",
-    image_url: "https://images.unsplash.com/photo-1553621042-f6e147245754?w=400",
-  },
-  {
-    id: 12,
-    title: "[SNS] 콘텐츠 공유 모집 4건 모집중",
-    reward_text: "캐시 100,000원",
-    image_url: "https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=400",
-  },
-];
-
-type DataSource = "live" | "fallback" | "mock";
+type DataSource = "live" | "fallback";
 
 const SOURCE_LABEL: Record<DataSource, string> = {
   live: "실시간 분석",
   fallback: "DB 폴백",
-  mock: "샘플 데이터",
 };
 
-const resolveCardItems = (items: TrendingCampaign[]) =>
+const resolveItems = (items: TrendingCampaign[]) =>
   items.map((item, idx) => {
     const recruit = Math.max(1, item.snapshots?.[0]?.recruit_count || 10);
     const applicants = Math.max(0, item.snapshots?.[0]?.applicant_count || 0);
-    const image = item.image_url || "https://images.unsplash.com/photo-1512436991641-c6a4203251f8?w=500";
-    const reward = item.reward_text || (item.reward_value ? `${item.reward_value.toLocaleString()}원` : "보상은 개별 안내 예정");
     return {
       ...item,
+      image: item.image_url || "/images/campaign-placeholder.webp",
+      reward: item.reward_text || (item.reward_value ? `${item.reward_value.toLocaleString()}원` : "보상은 개별 안내"),
+      rankRatio: applicants / recruit,
       recruit,
       applicants,
-      image,
-      reward,
-      rankRatio: applicants > 0 && recruit > 0 ? applicants / recruit : 0,
-      sourceIndex: idx + 1,
+      rank: idx + 1,
     };
   });
 
@@ -92,6 +46,7 @@ export default function TrendingPage() {
   const [campaigns, setCampaigns] = useState<TrendingCampaign[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [fallbackMessage, setFallbackMessage] = useState<string | null>(null);
   const [dataSource, setDataSource] = useState<DataSource>("live");
   const [refreshTick, setRefreshTick] = useState(0);
 
@@ -101,6 +56,7 @@ export default function TrendingPage() {
     const load = async () => {
       setLoading(true);
       setError(null);
+      setFallbackMessage(null);
 
       try {
         const analyticsRes = await fetch("/api/analytics", { signal: controller.signal });
@@ -121,6 +77,7 @@ export default function TrendingPage() {
         if (controller.signal.aborted) return;
         setDataSource("fallback");
         setError(e instanceof Error ? e.message : "트렌드 조회에 실패해 폴백 데이터를 사용합니다.");
+        setFallbackMessage("실시간 API 응답이 비어 DB 폴백으로 전환했습니다.");
 
         try {
           const fallbackRes = await fetch("/api/campaigns?sort=applicant_desc&limit=10", { signal: controller.signal });
@@ -132,11 +89,14 @@ export default function TrendingPage() {
               return;
             }
           }
-          setCampaigns(TRENDING_MOCK);
-          setDataSource("mock");
+
+          setFallbackMessage("폴백 데이터가 없어 빈 상태로 표시합니다.");
+          setCampaigns([]);
+          setDataSource("fallback");
         } catch {
-          setCampaigns(TRENDING_MOCK);
-          setDataSource("mock");
+          setFallbackMessage("연동 실패로 빈 상태를 표시합니다.");
+          setCampaigns([]);
+          setDataSource("fallback");
         }
       } finally {
         setLoading(false);
@@ -147,139 +107,135 @@ export default function TrendingPage() {
     return () => controller.abort();
   }, [refreshTick]);
 
-  const topCards = useMemo(() => resolveCardItems(campaigns).slice(0, 10), [campaigns]);
-  const honeypotItems = useMemo(() => {
-    if (dataSource === "mock") return HONEYPOT_MOCK;
-    return campaigns.length > 0 ? resolveCardItems(campaigns.slice(3, 6)) : HONEYPOT_MOCK;
-  }, [campaigns, dataSource]);
+  const items = useMemo(() => resolveItems(campaigns).slice(0, 10), [campaigns]);
+  const spotlight = items.slice(0, 4);
+  const compact = items.slice(4, 10);
 
   return (
-    <div className="min-h-screen bg-black text-white pb-32 font-sans selection:bg-orange-500/30">
-      <div className="pt-12 px-6 pb-6 bg-gradient-to-b from-orange-900/20 to-black sticky top-0 z-40 backdrop-blur-xl border-b border-white/5">
-        <div className="flex items-end justify-between">
-          <div>
-            <h1 className="text-3xl font-black tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-orange-400 to-red-500 font-sans flex items-center gap-2">
-              <TrendingUp className="w-8 h-8 text-orange-500" strokeWidth={2.5} />
-              실시간 트렌드
-            </h1>
-            <p className="text-slate-400 text-sm mt-1 font-medium">최근 오픈된 인기 캠페인과 마감 임박 리스트를 한눈에 확인하세요.</p>
-            <p className="text-[11px] mt-2 text-amber-200/90 font-black tracking-[0.15em] uppercase">데이터 소스: {SOURCE_LABEL[dataSource]}</p>
-          </div>
-          <button
-            type="button"
-            onClick={() => setRefreshTick((prev) => prev + 1)}
-            disabled={loading}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-amber-500/40 bg-amber-500/10 text-amber-200 text-xs font-black"
-          >
-            <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} />
-            실시간 재조회
-          </button>
-        </div>
-        {error ? <p className="mt-2 text-xs text-rose-300">{error}</p> : null}
-      </div>
+    <main className="min-h-screen bg-slate-50 dark:bg-slate-950 py-8">
+      <div className="page-shell page-stack gap-4">
+        <section className="section-card p-5 md:p-6">
+          <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+            <div className="space-y-2">
+              <p className="section-title inline-flex items-center gap-2">
+                <Sparkles className="w-3.5 h-3.5 text-blue-500" />
+                트렌드 센터
+              </p>
+              <h1 className="text-2xl md:text-3xl font-black tracking-tight text-slate-900 dark:text-white inline-flex items-center gap-2">
+                <TrendingUp className="w-6 h-6 text-blue-600 dark:text-blue-300" />
+                실시간 인기 캠페인
+              </h1>
+              <p className="text-sm text-slate-500 dark:text-slate-300 font-bold">
+                데이터 소스: <span className="text-blue-600 dark:text-blue-300">{SOURCE_LABEL[dataSource]}</span>
+              </p>
+            </div>
 
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-12 mt-6 overflow-hidden">
-        <motion.section className="pl-6">
-          <div className="flex items-center gap-2 mb-4">
-            <Flame className="w-5 h-5 text-red-500" />
-            <h2 className="text-lg font-bold tracking-tight">실시간 TOP 10</h2>
-            <ChevronRight className="w-4 h-4 text-slate-500 ml-2" />
+            <button
+              type="button"
+              onClick={() => setRefreshTick((prev) => prev + 1)}
+              disabled={loading}
+              aria-label="실시간 트렌드 데이터를 다시 조회"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-blue-300/60 dark:border-blue-700/60 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-200 text-xs font-black focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} />
+              실시간 재조회
+            </button>
           </div>
-          <div className="flex gap-4 overflow-x-auto pb-6 pr-6 snap-x hide-scrollbar" style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
-            {loading ? (
-              Array.from({ length: 3 }).map((_, i) => (
-                <div key={i} className="snap-start shrink-0 w-72 h-80 rounded-[2rem] bg-slate-900 animate-pulse border border-white/5" />
-              ))
-            ) : (
-              topCards.map((item) => (
+
+          {error ? <p className="mt-3 text-xs text-rose-600 dark:text-rose-300">{error}</p> : null}
+          {fallbackMessage ? (
+            <div className="mt-3 inline-flex items-center gap-2 text-xs px-3 py-2 rounded-xl border border-amber-300/40 bg-amber-100/40 dark:bg-amber-900/20 text-amber-900 dark:text-amber-200">
+              <AlertTriangle className="w-3.5 h-3.5" />
+              {fallbackMessage}
+              <Link href="/?sort=latest_desc" className="underline font-black">
+                목록으로 이동
+              </Link>
+            </div>
+          ) : null}
+        </section>
+
+        {loading ? (
+          <section className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div key={i} className="h-52 rounded-2xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 animate-pulse" />
+            ))}
+          </section>
+        ) : items.length === 0 ? (
+          <section className="section-card p-10 text-center">
+            <div className="inline-flex flex-col items-center gap-4 text-slate-500 dark:text-slate-300">
+              <SearchX className="w-8 h-8 text-slate-300" />
+              <div>
+                <p className="text-sm font-black text-slate-900 dark:text-white mb-1">표시 가능한 트렌드가 없습니다.</p>
+                <p className="text-xs text-slate-500">실시간 API와 DB 폴백이 모두 비어있습니다.</p>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setRefreshTick((prev) => prev + 1)}
+                  className="px-4 py-2 rounded-xl bg-blue-600 text-white text-xs font-black hover:bg-blue-500 transition-colors focus-visible:ring-2 focus-visible:ring-blue-500"
+                >
+                  다시 조회
+                </button>
+                <a href="/?sort=applicant_desc" className="px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-black text-slate-700 dark:text-slate-200 hover:border-blue-500 transition-colors">
+                  전체 목록으로
+                </a>
+              </div>
+            </div>
+          </section>
+        ) : (
+          <>
+            <section className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3">
+              {spotlight.map((item) => (
                 <Link
                   key={item.id}
                   href={`/campaigns/${item.id}`}
-                  className="snap-start shrink-0 w-72 relative rounded-[2rem] overflow-hidden group cursor-pointer border border-white/10 hover:border-orange-500/50 transition-colors"
+                  aria-label={`${item.title} 상세 보기`}
+                  className="section-card overflow-hidden group transition-all hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
                 >
-                  <div className="absolute top-4 left-4 z-20 bg-black/60 backdrop-blur-md text-white font-black text-xs px-3 py-1.5 rounded-full flex items-center gap-1 border border-white/10 shadow-lg">
-                    <Trophy className="w-3 h-3 text-yellow-400" />
-                    {item.sourceIndex}위
-                  </div>
-                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent z-10" />
-                  <Image
-                    src={item.image}
-                    alt={item.title}
-                    fill
-                    className="w-full h-80 object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
-                  />
-                  <div className="absolute bottom-0 left-0 right-0 p-5 z-20">
-                    <div className="flex justify-between items-end mb-2">
-                      <span className="text-xs font-bold px-2 py-1 bg-white/10 backdrop-blur-md rounded-md text-orange-300">
-                        경쟁률 {item.rankRatio.toFixed(1)}:1
-                      </span>
-                      {item.trend_score ? <span className="text-xs font-black px-2 py-1 bg-blue-500/20 text-blue-200 rounded-md">+{item.trend_score}%</span> : null}
+                  <div className="relative h-36">
+                    <Image src={item.image} alt={item.title} fill className="object-cover group-hover:scale-105 transition-transform" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                    <div className="absolute top-2 left-2 chip-muted bg-white/85 dark:bg-slate-900/85">TOP {item.rank}</div>
+                    <div className="absolute bottom-2 left-2 right-2 text-white">
+                      <p className="text-xs font-black">경쟁률 {item.rankRatio.toFixed(1)}:1</p>
                     </div>
-                    <h3 className="font-bold text-lg leading-tight text-white line-clamp-2 mb-1">{item.title}</h3>
-                    <p className="text-sm text-slate-300 font-medium">{item.reward}</p>
+                  </div>
+                  <div className="p-3.5 space-y-1.5">
+                    <h3 className="text-sm font-black text-slate-900 dark:text-white line-clamp-2">{item.title}</h3>
+                    <p className="text-xs text-slate-500 dark:text-slate-300 font-bold">{item.reward}</p>
                   </div>
                 </Link>
-              ))
-            )}
-          </div>
-        </motion.section>
+              ))}
+            </section>
 
-        <motion.section className="px-6">
-          <div className="bg-gradient-to-br from-indigo-900/40 via-purple-900/20 to-black border border-indigo-500/20 rounded-3xl p-6 relative overflow-hidden group">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/20 blur-3xl rounded-full pointer-events-none" />
-            <div className="flex items-start justify-between mb-6">
-              <div>
-                <div className="flex items-center gap-2 mb-1">
-                  <Target className="w-5 h-5 text-indigo-400" />
-                  <h2 className="text-lg font-bold tracking-tight text-white">잠재 마감 임박 리스트</h2>
-                </div>
-                <p className="text-xs text-indigo-300/80">고경쟁·고유입 캠페인을 빠르게 확인해 보세요.</p>
+            <section className="section-card p-5">
+              <div className="flex items-center justify-between mb-3">
+                <h2 className="text-sm font-black text-slate-900 dark:text-white">추가 인기 목록</h2>
+                <span className="chip-muted">실시간 연동</span>
               </div>
-            </div>
-
-            <div className="space-y-3">
-              {honeypotItems.map((item) => {
-                const base = resolveCardItems([item])[0];
-                return (
-                  <div key={base.id} className="flex gap-4 p-3 rounded-2xl bg-white/5 hover:bg-white/10 transition-colors border border-white/5 cursor-pointer items-center">
-                    <Image src={base.image} alt={base.title} width={64} height={64} className="w-16 h-16 rounded-xl object-cover shrink-0" />
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-bold text-sm text-white truncate">{base.title}</h3>
-                      <p className="text-xs text-slate-400 mt-0.5">{base.reward}</p>
-                      <div className="flex items-center gap-2 mt-1.5">
-                        <div className="h-1.5 flex-1 bg-slate-800 rounded-full overflow-hidden">
-                          <div className="h-full bg-indigo-500 rounded-full" style={{ width: `${Math.min(100, base.rankRatio * 100)}%` }} />
-                        </div>
-                        <span className="text-[10px] text-indigo-300 font-bold tracking-tighter">{base.applicants}/{base.recruit}</span>
-                      </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-2">
+                {compact.map((item) => (
+                  <Link
+                    key={item.id}
+                    href={`/campaigns/${item.id}`}
+                    aria-label={`${item.title} 상세 페이지 이동`}
+                    className="rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 p-3 flex items-center gap-3 hover:border-blue-400 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                  >
+                    <div className="w-10 h-10 rounded-lg bg-slate-900 dark:bg-blue-600 text-white text-xs font-black flex items-center justify-center shrink-0">
+                      {item.rank}
                     </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </motion.section>
-
-        <motion.section className="px-6 mb-12">
-          <div className="flex items-center gap-2 mb-4">
-            <Clock className="w-5 h-5 text-slate-400" />
-            <h2 className="text-lg font-bold tracking-tight text-slate-200">마감 임박</h2>
-            <span className="text-xs px-2 py-0.5 ml-2 bg-red-500/20 text-red-400 rounded-full font-bold">즉시확인</span>
-          </div>
-          <div className="bg-slate-900 rounded-[2rem] p-5 border border-white/5 flex items-center justify-between cursor-pointer hover:border-slate-700 transition-colors">
-            <div className="flex gap-4 items-center">
-              <div className="w-12 h-12 bg-red-500/10 rounded-full flex items-center justify-center text-red-500 shrink-0">
-                <Clock className="w-6 h-6" />
+                    <div className="min-w-0 flex-1">
+                      <p className="text-xs font-black text-slate-900 dark:text-white truncate">{item.title}</p>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-300">{item.applicants}/{item.recruit} · {item.reward}</p>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-slate-400 shrink-0" />
+                  </Link>
+                ))}
               </div>
-              <div>
-                <h3 className="font-bold text-sm text-white">곧 마감되는 캠페인 알림</h3>
-                <p className="text-xs text-slate-400">3일 이내 마감되는 공고를 빠르게 확인하세요.</p>
-              </div>
-            </div>
-            <ArrowRight className="w-5 h-5 text-slate-500" />
-          </div>
-        </motion.section>
-      </motion.div>
-    </div>
+            </section>
+          </>
+        )}
+      </div>
+    </main>
   );
 }

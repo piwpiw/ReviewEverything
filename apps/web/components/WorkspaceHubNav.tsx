@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { CalendarDays, ClipboardCheck, Cpu, LayoutDashboard, ShieldCheck, TrendingUp } from "lucide-react";
 
 type WorkspaceKey = "me" | "calendar" | "notifications" | "project" | "admin" | "system";
@@ -12,12 +12,12 @@ type WorkspaceLink = {
 };
 
 const WORKSPACE_LINKS: WorkspaceLink[] = [
-  { key: "me", href: "/me", label: "사용자 대시보드", icon: LayoutDashboard, tone: "blue" },
+  { key: "me", href: "/me", label: "마이페이지", icon: LayoutDashboard, tone: "blue" },
   { key: "calendar", href: "/me/calendar", label: "캘린더", icon: CalendarDays, tone: "emerald" },
   { key: "notifications", href: "/me/notifications", label: "알림", icon: ClipboardCheck, tone: "violet" },
   { key: "project", href: "/me/console", label: "프로젝트 콘솔", icon: Cpu, tone: "rose" },
-  { key: "admin", href: "/admin", label: "관리자 콘솔", icon: ShieldCheck, tone: "blue" },
-  { key: "system", href: "/system", label: "운영 시스템", icon: TrendingUp, tone: "emerald" },
+  { key: "admin", href: "/admin", label: "관리자", icon: ShieldCheck, tone: "blue" },
+  { key: "system", href: "/system", label: "시스템", icon: TrendingUp, tone: "emerald" },
 ];
 
 const toneClass = {
@@ -37,14 +37,14 @@ export default function WorkspaceHubNav({
   description: string;
 }) {
   const quickTarget = current === "admin" ? "/system" : current === "system" ? "/admin" : "/admin";
-  const quickLabel = current === "admin" ? "운영 환경 이동" : "관리자 콘솔 이동";
+  const quickLabel = current === "admin" ? "시스템으로 이동" : "관리자 화면으로 이동";
 
   return (
     <section className="max-w-[1700px] mx-auto px-4 md:px-8 pt-8 pb-6 border-b border-slate-100 dark:border-slate-800">
       <div className="flex flex-col gap-4">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <p className="text-[11px] font-black text-slate-500 uppercase tracking-[0.2em]">운영 메뉴</p>
+            <p className="text-[11px] font-black text-slate-500 uppercase tracking-[0.2em]">실행 영역</p>
             <h1 className="text-2xl md:text-3xl font-black tracking-tighter text-slate-900 dark:text-white">{title}</h1>
             <p className="text-sm text-slate-500 dark:text-slate-400 font-bold mt-1">{description}</p>
           </div>
@@ -53,7 +53,7 @@ export default function WorkspaceHubNav({
               href="/"
               className="px-4 py-2 rounded-xl text-[11px] font-black border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
             >
-              홈으로
+              홈
             </Link>
             <Link
               href={quickTarget}

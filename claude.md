@@ -95,3 +95,38 @@ Scope: Project execution for `d:\BohemianStudio\ReviewEverything`
 - Recurrence prevention:
   - one file changed => compile-check that file directly via `node -e "import('./')"` equivalent not needed; use full `npm run build` when edits touch shared components/layout.
   - if edit involves large text conversions, avoid command-line raw replacement; prefer direct patch.
+
+## 10) Multi-Agent Session Protocol
+
+이 프로젝트는 **Claude, Gemini, Codex가 교대로 작업**합니다. 매번 사용자가 재설명하는 토큰 낭비를 없애기 위해 아래 규칙을 따릅니다.
+
+### 세션 시작 시 (필수)
+```
+1. grep_search "#session_handoff" docs/SESSION_HANDOFF.md
+   → last_session: 이전 에이전트 작업 파악
+   → pending_work: 다음 착수 작업 확인
+   → work_context: 현재 마일스톤/트랙/P0 상태 즉시 파악
+   → cost_hint: 이번 세션에 Claude가 적합한 작업인지 확인
+2. 사용자 재설명 없이 바로 작업 시작
+```
+
+### 세션 완료 시 (§11 Post-Task Closing에 병합)
+```
+1. SESSION_HANDOFF.md #session_handoff JSON 갱신
+   - last_agent: "CLAUDE"
+   - timestamp: 현재 시각 (ISO 8601 KST)
+   - last_session.summary: 이번 세션 요약 (2줄 이내)
+   - last_session.files_modified: 수정한 파일 목록
+   - last_session.build_status: GREEN / RED
+   - pending_work.immediate: 다음 AI가 이어서 할 구체적 작업
+   - cost_hint: 다음 작업에 적합한 AI 제안
+
+2. #session_log 테이블에 1행 append (10건 초과 시 가장 오래된 행 삭제)
+
+3. 이후 기존 §11 Post-Task Closing 루틴 계속 수행
+```
+
+### Claude 특화 적합 작업
+- 복잡한 아키텍처 변경, API 구현, 기존 규약 정밀 준수가 필요한 작업
+- 멀티 파일 비연속 수정, 빌드 오류 근원 추적 및 수정
+- 문서-코드 정합성 보장, PR 완료 루틴

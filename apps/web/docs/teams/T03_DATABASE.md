@@ -38,4 +38,4 @@
 ## 5. Done Definition
 - DB 연동 에러 및 타임아웃 로그(0건).
 - N+1 쿼리 패턴 완전 박멸.
-- `queryBuilder.test.ts` 완벽 통과 및 `/api/health` 200 OK 확보.
+- `queryBuilder.test.ts` 완벽 통과 및 health check 200 OK 확보.

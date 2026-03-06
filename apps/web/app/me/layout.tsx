@@ -1,5 +1,14 @@
-﻿import MeSectionNav from "@/components/MeSectionNav";
+import type { Metadata } from "next";
+import MeSectionNav from "@/components/MeSectionNav";
 import WorkspaceHubNav from "@/components/WorkspaceHubNav";
+
+export const metadata: Metadata = {
+  title: "내 워크스페이스 | 리뷰에브리띵",
+  description: "내 활동, 일정, 알림, 콘솔을 한 흐름으로 확인하는 사용자 작업 공간입니다.",
+  alternates: {
+    canonical: "/me",
+  },
+};
 
 export const dynamic = "force-dynamic";
 

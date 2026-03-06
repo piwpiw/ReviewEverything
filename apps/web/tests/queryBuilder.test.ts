@@ -1,6 +1,11 @@
 import { describe, it, expect } from 'vitest';
 import { buildCampaignsQuery } from '../lib/queryBuilder';
 
+type QueryClause = {
+    title?: { contains?: string };
+    location?: { contains?: string };
+};
+
 describe('buildCampaignsQuery', () => {
     it('returns default pagination when no params given', () => {
         const sp = new URLSearchParams();
@@ -24,10 +29,10 @@ describe('buildCampaignsQuery', () => {
         const sp = new URLSearchParams({ q: keyword });
         const result = buildCampaignsQuery(sp);
         expect(result.where.OR).toBeDefined();
-        const orClauses: any = result.where.OR;
+        const orClauses = result.where.OR as QueryClause[];
         expect(Array.isArray(orClauses)).toBe(true);
-        expect(orClauses.some((clause: any) => clause.title?.contains === keyword)).toBe(true);
-        expect(orClauses.some((clause: any) => clause.location?.contains === keyword)).toBe(true);
+        expect(orClauses.some((clause) => clause.title?.contains === keyword)).toBe(true);
+        expect(orClauses.some((clause) => clause.location?.contains === keyword)).toBe(true);
     });
 
     it('applies platform_id filter as integer', () => {
@@ -56,7 +61,9 @@ describe('buildCampaignsQuery', () => {
 
     it('applies deadline_asc sort', () => {
         const sp = new URLSearchParams({ sort: 'deadline_asc' });
-        const result: any = buildCampaignsQuery(sp);
+        const result = buildCampaignsQuery(sp) as {
+            orderBy: Array<{ apply_end_date: { sort: string; nulls: string } }>;
+        };
 
         expect(Array.isArray(result.orderBy)).toBe(true);
         expect(result.orderBy[0].apply_end_date.sort).toBe('asc');

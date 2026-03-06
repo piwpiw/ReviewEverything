@@ -180,6 +180,7 @@
 - `PROJECT_STATUS.md`: 완료된 마일스톤 체크 및 실제 구현된 기능 목록 업데이트.
 - `PROJECT_STATUS_NEXT_ACTIONS.md`: 백로그 항목 체크오프 및 다음 우선순위 액션 정의.
 - `SCRAPERS.md`/`CRAWLER_TOP20_RESEARCH_SPECS.md`: 수집 플랜(우선순위/병렬도/실패 라벨) 변경 시 즉시 동기화.
+- `SESSION_HANDOFF.md`: 세션 완료 시 `#session_handoff` JSON 및 `#session_log` 갱신 필수 (Multi-Agent 인수인계 — §10 참조).
 - 운영 감사 항목: `CREATOR_CREATE/UPDATE/DELETE` 로그, 실패 코드북(`REAUTH_REQUIRED` 등) 동작 여부를 다음 문서에 함께 정리해 동기화한다.
 
 ### 11.2 고도화 (Premium Sophistication)
@@ -199,18 +200,30 @@
 
 
 
-## 12.10 5시간 무인 고도화 오퍼레이터 (Autonomous Ops 5h+)
+## 12.10 3시간/5시간 무인 고도화 오퍼레이터 (Autonomous Ops 3h+)
 
-목적: 사용자 개입 없이 5시간(300분) 동안 수집 병렬 루프 + 문서/품질 셀프 체크를 반복하고 증거 로그를 남긴다.
+목적: 사용자 개입 없이 3시간(180분) 또는 5시간(300분) 동안 반복 루프를 실행하고, 화면 고도화/문서/품질 셀프 체크 증거 로그를 남긴다.
 
 실행 규칙
 - 기본 실행: `npm run ops:autonomous` (`durationMinutes=300`, `cycleMinutes=20`, `phases=A,B,C`, `ingest/refactor/apiAudits` 동작)
+- 3시간 표준 실행: `npm run ops:autonomous:3h`
+- 3시간 화면 고도화 전용: `npm run ops:autonomous:3h:dev` 또는 `npm run ops:screen:3h` (ingest 비활성, refactor + API audit + health check)
 - 5시간 정밀 실행: `npm run ops:autonomous:5h`
-- 운영/수집 비활성화, 검토 작업리스트 전용: `npm run ops:review-list`, `npm run ops:review-list:5h`
+- 실제 고도화/수정 위주의 장기 실행: `npm run ops:autonomous:5h:dev` (reviewOnly 비활성, refactor+API audit+ingest 동시 수행)
+- 운영/수집 비활성화, 검토 작업리스트 전용: `npm run ops:review-list`, `npm run ops:review-list:3h`, `npm run ops:review-list:5h`
+- 병렬 검토 실행(권장): `npm run ops:review-list -- --reviewParallelism=3 --reviewTasksPerHour=100`
+- 매시간 리포트: `docs/AUTONOMOUS_HOURLY_REPORT.md`에 자동 누적 (`ops:review-list*` 실행 시 동작)
 - 권장 시작 전: 운영 중간 작업과 충돌이 없음을 확인하고 배포 동작은 별도 배포명령으로 분리
 - 산출물: `apps/web/logs/autonomous/*`, `apps/web/reports/*`
 - 제약: 배포/푸시 자동화는 기본 off. 자동 커밋은 `--autoCommit=false` 기본값.
 - 강제 종료: `Ctrl+C` 또는 작업 신호 발생 시 현재 사이클 종료 후 정리 종료
+
+운영 체크인 규칙:
+- 매시간 단락 1개 = 5시간 연산에서 1개 목표 블록으로 간주
+- 아침 확인은 `docs/AUTONOMOUS_HOURLY_REPORT.md`만 열어 `커맨드 분포`, `수행 항목 수`, `적용 사이클` 확인
+- 실패 기준: 목표 시간 블록 누락, 사이클 진행 정체, 파일 미갱신 1시간 초과
+- 작업 풀 규칙: `ops:review-list` 계열 실행 시 `docs/AUTONOMOUS_WORK_POOL.md`에 `[ ] <작업번호> <항목>` 형태로 즉시 append하여 신규 과제 누적.
+- 누적 체크 기준: 시작 전 `마지막 작업번호`를 읽고 이어붙임(중복 방지), 매시간 `AUTONOMOUS_HOURLY_REPORT.md`에서 수행량 추정치와 교차 점검.
 
 로그 규약
 - 루프 로그: `apps/web/logs/autonomous/autonomous-ops-<timestamp>.log`

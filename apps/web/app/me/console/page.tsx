@@ -2,17 +2,13 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
-  Activity,
   ArrowUpRight,
   BarChart3,
-  Database,
-  HeartPulse,
   Play,
   RefreshCw,
-  ShieldCheck,
   Terminal,
-  Zap,
 } from "lucide-react";
+import { getPlatformDisplay } from "@/lib/platformDisplay";
 
 type Platform = { name: string };
 type Run = {
@@ -76,7 +72,6 @@ const formatDateTime = (raw: string) => {
 export default function MeConsolePage() {
   const [isRunning, setIsRunning] = useState(false);
   const [systemStatus, setSystemStatus] = useState("대기 중");
-  const [performance, setPerformance] = useState({ cpu: 12, mem: 42, latency: 120 });
   const [runs, setRuns] = useState<Run[]>([]);
   const [logs, setLogs] = useState<LogEntry[]>([{ id: Date.now(), time: new Date().toLocaleTimeString(), msg: "콘솔 모드 준비", type: "info" }]);
   const [loading, setLoading] = useState(true);
@@ -147,11 +142,6 @@ export default function MeConsolePage() {
         setAlerts(null);
       }
 
-      setPerformance((prev) => ({
-        cpu: Math.max(8, prev.cpu + 1),
-        mem: Math.max(20, Math.min(78, prev.mem + 2)),
-        latency: Math.max(90, prev.latency + 3),
-      }));
       addLog("콘솔 데이터가 갱신되었습니다.", "success");
     } catch (e: unknown) {
       const message = e instanceof Error ? e.message : "운영 데이터 로드 중 오류가 발생했습니다.";
@@ -206,23 +196,22 @@ export default function MeConsolePage() {
     }
   };
 
+  const platformMetrics = useMemo(() => buildMetrics(runs), [buildMetrics, runs]);
   const metricCards = useMemo(
     () => [
-      { label: "CPU 사용률", value: `${performance.cpu}%`, icon: Zap, color: "text-amber-500" },
-      { label: "메모리 사용률", value: `${performance.mem}%`, icon: Activity, color: "text-blue-500" },
-      { label: "API 응답", value: `${performance.latency}ms`, icon: HeartPulse, color: "text-emerald-500" },
-      { label: "DB 상태", value: health.toUpperCase(), icon: ShieldCheck, color: health === "ok" ? "text-emerald-500" : "text-rose-500" },
-      { label: "품질 알림", value: `${quality?.alerts_count ?? 0}건`, icon: Database, color: "text-indigo-500" },
+      { label: "DB 상태", value: health === "ok" ? "정상" : health === "checking" ? "점검중" : "오류", color: health === "ok" ? "text-emerald-500" : "text-rose-500" },
+      { label: "품질 알림", value: `${quality?.alerts_count ?? 0}건`, color: "text-indigo-500" },
+      { label: "심각 경보", value: `${alerts?.summary?.critical ?? 0}건`, color: "text-rose-500" },
+      { label: "최근 실행", value: `${runs.length}건`, color: "text-slate-900 dark:text-white" },
+      { label: "플랫폼 수", value: `${platformMetrics.length}개`, color: "text-blue-600 dark:text-blue-300" },
     ],
-    [health, performance.cpu, performance.latency, performance.mem, quality?.alerts_count],
+    [alerts?.summary?.critical, health, platformMetrics.length, quality?.alerts_count, runs.length],
   );
 
-  const platformMetrics = useMemo(() => buildMetrics(runs), [buildMetrics, runs]);
-
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#0a0c10] text-slate-900 dark:text-slate-100 p-8">
-      <div className="max-w-7xl mx-auto space-y-8">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+    <main className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 py-8">
+      <div className="page-shell page-stack gap-5 max-w-[1700px]">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div>
             <div className="flex items-center gap-2 mb-2">
               <span className="px-2 py-0.5 bg-blue-500 rounded-lg text-[10px] font-black text-white tracking-widest leading-normal">내부 모니터</span>
@@ -232,13 +221,15 @@ export default function MeConsolePage() {
               AI 운영 콘솔
             </h1>
             <p className="text-slate-400 font-bold mt-2">수집 현황, API 상태, 알림 상태를 한 곳에서 점검합니다.</p>
+            <p className="text-xs text-slate-500 mt-1">status: ready · 장애 시 fallback 로그로 복구 동선을 확인하세요.</p>
           </div>
 
           <div className="flex items-center gap-3">
             <button
               onClick={() => void load()}
               disabled={loading}
-              className="flex items-center gap-2 px-6 py-4 rounded-[1.5rem] bg-white dark:bg-slate-900 text-sm font-black border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800"
+              aria-label="운영 콘솔 데이터 새로고침"
+              className="flex items-center gap-2 px-6 py-4 rounded-[1.5rem] bg-white dark:bg-slate-900 text-sm font-black border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
             >
               <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
               새로고침
@@ -246,6 +237,7 @@ export default function MeConsolePage() {
             <button
               onClick={triggerIngest}
               disabled={isRunning}
+              aria-label="전체 플랫폼 수집 실행"
               className={`flex items-center gap-2 px-6 py-4 rounded-[1.5rem] text-[13px] font-black transition-all shadow-xl active:scale-95 ${
                 isRunning ? "bg-slate-100 text-slate-400" : "bg-slate-900 dark:bg-blue-600 text-white hover:shadow-blue-500/20"
               }`}
@@ -258,18 +250,35 @@ export default function MeConsolePage() {
         </div>
 
         {error ? <div className="rounded-xl border border-rose-300/60 bg-rose-50 text-rose-700 px-4 py-3 text-sm">{error}</div> : null}
+        <section className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4">
+          <h2 className="text-sm font-black mb-2">빠른 이동</h2>
+          <div className="flex flex-wrap gap-2 text-xs">
+            <a
+              href="/me"
+              className="rounded-lg border border-slate-300 dark:border-slate-700 px-3 py-1.5 font-black hover:border-blue-500 hover:text-blue-600 dark:hover:text-blue-300 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+            >
+              사용자 홈
+            </a>
+            <a
+              href="/admin"
+              className="rounded-lg border border-slate-300 dark:border-slate-700 px-3 py-1.5 font-black hover:border-blue-500 hover:text-blue-600 dark:hover:text-blue-300 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+            >
+              운영 콘솔
+            </a>
+          </div>
+        </section>
 
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
           {metricCards.map((stat) => (
-            <div key={stat.label} className="bg-white dark:bg-slate-900 p-6 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-sm">
+            <div key={stat.label} className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm">
               <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{stat.label}</p>
               <p className={`text-2xl font-black ${stat.color}`}>{stat.value}</p>
             </div>
           ))}
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <section className="bg-white dark:bg-slate-900 p-6 rounded-[2rem] border border-slate-100 dark:border-slate-800">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <section className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-100 dark:border-slate-800">
             <div className="flex items-center gap-2 mb-4">
               <BarChart3 className="w-4 h-4" />
               <h2 className="text-sm font-black">품질 상태</h2>
@@ -280,7 +289,7 @@ export default function MeConsolePage() {
 
             <div className="space-y-2 text-sm text-slate-600 dark:text-slate-400">
               <p>
-                <span className="font-black text-slate-900 dark:text-slate-200">최근 알림</span>: {alerts?.summary?.critical ?? 0}건(critical) / {alerts?.summary?.warn ?? 0}건(warn)
+                <span className="font-black text-slate-900 dark:text-slate-200">최근 알림</span>: {alerts?.summary?.critical ?? 0}건(심각) / {alerts?.summary?.warn ?? 0}건(주의)
               </p>
               <p>
                 <span className="font-black text-slate-900 dark:text-slate-200">플랫폼 수</span>: {platformMetrics.length}개
@@ -291,19 +300,23 @@ export default function MeConsolePage() {
             </div>
           </section>
 
-          <section className="bg-white dark:bg-slate-900 p-6 rounded-[2rem] border border-slate-100 dark:border-slate-800">
+          <section className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-100 dark:border-slate-800">
             <h3 className="text-sm font-black text-slate-900 dark:text-white mb-3">실행 로그</h3>
             <div className="h-80 overflow-y-auto bg-slate-950/95 dark:bg-slate-800 rounded-2xl p-4 space-y-2">
-              {logs.map((entry) => (
-                <div key={entry.id} className="text-xs text-slate-200">
-                  <span className="text-slate-400">[{entry.time}]</span> {entry.msg}
-                </div>
-              ))}
+              {logs.length === 0 ? (
+                <div className="text-xs text-slate-300">아직 표시할 로그가 없습니다. 새로고침으로 다시 시도하세요.</div>
+              ) : (
+                logs.map((entry) => (
+                  <div key={entry.id} className="text-xs text-slate-200">
+                    <span className="text-slate-400">[{entry.time}]</span> {entry.msg}
+                  </div>
+                ))
+              )}
             </div>
           </section>
         </div>
 
-        <section className="bg-white dark:bg-slate-900 p-6 rounded-[2rem] border border-slate-100 dark:border-slate-800">
+        <section className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-100 dark:border-slate-800">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <Terminal className="w-4 h-4" />
@@ -324,7 +337,11 @@ export default function MeConsolePage() {
               <tbody>
                 {platformMetrics.map((item) => (
                   <tr key={item.id} className="border-b border-slate-100 dark:border-slate-800">
-                    <td className="py-3 pr-4">{item.name}</td>
+                    <td className="py-3 pr-4">
+                      <span className={`inline-flex items-center rounded-md border px-2 py-1 text-[11px] font-black ${getPlatformDisplay(item.name).badgeClassName}`}>
+                        {getPlatformDisplay(item.name).label}
+                      </span>
+                    </td>
                     <td className="py-3 pr-4">
                       <span className="inline-flex text-xs px-2 py-1 rounded-full bg-slate-100 dark:bg-slate-800">{item.status}</span>
                     </td>
@@ -337,16 +354,17 @@ export default function MeConsolePage() {
           </div>
         </section>
 
-        <section className="bg-white dark:bg-slate-900 p-6 rounded-[2rem] border border-slate-100 dark:border-slate-800">
+        <section className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-100 dark:border-slate-800">
           <h2 className="text-sm font-black mb-2">운영 체크리스트</h2>
           <ul className="text-sm text-slate-600 dark:text-slate-300 list-disc pl-5 space-y-2">
             <li>수집 실행 버튼 클릭 후 2~5분 간격으로 로그 최신화 확인</li>
-            <li>품질 상태가 Critical이면 /system에서 알림 상세 처리</li>
-            <li>DB 상태가 OK가 아니면 /admin의 플랫폼 상태, /api/health 확인</li>
+            <li>품질 상태가 “심각”이면 /system에서 알림 상세를 처리하세요.</li>
+            <li>DB 상태가 “정상”이 아니면 /admin 플랫폼 상태와 /api/health를 확인하세요.</li>
             <li>실행 후 30분 이내 미수집 데이터가 존재하는지 캠페인 목록을 점검</li>
           </ul>
         </section>
       </div>
-    </div>
+    </main>
   );
 }
+

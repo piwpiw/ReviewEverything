@@ -1,0 +1,10 @@
+{
+  "generatedAt": "2026-03-06T00:33:59.329Z",
+  "results": [
+    {
+      "file": "app/campaigns/[id]/page.tsx",
+      "touched": false,
+      "reason": "no-change"
+    }
+  ]
+}

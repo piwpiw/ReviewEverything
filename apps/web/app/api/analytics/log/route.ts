@@ -1,6 +1,10 @@
 import { db } from "@/lib/db";
 import { NextResponse } from "next/server";
 
+function getErrorMessage(error: unknown) {
+  return error instanceof Error ? error.message : "Unknown error";
+}
+
 export async function POST(req: Request) {
   try {
     const { campaignId, action, userId, platform } = await req.json();
@@ -19,8 +23,8 @@ export async function POST(req: Request) {
     });
 
     return NextResponse.json({ success: true, id: log.id.toString() });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Action log error:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: getErrorMessage(error) }, { status: 500 });
   }
 }

@@ -8,7 +8,7 @@ import {
   Layers,
   BarChart2,
   ArrowUpRight,
-  Target
+  Target,
 } from "lucide-react";
 
 type PlatformStat = {
@@ -33,7 +33,7 @@ export default function AnalyticsDashboard() {
         const json = await res.json();
         setData(json.data);
       } catch (e) {
-        console.error("분석 통계 로드 실패", e);
+        console.error("통계 조회 실패", e);
       } finally {
         setLoading(false);
       }
@@ -45,7 +45,7 @@ export default function AnalyticsDashboard() {
     return (
       <div className="h-96 flex flex-col items-center justify-center gap-4 bg-slate-900/40 rounded-[2.5rem] border border-slate-800/60">
         <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
-        <span className="text-[10px] font-black tracking-widest text-slate-500 uppercase">파이프라인 데이터를 분석 중...</span>
+        <span className="text-[10px] font-black tracking-widest text-slate-500 uppercase">데이터를 불러오는 중입니다.</span>
       </div>
     );
   }
@@ -132,10 +132,10 @@ export default function AnalyticsDashboard() {
           <div className="flex flex-col gap-1">
             <h3 className="text-2xl font-black text-white flex items-center gap-3 italic">
               <BarChart2 className="w-6 h-6 text-blue-500" />
-              시장 침투 동향
+              운영 분석 지표
             </h3>
             <p className="text-[10px] text-slate-500 font-black uppercase tracking-widest">
-              캠페인 수와 모집 수의 변화 추이를 비교해봅니다.
+              플랫폼별 성능과 경쟁률을 한 번에 비교하세요.
             </p>
           </div>
 
@@ -146,7 +146,7 @@ export default function AnalyticsDashboard() {
                 view === "campaigns" ? "bg-blue-600 text-white shadow-lg" : "text-slate-500 hover:text-slate-300"
               }`}
             >
-              캠페인 수
+              캠페인
             </button>
             <button
               onClick={() => setView("competition")}
@@ -174,7 +174,7 @@ export default function AnalyticsDashboard() {
                       {item.name}
                     </span>
                     <span className="text-white">
-                      {view === "campaigns" ? `${item.latest.totalCampaigns}건` : `${item.compRate.toFixed(2)}:1`}
+                      {view === "campaigns" ? `${item.latest.totalCampaigns}개` : `${item.compRate.toFixed(2)}:1`}
                     </span>
                   </div>
                   <div className="h-4 bg-black/40 rounded-full overflow-hidden border border-slate-800/50 p-0.5">
@@ -198,34 +198,34 @@ export default function AnalyticsDashboard() {
           <div className="flex flex-col gap-1">
             <div className="flex items-center gap-2 text-blue-500 mb-2">
               <Layers className="w-4 h-4" />
-              <span className="text-[10px] font-black uppercase tracking-widest">전체 캠페인</span>
+              <span className="text-[10px] font-black uppercase tracking-widest">전체 플랫폼</span>
             </div>
             <div className="text-2xl font-black text-white">{summary.reduce((a, b) => a + b.latest.totalCampaigns, 0).toLocaleString()}</div>
-            <span className="text-[9px] font-black text-slate-600">총 수량</span>
+            <span className="text-[9px] font-black text-slate-600">총 캠페인</span>
           </div>
           <div className="flex flex-col gap-1">
             <div className="flex items-center gap-2 text-emerald-500 mb-2">
               <Users className="w-4 h-4" />
-              <span className="text-[10px] font-black uppercase tracking-widest">전체 모집수</span>
+              <span className="text-[10px] font-black uppercase tracking-widest">총 모집인원</span>
             </div>
             <div className="text-2xl font-black text-white">{summary.reduce((a, b) => a + b.latest.totalRecruits, 0).toLocaleString()}</div>
-            <span className="text-[9px] font-black text-slate-600">누적 모집 수</span>
+            <span className="text-[9px] font-black text-slate-600">총 모집수</span>
           </div>
           <div className="flex flex-col gap-1">
             <div className="flex items-center gap-2 text-amber-500 mb-2">
               <Target className="w-4 h-4" />
-              <span className="text-[10px] font-black uppercase tracking-widest">핫 슬롯</span>
+              <span className="text-[10px] font-black uppercase tracking-widest">고경쟁</span>
             </div>
             <div className="text-2xl font-black text-white">{summary.filter((s) => s.compRate > 5).length}</div>
-            <span className="text-[9px] font-black text-slate-600">경쟁률 5:1 초과</span>
+            <span className="text-[9px] font-black text-slate-600">5:1 이상</span>
           </div>
           <div className="flex flex-col gap-1">
             <div className="flex items-center gap-2 text-rose-500 mb-2">
               <ArrowUpRight className="w-4 h-4" />
-              <span className="text-[10px] font-black uppercase tracking-widest">성장 지수</span>
+              <span className="text-[10px] font-black uppercase tracking-widest">일별 변화</span>
             </div>
             <div className="text-2xl font-black text-white">+{summary.reduce((a, b) => a + b.change, 0)}</div>
-            <span className="text-[9px] font-black text-slate-600">일일 변동</span>
+            <span className="text-[9px] font-black text-slate-600">전체 증감</span>
           </div>
         </div>
       </div>

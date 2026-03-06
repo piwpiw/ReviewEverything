@@ -6,24 +6,24 @@ import { Sparkles, X, Crown, Coffee, Zap, CheckCircle2 } from "lucide-react";
 
 const PRO_FEATURES = [
   {
-    icon: "🧠",
-    title: "AI 우선 큐레이션",
-    desc: "캠페인 선별 정확도와 제안 근거를 강화해 더 빠르게 결정할 수 있습니다.",
+    icon: "🚀",
+    title: "AI 추천 우선 배치",
+    desc: "검색/정렬 조건을 반영한 추천 캠페인을 우선순위로 보여줍니다.",
   },
   {
-    icon: "⏱️",
-    title: "D-day 알림 강화",
-    desc: "캠페인 마감 직전 단계별 리마인드 알림을 자동으로 받습니다.",
+    icon: "📆",
+    title: "D-day 알림 알림 강화",
+    desc: "남은 시간 마감 임박 캠페인을 우선 순위로 알림해 놓치지 않게 돕습니다.",
   },
   {
-    icon: "📊",
-    title: "통합 운영 대시보드",
-    desc: "캠페인 성과, 수익 예측, 상태별 진행률을 한 화면에서 확인합니다.",
+    icon: "📈",
+    title: "운영 통합 성과 분석",
+    desc: "지원 수·모집 수·전환율 데이터를 한 화면에서 볼 수 있도록 정리해 줍니다.",
   },
   {
-    icon: "🔔",
-    title: "알림 채널 최적화",
-    desc: "카카오톡/텔레그램/푸시 경로의 실패 이력까지 한 번에 추적합니다.",
+    icon: "🔒",
+    title: "일정/알림 자동화",
+    desc: "카카오톡·이메일·푸시의 알림 규칙을 자동으로 설정해서 운영 부담을 줄여줍니다.",
   },
 ];
 
@@ -53,17 +53,17 @@ export default function ProUpgradeSection() {
           <div className="relative z-10">
             <div className="flex items-center gap-2 mb-3">
               <Crown className="w-5 h-5 text-amber-300 fill-current" />
-              <span className="text-[11px] font-black uppercase tracking-widest opacity-80">프로 권장</span>
+              <span className="text-[11px] font-black uppercase tracking-widest opacity-80">멤버십 업그레이드</span>
             </div>
-            <h3 className="text-2xl font-black mb-1">PRO 멤버십</h3>
-            <p className="text-[13px] font-bold opacity-75 mb-5">월 9,900원으로 AI 추천 정확도·운영 자동화·알림 품질을 업그레이드합니다.</p>
+            <h3 className="text-2xl font-black mb-1">PRO 전환</h3>
+            <p className="text-[13px] font-bold opacity-75 mb-5">월 9,900원에 AI 추천, D-day 알림, 관리자 분석을 한 번에 사용할 수 있습니다.</p>
             <div className="flex items-end gap-1 mb-5">
-              <span className="text-3xl font-black">9,900원</span>
-              <span className="text-sm opacity-60 mb-1">/월</span>
+              <span className="text-3xl font-black">9,900</span>
+              <span className="text-sm opacity-60 mb-1">원/월</span>
             </div>
             <button className="px-6 py-2.5 bg-white text-blue-600 rounded-2xl text-[11px] font-black shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center gap-2">
               <Zap className="w-3.5 h-3.5 fill-current text-amber-500" />
-              PRO 이용하기
+              PRO로 전환하기
             </button>
           </div>
           <div className="absolute -right-8 -bottom-8 w-48 h-48 bg-white/5 rounded-full" />
@@ -83,13 +83,13 @@ export default function ProUpgradeSection() {
             <Coffee className="w-7 h-7 text-white" />
           </div>
           <div className="text-center">
-            <h3 className="text-sm font-black text-slate-900 dark:text-white">커피 응원 후원</h3>
+            <h3 className="text-sm font-black text-slate-900 dark:text-white">개발자 후원</h3>
             <p className="text-[11px] font-bold text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
-              후원을 통해 운영비를 지원하고 핵심 기능 개선 속도를 함께 높여주세요.
+              커피 한 잔 후원으로 운영 안정성 유지에 도움을 주세요. 지속 운영에 큰 힘이 됩니다.
             </p>
           </div>
           <button className="mt-1 px-5 py-2 bg-amber-500 text-white rounded-xl text-[10px] font-black shadow-lg shadow-amber-500/20 hover:bg-amber-600 transition-all active:scale-95 flex items-center gap-2">
-            토스 / 카카오페이 후원
+            후원 / 오픈카톡 지원
           </button>
         </div>
       </div>
@@ -118,8 +118,8 @@ export default function ProUpgradeSection() {
                   <Crown className="w-6 h-6 text-amber-300 fill-current" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-black text-slate-900 dark:text-white">PRO 멤버십</h3>
-                  <p className="text-[11px] font-bold text-slate-400">월 9,900원 정액 결제</p>
+                  <h3 className="text-xl font-black text-slate-900 dark:text-white">PRO 전환</h3>
+                  <p className="text-[11px] font-bold text-slate-400">월 9,900원 결제 진행</p>
                 </div>
               </div>
               <ul className="space-y-3 mb-8">
@@ -140,7 +140,7 @@ export default function ProUpgradeSection() {
                 className="w-full py-4 bg-gradient-to-r from-blue-600 to-violet-600 text-white rounded-2xl font-black text-sm shadow-xl shadow-blue-500/30 hover:shadow-blue-500/50 transition-all active:scale-[0.98] disabled:opacity-70 flex items-center justify-center gap-2"
               >
                 {upgrading ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <Sparkles className="w-4 h-4" />}
-                {upgrading ? "결제창 열기..." : "결제 진행하기"}
+                {upgrading ? "결제 중..." : "결제 진행하기"}
               </button>
             </motion.div>
           </motion.div>
@@ -165,27 +165,29 @@ export default function ProUpgradeSection() {
                 <X className="w-5 h-5" />
               </button>
               <div className="w-20 h-20 bg-amber-100 dark:bg-amber-900/20 rounded-[2rem] flex items-center justify-center mx-auto mb-6 text-4xl shadow-xl shadow-amber-500/10">☕</div>
-              <h3 className="text-xl font-black text-slate-900 dark:text-white mb-2">커피 후원하기</h3>
-              <p className="text-sm font-bold text-slate-500 dark:text-slate-400 mb-8 leading-relaxed">서비스 안정성과 속도 개선을 위해 자유롭게 후원해 주세요.</p>
+              <h3 className="text-xl font-black text-slate-900 dark:text-white mb-2">후원하러 가기</h3>
+              <p className="text-sm font-bold text-slate-500 dark:text-slate-400 mb-8 leading-relaxed">
+                후원 링크로 간편하게 후원해주시면 운영 개선과 서버 안정화에 큰 도움이 됩니다.
+              </p>
               <div className="grid grid-cols-2 gap-3">
                 <button
                   onClick={handleCoffee}
                   className="py-3 bg-amber-500 text-white rounded-2xl text-[11px] font-black shadow-lg shadow-amber-500/20 hover:bg-amber-600 transition-all active:scale-95"
                 >
-                  커피 3,000원
+                  후원 3,000원
                 </button>
                 <button
                   onClick={handleCoffee}
                   className="py-3 bg-amber-500 text-white rounded-2xl text-[11px] font-black shadow-lg shadow-amber-500/20 hover:bg-amber-600 transition-all active:scale-95"
                 >
-                  커피 10,000원
+                  후원 10,000원
                 </button>
               </div>
               <button
                 onClick={handleCoffee}
                 className="mt-3 w-full py-3 border-2 border-slate-100 dark:border-slate-800 rounded-2xl text-[11px] font-black text-slate-600 dark:text-slate-400 hover:border-amber-300 transition-colors"
               >
-                후원금 직접 전송
+                기타 금액으로 후원
               </button>
             </motion.div>
           </motion.div>

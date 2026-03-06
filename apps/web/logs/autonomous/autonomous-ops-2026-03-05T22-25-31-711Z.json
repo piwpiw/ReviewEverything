@@ -1,0 +1,11 @@
+{
+  "startedAt": "2026-03-05T22:25:31.711Z",
+  "durationMinutes": 1,
+  "cycleMinutes": 1,
+  "completedCycles": 1,
+  "ingestRestarts": 0,
+  "stopReason": "duration",
+  "tasks": [],
+  "healthChecks": [],
+  "endedAt": "2026-03-05T22:26:31.719Z"
+}

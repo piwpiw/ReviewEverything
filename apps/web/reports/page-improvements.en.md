@@ -1,0 +1,313 @@
+﻿# Page Improvement Report
+- Generated At: 2026-03-04T23:30:52.058Z
+- Target Pages: 14
+- Criteria: 20 items per page
+- Total Score: 280/280 (100%)
+
+## /admin (20/20)
+- File: `app/admin/page.tsx`
+- [OK] Metadata exists
+- [OK] Base layout exists
+- [OK] Primary heading (H1) exists
+- [OK] Secondary heading (H2) exists
+- [OK] Main text block exists
+- [OK] Subtitle/description text exists
+- [OK] Supplemental text exists
+- [OK] Primary action button exists
+- [OK] Links/navigation elements exist
+- [OK] Detailed explanatory text exists
+- [OK] Button/form ARIA label coverage
+- [OK] Form/input accessibility support
+- [OK] Contrast and readability are acceptable
+- [OK] Empty-state and missing data handling
+- [OK] Error/exception handling
+- [OK] Loading state handling
+- [OK] Retry action available
+- [OK] Empty list handling
+- [OK] Semantic list/grid structure
+
+## /business/apply (20/20)
+- File: `app/business/apply/page.tsx`
+- [OK] Metadata exists
+- [OK] Base layout exists
+- [OK] Primary heading (H1) exists
+- [OK] Secondary heading (H2) exists
+- [OK] Main text block exists
+- [OK] Subtitle/description text exists
+- [OK] Supplemental text exists
+- [OK] Primary action button exists
+- [OK] Links/navigation elements exist
+- [OK] Detailed explanatory text exists
+- [OK] Button/form ARIA label coverage
+- [OK] Form/input accessibility support
+- [OK] Contrast and readability are acceptable
+- [OK] Empty-state and missing data handling
+- [OK] Error/exception handling
+- [OK] Loading state handling
+- [OK] Retry action available
+- [OK] Empty list handling
+- [OK] Semantic list/grid structure
+
+## /business (20/20)
+- File: `app/business/page.tsx`
+- [OK] Metadata exists
+- [OK] Base layout exists
+- [OK] Primary heading (H1) exists
+- [OK] Secondary heading (H2) exists
+- [OK] Main text block exists
+- [OK] Subtitle/description text exists
+- [OK] Supplemental text exists
+- [OK] Primary action button exists
+- [OK] Links/navigation elements exist
+- [OK] Detailed explanatory text exists
+- [OK] Button/form ARIA label coverage
+- [OK] Form/input accessibility support
+- [OK] Contrast and readability are acceptable
+- [OK] Empty-state and missing data handling
+- [OK] Error/exception handling
+- [OK] Loading state handling
+- [OK] Retry action available
+- [OK] Empty list handling
+- [OK] Semantic list/grid structure
+
+## /campaigns (20/20)
+- File: `app/campaigns/page.tsx`
+- [OK] Metadata exists
+- [OK] Base layout exists
+- [OK] Primary heading (H1) exists
+- [OK] Secondary heading (H2) exists
+- [OK] Main text block exists
+- [OK] Subtitle/description text exists
+- [OK] Supplemental text exists
+- [OK] Primary action button exists
+- [OK] Links/navigation elements exist
+- [OK] Detailed explanatory text exists
+- [OK] Button/form ARIA label coverage
+- [OK] Form/input accessibility support
+- [OK] Contrast and readability are acceptable
+- [OK] Empty-state and missing data handling
+- [OK] Error/exception handling
+- [OK] Loading state handling
+- [OK] Retry action available
+- [OK] Empty list handling
+- [OK] Semantic list/grid structure
+
+## /campaigns/[id] (20/20)
+- File: `app/campaigns/[id]/page.tsx`
+- [OK] Metadata exists
+- [OK] Base layout exists
+- [OK] Primary heading (H1) exists
+- [OK] Secondary heading (H2) exists
+- [OK] Main text block exists
+- [OK] Subtitle/description text exists
+- [OK] Supplemental text exists
+- [OK] Primary action button exists
+- [OK] Links/navigation elements exist
+- [OK] Detailed explanatory text exists
+- [OK] Button/form ARIA label coverage
+- [OK] Form/input accessibility support
+- [OK] Contrast and readability are acceptable
+- [OK] Empty-state and missing data handling
+- [OK] Error/exception handling
+- [OK] Loading state handling
+- [OK] Retry action available
+- [OK] Empty list handling
+- [OK] Semantic list/grid structure
+
+## /map (20/20)
+- File: `app/map/page.tsx`
+- [OK] Metadata exists
+- [OK] Base layout exists
+- [OK] Primary heading (H1) exists
+- [OK] Secondary heading (H2) exists
+- [OK] Main text block exists
+- [OK] Subtitle/description text exists
+- [OK] Supplemental text exists
+- [OK] Primary action button exists
+- [OK] Links/navigation elements exist
+- [OK] Detailed explanatory text exists
+- [OK] Button/form ARIA label coverage
+- [OK] Form/input accessibility support
+- [OK] Contrast and readability are acceptable
+- [OK] Empty-state and missing data handling
+- [OK] Error/exception handling
+- [OK] Loading state handling
+- [OK] Retry action available
+- [OK] Empty list handling
+- [OK] Semantic list/grid structure
+
+## /me/calendar (20/20)
+- File: `app/me/calendar/page.tsx`
+- [OK] Metadata exists
+- [OK] Base layout exists
+- [OK] Primary heading (H1) exists
+- [OK] Secondary heading (H2) exists
+- [OK] Main text block exists
+- [OK] Subtitle/description text exists
+- [OK] Supplemental text exists
+- [OK] Primary action button exists
+- [OK] Links/navigation elements exist
+- [OK] Detailed explanatory text exists
+- [OK] Button/form ARIA label coverage
+- [OK] Form/input accessibility support
+- [OK] Contrast and readability are acceptable
+- [OK] Empty-state and missing data handling
+- [OK] Error/exception handling
+- [OK] Loading state handling
+- [OK] Retry action available
+- [OK] Empty list handling
+- [OK] Semantic list/grid structure
+
+## /me/console (20/20)
+- File: `app/me/console/page.tsx`
+- [OK] Metadata exists
+- [OK] Base layout exists
+- [OK] Primary heading (H1) exists
+- [OK] Secondary heading (H2) exists
+- [OK] Main text block exists
+- [OK] Subtitle/description text exists
+- [OK] Supplemental text exists
+- [OK] Primary action button exists
+- [OK] Links/navigation elements exist
+- [OK] Detailed explanatory text exists
+- [OK] Button/form ARIA label coverage
+- [OK] Form/input accessibility support
+- [OK] Contrast and readability are acceptable
+- [OK] Empty-state and missing data handling
+- [OK] Error/exception handling
+- [OK] Loading state handling
+- [OK] Retry action available
+- [OK] Empty list handling
+- [OK] Semantic list/grid structure
+
+## /me/notifications (20/20)
+- File: `app/me/notifications/page.tsx`
+- [OK] Metadata exists
+- [OK] Base layout exists
+- [OK] Primary heading (H1) exists
+- [OK] Secondary heading (H2) exists
+- [OK] Main text block exists
+- [OK] Subtitle/description text exists
+- [OK] Supplemental text exists
+- [OK] Primary action button exists
+- [OK] Links/navigation elements exist
+- [OK] Detailed explanatory text exists
+- [OK] Button/form ARIA label coverage
+- [OK] Form/input accessibility support
+- [OK] Contrast and readability are acceptable
+- [OK] Empty-state and missing data handling
+- [OK] Error/exception handling
+- [OK] Loading state handling
+- [OK] Retry action available
+- [OK] Empty list handling
+- [OK] Semantic list/grid structure
+
+## /me (20/20)
+- File: `app/me/page.tsx`
+- [OK] Metadata exists
+- [OK] Base layout exists
+- [OK] Primary heading (H1) exists
+- [OK] Secondary heading (H2) exists
+- [OK] Main text block exists
+- [OK] Subtitle/description text exists
+- [OK] Supplemental text exists
+- [OK] Primary action button exists
+- [OK] Links/navigation elements exist
+- [OK] Detailed explanatory text exists
+- [OK] Button/form ARIA label coverage
+- [OK] Form/input accessibility support
+- [OK] Contrast and readability are acceptable
+- [OK] Empty-state and missing data handling
+- [OK] Error/exception handling
+- [OK] Loading state handling
+- [OK] Retry action available
+- [OK] Empty list handling
+- [OK] Semantic list/grid structure
+
+## /me/settings (20/20)
+- File: `app/me/settings/page.tsx`
+- [OK] Metadata exists
+- [OK] Base layout exists
+- [OK] Primary heading (H1) exists
+- [OK] Secondary heading (H2) exists
+- [OK] Main text block exists
+- [OK] Subtitle/description text exists
+- [OK] Supplemental text exists
+- [OK] Primary action button exists
+- [OK] Links/navigation elements exist
+- [OK] Detailed explanatory text exists
+- [OK] Button/form ARIA label coverage
+- [OK] Form/input accessibility support
+- [OK] Contrast and readability are acceptable
+- [OK] Empty-state and missing data handling
+- [OK] Error/exception handling
+- [OK] Loading state handling
+- [OK] Retry action available
+- [OK] Empty list handling
+- [OK] Semantic list/grid structure
+
+## / (20/20)
+- File: `app/page.tsx`
+- [OK] Metadata exists
+- [OK] Base layout exists
+- [OK] Primary heading (H1) exists
+- [OK] Secondary heading (H2) exists
+- [OK] Main text block exists
+- [OK] Subtitle/description text exists
+- [OK] Supplemental text exists
+- [OK] Primary action button exists
+- [OK] Links/navigation elements exist
+- [OK] Detailed explanatory text exists
+- [OK] Button/form ARIA label coverage
+- [OK] Form/input accessibility support
+- [OK] Contrast and readability are acceptable
+- [OK] Empty-state and missing data handling
+- [OK] Error/exception handling
+- [OK] Loading state handling
+- [OK] Retry action available
+- [OK] Empty list handling
+- [OK] Semantic list/grid structure
+
+## /system (20/20)
+- File: `app/system/page.tsx`
+- [OK] Metadata exists
+- [OK] Base layout exists
+- [OK] Primary heading (H1) exists
+- [OK] Secondary heading (H2) exists
+- [OK] Main text block exists
+- [OK] Subtitle/description text exists
+- [OK] Supplemental text exists
+- [OK] Primary action button exists
+- [OK] Links/navigation elements exist
+- [OK] Detailed explanatory text exists
+- [OK] Button/form ARIA label coverage
+- [OK] Form/input accessibility support
+- [OK] Contrast and readability are acceptable
+- [OK] Empty-state and missing data handling
+- [OK] Error/exception handling
+- [OK] Loading state handling
+- [OK] Retry action available
+- [OK] Empty list handling
+- [OK] Semantic list/grid structure
+
+## /trending (20/20)
+- File: `app/trending/page.tsx`
+- [OK] Metadata exists
+- [OK] Base layout exists
+- [OK] Primary heading (H1) exists
+- [OK] Secondary heading (H2) exists
+- [OK] Main text block exists
+- [OK] Subtitle/description text exists
+- [OK] Supplemental text exists
+- [OK] Primary action button exists
+- [OK] Links/navigation elements exist
+- [OK] Detailed explanatory text exists
+- [OK] Button/form ARIA label coverage
+- [OK] Form/input accessibility support
+- [OK] Contrast and readability are acceptable
+- [OK] Empty-state and missing data handling
+- [OK] Error/exception handling
+- [OK] Loading state handling
+- [OK] Retry action available
+- [OK] Empty list handling
+- [OK] Semantic list/grid structure

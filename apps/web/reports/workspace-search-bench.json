@@ -1,0 +1,248 @@
+{
+  "generatedAt": "2026-03-05T15:30:05.494Z",
+  "queries": [
+    "metadata",
+    "page",
+    "admin",
+    "me",
+    "campaign"
+  ],
+  "results": [
+    {
+      "mode": "lean",
+      "query": "metadata",
+      "selectedMode": "lean",
+      "executedMode": "lean",
+      "usedFallback": false,
+      "candidates": 24,
+      "matches": 14,
+      "elapsedMs": 114,
+      "usedIndex": "workspace-index-lean.json",
+      "usedIndexMode": "lean"
+    },
+    {
+      "mode": "lean",
+      "query": "page",
+      "selectedMode": "lean",
+      "executedMode": "lean",
+      "usedFallback": false,
+      "candidates": 19,
+      "matches": 83,
+      "elapsedMs": 108,
+      "usedIndex": "workspace-index-lean.json",
+      "usedIndexMode": "lean"
+    },
+    {
+      "mode": "lean",
+      "query": "admin",
+      "selectedMode": "lean",
+      "executedMode": "lean",
+      "usedFallback": false,
+      "candidates": 28,
+      "matches": 205,
+      "elapsedMs": 94,
+      "usedIndex": "workspace-index-lean.json",
+      "usedIndexMode": "lean"
+    },
+    {
+      "mode": "lean",
+      "query": "me",
+      "selectedMode": "lean",
+      "executedMode": "lean",
+      "usedFallback": false,
+      "candidates": 27,
+      "matches": 658,
+      "elapsedMs": 89,
+      "usedIndex": "workspace-index-lean.json",
+      "usedIndexMode": "lean"
+    },
+    {
+      "mode": "lean",
+      "query": "campaign",
+      "selectedMode": "lean",
+      "executedMode": "lean",
+      "usedFallback": false,
+      "candidates": 29,
+      "matches": 378,
+      "elapsedMs": 84,
+      "usedIndex": "workspace-index-lean.json",
+      "usedIndexMode": "lean"
+    },
+    {
+      "mode": "full",
+      "query": "metadata",
+      "selectedMode": "full",
+      "executedMode": "full",
+      "usedFallback": false,
+      "candidates": 37,
+      "matches": 22,
+      "elapsedMs": 81,
+      "usedIndex": "workspace-index-full.json",
+      "usedIndexMode": "full"
+    },
+    {
+      "mode": "full",
+      "query": "page",
+      "selectedMode": "full",
+      "executedMode": "full",
+      "usedFallback": false,
+      "candidates": 19,
+      "matches": 83,
+      "elapsedMs": 84,
+      "usedIndex": "workspace-index-full.json",
+      "usedIndexMode": "full"
+    },
+    {
+      "mode": "full",
+      "query": "admin",
+      "selectedMode": "full",
+      "executedMode": "full",
+      "usedFallback": false,
+      "candidates": 34,
+      "matches": 251,
+      "elapsedMs": 83,
+      "usedIndex": "workspace-index-full.json",
+      "usedIndexMode": "full"
+    },
+    {
+      "mode": "full",
+      "query": "me",
+      "selectedMode": "full",
+      "executedMode": "full",
+      "usedFallback": false,
+      "candidates": 27,
+      "matches": 658,
+      "elapsedMs": 83,
+      "usedIndex": "workspace-index-full.json",
+      "usedIndexMode": "full"
+    },
+    {
+      "mode": "full",
+      "query": "campaign",
+      "selectedMode": "full",
+      "executedMode": "full",
+      "usedFallback": false,
+      "candidates": 68,
+      "matches": 734,
+      "elapsedMs": 115,
+      "usedIndex": "workspace-index-full.json",
+      "usedIndexMode": "full"
+    },
+    {
+      "mode": "auto",
+      "query": "metadata",
+      "selectedMode": "full",
+      "executedMode": "full",
+      "usedFallback": false,
+      "candidates": 37,
+      "matches": 22,
+      "elapsedMs": 79,
+      "usedIndex": "workspace-index-full.json",
+      "usedIndexMode": "full"
+    },
+    {
+      "mode": "auto",
+      "query": "page",
+      "selectedMode": "full",
+      "executedMode": "full",
+      "usedFallback": false,
+      "candidates": 19,
+      "matches": 83,
+      "elapsedMs": 82,
+      "usedIndex": "workspace-index-full.json",
+      "usedIndexMode": "full"
+    },
+    {
+      "mode": "auto",
+      "query": "admin",
+      "selectedMode": "full",
+      "executedMode": "full",
+      "usedFallback": false,
+      "candidates": 34,
+      "matches": 251,
+      "elapsedMs": 81,
+      "usedIndex": "workspace-index-full.json",
+      "usedIndexMode": "full"
+    },
+    {
+      "mode": "auto",
+      "query": "me",
+      "selectedMode": "full",
+      "executedMode": "full",
+      "usedFallback": false,
+      "candidates": 27,
+      "matches": 658,
+      "elapsedMs": 82,
+      "usedIndex": "workspace-index-full.json",
+      "usedIndexMode": "full"
+    },
+    {
+      "mode": "auto",
+      "query": "campaign",
+      "selectedMode": "full",
+      "executedMode": "full",
+      "usedFallback": false,
+      "candidates": 68,
+      "matches": 734,
+      "elapsedMs": 106,
+      "usedIndex": "workspace-index-full.json",
+      "usedIndexMode": "full"
+    }
+  ],
+  "summary": [
+    {
+      "mode": "auto",
+      "queryCount": 5,
+      "fallbackCount": 0,
+      "totalCandidates": 185,
+      "totalMatches": 1748,
+      "totalMs": 430,
+      "minElapsedMs": 79,
+      "maxElapsedMs": 106,
+      "executedModes": {
+        "lean": 0,
+        "full": 5
+      }
+    },
+    {
+      "mode": "full",
+      "queryCount": 5,
+      "fallbackCount": 0,
+      "totalCandidates": 185,
+      "totalMatches": 1748,
+      "totalMs": 446,
+      "minElapsedMs": 81,
+      "maxElapsedMs": 115,
+      "executedModes": {
+        "lean": 0,
+        "full": 5
+      }
+    },
+    {
+      "mode": "lean",
+      "queryCount": 5,
+      "fallbackCount": 0,
+      "totalCandidates": 127,
+      "totalMatches": 1338,
+      "totalMs": 489,
+      "minElapsedMs": 84,
+      "maxElapsedMs": 114,
+      "executedModes": {
+        "lean": 5,
+        "full": 0
+      }
+    }
+  ],
+  "guard": {
+    "enabled": true,
+    "thresholds": {
+      "enabled": true,
+      "maxElapsedMs": 200,
+      "minCandidates": 20,
+      "minMatches": 100,
+      "maxFallbackRate": 0.9
+    },
+    "failures": [],
+    "passed": true
+  }
+}

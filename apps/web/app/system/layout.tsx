@@ -1,5 +1,14 @@
-﻿import SystemSectionNav from "@/components/SystemSectionNav";
+import type { Metadata } from "next";
+import SystemSectionNav from "@/components/SystemSectionNav";
 import WorkspaceHubNav from "@/components/WorkspaceHubNav";
+
+export const metadata: Metadata = {
+  title: "시스템 점검 센터 | 리뷰에브리띵",
+  description: "수집 파이프라인, 경고 알림, 운영 지표를 통합 점검하는 시스템 페이지입니다.",
+  alternates: {
+    canonical: "/system",
+  },
+};
 
 export default function SystemLayout({ children }: { children: React.ReactNode }) {
   return (

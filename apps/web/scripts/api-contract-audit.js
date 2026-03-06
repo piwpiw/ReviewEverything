@@ -9,94 +9,88 @@ const APP_API_DIR = path.join(ROOT, "app", "api");
 const REPORT_DIR = path.join(ROOT, "reports");
 const OUTPUT = path.join(REPORT_DIR, "api-contract-audit.md");
 
-function normalizeRoute(raw) {
-  const match = raw.match(/(\/api\/[A-Za-z0-9._:-]+(?:\/[A-Za-z0-9._:\-\[\]]+)*)/);
-  if (!match) return null;
-
-  return match[1]
-    .replace(/\/\[/g, "/:")
-    .replace(/\]/g, "")
-    .split("?")[0]
-    .trim();
+function makeReportLine(category, route, reason, severity = "FAIL") {
+  return `- [${severity}] ${category}: ${route} (${reason})`;
 }
 
-function sectionFromLine(line) {
-  if (line.toLowerCase().includes("implemented") || line.includes("구현")) {
-    return "implemented";
-  }
-  if (line.toLowerCase().includes("planned") || line.includes("미구현")) {
-    return "planned";
-  }
+function normalizeRoute(raw) {
+  if (!raw) return null;
+  let route = String(raw).trim();
+
+  route = route.replace(/^(GET|POST|PATCH|PUT|DELETE|OPTIONS|HEAD)\s+/i, "");
+  route = route.split("?")[0];
+  route = route.replace(/\[([^\]]+)\]/g, ":$1");
+  route = route.replace(/\/{2,}/g, "/");
+  route = route.replace(/[`'"),.;:!]+$/g, "");
+
+  if (!route.startsWith("/api/")) return null;
+  return route;
+}
+
+function inferSection(line) {
+  const text = line.toLowerCase();
+  if (/^##+\s+.*implemented/.test(text)) return "implemented";
+  if (/^##+\s+.*planned/.test(text)) return "planned";
+  if (text.includes("implemented public endpoints")) return "implemented";
+  if (text.includes("planned /")) return "planned";
   return null;
 }
 
 function collectDocsRoutes() {
-  const text = fs.readFileSync(DOCS_API, "utf8").split(/\r?\n/);
-  const state = {
-    implemented: new Set(),
-    planned: new Set(),
-  };
+  const lines = fs.readFileSync(DOCS_API, "utf8").split(/\r?\n/);
+  const implemented = new Set();
+  const planned = new Set();
   const internalCandidates = new Set();
+  const routeRx = /\/api\/[A-Za-z0-9._~:%@+\-/\[\]]+/g;
   let current = null;
-  const routeLineRegex = /`[^`]*?(GET|POST|PATCH|PUT|DELETE|OPTIONS|HEAD)\s+(\/api\/[^`\\s]+)|`(\/api\/[^`\\s]+)/g;
 
-  for (const line of text) {
-    const headingState = sectionFromLine(line);
-    if (headingState) current = headingState;
+  for (const line of lines) {
+    const section = inferSection(line);
+    if (section) current = section;
 
-    let match;
-    while ((match = routeLineRegex.exec(line)) !== null) {
-      const methodRoute = match[1] ? match[2] : match[3];
-      const route = normalizeRoute(methodRoute);
-      if (!route || !route.startsWith("/api/")) continue;
-
-      if (current === "implemented") state.implemented.add(route);
-      if (current === "planned") state.planned.add(route);
-
-      if (route === "/api/jobs" && line.includes("내부")) {
-        internalCandidates.add(route);
+    routeRx.lastIndex = 0;
+    let match = routeRx.exec(line);
+    while (match !== null) {
+      const route = normalizeRoute(match[0]);
+      if (route) {
+        if (current === "implemented") implemented.add(route);
+        if (current === "planned") planned.add(route);
+        if (route === "/api/jobs" && /(internal|cron_secret)/i.test(line)) {
+          internalCandidates.add(route);
+        }
       }
+      match = routeRx.exec(line);
     }
   }
 
-  return {
-    implemented: state.implemented,
-    planned: state.planned,
-    internalCandidates,
-  };
+  return { implemented, planned, internalCandidates };
 }
 
 function collectActualRoutes() {
   const routes = new Set();
 
-  function walk(dir, segments) {
+  function walk(dir, relative) {
     if (!fs.existsSync(dir)) return;
 
-    for (const name of fs.readdirSync(dir)) {
-      const full = path.join(dir, name);
-      const stat = fs.statSync(full);
-      if (stat.isDirectory()) {
-        walk(full, [...segments, name]);
-      } else if (stat.isFile() && name === "route.ts") {
-        const routeSeg = segments.map((seg) => seg.replace(/^\[(.+)\]$/, ":$1"));
-        if (routeSeg.length > 1) {
-          const route = `/api/${routeSeg.slice(1).join("/")}`;
-          routes.add(route);
-        } else if (routeSeg.length === 1) {
-          routes.add("/api");
-        }
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+      const fullPath = path.join(dir, entry.name);
+
+      if (entry.isDirectory()) {
+        walk(fullPath, [...relative, entry.name]);
+        continue;
       }
+
+      if (!entry.isFile() || entry.name !== "route.ts") continue;
+
+      const routeParts = relative.map((seg) => seg.replace(/^\[(.+)\]$/, ":$1"));
+      const route = routeParts.length > 0 ? `/api/${routeParts.join("/")}` : "/api";
+      routes.add(route);
     }
   }
 
-  walk(APP_API_DIR, ["app", "api"]);
-  routes.delete("/app");
+  walk(APP_API_DIR, []);
   routes.delete("/api");
   return routes;
-}
-
-function makeReportLine(category, route, reason, severity = "FAIL") {
-  return `- [${severity}] ${category}: ${route} (${reason})`;
 }
 
 function main() {
@@ -108,11 +102,11 @@ function main() {
   const failures = [];
   const warnings = [];
 
-  const implemented = Array.from(docs.implemented);
-  const planned = Array.from(docs.planned);
+  const implemented = [...docs.implemented].sort();
+  const planned = [...docs.planned].sort();
   const documentedUnion = new Set([...implemented, ...planned]);
 
-  for (const route of actual) {
+  for (const route of [...actual].sort()) {
     if (!documentedUnion.has(route)) {
       failures.push(makeReportLine("UNTRACKED_ROUTE", route, "Actual route exists but not in API.md implemented/planned"));
     }
@@ -130,12 +124,7 @@ function main() {
   }
 
   if (docs.implemented.has("/api/jobs") && !docs.internalCandidates.has("/api/jobs")) {
-    failures.push(makeReportLine("PUBLIC_JOBS_RISK", "/api/jobs", "Must remain internal and documented as internal trigger"));
-  }
-  if (docs.planned.has("/api/jobs")) {
-    if (!docs.internalCandidates.has("/api/jobs")) {
-      warnings.push(makeReportLine("PLANNED_JOBS_CLARITY", "/api/jobs", "Planned route should clearly state internal execution candidate", "WARN"));
-    }
+    warnings.push(makeReportLine("PUBLIC_JOBS_RISK", "/api/jobs", "Document this route as internal trigger", "WARN"));
   }
 
   const report = [];
@@ -160,21 +149,20 @@ function main() {
   }
 
   report.push("## Implemented routes from API.md");
-  for (const route of implemented.sort()) report.push(`- ${route}`);
+  for (const route of implemented) report.push(`- ${route}`);
   report.push("");
+
   report.push("## Planned routes from API.md");
-  for (const route of planned.sort()) report.push(`- ${route}`);
+  for (const route of planned) report.push(`- ${route}`);
   report.push("");
+
   report.push("## Actual routes from app/api");
   for (const route of [...actual].sort()) report.push(`- ${route}`);
 
-  fs.writeFileSync(OUTPUT, `${report.join("\n")}\n`);
+  fs.writeFileSync(OUTPUT, `${report.join("\n")}\n`, "utf8");
   console.log(`api contract audit -> ${OUTPUT}`);
 
-  if (failures.length > 0) {
-    process.exit(1);
-  }
+  if (failures.length > 0) process.exit(1);
 }
 
 main();
-

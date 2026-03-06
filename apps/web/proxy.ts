@@ -18,26 +18,26 @@ const missingAdminPasswordHtml = `<!doctype html>
   </head>
   <body>
     <div class="wrap">
-      <h1>Admin API access failed</h1>
-      <p><strong>Render environment variable</strong> has no ADMIN_PASSWORD, so admin APIs are blocked.</p>
+      <h1>관리자 API 접근 차단</h1>
+      <p><strong>배포 환경 변수</strong>에 ADMIN_PASSWORD가 없어 관리자 API가 차단되어 있습니다.</p>
       <ul>
         <li>ADMIN_PASSWORD</li>
         <li>DATABASE_URL / DIRECT_URL</li>
         <li>CRON_SECRET</li>
         <li>NEXT_PUBLIC_KAKAO_JS_KEY or NEXT_PUBLIC_NAVER_CLIENT_ID</li>
       </ul>
-      <p>If these values are set in Render Environment Variables, admin features work immediately.</p>
+      <p>다음 값이 배포 환경 변수에 설정되어 있으면 관리자 기능이 즉시 사용 가능합니다.</p>
     </div>
   </body>
 </html>`;
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
     const { pathname } = request.nextUrl
 
     // Protect /admin and /api/admin routes
     if (pathname.startsWith('/admin') || pathname.startsWith('/api/admin')) {
         const isAdminPage = pathname.startsWith('/admin')
         const authHeader = request.headers.get('authorization')
-        const adminPassword = process.env.ADMIN_PASSWORD;
+        const adminPassword = process.env.ADMIN_PASSWORD || process.env.CRON_SECRET;
 
         // Bypass check in local dev
         if (!adminPassword && process.env.NODE_ENV !== 'production') {
@@ -57,7 +57,7 @@ export function middleware(request: NextRequest) {
             return NextResponse.json(
                 {
                     error:
-                        'ADMIN_PASSWORD is not configured. Set ADMIN_PASSWORD in Render Environment Variables.',
+                        'ADMIN_PASSWORD(CRON_SECRET 대체값)가 설정되어 있지 않습니다. 배포 환경 변수에 관리자 인증값을 등록하세요.',
                 },
                 { status: 503 },
             );

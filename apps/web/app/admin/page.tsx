@@ -1,7 +1,7 @@
 ﻿"use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Activity, ArrowUpRight, CheckCircle2, Database, Layers, RefreshCcw, ShieldAlert, Terminal, BarChart3, TerminalSquare } from "lucide-react";
+import { Activity, AlertTriangle, ArrowUpRight, CheckCircle2, Database, Layers, RefreshCcw, ShieldAlert, Terminal, TerminalSquare, BarChart3 } from "lucide-react";
 import ScraperStatusTable from "@/components/ScraperStatusTable";
 import CsvUploadFallback from "@/components/CsvUploadFallback";
 import PlatformManager from "@/components/PlatformManager";
@@ -72,6 +72,7 @@ export default function AdminDashboard() {
   const [totalCampaigns, setTotalCampaigns] = useState<number | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [requiresAdminConfig, setRequiresAdminConfig] = useState(false);
+  const [lastIngestMessage, setLastIngestMessage] = useState<string | null>(null);
   const logContainerRef = useRef<HTMLDivElement>(null);
 
   const addLog = useCallback((msg: string) => {
@@ -154,12 +155,13 @@ export default function AdminDashboard() {
   const triggerIngest = async () => {
     if (ingestStatus === "running") return;
     if (requiresAdminConfig) {
-      setErrorMessage("관리자 API 설정이 필요합니다. ADMIN_PASSWORD를 Render 환경 변수에 등록하세요.");
+      setErrorMessage("관리자 API 설정이 필요합니다. ADMIN_PASSWORD를 배포 환경 변수에 등록하세요.");
       return;
     }
 
     setIngestStatus("running");
     setErrorMessage(null);
+    setLastIngestMessage(null);
 
     const targets =
       selectedPlatformId === "all" ? dbPlatforms : dbPlatforms.filter((platform) => platform.id === selectedPlatformId);
@@ -173,6 +175,7 @@ export default function AdminDashboard() {
 
     const targetLabel = selectedPlatformId === "all" ? "전체 플랫폼" : String(selectedPlatformId);
     addLog(`수집 요청: ${targetLabel} (${targets.length}개)`);
+    setLastIngestMessage(`${targetLabel}: 요청 전송됨 (${targets.length}개)`);
 
     try {
       const requests = targets.map((target) =>
@@ -201,6 +204,8 @@ export default function AdminDashboard() {
         throw new Error(failure.message || `${failure.target} 수집 요청 실패`);
       }
 
+      setLastIngestMessage(`${targetLabel}: 요청 승인 후 큐 적재 중`);
+
       for (const result of results) {
         addLog(`${result.target} 수집 요청 승인`);
       }
@@ -213,6 +218,7 @@ export default function AdminDashboard() {
       setErrorMessage(message);
       setIngestStatus("error");
       addLog(`ERROR: ${message}`);
+      setLastIngestMessage(`요청 실패: ${message}`);
     } finally {
       setTimeout(() => setIngestStatus("idle"), 3000);
     }
@@ -246,8 +252,22 @@ export default function AdminDashboard() {
   const successRuns = useMemo(() => runs.filter((run) => run.status === "SUCCESS").length, [runs]);
   const failedRuns = useMemo(() => runs.filter((run) => run.status === "FAILED").length, [runs]);
   const runningRuns = useMemo(() => runs.filter((run) => run.status === "RUNNING").length, [runs]);
+  const pendingRuns = useMemo(() => runs.filter((run) => run.status === "PENDING" || run.status === "QUEUED").length, [runs]);
+  const queueDepth = pendingRuns + runningRuns;
   const lastRun = runs[0];
   const lastSyncLabel = lastRun ? new Date(lastRun.start_time).toLocaleString() : "대기";
+  const requestStateLabel = (() => {
+    if (requiresAdminConfig) return "중단됨";
+    if (ingestStatus === "running") return "요청중";
+    if (dbPlatforms.length === 0) return "대기";
+    if (runs.length === 0) return "요청 대기";
+    if (queueDepth > 0) return "큐 적재 중";
+    return "완료/대기";
+  })();
+  const queueStateClass =
+    queueDepth > 0
+      ? "text-amber-300 border-amber-500/40 bg-amber-500/10"
+      : "text-emerald-300 border-emerald-500/40 bg-emerald-500/10";
 
   const cards = [
     {
@@ -283,27 +303,38 @@ export default function AdminDashboard() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#020617] text-slate-200 pb-20">
-      <main className="max-w-[1680px] mx-auto p-6 space-y-6">
-        <section className="rounded-2xl bg-slate-900/60 border border-slate-800 p-6">
+    <div className="min-h-screen bg-[#020617] dark:bg-[#020617] text-slate-200 pb-20">
+      <main className="max-w-[1780px] mx-auto p-5 md:p-6 space-y-5">
+        <section className="rounded-2xl bg-slate-900/60 border border-slate-800 p-5">
           <p className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">운영 대시보드</p>
           <h1 className="text-2xl font-black text-white mt-2">관리자 콘솔</h1>
           <p className="text-sm text-slate-400 mt-2">수집, 플랫폼 상태, 분석, 알림 이력을 한 화면에서 운영합니다.</p>
           <button
             onClick={() => void checkHealth()}
-            className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-800 text-white text-xs font-black border border-slate-700/50 hover:bg-slate-700"
+            aria-label="운영 상태를 다시 점검"
+            className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-800 text-white text-xs font-black border border-slate-700/50 hover:bg-slate-700 transition-all focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
             disabled={healthStatus === "checking"}
           >
             운영 상태 재점검
           </button>
         </section>
 
-        {errorMessage ? <div className="rounded-lg border border-rose-500/40 bg-rose-500/10 text-rose-200 px-4 py-3 text-sm">{errorMessage}</div> : null}
+        {errorMessage ? (
+          <div className="rounded-lg border border-rose-500/40 bg-rose-500/10 text-rose-200 px-4 py-3 text-sm flex items-center justify-between gap-4">
+            <span>{errorMessage}</span>
+            <button
+              onClick={() => { void checkHealth(); void fetchRuns(); }}
+              className="shrink-0 px-3 py-1 rounded-lg border border-rose-400/40 text-rose-200 hover:bg-rose-500/10 text-xs font-bold focus-visible:ring-2 focus-visible:ring-rose-400"
+            >
+              재시도
+            </button>
+          </div>
+        ) : null}
         {requiresAdminConfig ? (
           <section className="rounded-lg border border-rose-400/50 bg-rose-500/10 px-4 py-4 text-rose-200 text-sm space-y-3">
             <p className="font-black text-rose-100">관리자 API 인증 설정 필요</p>
             <p className="text-rose-200/90 leading-relaxed">
-              관리자 API 요청이 503으로 내려옵니다. Render 환경 변수에 아래 값을 등록하고 재배포하면 즉시 해소됩니다.
+              관리자 API 요청이 503으로 내려옵니다. 배포 환경 변수에 아래 값을 등록하고 재배포하면 즉시 해소됩니다.
             </p>
             <ul className="list-disc list-inside text-xs text-rose-200/90 space-y-1">
               <li><strong>ADMIN_PASSWORD</strong> : 운영자 전용 비밀번호</li>
@@ -317,7 +348,7 @@ export default function AdminDashboard() {
           </section>
         ) : null}
 
-        <section id="overview" className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-4">
+        <section id="overview" className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-3">
           {cards.map((card) => (
             <div
               key={card.label}
@@ -345,7 +376,8 @@ export default function AdminDashboard() {
               <button
                 onClick={() => void fetchRuns()}
                 disabled={isLoadingSnapshot}
-                className="p-2 rounded-xl bg-slate-800 border border-slate-700 hover:bg-slate-700"
+                aria-label="수집 이력 새로고침"
+                className="p-2 rounded-xl bg-slate-800 border border-slate-700 hover:bg-slate-700 transition-colors focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
               >
                 <RefreshCcw className={`w-4 h-4 ${isLoadingSnapshot ? "animate-spin" : ""}`} />
               </button>
@@ -354,11 +386,10 @@ export default function AdminDashboard() {
             <div className="flex flex-wrap gap-2 mb-5">
               <button
                 onClick={() => setSelectedPlatformId("all")}
-                className={`px-3 py-2 text-xs rounded-xl border font-black ${
-                  selectedPlatformId === "all"
+                className={`px-3 py-2 text-xs rounded-xl border font-black ${selectedPlatformId === "all"
                     ? "bg-blue-600 border-blue-500 text-white"
                     : "bg-slate-800 border-slate-700 text-slate-400"
-                }`}
+                  }`}
               >
                 전체 플랫폼
               </button>
@@ -366,11 +397,10 @@ export default function AdminDashboard() {
                 <button
                   key={platform.id}
                   onClick={() => setSelectedPlatformId(platform.id)}
-                  className={`px-3 py-2 text-xs rounded-xl border font-black ${
-                    selectedPlatformId === platform.id
+                  className={`px-3 py-2 text-xs rounded-xl border font-black ${selectedPlatformId === platform.id
                       ? "bg-blue-600 border-blue-500 text-white"
                       : "bg-slate-800 border-slate-700 text-slate-400"
-                  }`}
+                    }`}
                 >
                   {platform.name}
                 </button>
@@ -398,33 +428,59 @@ export default function AdminDashboard() {
                 <p className="text-slate-500 mb-1">실시간 실행</p>
                 <p className="text-white font-black">{runningRuns} / {runs.length}</p>
               </div>
+              <div className="rounded-xl border border-slate-800 p-3">
+                <p className="text-slate-500 mb-1">큐 적재</p>
+                <p className="text-white font-black">
+                  {queueDepth}건 (대기 {pendingRuns}건)
+                </p>
+              </div>
+              <div className="rounded-xl border border-slate-800 p-3">
+                <p className="text-slate-500 mb-1">요청 단계</p>
+                <p className="text-white font-black">{requestStateLabel}</p>
+              </div>
             </div>
+            {lastIngestMessage ? (
+              <div className="mb-4 rounded-xl border border-blue-500/40 bg-blue-950/30 p-3 text-xs text-blue-200 flex gap-2 items-start">
+                <TerminalSquare className="w-3.5 h-3.5 mt-0.5" />
+                <p className="leading-relaxed">{lastIngestMessage}</p>
+              </div>
+            ) : null}
 
             <button
               onClick={triggerIngest}
-              disabled={ingestStatus === "running" || requiresAdminConfig}
-              className={`w-full py-4 rounded-2xl border border-slate-700 font-black text-sm tracking-wide ${
-                ingestStatus === "running"
+              disabled={ingestStatus === "running" || requiresAdminConfig || dbPlatforms.length === 0}
+              aria-label="선택된 플랫폼 수집 실행"
+              className={`w-full py-4 rounded-2xl border border-slate-700 font-black text-sm tracking-wide ${ingestStatus === "running"
                   ? "bg-slate-800 text-slate-500"
                   : requiresAdminConfig
                     ? "bg-slate-800 text-rose-300 cursor-not-allowed"
-                  : "bg-white text-slate-900 hover:bg-blue-500 hover:text-white"
-              }`}
+                    : dbPlatforms.length === 0
+                      ? "bg-slate-800 text-amber-300 cursor-not-allowed"
+                      : "bg-white text-slate-900 hover:bg-blue-500 hover:text-white transition-all focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                }`}
             >
               {requiresAdminConfig
                 ? "환경 설정 필요"
                 : ingestStatus === "running"
                   ? "수집 실행 중..."
-                  : "수집 실행"}
+                  : dbPlatforms.length === 0
+                    ? "플랫폼이 없습니다"
+                    : "수집 실행"}
             </button>
+            {dbPlatforms.length === 0 ? (
+              <p className="text-amber-300 text-xs mt-2 flex items-center gap-2">
+                <AlertTriangle className="w-3.5 h-3.5" />
+                활성화된 플랫폼이 없습니다. 플랫폼 관리에서 사이트를 먼저 등록해 주세요.
+              </p>
+            ) : null}
 
             <div
               className="mt-5 border border-slate-800 rounded-2xl p-4 bg-black/40 h-56 overflow-y-auto"
               ref={logContainerRef}
             >
               {isLoading ? <p className="text-slate-500">이전 로그를 불러오는 중입니다.</p> : null}
-              {logs.map((log) => (
-                <p key={log} className="font-mono text-xs text-emerald-300/90 mb-1">
+              {logs.map((log, idx) => (
+                <p key={`log-${idx}`} className="font-mono text-xs text-emerald-300/90 mb-1">
                   {log}
                 </p>
               ))}
@@ -445,13 +501,12 @@ export default function AdminDashboard() {
                 <div className="flex items-center justify-between">
                   <span>알림 건수</span>
                   <span
-                    className={`px-2 py-1 rounded-full text-xs border ${
-                      qualityStatus === "ok"
+                    className={`px-2 py-1 rounded-full text-xs border ${qualityStatus === "ok"
                         ? "text-emerald-300 border-emerald-500/40 bg-emerald-500/10"
                         : qualityStatus === "warn"
                           ? "text-amber-300 border-amber-500/40 bg-amber-500/10"
                           : "text-rose-300 border-rose-500/40 bg-rose-500/10"
-                    }`}
+                      }`}
                   >
                     {alertsCount}건
                   </span>
@@ -459,6 +514,16 @@ export default function AdminDashboard() {
                 <div className="flex items-center justify-between">
                   <span>총 실행 수</span>
                   <span className="font-black">{runMeta?.total ?? 0}건</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span>요청 큐</span>
+                  <span className={`px-2 py-1 rounded-full text-xs border ${queueStateClass}`}>
+                    {queueDepth}건
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span>최근 단계</span>
+                  <span className="font-black">{lastIngestMessage ?? "대기"}</span>
                 </div>
               </div>
             </div>
@@ -526,4 +591,5 @@ export default function AdminDashboard() {
     </div>
   );
 }
+
 

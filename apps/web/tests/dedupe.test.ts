@@ -10,10 +10,12 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 // ─── Mock Prisma db ───────────────────────────────────────────────────────────
 vi.mock('../lib/db', () => ({
     db: {
+        $transaction: vi.fn(),
         campaign: {
             findUnique: vi.fn(),
             create: vi.fn(),
             update: vi.fn(),
+            findFirst: vi.fn(),
         },
         campaignSnapshot: {
             create: vi.fn(),
@@ -43,6 +45,7 @@ const sampleCampaign: ScrapedCampaign = {
 
 beforeEach(() => {
     vi.clearAllMocks();
+    vi.mocked(db.$transaction).mockImplementation(async (callback: (tx: typeof db) => Promise<unknown>) => callback(db as typeof db));
 });
 
 describe('processAndDedupeCampaign – new campaign', () => {

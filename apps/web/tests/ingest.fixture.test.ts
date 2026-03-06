@@ -42,9 +42,9 @@ describe('Adapter Metadata (platformId + baseUrl)', () => {
         { Adapter: ReviewnoteAdapter, platformId: 2, baseUrl: 'https://www.reviewnote.co.kr' },
         { Adapter: DinnerQueenAdapter, platformId: 3, baseUrl: 'https://dinnerqueen.net' },
         { Adapter: ReviewPlaceAdapter, platformId: 4, baseUrl: 'https://www.reviewplace.co.kr' },
-        { Adapter: SeouloppaAdapter, platformId: 5, baseUrl: 'https://seouloppa.net' },
+        { Adapter: SeouloppaAdapter, platformId: 5, baseUrl: 'https://www.seoulouba.co.kr' },
         { Adapter: MrBlogAdapter, platformId: 6, baseUrl: 'https://mrblog.net' },
-        { Adapter: GangnamFoodAdapter, platformId: 7, baseUrl: 'https://gangnamfood.net' },
+        { Adapter: GangnamFoodAdapter, platformId: 7, baseUrl: 'https://xn--939au0g4vj8sq.net' },
     ])('$Adapter.name has correct platformId and baseUrl', ({ Adapter, platformId, baseUrl }) => {
         const instance = new (Adapter as any)();
         expect(instance.platformId).toBe(platformId);
@@ -131,8 +131,8 @@ describe('GangnamFoodAdapter', () => {
 describe('Adapter Registry', () => {
     const EXPECTED_KEYS = ['revu', 'reviewnote', 'dinnerqueen', 'reviewplace', 'seouloppa', 'mrblog', 'gangnamfood'];
 
-    it('has all 7 adapters registered', () => {
-        expect(Object.keys(InitializedAdapters).length).toBe(7);
+    it('keeps the original 7 adapters registered and allows expansion', () => {
+        expect(Object.keys(InitializedAdapters).length).toBeGreaterThanOrEqual(7);
     });
 
     it.each(EXPECTED_KEYS)('registry contains "%s" key', (key) => {

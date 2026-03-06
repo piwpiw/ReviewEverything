@@ -13,6 +13,11 @@ const eslintConfig = defineConfig([
     "build/**",
     "next-env.d.ts",
     "tmp/**",
+    // Generated/runtime outputs that should not be lint-gated:
+    ".vercel/**",
+    "reports/**",
+    "logs/**",
+    "coverage/**",
   ]),
   {
     files: ["**/*.ts", "**/*.tsx", "scripts/**/*.js"],

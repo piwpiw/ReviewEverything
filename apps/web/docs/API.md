@@ -23,11 +23,19 @@
 - `PATCH /api/admin/creators/:id`
 - `DELETE /api/admin/creators/:id`
 - `GET /api/admin/creators/autologin` (후보 정렬/상태 정책 조회). 응답 필드: `failure_code`, `failure_label` 포함.
+- `GET /api/admin/analytics/stats`
+- `GET /api/admin/platforms`
+- `POST /api/admin/platforms`
+- `PATCH /api/admin/platforms/:id`
+- `DELETE /api/admin/platforms/:id`
 - `GET /api/admin/runs`
 - `GET /api/admin/quality`
 - `GET /api/admin/alerts`
 - `POST /api/admin/alerts/actions` (`ack`, `snooze`)
+- `POST /api/analytics/log`
 - `GET /api/health`
+- `GET /api/public/stats`
+- `GET /api/search/suggest`
 - `POST /api/jobs` (internal endpoint, `CRON_SECRET` required)
   - 예시 body: `{"runNow":true,"phases":["A","B","C"],"limit":12,"platform_keys":["reviewnote","revu"]}`
 - `GET /api/me/revenue`
@@ -80,10 +88,19 @@ Note:
   - `PATCH /api/admin/creators/:id`
   - `DELETE /api/admin/creators/:id`
   - `GET /api/admin/creators/autologin`
+  - `GET /api/admin/analytics/stats`
+  - `GET /api/admin/platforms`
+  - `POST /api/admin/platforms`
+  - `PATCH /api/admin/platforms/:id`
+  - `DELETE /api/admin/platforms/:id`
   - `GET /api/admin/runs`
   - `GET /api/admin/quality`
   - `GET /api/admin/alerts`
   - `POST /api/admin/alerts/actions`
+- `T06_ANALYTICS`
+  - `POST /api/analytics/log`
+  - `GET /api/public/stats`
+  - `GET /api/search/suggest`
 - `T08_MANAGER`
   - `GET /api/me/revenue`
   - `GET /api/me/board`

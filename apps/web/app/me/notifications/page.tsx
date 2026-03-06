@@ -189,7 +189,7 @@ function NotificationsContent() {
       return entry.ok;
     }
     const detail = String(entry.detail || "").toLowerCase();
-  return detail === "ok" || detail === "success" || detail.includes(":ok") || detail.endsWith(" ok");
+    return detail === "ok" || detail === "success" || detail.includes(":ok") || detail.endsWith(" ok");
   };
 
   return (
@@ -199,13 +199,13 @@ function NotificationsContent() {
           <div className="flex items-center gap-4">
             <Link
               href="/me"
-              className="w-10 h-10 rounded-2xl bg-white dark:bg-slate-900 flex items-center justify-center border border-slate-100 dark:border-slate-800 text-slate-500 hover:text-blue-600 transition-colors shadow-sm"
+              className="w-10 h-10 rounded-2xl bg-white dark:bg-slate-900 flex items-center justify-center border border-slate-100 dark:border-slate-800 text-slate-500 hover:text-blue-600 transition-colors shadow-sm focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
             >
               <ArrowLeft className="w-5 h-5" />
             </Link>
             <div>
               <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tighter flex items-center gap-2">
-              <Bell className="w-6 h-6 text-blue-600" /> 알림
+                <Bell className="w-6 h-6 text-blue-600" /> 알림
               </h1>
               <p className="text-xs text-slate-400 font-bold mt-1 uppercase tracking-widest">발송 이력</p>
             </div>
@@ -225,12 +225,18 @@ function NotificationsContent() {
         </div>
 
         {error ? (
-          <div className="mb-4 rounded-2xl border border-rose-200 bg-rose-50 text-rose-700 px-4 py-3 text-sm font-bold">
-            {error}
+          <div className="mb-4 rounded-2xl border border-rose-200 bg-rose-50 text-rose-700 px-4 py-3 text-sm font-bold flex items-center justify-between gap-4">
+            <span>{error}</span>
+            <button
+              onClick={() => void load()}
+              className="shrink-0 px-3 py-1.5 rounded-lg border border-rose-300 text-rose-600 hover:bg-rose-100 text-xs font-bold focus-visible:ring-2 focus-visible:ring-rose-400"
+            >
+              재시도
+            </button>
           </div>
         ) : null}
-
-        <div className="space-y-4">
+        <section className="space-y-4">
+          <h2 className="sr-only">알림 필터와 목록</h2>
           <div className="flex items-center gap-2 text-xs">
             {(
               [
@@ -245,25 +251,24 @@ function NotificationsContent() {
                 <button
                   key={value}
                   onClick={() => setFilter(value)}
-                  className={`px-3 py-1.5 rounded-xl border ${
-                    isActive
+                  className={`px-3 py-1.5 rounded-xl border ${isActive
                       ? "bg-blue-600 text-white border-blue-500"
                       : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300"
-                  }`}
+                    }`}
                 >
                   {label} {count}
                 </button>
-                );
-              })}
+              );
+            })}
           </div>
 
           <div className="flex items-center gap-2 text-xs">
             {(
               [
                 ["all", "전체"],
-                ["push", "PUSH"],
-                ["kakao", "KAKAO"],
-                ["telegram", "TELEGRAM"],
+                ["push", "푸시"],
+                ["kakao", "카카오"],
+                ["telegram", "텔레그램"],
               ] as const
             ).map(([value, label]) => {
               const value2 = value as ChannelFilter;
@@ -272,11 +277,10 @@ function NotificationsContent() {
                 <button
                   key={value2}
                   onClick={() => setChannelFilter(value2)}
-                  className={`px-3 py-1.5 rounded-xl border ${
-                    isActive
+                  className={`px-3 py-1.5 rounded-xl border ${isActive
                       ? "bg-blue-600 text-white border-blue-500"
                       : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300"
-                  }`}
+                    }`}
                 >
                   {label}
                 </button>
@@ -299,11 +303,10 @@ function NotificationsContent() {
                 <button
                   key={value2}
                   onClick={() => setTimeRange(value2)}
-                  className={`px-3 py-1.5 rounded-xl border ${
-                    isActive
+                  className={`px-3 py-1.5 rounded-xl border ${isActive
                       ? "bg-blue-600 text-white border-blue-500"
                       : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300"
-                  }`}
+                    }`}
                 >
                   {label}
                 </button>
@@ -330,103 +333,107 @@ function NotificationsContent() {
               {filteredNotifications.map((n, i) => {
                 const attempts = getAttemptedChannels(n);
                 return (
-                <motion.div
-                  key={n.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.03 }}
-                  className="bg-white dark:bg-slate-900 rounded-[2rem] p-6 border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group"
-                >
-                  <div className="flex items-start justify-between gap-4 relative z-10">
-                    <div className="flex gap-4">
-                      <div
-                        className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 ${
-                          isSuccess(n.status)
-                            ? "bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600"
-                            : isPending(n.status)
-                              ? "bg-amber-50 dark:bg-amber-900/20 text-amber-600"
-                            : "bg-rose-50 dark:bg-rose-900/20 text-rose-600"
-                        }`}
-                      >
-                        {isSuccess(n.status) ? <CheckCircle2 className="w-6 h-6" /> : <ShieldAlert className="w-6 h-6" />}
-                      </div>
-                      <div>
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="text-[10px] font-black text-blue-600 uppercase tracking-widest">
-                            {n.userSchedule?.custom_title || "일정 리마인더"}
-                          </span>
-                          <div className="w-1 h-1 rounded-full bg-slate-200 dark:bg-slate-700" />
-                          <span className="text-[10px] font-black text-slate-400">{statusLabel(n.status)}</span>
+                  <motion.div
+                    key={n.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.03 }}
+                    className="bg-white dark:bg-slate-900 rounded-[2rem] p-6 border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group"
+                  >
+                    <div className="flex items-start justify-between gap-4 relative z-10">
+                      <div className="flex gap-4">
+                        <div
+                          className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 ${isSuccess(n.status)
+                              ? "bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600"
+                              : isPending(n.status)
+                                ? "bg-amber-50 dark:bg-amber-900/20 text-amber-600"
+                                : "bg-rose-50 dark:bg-rose-900/20 text-rose-600"
+                            }`}
+                        >
+                          {isSuccess(n.status) ? <CheckCircle2 className="w-6 h-6" /> : <ShieldAlert className="w-6 h-6" />}
                         </div>
-                        <p className="text-sm font-black text-slate-800 dark:text-white leading-tight">
-                          {isSuccess(n.status)
-                              ? "알림이 성공적으로 발송되었습니다."
-                            : isPending(n.status)
-                              ? "발송 대기 중입니다."
-                              : `실패: ${n.error_message || "알 수 없는 오류"}`}
-                        </p>
-                        <p className="text-xs text-slate-400 mt-1">채널: {n.channel || "알 수 없음"}</p>
-                        <p className="text-[10px] text-slate-500 mt-1">
-                          시도 경로: <span className="font-bold">{getAttemptSummary(n)}</span>
-                        </p>
-                        {attempts.length > 0 ? (
-                          <div className="mt-1">
-                            <p className="text-[10px] text-slate-500 font-bold">시도 상세:</p>
-                            <ul className="mt-0.5 text-[11px] text-slate-500 space-y-0.5">
-                               {attempts.map((entry, idx) => (
-                            <li key={`${n.id}-${idx}`} className="font-bold flex items-center gap-2">
-                                   <span
-                                    className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] ${
-                                      isAttemptSuccess(entry)
-                                        ? "bg-emerald-50 text-emerald-600"
-                                        : "bg-rose-50 text-rose-600"
-                                    }`}
-                                  >
-                                    {isAttemptSuccess(entry) ? "성공" : "실패"}
-                                  </span>
-                                  {entry.channel || "알 수 없음"}: {entry.detail || "상세 정보 없음"}
-                                 </li>
-                               ))}
-                            </ul>
+                        <div>
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="text-[10px] font-black text-blue-600 uppercase tracking-widest">
+                              {n.userSchedule?.custom_title || "일정 리마인더"}
+                            </span>
+                            <div className="w-1 h-1 rounded-full bg-slate-200 dark:bg-slate-700" />
+                            <span className="text-[10px] font-black text-slate-400">{statusLabel(n.status)}</span>
                           </div>
-                        ) : null}
-                        {n.message ? <p className="text-xs text-slate-500 mt-2">{n.message}</p> : null}
-                        <div className="flex items-center gap-1.5 mt-2 text-[10px] font-bold text-slate-400">
-                          <Clock className="w-3 h-3" />
-                          {new Date(n.sent_at || n.created_at || Date.now()).toLocaleString()}
+                          <p className="text-sm font-black text-slate-800 dark:text-white leading-tight">
+                            {isSuccess(n.status)
+                              ? "알림이 성공적으로 발송되었습니다."
+                              : isPending(n.status)
+                                ? "발송 대기 중입니다."
+                                : `실패: ${n.error_message || "알 수 없는 오류"}`}
+                          </p>
+                          <p className="text-xs text-slate-400 mt-1">채널: {n.channel || "알 수 없음"}</p>
+                          <p className="text-[10px] text-slate-500 mt-1">
+                            시도 경로: <span className="font-bold">{getAttemptSummary(n)}</span>
+                          </p>
+                          {attempts.length > 0 ? (
+                            <div className="mt-1">
+                              <p className="text-[10px] text-slate-500 font-bold">시도 상세:</p>
+                              <ul className="mt-0.5 text-[11px] text-slate-500 space-y-0.5">
+                                {attempts.map((entry, idx) => (
+                                  <li key={`${n.id}-${idx}`} className="font-bold flex items-center gap-2">
+                                    <span
+                                      className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] ${isAttemptSuccess(entry)
+                                          ? "bg-emerald-50 text-emerald-600"
+                                          : "bg-rose-50 text-rose-600"
+                                        }`}
+                                    >
+                                      {isAttemptSuccess(entry) ? "성공" : "실패"}
+                                    </span>
+                                    {entry.channel || "알 수 없음"}: {entry.detail || "상세 정보 없음"}
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          ) : null}
+                          {n.message ? <p className="text-xs text-slate-500 mt-2">{n.message}</p> : null}
+                          <div className="flex items-center gap-1.5 mt-2 text-[10px] font-bold text-slate-400">
+                            <Clock className="w-3 h-3" />
+                            {new Date(n.sent_at || n.created_at || Date.now()).toLocaleString()}
+                          </div>
                         </div>
                       </div>
-                    </div>
 
-                    <button
-                      onClick={() => deleteNotification(n.id)}
-                      disabled={deletingId === n.id}
-                      className={`p-2 text-slate-300 hover:text-rose-500 transition-all ${
-                        deletingId === n.id ? "opacity-100" : "opacity-0 group-hover:opacity-100"
-                      } disabled:opacity-40 disabled:cursor-not-allowed`}
-                      aria-label="알림 삭제"
-                    >
-                      <Trash2 className={`w-4 h-4 ${deletingId === n.id ? "animate-spin" : ""}`} />
-                    </button>
-                  </div>
-                </motion.div>
-              )})}
+                      <button
+                        onClick={() => deleteNotification(n.id)}
+                        disabled={deletingId === n.id}
+                        className={`p-2 text-slate-300 hover:text-rose-500 transition-all ${deletingId === n.id ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+                          } disabled:opacity-40 disabled:cursor-not-allowed`}
+                        aria-label="알림 삭제"
+                      >
+                        <Trash2 className={`w-4 h-4 ${deletingId === n.id ? "animate-spin" : ""}`} />
+                      </button>
+                    </div>
+                  </motion.div>
+                )
+              })}
             </AnimatePresence>
           )}
 
           {loadMoreError ? (
-            <div className="rounded-2xl border border-rose-200 bg-rose-50 text-rose-700 px-4 py-3 text-sm font-bold">
-              {loadMoreError}
+            <div className="rounded-2xl border border-rose-200 bg-rose-50 text-rose-700 px-4 py-3 text-sm font-bold flex items-center justify-between gap-4">
+              <span>{loadMoreError}</span>
+              <button
+                onClick={() => void loadMore()}
+                className="shrink-0 px-3 py-1.5 rounded-lg border border-rose-300 text-rose-600 hover:bg-rose-100 text-xs font-bold focus-visible:ring-2 focus-visible:ring-rose-400"
+              >
+                재시도
+              </button>
             </div>
           ) : null}
-        </div>
+        </section>
 
         {!loading && hasMore ? (
           <div className="mt-6 flex justify-center">
             <button
               onClick={loadMore}
               disabled={loadingMore}
-              className="px-4 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs font-black hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-40 disabled:cursor-not-allowed"
+              className="px-4 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs font-black hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-40 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
             >
               {loadingMore ? "불러오는 중..." : "더 보기"}
             </button>
@@ -436,7 +443,7 @@ function NotificationsContent() {
         <div className="mt-10 flex justify-end">
           <button
             onClick={load}
-            className="px-4 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs font-black hover:bg-slate-50 dark:hover:bg-slate-800"
+            className="px-4 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs font-black hover:bg-slate-50 dark:hover:bg-slate-800 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
           >
             새로고침
           </button>

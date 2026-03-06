@@ -1,21 +1,38 @@
-﻿import type { Metadata, Viewport } from "next";
-import "./globals.css";
+import type { Metadata, Viewport } from "next";
 import { Suspense } from "react";
 import Header from "@/components/Header";
-import PWAPrompt from "@/components/PWAPrompt";
 import MobileNav from "@/components/MobileNav";
+import PWAPrompt from "@/components/PWAPrompt";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import "./globals.css";
+
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://revieweverything.com";
 
 export const metadata: Metadata = {
   title: "리뷰에브리띵 | 리뷰 운영은 한 번의 검색으로 정리",
   description: "검색, 필터, 지도, 일정까지 한 화면에서 관리하는 한국형 리뷰 캠페인 허브입니다.",
   keywords: "리뷰 캠페인 플랫폼, 리뷰어, 인플루언서, 플랫폼, 지도, 쿠폰, 방문형, 쇼핑형",
+  metadataBase: new URL(SITE_URL),
+  alternates: {
+    canonical: "/",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
   manifest: "/manifest.json",
   openGraph: {
     title: "리뷰에브리띵 | 리뷰 운영 허브",
     description: "빠른 검색과 지도 기반 필터링으로 캠페인을 운영하고 관리하세요.",
+    url: SITE_URL,
+    siteName: "리뷰에브리띵",
     type: "website",
     locale: "ko_KR",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "리뷰에브리띵 | 리뷰 운영 허브",
+    description: "빠른 검색과 지도 기반 필터링으로 캠페인을 운영하고 관리하세요.",
   },
 };
 
@@ -23,8 +40,6 @@ export const viewport: Viewport = {
   themeColor: "#0f172a",
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
 };
 
 export default function RootLayout({
@@ -33,6 +48,12 @@ export default function RootLayout({
   return (
     <html lang="ko" suppressHydrationWarning>
       <body className="bg-background min-h-screen text-foreground flex flex-col selection:bg-blue-500 selection:text-white transition-colors duration-300">
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus-visible:not-sr-only focus-visible:fixed focus-visible:top-4 focus-visible:left-4 focus-visible:z-[200] rounded-lg bg-blue-600 px-4 py-2 text-white font-black shadow-lg"
+        >
+          본문으로 바로가기
+        </a>
         <ThemeProvider attribute="data-theme" defaultTheme="system" enableSystem disableTransitionOnChange>
           <Suspense
             fallback={
@@ -41,7 +62,7 @@ export default function RootLayout({
           >
             <Header />
           </Suspense>
-          <main className="flex-1 relative">
+          <main id="main-content" className="flex-1 relative">
             <div className="max-w-[1700px] mx-auto min-h-[calc(100vh-72px)]">{children}</div>
           </main>
           <Suspense fallback={null}>

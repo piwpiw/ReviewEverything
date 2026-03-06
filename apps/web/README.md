@@ -34,7 +34,7 @@ For future AI agents modifying this project, here are the core locations and the
 - **API Routes** (`app/api/`):
   - `/campaigns/route.ts` (Main API, utilizes Vercel Edge Caching `s-maxage=60`)
   - `/analytics/route.ts` (Returns trending campaigns)
-  - `/admin/ingest/route.ts` (Protected by Basic Auth via `middleware.ts`)
+  - `/admin/ingest/route.ts` (Protected by Basic Auth via `proxy.ts`)
 - **UI Components** (`components/`):
   - `CampaignCard.tsx` (Premium Jeomsin-style UI, handles "HOT LOW COMP" / "TRENDING" badges)
   - `FilterBar.tsx` / `SortBar.tsx` (Advanced search logic)
@@ -78,7 +78,7 @@ For an in-depth understanding, see the specialized technical documents:
 ### 3. Engineering Excellence
 - **Zero-DB Fallback**: High-fidelity mock system kicks in automatically if the Postgres DB is unreachable, ensuring continuous UI/UX operations.
 - **Edge Caching**: `/api/campaigns` leverages `Cache-Control` headers for maximum CDN scalability.
-- **Security**: `/admin` operations are securely gated by JWT/Basic Auth middleware.
+- **Security**: `/admin` operations are securely gated by JWT/Basic Auth proxy middleware.
 
 ## 📡 Operational Status
 
@@ -193,3 +193,15 @@ Prerequisites:
 
 - `npm run ingest:top20:agents:3h`
 - 내부적으로 `A/B/C`를 각각 독립 프로세스로 동시에 구동하고 로그를 분리(`./logs/top20-agents/agent-*.log`) 기록
+
+## Screen Refinement Loop (3h / 5h)
+
+- 3h standard autonomous loop: `npm run ops:autonomous:3h`
+- 3h screen-focused loop: `npm run ops:autonomous:3h:dev` or `npm run ops:screen:3h`
+  - profile: ingest off, refactor + api audits + health check on
+- 3h review-list only: `npm run ops:review-list:3h`
+- 5h development loop: `npm run ops:autonomous:5h:dev`
+
+Recommended usage:
+- UI-heavy batch: `npm run ops:screen:3h`
+- Data + UI + ops mixed batch: `npm run ops:autonomous:5h:dev`

@@ -36,9 +36,10 @@
 ---
 
 ## #collaboration (Dynamic State)
-- **Stream Alpha [Data]**: `T01` ↔ `T02` ↔ `T03` ? *가동 중*
-- **Stream Beta [User]**: `T08` ↔ `T07` ? *대기 중*
-- **Stream Gamma [Ops]**: `T10` ↔ `T09` ? *상시 백그라운드 구동 중*
+- **Stream Alpha [Data]**: `T01` ↔ `T02` ↔ `T03` → *가동 중*
+- **Stream Beta [User]**: `T08` ↔ `T07` → *대기 중*
+- **Stream Gamma [Ops]**: `T10` ↔ `T09` → *상시 백그라운드 구동 중*
+- **Active Agent**: `SESSION_HANDOFF.md #session_handoff` 참조 (last_agent / timestamp / pending_work)
 
 ---
 
@@ -137,8 +138,18 @@
 - 문서 동기화:
   - 상태 변경 발생 시 `PROJECT_STATUS_NEXT_ACTIONS.md` 11/12 섹션과 동시 갱신.
 
+## #multi_agent (2026-03-05)
+- 이 프로젝트는 Claude / Gemini / Codex가 교대로 작업합니다.
+- 에이전트 전환 비용 제로를 위해 `SESSION_HANDOFF.md`를 통해 인수인계합니다.
+- 부팅 파일: 루트의 `claude.md` (Claude), `GEMINI.md` (Gemini), `CODEX.md` (Codex)
+- 세션 시작: `#session_handoff` 읽기 → 사용자 재설명 없이 바로 작업 시작
+- 세션 종료: `#session_handoff` JSON + `#session_log` 갱신 → 다음 AI에게 인수인계
+- 비용 라우팅 가이드: `SESSION_HANDOFF.md #cost_routing` 참조
+
 ## #autonomous_ops (2026-03-04)
 - 현재 상태: 5시간 무인 실행 루프 엔진이 `apps/web/scripts/autonomous-ops-loop.ts`로 활성화됨.
 - 운영 모드: `ops:autonomous`(기본 300분), `ops:autonomous:5h`(명시 실행).
 - 1시간 단위로 상태를 health/API audit/운영로그로 갱신하고, 변경이 확인되면 별도 수동 승인 후 커밋.
+- `ops:review-list`는 신규 작업 항목을 `apps/web/docs/AUTONOMOUS_WORK_POOL.md`에 append-only로 누적하고,
+  재시작 시 마지막 작업번호를 읽어 이어서 생성해 “중단 없는 연속 고도화”를 유지함.
 - 기본 규칙: 자동 커밋은 기본 비활성(`--autoCommit=false`). 필요 시 명시 플래그로만 허용.

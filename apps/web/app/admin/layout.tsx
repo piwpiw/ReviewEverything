@@ -1,5 +1,14 @@
-﻿import AdminSectionNav from "@/components/AdminSectionNav";
+import type { Metadata } from "next";
+import AdminSectionNav from "@/components/AdminSectionNav";
 import WorkspaceHubNav from "@/components/WorkspaceHubNav";
+
+export const metadata: Metadata = {
+  title: "운영 허브 | 리뷰에브리띵",
+  description: "수집 상태, 플랫폼 운영, 품질 지표를 운영팀 관점으로 점검합니다.",
+  alternates: {
+    canonical: "/admin",
+  },
+};
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   return (

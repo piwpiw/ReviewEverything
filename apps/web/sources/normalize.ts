@@ -3,32 +3,46 @@ import { ScrapedCampaign } from "./types";
 import { resolveCampaignCoordinates } from "../lib/geo/campaignGeo";
 import { Prisma } from "@prisma/client";
 
-const KNOWN_CITIES = [
-  "seoul",
-  "seoul special city",
-  "busan",
-  "incheon",
-  "daegu",
-  "gwangju",
-  "ulsan",
-  "daejeon",
-  "gyeonggi",
-  "gangwon",
-  "jeju",
-  "sejong",
-  "incheon",
-  "gyeongbuk",
-  "gyeongnam",
-];
+const REGION_ALIASES: Record<string, string> = {
+  seoul: "서울",
+  "seoul special city": "서울",
+  "서울특별시": "서울",
+  busan: "부산",
+  "busan metropolitan city": "부산",
+  "부산광역시": "부산",
+  incheon: "인천",
+  "incheon metropolitan city": "인천",
+  "인천광역시": "인천",
+  daegu: "대구",
+  "대구광역시": "대구",
+  gwangju: "광주",
+  "광주광역시": "광주",
+  ulsan: "울산",
+  "울산광역시": "울산",
+  daejeon: "대전",
+  "대전광역시": "대전",
+  gyeonggi: "경기",
+  "경기도": "경기",
+  gangwon: "강원",
+  "강원도": "강원",
+  jeju: "제주",
+  "제주특별자치도": "제주",
+  sejong: "세종",
+  "세종특별자치시": "세종",
+  gyeongbuk: "경북",
+  "경상북도": "경북",
+  gyeongnam: "경남",
+  "경상남도": "경남",
+};
 
 const KEYWORDS = {
-  visit: ["visit", "vst", "visit campaign", "onsite", "store", "offline", "foot traffic", "in-store"],
-  ship: ["delivery", "ship", "shipping", "sample", "sampling", "purchase", "shipped", "ship review", "freebie"],
+  visit: ["방문", "체험", "visit", "vst", "visit campaign", "onsite", "store", "offline", "foot traffic", "in-store"],
+  ship: ["배송", "배달", "택배", "delivery", "ship", "shipping", "sample", "sampling", "purchase", "shipped", "ship review", "freebie"],
   media: {
-    ip: ["instagram", "insta", "reels", "blogger", "blog", "sns", "social", "influencer", "ig"],
-    yp: ["youtube", "yout", "shorts", "creator", "video"],
-    tk: ["tiktok", "short", "fyp", "video"],
-    bp: ["blog", "blogger", "community", "post", "review"],
+    ip: ["인스타", "인스타그램", "instagram", "insta", "reels", "sns", "social", "influencer", "ig"],
+    yp: ["유튜브", "youtube", "yout", "shorts", "creator", "video"],
+    tk: ["틱톡", "tiktok", "short", "fyp", "video"],
+    bp: ["블로그", "blog", "blogger", "community", "post", "review"],
     rs: ["reel", "reels", "story", "clip"],
     sh: ["short", "shortform", "clip", "snippet"],
     cl: ["clip", "clip", "mini video", "vertical"],
@@ -82,17 +96,23 @@ export function normalizeMediaType(mediaRaw: string): string {
 function collectRewardNumbers(text: string): number[] {
   const normalized = normalizeText(text).replace(/,/g, "").toLowerCase();
   const values = new Set<number>();
+  let matchedByUnit = false;
 
   const add = (regex: RegExp, factor = 1) => {
     let m: RegExpExecArray | null;
     while ((m = regex.exec(normalized)) !== null) {
       const raw = Number.parseFloat(m[1]);
       if (Number.isFinite(raw)) {
+        matchedByUnit = true;
         values.add(Math.round(raw * factor));
       }
     }
   };
 
+  add(/(\d+(?:\.\d+)?)\s*억/g, 100_000_000);
+  add(/(\d+(?:\.\d+)?)\s*만(?:원)?/g, 10_000);
+  add(/(\d+(?:\.\d+)?)\s*천원/g, 1_000);
+  add(/(\d+(?:\.\d+)?)\s*달러/g, 1_300);
   add(/(\d+(?:\.\d+)?)\s*(billion|bn)\b/g, 100_000_000);
   add(/(\d+(?:\.\d+)?)\s*(million|m)\b/g, 1_000_000);
   add(/(\d+(?:\.\d+)?)\s*(ten thousand|man|10k|10000)\b/g, 10_000);
@@ -101,10 +121,10 @@ function collectRewardNumbers(text: string): number[] {
   add(/(\d+(?:\.\d+)?)\s*(?:\$|usd)\b/g, 1_300);
 
   const fallback = normalized.match(/\d[\d,]*/g);
-  if (fallback) {
+  if (!matchedByUnit && fallback) {
     for (const raw of fallback) {
       const value = Number.parseInt(raw, 10);
-      if (Number.isFinite(value)) values.add(value);
+      if (Number.isFinite(value) && value >= 1000) values.add(value);
     }
   }
 
@@ -130,10 +150,10 @@ export function normalizeRewardValueWithConfidence(text: string): RewardParseRes
   const values = collectRewardNumbers(normalized);
   if (!values.length) return { value: 0, confidence: "LOW", method: "zero" };
 
-  const hasUnit = /(billion|million|thousand|man|won|krw|usd|\$)/i.test(normalized);
+  const hasUnit = /(억|만(?:원)?|천원|달러|billion|million|thousand|man|won|krw|usd|\$)/i.test(normalized);
   return {
     value: Math.max(...values),
-    confidence: hasUnit ? "HIGH" : "LOW",
+    confidence: !hasUnit ? "LOW" : values.length > 1 ? "MEDIUM" : "HIGH",
     method: hasUnit ? "unit_parse" : "fallback_number",
   };
 }
@@ -142,11 +162,12 @@ export function normalizeRegion(location: string): [string | null, string | null
   const raw = normalizeText(location);
   if (!raw) return [null, null];
 
-  const parts = raw.split(/[\\s,>/|]+/).filter(Boolean);
-  const depth1 = parts[0] || null;
+  const parts = raw.split(/[\s,>/|]+/).filter(Boolean);
+  const depth1Raw = parts[0] || null;
+  const depth1 = depth1Raw ? REGION_ALIASES[depth1Raw.toLowerCase()] ?? depth1Raw : null;
   const depth2 = parts[1] || null;
 
-  return [KNOWN_CITIES.includes((depth1 || "").toLowerCase()) ? "Seoul" : depth1, depth2];
+  return [depth1, depth2];
 }
 
 function detectCategory(text: string): string {
@@ -355,6 +376,11 @@ export async function processAndDedupeCampaign(platformId: number, item: Scraped
     }
   }
 
+  const shouldCreateSnapshot =
+    !existing.snapshots[0] ||
+    existing.snapshots[0].recruit_count !== recruitCount ||
+    existing.snapshots[0].applicant_count !== applicantCount;
+
   await db.$transaction(async (tx) => {
     await tx.campaign.update({ where: { id: existing.id }, data: baseData });
     const latest = existing.snapshots[0];
@@ -370,8 +396,5 @@ export async function processAndDedupeCampaign(platformId: number, item: Scraped
     }
   });
 
-  return existing.snapshots[0] &&
-    (existing.snapshots[0].recruit_count !== recruitCount || existing.snapshots[0].applicant_count !== applicantCount)
-    ? { status: "updated_with_snapshot", id: existing.id }
-    : { status: "updated", id: existing.id };
+  return shouldCreateSnapshot ? { status: "updated_with_snapshot", id: existing.id } : { status: "updated", id: existing.id };
 }

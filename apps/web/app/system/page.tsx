@@ -48,10 +48,26 @@ const statusBadge = (status: string) => {
   return "bg-rose-500/15 text-rose-300 border-rose-500/40";
 };
 
+const statusText = (status: string) => {
+  if (status === "ok") return "정상";
+  if (status === "warn") return "주의";
+  if (status === "critical") return "심각";
+  if (status === "error") return "오류";
+  if (status === "checking") return "점검중";
+  return status;
+};
+
 const levelBadge = (level: string) => {
   if (level === "critical") return "bg-rose-500/15 text-rose-300 border-rose-500/40";
   if (level === "warn") return "bg-amber-500/15 text-amber-300 border-amber-500/40";
   return "bg-blue-500/15 text-blue-300 border-blue-500/40";
+};
+
+const levelText = (level: string) => {
+  if (level === "critical") return "심각";
+  if (level === "warn") return "주의";
+  if (level === "info") return "안내";
+  return level;
 };
 
 export default function SystemPage() {
@@ -60,6 +76,7 @@ export default function SystemPage() {
   const [healthStatus, setHealthStatus] = useState<HealthStatus>("checking");
   const [fetchState, setFetchState] = useState<FetchState>({ status: "loading", error: null });
   const [actioningId, setActioningId] = useState<string | null>(null);
+  const [actionErrors, setActionErrors] = useState<Record<string, string>>({});
 
   const fetchAll = async () => {
     setFetchState({ status: "loading", error: null });
@@ -102,16 +119,24 @@ export default function SystemPage() {
 
   const runAlertAction = async (id: string) => {
     setActioningId(id);
+    setActionErrors((prev) => {
+      const next = { ...prev };
+      delete next[id];
+      return next;
+    });
     try {
       const res = await fetch("/api/admin/alerts/actions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id, action: "ack", minutes: 120 }),
       });
-      if (!res.ok) throw new Error("알림 조치 요청이 실패했습니다.");
+      if (!res.ok) {
+        const body = await res.text();
+        throw new Error(body || "알림 조치 요청이 실패했습니다.");
+      }
       await fetchAll();
     } catch {
-      setFetchState((prev) => ({ ...prev, status: "error", error: "알림 조치 요청이 실패했습니다." }));
+      setActionErrors((prev) => ({ ...prev, [id]: "알림 조치 요청이 실패했습니다. 재시도 가능합니다." }));
     } finally {
       setActioningId(null);
     }
@@ -126,31 +151,35 @@ export default function SystemPage() {
   }, [quality]);
 
   return (
-    <div className="min-h-screen bg-[#020617] text-slate-200 pb-16">
-      <section className="max-w-[1300px] mx-auto px-4 md:px-8 pt-10 space-y-6">
+    <main className="min-h-screen bg-[#020617] dark:bg-[#020617] text-slate-200 pb-16">
+      <section className="max-w-[1700px] mx-auto px-4 md:px-8 pt-8 space-y-5">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
             <p className="text-xs uppercase tracking-[0.2em] text-blue-300 font-black">운영 인프라</p>
             <h1 className="text-3xl md:text-4xl font-black tracking-tight text-white">시스템 점검 센터</h1>
             <p className="text-sm text-slate-400 mt-2">실시간 상태, 수집 품질, 알림을 한 화면에서 점검하고 조치할 수 있습니다.</p>
+            <p className="text-xs text-slate-500 mt-1">연동 실패 시 fallback 상태 로그를 기반으로 복구 경로를 안내합니다.</p>
           </div>
           <div className="flex flex-wrap items-center gap-2 justify-end">
             <Link
               href="/admin"
-              className="px-4 py-2 rounded-xl bg-slate-800 border border-slate-700 text-xs font-bold hover:bg-slate-700 transition-colors whitespace-nowrap"
+              aria-label="운영 콘솔로 이동"
+              className="px-4 py-2 rounded-xl bg-slate-800 border border-slate-700 text-xs font-bold hover:bg-slate-700 transition-colors whitespace-nowrap focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
             >
               운영 콘솔
             </Link>
             <Link
               href="/me"
-              className="px-4 py-2 rounded-xl bg-slate-800 border border-slate-700 text-sm font-bold hover:bg-slate-700 transition-colors"
+              aria-label="사용자 홈으로 이동"
+              className="px-4 py-2 rounded-xl bg-slate-800 border border-slate-700 text-sm font-bold hover:bg-slate-700 transition-colors focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
             >
               사용자 홈
             </Link>
             <button
               onClick={() => void fetchAll()}
               disabled={fetchState.status === "loading"}
-              className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 disabled:opacity-50 transition-colors text-sm font-bold inline-flex items-center gap-2"
+              aria-label="시스템 상태 다시 점검"
+              className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 disabled:opacity-50 transition-colors text-sm font-bold inline-flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
             >
               <RefreshCcw className={`w-4 h-4 ${fetchState.status === "loading" ? "animate-spin" : ""}`} />
               다시 점검
@@ -159,18 +188,26 @@ export default function SystemPage() {
         </div>
 
         {fetchState.status === "error" && fetchState.error ? (
-          <div className="rounded-xl border border-rose-400/40 bg-rose-400/10 text-rose-200 px-4 py-2 text-sm">{fetchState.error}</div>
+          <div className="rounded-xl border border-rose-400/40 bg-rose-400/10 text-rose-200 px-4 py-3 text-sm flex items-center justify-between gap-4">
+            <span>{fetchState.error}</span>
+            <button
+              onClick={() => void fetchAll()}
+              className="shrink-0 px-3 py-1.5 rounded-lg border border-rose-400/40 text-rose-200 hover:bg-rose-400/10 text-xs font-bold focus-visible:ring-2 focus-visible:ring-rose-400 focus-visible:ring-offset-2"
+            >
+              재시도
+            </button>
+          </div>
         ) : null}
 
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
           <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-5">
             <div className="flex items-center justify-between">
               <span className="text-xs text-slate-400 font-bold">데이터베이스 상태</span>
               <Server className="w-4 h-4 text-blue-300" />
             </div>
-            <p className="mt-3 text-2xl font-black text-white">{healthStatus.toUpperCase()}</p>
+            <p className="mt-3 text-2xl font-black text-white">{statusText(healthStatus)}</p>
             <span className={`inline-flex mt-2 text-xs px-2 py-1 rounded-full border ${statusBadge(healthStatus === "checking" ? "warn" : healthStatus === "ok" ? "ok" : "critical")}`}>
-              db: {healthStatus}
+              DB: {statusText(healthStatus)}
             </span>
           </div>
 
@@ -179,11 +216,11 @@ export default function SystemPage() {
               <span className="text-xs text-slate-400 font-bold">품질 상태</span>
               <ShieldAlert className="w-4 h-4 text-indigo-300" />
             </div>
-            <p className="mt-3 text-2xl font-black text-white">{quality?.status?.toUpperCase() ?? "CHECK"}</p>
+            <p className="mt-3 text-2xl font-black text-white">{statusText(quality?.status ?? "warn")}</p>
             <span className={`inline-flex mt-2 text-xs px-2 py-1 rounded-full border ${statusBadge(quality?.status ?? "warn")}`}>
-              alerts {quality?.alerts_count ?? 0}
+              알림 {quality?.alerts_count ?? 0}건
             </span>
-            <p className="text-xs text-slate-500 mt-2">suppressed {quality?.suppressed_count ?? 0}</p>
+            <p className="text-xs text-slate-500 mt-2">제외 {quality?.suppressed_count ?? 0}건</p>
           </div>
 
           <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-5">
@@ -201,7 +238,7 @@ export default function SystemPage() {
               <AlertTriangle className="w-4 h-4 text-rose-300" />
             </div>
             <p className="mt-3 text-2xl font-black text-white">{alerts?.summary?.critical ?? 0}</p>
-            <p className="text-xs text-slate-400 mt-2">warn: {alerts?.summary?.warn ?? 0}</p>
+            <p className="text-xs text-slate-400 mt-2">주의: {alerts?.summary?.warn ?? 0}건</p>
           </div>
         </div>
 
@@ -226,10 +263,15 @@ export default function SystemPage() {
               </div>
               <div className="rounded-xl border border-slate-800 bg-slate-950/50 p-4">
                 <p className="text-slate-400">데이터 최신성</p>
-                <p className="text-xl font-black text-white">
+                <p className={`text-xl font-black ${quality?.metrics.dataFreshness.ageMinutes !== null &&
+                    quality?.thresholds?.freshnessMaxMinutes !== undefined &&
+                    (quality.metrics.dataFreshness.ageMinutes ?? 0) > quality.thresholds.freshnessMaxMinutes
+                    ? "text-rose-400"
+                    : "text-white"
+                  }`}>
                   {quality?.metrics.dataFreshness.ageMinutes !== null && quality?.metrics.dataFreshness.ageMinutes !== undefined
-                    ? `${quality.metrics.dataFreshness.ageMinutes}m`
-                    : "n/a"}
+                    ? `${quality.metrics.dataFreshness.ageMinutes}분`
+                    : "미확인"}
                 </p>
                 <p className="text-xs text-slate-500">목표 {quality?.thresholds?.freshnessMaxMinutes ?? 180}분 이내</p>
               </div>
@@ -252,7 +294,7 @@ export default function SystemPage() {
                   <article key={alert.id} className="rounded-xl border border-slate-800 bg-slate-950/50 p-4">
                     <div className="flex items-center justify-between gap-3">
                       <p className="text-sm font-bold text-white">{alert.title}</p>
-                      <span className={`text-[11px] px-2 py-1 rounded-full border ${levelBadge(alert.level)}`}>{alert.level}</span>
+                      <span className={`text-[11px] px-2 py-1 rounded-full border ${levelBadge(alert.level)}`}>{levelText(alert.level)}</span>
                     </div>
                     <p className="text-xs text-slate-400 mt-2">{alert.detail}</p>
                     <div className="mt-3 flex items-center justify-between">
@@ -261,18 +303,34 @@ export default function SystemPage() {
                         <button
                           onClick={() => void runAlertAction(alert.id)}
                           disabled={actioningId === alert.id}
-                          className="text-[11px] px-2 py-1 rounded-md border border-emerald-500/40 text-emerald-300 hover:bg-emerald-500/10 disabled:opacity-40"
+                          aria-label={`${alert.title} 상태 처리`}
+                          className="text-[11px] px-2 py-1 rounded-md border border-emerald-500/40 text-emerald-300 hover:bg-emerald-500/10 disabled:opacity-40 focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
                         >
                           상태 처리
                         </button>
                         {alert.actionPath ? (
-                          <Link href={alert.actionPath} className="inline-flex items-center gap-1 text-xs font-bold text-blue-300 hover:text-blue-200">
+                          <Link
+                            href={alert.actionPath}
+                            aria-label={`${alert.title} 조치 화면으로 이동`}
+                            className="inline-flex items-center gap-1 text-xs font-bold text-blue-300 hover:text-blue-200 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 rounded"
+                          >
                             <Wrench className="w-3.5 h-3.5" />
                             이동
                           </Link>
                         ) : null}
                       </div>
                     </div>
+                    {actionErrors[alert.id] ? (
+                      <div className="mt-2 text-[11px] text-rose-300 flex items-center justify-between">
+                        <span>{actionErrors[alert.id]}</span>
+                        <button
+                          onClick={() => void runAlertAction(alert.id)}
+                          className="px-2 py-1 rounded-md border border-rose-500/40 text-rose-200 hover:bg-rose-500/10 focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:ring-offset-2"
+                        >
+                          재시도
+                        </button>
+                      </div>
+                    ) : null}
                   </article>
                 ))
               )}
@@ -280,6 +338,7 @@ export default function SystemPage() {
           </section>
         </div>
       </section>
-    </div>
+    </main>
   );
 }
+

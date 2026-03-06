@@ -1,9 +1,13 @@
-﻿import { db } from "@/lib/db";
+import { db } from "@/lib/db";
 import { NextResponse } from "next/server";
 
 type RouteContext = {
   params: Promise<{ id: string }>;
 };
+
+function getErrorMessage(error: unknown) {
+  return error instanceof Error ? error.message : "Unknown error";
+}
 
 export async function PATCH(req: Request, { params }: RouteContext) {
   try {
@@ -17,8 +21,8 @@ export async function PATCH(req: Request, { params }: RouteContext) {
     });
 
     return NextResponse.json(platform);
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    return NextResponse.json({ error: getErrorMessage(error) }, { status: 500 });
   }
 }
 
@@ -28,7 +32,7 @@ export async function DELETE(req: Request, { params }: RouteContext) {
     const parsedId = parseInt(id, 10);
     await db.platform.delete({ where: { id: parsedId } });
     return NextResponse.json({ message: "Deleted" });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    return NextResponse.json({ error: getErrorMessage(error) }, { status: 500 });
   }
 }

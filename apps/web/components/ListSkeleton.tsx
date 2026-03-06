@@ -1,63 +1,66 @@
-export default function ListSkeleton() {
+﻿export default function ListSkeleton({ layoutMode = "card" }: { layoutMode?: "card" | "list" }) {
+  if (layoutMode === "list") {
     return (
-        <div className="flex flex-col gap-10 w-full animate-pulse">
-            {/* 큐레이션 영역 스켈레톤 */}
-            <div>
-                <div className="flex items-center gap-2 mb-6 ml-2">
-                    <div className="w-5 h-5 rounded-full bg-slate-200 dark:bg-slate-800" />
-                    <div className="h-6 w-48 rounded-lg bg-slate-200 dark:bg-slate-800" />
+      <div className="flex flex-col gap-3 w-full animate-pulse">
+        {Array.from({ length: 8 }).map((_, i) => (
+          <div
+            key={i}
+            className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4"
+          >
+            <div className="grid grid-cols-1 lg:grid-cols-[220px_1fr_220px] gap-4">
+              <div className="h-[130px] rounded-xl bg-slate-100 dark:bg-slate-800" />
+              <div className="space-y-3">
+                <div className="h-4 w-40 rounded bg-slate-200 dark:bg-slate-700" />
+                <div className="h-5 w-full rounded bg-slate-200 dark:bg-slate-700" />
+                <div className="h-5 w-3/4 rounded bg-slate-200 dark:bg-slate-700" />
+                <div className="grid grid-cols-3 gap-2 pt-2">
+                  <div className="h-12 rounded bg-slate-200 dark:bg-slate-700" />
+                  <div className="h-12 rounded bg-slate-200 dark:bg-slate-700" />
+                  <div className="h-12 rounded bg-slate-200 dark:bg-slate-700" />
                 </div>
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-                    {Array.from({ length: 5 }).map((_, i) => (
-                        <div key={i} className="bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-100 dark:border-slate-800 overflow-hidden shadow-sm">
-                            <div className="h-[180px] bg-slate-100 dark:bg-slate-800" />
-                            <div className="p-5 space-y-4">
-                                <div className="flex gap-2">
-                                    <div className="h-4 w-12 bg-slate-200 dark:bg-slate-700 rounded-md" />
-                                    <div className="h-4 w-12 bg-slate-200 dark:bg-slate-700 rounded-md" />
-                                </div>
-                                <div className="space-y-2">
-                                    <div className="h-5 w-full bg-slate-200 dark:bg-slate-700 rounded-md" />
-                                    <div className="h-5 w-2/3 bg-slate-200 dark:bg-slate-700 rounded-md" />
-                                </div>
-                                <div className="pt-2 flex justify-between">
-                                    <div className="h-4 w-16 bg-slate-200 dark:bg-slate-800 rounded-md" />
-                                    <div className="h-4 w-8 bg-slate-200 dark:bg-slate-800 rounded-md" />
-                                </div>
-                            </div>
-                        </div>
-                    ))}
-                </div>
+              </div>
+              <div className="grid grid-cols-2 lg:grid-cols-1 gap-2">
+                <div className="h-10 rounded bg-slate-200 dark:bg-slate-700" />
+                <div className="h-10 rounded bg-slate-200 dark:bg-slate-700" />
+                <div className="col-span-2 lg:col-span-1 h-10 rounded bg-slate-200 dark:bg-slate-700" />
+              </div>
             </div>
-
-            {/* 메인 리스트 스켈레톤 */}
-            <div>
-                <div className="h-6 w-32 bg-slate-200 dark:bg-slate-800 rounded-lg mb-6 ml-2" />
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                    {Array.from({ length: 15 }).map((_, i) => (
-                        <div
-                            key={i}
-                            className="bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-100 dark:border-slate-800 overflow-hidden shadow-sm"
-                        >
-                            <div className="h-[180px] bg-slate-100 dark:bg-slate-800" />
-                            <div className="p-5 space-y-4">
-                                <div className="flex gap-2">
-                                    <div className="h-4 w-12 bg-slate-200 dark:bg-slate-700 rounded-md" />
-                                    <div className="h-4 w-16 bg-slate-200 dark:bg-slate-700 rounded-md" />
-                                </div>
-                                <div className="space-y-2">
-                                    <div className="h-4 w-full bg-slate-200 dark:bg-slate-700 rounded-md" />
-                                    <div className="h-4 w-3/4 bg-slate-200 dark:bg-slate-700 rounded-md" />
-                                </div>
-                                <div className="pt-2 flex justify-between items-center">
-                                    <div className="h-3 w-16 bg-slate-200 dark:bg-slate-800 rounded-md" />
-                                    <div className="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-800" />
-                                </div>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            </div>
-        </div>
+          </div>
+        ))}
+      </div>
     );
+  }
+
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 w-full animate-pulse">
+      {Array.from({ length: 15 }).map((_, i) => (
+        <div
+          key={i}
+          className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm"
+        >
+          <div className="h-[132px] bg-slate-100 dark:bg-slate-800" />
+          <div className="p-3.5 space-y-2.5">
+            <div className="flex gap-2">
+              <div className="h-4 w-12 bg-slate-200 dark:bg-slate-700 rounded-md" />
+              <div className="h-4 w-14 bg-slate-200 dark:bg-slate-700 rounded-md" />
+            </div>
+            <div className="space-y-2">
+              <div className="h-4 w-full bg-slate-200 dark:bg-slate-700 rounded-md" />
+              <div className="h-4 w-2/3 bg-slate-200 dark:bg-slate-700 rounded-md" />
+            </div>
+            <div className="grid grid-cols-3 gap-2 pt-2">
+              <div className="h-12 rounded bg-slate-200 dark:bg-slate-700" />
+              <div className="h-12 rounded bg-slate-200 dark:bg-slate-700" />
+              <div className="h-12 rounded bg-slate-200 dark:bg-slate-700" />
+            </div>
+            <div className="grid grid-cols-2 gap-2 pt-1">
+              <div className="h-9 rounded bg-slate-200 dark:bg-slate-700" />
+              <div className="h-9 rounded bg-slate-200 dark:bg-slate-700" />
+              <div className="col-span-2 h-9 rounded bg-slate-200 dark:bg-slate-700" />
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
 }

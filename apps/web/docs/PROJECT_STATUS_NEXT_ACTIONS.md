@@ -2,7 +2,7 @@
 
 - Canonical update order: API.md -> ARCHITECTURE.md -> TEAM_CONTEXT.md -> AGENT_WORKFLOW.md -> PROJECT_STATUS.md -> PROJECT_STATUS_NEXT_ACTIONS.md
 - Implemented status rule: route exists under apps/web/app/api.
-- Current implemented API set: `GET /api/campaigns`, `GET /api/campaigns/:id`, `GET /api/campaigns/:id/related`, `GET /api/analytics`, `GET /api/cron`, `POST /api/admin/ingest`, `GET /api/admin/runs`, `GET /api/admin/quality`, `GET /api/admin/alerts`, `POST /api/admin/alerts/actions`, `POST /api/jobs`, `GET /api/health`, `GET /api/me/revenue`, `GET /api/me/board`, `GET /api/me/pro`, `POST /api/me/pro`, `GET /api/me/curation`, `GET /api/me/schedules`, `POST /api/me/schedules`, `PATCH /api/me/schedules/:id`, `DELETE /api/me/schedules/:id`, `GET /api/me/notifications`, `POST /api/me/notifications`, `PATCH /api/me/notifications`, `DELETE /api/me/notifications/:id`, `POST /api/me/notifications/test`, `GET /api/me/notification-channels`, `GET /api/me/notification-preferences`
+- Current implemented API set: `GET /api/campaigns`, `GET /api/campaigns/:id`, `GET /api/campaigns/:id/related`, `GET /api/analytics`, `POST /api/analytics/log`, `GET /api/cron`, `POST /api/admin/ingest`, `GET /api/admin/analytics/stats`, `GET /api/admin/platforms`, `POST /api/admin/platforms`, `PATCH /api/admin/platforms/:id`, `DELETE /api/admin/platforms/:id`, `GET /api/admin/runs`, `GET /api/admin/quality`, `GET /api/admin/alerts`, `POST /api/admin/alerts/actions`, `POST /api/jobs`, `GET /api/health`, `GET /api/public/stats`, `GET /api/search/suggest`, `GET /api/me/revenue`, `GET /api/me/board`, `GET /api/me/pro`, `POST /api/me/pro`, `GET /api/me/curation`, `GET /api/me/schedules`, `POST /api/me/schedules`, `PATCH /api/me/schedules/:id`, `DELETE /api/me/schedules/:id`, `GET /api/me/notifications`, `POST /api/me/notifications`, `PATCH /api/me/notifications`, `DELETE /api/me/notifications/:id`, `POST /api/me/notifications/test`, `GET /api/me/notification-channels`, `GET /api/me/notification-preferences`, `PUT /api/me/notification-preferences`
 
 # NEXT ACTIONS & SPRINT DIRECTIVES (2026-03-01)
 > 핵심 문서 동기화는 `API.md`, `ARCHITECTURE.md`, `TEAM_CONTEXT.md`, `AGENT_WORKFLOW.md`, `PROJECT_STATUS.md`를 기준으로 수행합니다.
@@ -233,6 +233,7 @@
 - 라우트-문서 정합성 누락 제거
   - `apps/web/docs/API.md` 구현 목록에 `/system` 화면 API 연동(quality/alerts/actions)을 유지.
   - `apps/web/docs/TEAM_CONTEXT.md`의 `#api_contract_audit`는 48시간 내 1회 실측 라우트 동기화.
+  - 작업 풀 운영: `AUTONOMOUS_REVIEW_WORKLIST` 생성량을 `docs/AUTONOMOUS_WORK_POOL.md`로 이관해 누적 항목을 유지하고, 운영 시작 전 마지막 작업번호 기준으로 이어서 배치.
 
 - 수집 운영 품질 보강
   - 플랜트 추가 시 `/api/cron` `runNow` smoke-run 결과를 로그로 남겨 24시간 재수집 조건 충족 여부 확인.
@@ -370,6 +371,7 @@
 - [x] 새 엔드포인트(`GET/POST/PATCH/DELETE /api/admin/creators`)를 `API.md`/`TEAM_CONTEXT.md`/`AGENT_WORKFLOW.md`에 implemented로 정렬.
 - [x] 체험단 자동로그인 전환 조건(`status/auto_signin/provider state`)을 운영 체크리스트로 문서화.
 - [x] `/admin`에서 체험단 추가/수정/삭제/연결 상태 변경 1회 동작 테스트 로그(요청/응답/반영 시간) 보존.
+ - [ ] `/admin` 화면 고도화: 빈 상태/오류 상태/로딩 상태 대응 플로우 및 상태 라벨(요청중/대기/성공/실패) 표시 일치성 점검.
 
 ### 14.4 병렬 실행 설계 (즉시 착수)
 
@@ -392,6 +394,7 @@
 
 3. [B] 운영 UI 고도화
    - 구현 항목: `/admin` 체험단 섹션에 필터/일괄 적용/정렬/상태 배치 토글 추가.
+   - 추가 항목(병행): `/admin` 체험단 목록의 빈 상태, 오류 상태, 스켈레톤 로딩 UX 고도화.
    - 산출물: 체험단 표 상태 열(상태, 자동로그인, 마지막 검증, 마지막 실패) 1페이지.
    - 완료 기준: 리스트 내 편집→저장→반영 시간 1초 이내 체감과 연결 상태 즉시 라벨 갱신.
    - [x] `/admin`에 체험단 목록 생성/수정/삭제/일괄 토글/필터/정렬 UI를 탑재.
@@ -416,6 +419,21 @@
 - [x] [B] 자동로그인 정책 문구: 기능 라벨/툴팁/오류 메시지 일괄 고정.
 - [x] [C] 보안 로그: 실패 사유 코드북 적용 및 로그 저장 포맷 고정.
 - [ ] 병렬 통합 점검: 브랜치 병합 전 `AGENT_WORKFLOW` + `TEAM_CONTEXT` + `API.md` 12.9 규칙 동기화.
+
+### 14.10 페이지별 기준 미달 고도화(중복 방지/연속 누적)
+
+- 목표: 화면별 기준 미달 항목을 실시간으로 작업풀에 누적해서 중복되지 않게 개선 범위를 확장한다.
+- 원칙: 동일 화면의 동일 액션은 중복 등록 금지, 분기별로 "상태표시", "오류복구", "빈/로딩", "성공흐름" 4개 축만 남겨 반복 고도화.
+
+- [ ] `/`(홈/목록/필터): 필터 조건 요약/초기화/정렬 재요청 시 카드 반영 지연, 빈 상태 메시지, 권한 없는 지도 토글 메시지를 AC별로 점검해 보강한다.
+- [ ] `/campaigns/[id]`(상세): D-day/보상/지원자·모집·경쟁률 계산 표시의 값 누락/0 처리, 관련 캠페인 fallback, 링크 유효성 오류 복구 CTA를 1세트로 고도화한다.
+- [ ] `/map`(지도): 권한 거부 시 대체 탐색 흐름, 지역/카테고리 변경 반영, 결과 없음/로딩 연장 메시지를 화면 상태라벨과 동기화한다.
+- [ ] `/admin`(운영): `/admin/creators` CRUD 반영 지연, 수집 실행 단계(요청→대기→완료) 타임라인 표시, 상태 토스트/로그 연동 라벨 일관성 고도화.
+- [ ] `/system`(운영 점검): 경보 액션 실패 시 재시도/재요청 UX, 경보 level별 메시지 표기, data freshness fallback 문구를 강화한다.
+- [ ] `/me`(사용자): 사용자 ID/탭 상태 유지, 액션 실패 후 복구 메시지, 일정/알림 동선에서 미조회 시 대체 콘텐츠를 강화한다.
+- [ ] `/business`: CTA가 실제 동작으로 이어지는지(신청/문의/기능 미연동) 문구-액션 동기화 점검 후 전환율 기준 보완한다.
+- [ ] `/trending`(탐색 랭킹): 랭킹 근거 설명, 항목 비어있을 때의 안내, 리다이렉트 실패 대응을 고도화해 실제 운영 지표와 연결한다.
+- [ ] `app layout` 공통: 화면 공통 라벨 규칙(정상/주의/경고/중단), 에러 토스트, 로딩 스켈레톤, 빈 화면 정책을 한 번에 정합화.
 
 ### 14.9 실행 자료
 
@@ -448,3 +466,135 @@
 
 - 2026-03-04: autonomous-ops-loop.ts hardened for 5h continuity. Ingest worker is supervised, and any unexpected exit now auto-restarts with remaining duration; no-op cycle fallback. ops:autonomous:5h kept as long-run trigger.
 - 2026-03-04: review-only 5시간 모드 추가. `npm run ops:review-list:5h`로 전환해 수집/크롤링/리팩터 없이 `docs/AUTONOMOUS_REVIEW_WORKLIST.md`에 사이클 단위 검토 항목만 누적 생성하도록 운영 규칙 고도화.
+- 2026-03-04: 매시간 운영 점검 문서를 `docs/AUTONOMOUS_HOURLY_REPORT.md`로 고정. 아침 리포트 점검 기준은 `적용 사이클`, `command 분포`, `누적 검토 항목` 3항목으로 단일 판단.
+- 2026-03-04: review-only 병렬 분기 실행을 추가. `--reviewParallelism=3`로 1사이클 당 3개 병렬 review-worklist 브랜치가 동작해 작업량 분할·수집 속도를 상향.
+- 2026-03-04: 실제 수정/고도화를 위한 5시간 루틴 경로 추가. `npm run ops:autonomous:5h:dev` 도입, 리뷰 모드 제외 상태에서 `refactor`/`api audit`/`ingest` 병렬 수행.
+- 2026-03-04: 리뷰 작업량 목표를 시간당 100개로 고정(`reviewTasksPerHour`)해 스케줄 기반 생성량이 유지되도록 `ops:review-list` 루프 설계를 강화.
+
+- 2026-03-04: 
+eviewOnly 자동루프 5h 재가동 (duration=300m, cycle=20m, reviewParallelism=3, reviewTasksPerHour=100) 후 작업할당 로직을 평균 100개/시간이 되도록 누적분수 기반으로 보정하고 작업풀 누적 정책 유지
+## 2026-03-04 09:40 | 5h 연속 고도화 루프(2차)
+- 반영 완료
+  - [x] /admin 수집 제어 패널에 `요청 단계`/`큐 적재` 상태 표시를 추가해 요청→큐→완료 흐름을 명시.
+  - [x] /admin 플랫폼 미등록 가드(버튼 비활성/경고)와 최근 수집 단계 메시지 배너를 추가.
+  - [x] /admin 수집 환경 요약 카드에 최근 단계, 요청 큐 상태를 추가.
+- 누적 작업 생성
+  - [ ] AUTONOMOUS_WORK_POOL.md에 화면별 개선 작업 326~335 항목 누적 등록
+- 운영 모드
+  - [ ] 5시간 루프 종료 시점에 아침 리포트(작업량/명령 분포/적용 사이클)만으로 완료 상태 점검
+
+## 2026-03-04 10:00 지속 고도화(화면 보강 반영)
+- 반영 상태: 화면 고도화 1차 완료
+- 완료 항목: `/me` 사용자 상태 보존/복구 동선, `/trending` 폴백 재조회 메시지, `/business` CTA 동작 보강, `/business/apply` 라우트 추가, `/` 필터 초기화 링크 정비, 지도 권한 가이드 안내 추가
+- 신규 분기: 14.11 화면 기준 고도화 체크포인트 추가
+  - [x] `/me`: 사용자 ID 누락 폴백 및 탭/액션 링크 동기화
+  - [x] `/trending`: 데이터 소스 실패 시 fallback 사유 노출 및 보조 탐색 동선
+  - [x] `/business`: 유효 동작 라우트 미싱 링크 제거 및 신청 경로 추가
+  - [ ] `/`: 지도 권한 거부 메시지와 목록 전환 경로 실검증(허용 파라미터 기반)
+  - [ ] `/admin`: 위 액션 연동 상태를 `system` 대시보드 액션 로그와 교차 확인
+## 2026-03-04 11:00 ~ 12:00 중복/누락 제로 운영 반영
+
+- 신규 반영: 작업 충돌 방지 키 규칙과 누락 점검 루프를 `PROJECT_STATUS_NEXT_ACTIONS` 기준에 추가.
+- 목적: 화면별 고도화/수정이 중복 없이 누적되고, 매시간 히스토리/요약 로그로 추적되도록 고정.
+
+- [x] 작업 키 규칙 도입: `Screen|Area|Intent|Version` 중복 체크 후 재생성.
+- [x] 충돌 가드: 화면 동시편집 시 작업 단계(검토→구현→문서 반영) 순서를 1차 통합.
+- [x] 누락 가드: 미완료 화면 항목은 해당 화면 추가 작업으로 우선 채우도록 우선순위 재정렬.
+- [x] 지표 가시화: `완료/중복/미충족` 최소 3지표를 매시간 리포트로 고정.
+
+### 14.11 다음 액션(병렬 큐, 중복 금지)
+
+- [ ] `/` 홈: 지도/목록 전환 실패, 권한 거부, 초기화 지점 재현 가드.
+- [ ] `/campaigns/[id]` 상세: 링크 유효성 실패시 대체 이동 CTA 일괄 정합.
+- [ ] `/map`: 권한 파라미터 연동 실패/결과 없음 시 안내 텍스트 및 재시도 동선 보강.
+- [ ] `/admin`: 체험단/수집 단계 라벨과 감사 로그 동기 탭 교차 검증 UX.
+- [ ] `/system`: 경보 액션 실패의 재시도/재요청 경로 가시화.
+- [ ] `/me`: 액션 실패 복구 토스트 및 미조회 상태 대체 콘텐츠.
+- [ ] `/business`: CTA 실동작 보장과 안내 메시지 정합성 점검.
+- [ ] `/trending`: 비어있는 랭킹 처리와 재조회 동선 고정.
+- [ ] layout 공통: 상태 라벨 사전(정상/주의/위험/중단) 및 빈/로딩/오류 정책 1세트 통일.
+
+## 2026-03-06 진행 요약 이력 업데이트 (표준/운영 기준)
+
+- 목적: 진행 내용을 이력 문서에 고정 기록해 다음 고도화 시 재검토 비용을 줄이고, 배포 전 검증 순서를 일관되게 유지한다.
+
+- 반영 완료
+  - [x] `scripts/api-contract-audit.js` 경로 파싱 로직 정비 (`/api/api` 중복 경로 문제 제거).
+  - [x] `scripts/api-contract-sync-audit.js` 재작성 및 BOM 이슈 제거.
+  - [x] `eslint.config.mjs`에 운영/생성 산출물 경로 ignore 추가 (`.vercel`, `reports`, `logs`, `coverage`).
+  - [x] `package.json` 품질 게이트 정리:
+    - `quality:standard` 스크립트 추가.
+    - `bench:workspace-search:ci`에서 `--skip-build` 제거.
+  - [x] 역할 기반 검증 문서 추가: `docs/ROLE_BASED_TEST_SCENARIOS.md`.
+  - [x] 프로젝트 점수카드 문서 추가: `reports/PROJECT_SCORECARD_2026-03-06.md`.
+
+- 검증 결과 (2026-03-06)
+  - [x] `npm run lint:ci` PASS
+  - [x] `npm run typecheck` PASS
+  - [ ] `npm run api:contract-audit` FAIL (실제 문서 미정합 6건 확인)
+  - [ ] `npm run api:contract-sync-audit` FAIL (문서 간 상태 불일치 다수 확인)
+
+- 잔여 이슈(우선순위)
+  - [ ] `API.md` 및 연관 문서의 implemented/planned 상태를 실제 라우트 기준으로 동기화.
+  - [ ] `reports/api-contract-audit.md`, `reports/api-contract-sync-audit.md` 기준으로 누락 엔드포인트 문서화.
+  - [ ] 문서 동기화 후 `quality:standard` 재실행하여 계약 감사 fail 건수 0으로 수렴.
+
+- 다음 액션 (고도화 연결)
+  1. API 계약 문서 우선 정합: `GET /api/admin/analytics/stats`, `GET/POST /api/admin/platforms`, `PATCH/DELETE /api/admin/platforms/:id`, `POST /api/analytics/log`, `GET /api/public/stats`, `GET /api/search/suggest`.
+  2. 문서-구현 동기화 완료 후 QA 게이트 재실행 (`lint:ci`, `typecheck`, `api:contract-audit`, `api:contract-sync-audit`).
+  3. 결과를 운영 이력에 재append하고 배포 체크리스트와 연결.
+
+## 2026-03-06 화면 고도화 3시간 반복 개발 루틴 추가/수정 완료
+
+- 반영 내용
+  - [x] 3시간 반복 루프 명령 추가: `npm run ops:autonomous:3h`
+  - [x] 3시간 화면 고도화 전용 루프 추가: `npm run ops:autonomous:3h:dev` (`ops:screen:3h` alias)
+  - [x] 5시간 개발 루틴 누락 보정: `npm run ops:autonomous:5h:dev`
+  - [x] 3시간 리뷰 작업풀 루틴 추가: `npm run ops:review-list:3h`
+  - [x] `AGENT_WORKFLOW.md` 실행 규칙에 3h/5h 표준 경로 동기화
+  - [x] `scripts/autonomous-ops-loop.ts` Windows 커맨드 해석 수정 (`git.cmd` 오류 제거)
+
+- 운영 사용 기준
+  - 화면 고도화 집중: `npm run ops:screen:3h`
+  - 수집 포함 장기 개선: `npm run ops:autonomous:5h:dev`
+  - 검토 항목만 누적: `npm run ops:review-list:3h`
+
+- 스모크 검증
+  - [x] `npm run ops:screen:3h -- --durationMinutes=1 --cycleMinutes=1 --refactor=false --apiAudits=false --healthCheck=false --reportIntervalMinutes=1` 정상 종료 확인
+
+## 2026-03-06 09:03 KST 화면 고도화 3시간 반복 개발 실운영 시작
+
+- 실행 명령: `npm run ops:screen:3h`
+- 실행 목적: 화면 고도화 중심으로 `refactor + api audit + health check`를 15분 주기로 반복 실행
+- 실행 상태: 시작 완료, cycle 1 진입 확인
+- 로그 경로: `apps/web/logs/autonomous/screen-refinement-3h-launch-2026-03-06_09-03-55.log`
+- 운영 메모: `ingest=false`, `autoCommit=false` 기준으로 화면/품질 개선 중심 배치
+
+## 2026-03-06 09:24 KST 잔여 API 정합성 병렬 수정 완료
+
+- 반영 완료
+  - [x] `API.md`에 누락된 실제 라우트 6종 반영
+  - [x] `PROJECT_STATUS.md`, `PROJECT_STATUS_NEXT_ACTIONS.md`, `teams/T08_MANAGER.md`, `teams/T03_DATABASE.md`의 와일드카드/가짜 경로/오탐 문구 정리
+  - [x] `scripts/api-contract-sync-audit.js` 문맥 추론 축소: 와일드카드 route 무시, 비목록 문장 route 오탐 차단
+
+- 검증 결과
+  - [x] `npm run api:contract-audit` PASS
+  - [x] `npm run api:contract-sync-audit` PASS
+
+## 2026-03-06 09:50 KST 프론트 집중 수정 1차 완료
+
+- 반영 완료
+  - [x] 체험단 플랫폼명 공통 한글화 유틸 추가: `lib/platformDisplay.ts`
+  - [x] 홈 카드/리스트/운영 플랫폼 테이블에 한글 배지 적용
+  - [x] 카드/리스트 밀도 상향: 한 화면 노출량 확대
+  - [x] `StatsBanner`, `Trending`, `/me` 통계 탭의 임의 생성 데이터 제거
+  - [x] `/me/console` 임의 성능 수치 제거, 실제 운영 상태 카드로 대체
+
+- 검증 결과
+  - [x] `npm run typecheck` PASS
+  - [ ] `eslint` 경고 2건 잔존: `components/CampaignList.tsx`의 기존 `any`
+
+- 완료 정의(이번 요청 기준)
+  - [x] 반복 개발 실행 경로 신설
+  - [x] 문서-명령 불일치 제거
+  - [x] 기존 이력 문서에 append 완료

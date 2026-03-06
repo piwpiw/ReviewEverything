@@ -272,7 +272,7 @@ The next iteration should extend the existing Aggregator architecture, not repla
 
 - API 세트, 데이터 요구사항, 에러 케이스는 페이지별로 동일한 항목 집합으로 통합 정의
 - 기존에 분산되던 스냅샷을 다음 규칙으로 정렬:
-  - API 문서: `GET /api/campaigns`, `GET /api/analytics`, `GET /api/me/*`, `GET /api/admin/*`
+  - API 문서: `GET /api/campaigns`, `GET /api/analytics`, `GET /api/me/revenue`, `GET /api/me/schedules`, `GET /api/admin/runs`, `GET /api/admin/quality`
   - 예외 처리: 404, 403, 네트워크 실패, 값 누락/지연 공통 처리 정책 1종 적용
   - 테스트: 필터 정합성, 정렬 회귀, 큐 적재 실패 상태, health 503 케이스를 회귀 기준으로 고정
 
@@ -429,7 +429,7 @@ The next iteration should extend the existing Aggregator architecture, not repla
 
 #### 매니저/캘린더
 - 데이터: `UserSchedule`, `next_schedule`, `visit_date`, `status`
-- API: `GET /api/me/schedules`, `GET /api/me/schedules/summary`, `GET /api/me/schedules/:id`, `POST /api/me/schedules`, `PATCH /api/me/schedules/:id`, `DELETE /api/me/schedules/:id`
+- API: `GET /api/me/schedules`, `POST /api/me/schedules`, `PATCH /api/me/schedules/:id`, `DELETE /api/me/schedules/:id`
 
 #### 정산
 - 데이터: `monthly_revenue`, `yearly_revenue`, `platform_breakdown`, `category_breakdown`
@@ -521,7 +521,7 @@ The next iteration should extend the existing Aggregator architecture, not repla
 - `GET /api/me/notification-channels`
 
 ### 계획/API 미구현 상태
-- `GET /api/me/schedules/summary`
+- 없음
 
 ### 문서-실행 연결 규칙
 - 구현 기준: 실제 앱 라우트 경로 존재 여부를 우선 적용
@@ -561,8 +561,8 @@ The next iteration should extend the existing Aggregator architecture, not repla
 - [x] `GET /api/me/curation`
 
 ### 2) 고도화 항목 (Planned)
-- [ ] 운영 품질 액션 UX: `POST /api/admin/alerts/actions` 응답 상태를 `/system` 화면 라벨/피드백에 반영
-- [x] 워커 내부 API 정합성: `/api/jobs`는 `CRON_SECRET` 기반 내부 실행 엔드포인트로 반영
+- [ ] 운영 품질 액션 UX: alerts action 응답 상태를 `/system` 화면 라벨/피드백에 반영
+- [x] 워커 내부 API 정합성: jobs 실행 경로는 `CRON_SECRET` 기반 내부 엔드포인트로 반영
 
 ### 3) 정합성 체크
 - [ ] `API.md`, `ARCHITECTURE.md`, `AGENT_WORKFLOW.md`, `TEAM_CONTEXT.md`, `PROJECT_STATUS.md` 동시 갱신

@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { Compass, Info, Navigation, Search, X } from "lucide-react";
+import { normalizeCampaignUrl } from "@/lib/campaignLinks";
 
 declare global {
   interface Window {
@@ -23,6 +24,8 @@ type Campaign = {
   region_depth1?: string;
   region_depth2?: string;
   url?: string;
+  link?: string;
+  source_url?: string;
   geo_match_source?: string;
   geo_match_score?: number;
   geo_store_key?: string;
@@ -457,6 +460,12 @@ export function MapView({
   const count = pinnedCampaigns.length;
   const activeCampaign = activeGroup?.representative;
   const activeLocation = [activeCampaign?.region_depth1, activeCampaign?.region_depth2].filter(Boolean).join(" ");
+  const safeActiveCampaignUrl = normalizeCampaignUrl(
+    activeCampaign?.url || activeCampaign?.link || activeCampaign?.source_url || null,
+  );
+  const activeCampaignSearchUrl = activeCampaign
+    ? `https://www.google.com/search?q=${encodeURIComponent(`${activeCampaign.title || ""} ${activeLocation || ""}`.trim())}`
+    : null;
 
   const setMapCenter = useCallback(
     (lat: number, lng: number) => {
@@ -738,14 +747,27 @@ export function MapView({
                   >
                     상세 확인
                   </Link>
-                  <a
-                    href={activeCampaign.url || "#"}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex h-10 items-center justify-center rounded-xl border-2 border-slate-200 px-5 text-sm font-black text-slate-700 transition-all hover:bg-slate-50 dark:border-slate-800 dark:text-slate-300"
-                  >
-                    원문 이동
-                  </a>
+                  {safeActiveCampaignUrl ? (
+                    <a
+                      href={safeActiveCampaignUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex h-10 items-center justify-center rounded-xl border-2 border-slate-200 px-5 text-sm font-black text-slate-700 transition-all hover:bg-slate-50 dark:border-slate-800 dark:text-slate-300"
+                      aria-label="원문 이동"
+                    >
+                      원문 이동
+                    </a>
+                  ) : (
+                    <a
+                      href={activeCampaignSearchUrl || "/"}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex h-10 items-center justify-center rounded-xl border-2 border-slate-200 px-5 text-sm font-black text-slate-700 transition-all hover:bg-slate-50 dark:border-slate-800 dark:text-slate-300"
+                      aria-label="원문 검색 이동"
+                    >
+                      원문 검색으로 이동
+                    </a>
+                  )}
                 </div>
               </div>
             </div>

@@ -1,16 +1,82 @@
-﻿# API Contract Sync Audit
-Generated: 2026-03-02T12:20:00+09:00
+# API Sync Audit Report
+Generated: 2026-03-06T00:33:59.923Z
+- Actual routes: 32
+- API.md implemented routes: 32
+- API.md planned routes: 0
+- Result: PASS
 
-Actual routes: 23
-API.md implemented: 23
-API.md planned: 0
-Tracked route entries from documents: 23
-Result: PASS
+## Scope
+- apps/web/app/api
+- apps/web/docs/API.md
+- apps/web/docs/*.md
+- apps/web/docs/teams/*.md
 
-## Failures
-- [PASS] No route-contract failures detected.
+## API.md implemented
+- /api/admin/alerts
+- /api/admin/alerts/actions
+- /api/admin/analytics/stats
+- /api/admin/creators
+- /api/admin/creators/:id
+- /api/admin/creators/autologin
+- /api/admin/ingest
+- /api/admin/platforms
+- /api/admin/platforms/:id
+- /api/admin/quality
+- /api/admin/runs
+- /api/analytics
+- /api/analytics/log
+- /api/campaigns
+- /api/campaigns/:id
+- /api/campaigns/:id/related
+- /api/cron
+- /api/health
+- /api/jobs
+- /api/me/board
+- /api/me/curation
+- /api/me/notification-channels
+- /api/me/notification-preferences
+- /api/me/notifications
+- /api/me/notifications/:id
+- /api/me/notifications/test
+- /api/me/pro
+- /api/me/revenue
+- /api/me/schedules
+- /api/me/schedules/:id
+- /api/public/stats
+- /api/search/suggest
 
-## Cross-ref
-- `ARCHITECTURE.md`, `TEAM_CONTEXT.md`, `PROJECT_STATUS.md`, `PROJECT_STATUS_NEXT_ACTIONS.md`, `AGENT_WORKFLOW.md` and `docs/teams/*.md` implementation sections are aligned with `API.md` at this point.
-- No implemented route is marked planned in cross-reference documents.
-- Planned/API-gap section remains empty (`미구현(계획): 없음`).
+## API.md planned
+
+## Actual routes in app/api
+- /api/admin/alerts
+- /api/admin/alerts/actions
+- /api/admin/analytics/stats
+- /api/admin/creators
+- /api/admin/creators/:id
+- /api/admin/creators/autologin
+- /api/admin/ingest
+- /api/admin/platforms
+- /api/admin/platforms/:id
+- /api/admin/quality
+- /api/admin/runs
+- /api/analytics
+- /api/analytics/log
+- /api/campaigns
+- /api/campaigns/:id
+- /api/campaigns/:id/related
+- /api/cron
+- /api/health
+- /api/jobs
+- /api/me/board
+- /api/me/curation
+- /api/me/notification-channels
+- /api/me/notification-preferences
+- /api/me/notifications
+- /api/me/notifications/:id
+- /api/me/notifications/test
+- /api/me/pro
+- /api/me/revenue
+- /api/me/schedules
+- /api/me/schedules/:id
+- /api/public/stats
+- /api/search/suggest

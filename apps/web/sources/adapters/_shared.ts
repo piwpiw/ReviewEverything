@@ -2,7 +2,12 @@ export const DEFAULT_DDAY_DAYS = 7;
 export const DEFAULT_RECRUIT_COUNT = 5;
 export const DEFAULT_APPLICANT_COUNT = 0;
 
-export const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+export const sleep = (ms: number) => {
+  if (process.env.NODE_ENV === "test" || process.env.VITEST) {
+    return Promise.resolve();
+  }
+  return new Promise((resolve) => setTimeout(resolve, ms));
+};
 
 export function normalizeText(value: unknown): string {
   return String(value || "")

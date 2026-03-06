@@ -183,7 +183,7 @@ const withFallbackCoords = (campaign: any) => {
   });
   const type = campaign.campaign_type || "ETC";
   const media = campaign.media_type || "OTHER";
-  const sourceUrl = campaign.url || campaign.link || campaign.source_url || `https://example.com/campaigns/${campaign.id}`;
+  const sourceUrl = campaign.url || campaign.link || campaign.source_url || null;
   const shopUrl = campaign.shop_url || campaign.shop_link || campaign.coupon_url || null;
 
   return {

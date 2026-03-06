@@ -23,6 +23,7 @@ type DateTarget = "visit" | "deadline";
 export default function AddToScheduleButton({ userId, campaignId, defaultTitle, deadlineDateIso }: Props) {
   const fallbackDeadlineDate = deadlineDateIso ? deadlineDateIso.slice(0, 10) : "";
   const defaultDateTarget: DateTarget = fallbackDeadlineDate ? "deadline" : "visit";
+
   const getDefaultSelectedDate = () => (defaultDateTarget === "deadline" ? fallbackDeadlineDate : "");
 
   const [open, setOpen] = useState(false);
@@ -50,24 +51,25 @@ export default function AddToScheduleButton({ userId, campaignId, defaultTitle, 
     const hasRequiredDate = form.dateTarget === "visit" ? !!resolvedSelectedDate : !!(resolvedSelectedDate || effectiveDeadlineDate);
     return hasTitle && hasRequiredDate;
   }, [form.dateTarget, form.title, resolvedSelectedDate, effectiveDeadlineDate]);
+
   const dateValidationMessage = useMemo(() => {
-    if (form.dateTarget === "visit" && !resolvedSelectedDate) return "방문일을 선택해 주세요.";
-    if (form.dateTarget === "deadline" && !resolvedSelectedDate && !effectiveDeadlineDate) return "마감일을 선택해 주세요.";
+    if (form.dateTarget === "visit" && !resolvedSelectedDate) return "방문 날짜를 선택해 주세요.";
+    if (form.dateTarget === "deadline" && !resolvedSelectedDate && !effectiveDeadlineDate) return "마감 날짜를 선택해 주세요.";
     return null;
   }, [effectiveDeadlineDate, form.dateTarget, resolvedSelectedDate]);
 
   const submit = async () => {
     if (!Number.isInteger(userId)) {
-      setError("유효하지 않은 사용자 ID입니다.");
+      setError("유효한 사용자 ID를 찾을 수 없습니다.");
       return;
     }
     if (form.dateTarget === "visit" && !resolvedSelectedDate) {
-      setError("방문일을 선택해 주세요.");
+      setError("방문 날짜를 선택해 주세요.");
       setSaving(false);
       return;
     }
     if (form.dateTarget === "deadline" && !resolvedSelectedDate && !effectiveDeadlineDate) {
-      setError("마감일을 선택해 주세요.");
+      setError("마감 날짜를 선택해 주세요.");
       setSaving(false);
       return;
     }
@@ -93,14 +95,14 @@ export default function AddToScheduleButton({ userId, campaignId, defaultTitle, 
       });
       const payload = (await response.json().catch(() => null)) as { error?: string; id?: number | string } | null;
       if (!response.ok) {
-        throw new Error(payload?.error || "캘린더 추가 실패");
+        throw new Error(payload?.error || "일정 추가 요청에 실패했습니다.");
       }
       const rawId = payload?.id;
       const nextId = typeof rawId === "string" ? Number.parseInt(rawId, 10) : Number.isInteger(rawId) ? (rawId as number) : null;
       setCreatedScheduleId(nextId ?? null);
       setDone(true);
     } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : "캘린더 추가 실패");
+      setError(e instanceof Error ? e.message : "일정 추가 요청에 실패했습니다.");
     } finally {
       setSaving(false);
     }
@@ -151,7 +153,9 @@ export default function AddToScheduleButton({ userId, campaignId, defaultTitle, 
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-            onClick={() => (saving ? null : setOpen(false))}
+            onClick={() => {
+              if (!saving) setOpen(false);
+            }}
           >
             <motion.div
               initial={{ scale: 0.92, y: 16 }}
@@ -163,7 +167,9 @@ export default function AddToScheduleButton({ userId, campaignId, defaultTitle, 
               <div className="flex items-center justify-between mb-5">
                 <h3 className="text-lg font-black text-slate-900 dark:text-white">일정 등록</h3>
                 <button
-                  onClick={() => (saving ? null : setOpen(false))}
+                  onClick={() => {
+                    if (!saving) setOpen(false);
+                  }}
                   className="w-8 h-8 rounded-xl border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-400 hover:text-slate-600"
                 >
                   <X className="w-4 h-4" />
@@ -180,14 +186,14 @@ export default function AddToScheduleButton({ userId, campaignId, defaultTitle, 
                 <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-5 text-emerald-700">
                   <div className="flex items-center gap-2 font-black">
                     <CheckCircle2 className="w-5 h-5" />
-                    캘린더에 일정이 추가되었습니다.
+                    일정 등록이 완료되었습니다.
                   </div>
                   <div className="mt-4 flex gap-3">
                     <Link
                       href={calendarHref}
                       className="flex-1 py-3 rounded-xl bg-slate-900 text-white text-sm font-black text-center hover:bg-blue-600 transition-colors"
                     >
-                      캘린더 보기
+                      일정 확인하러 가기
                     </Link>
                     <button
                       onClick={() => setOpen(false)}
@@ -201,7 +207,7 @@ export default function AddToScheduleButton({ userId, campaignId, defaultTitle, 
                 <>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="md:col-span-2">
-                      <label className="text-[10px] font-black text-slate-400 block mb-2">캠페인명</label>
+                      <label className="text-[10px] font-black text-slate-400 block mb-2">일정 제목</label>
                       <input
                         value={form.title}
                         onChange={(e) => setForm((p) => ({ ...p, title: e.target.value }))}
@@ -210,7 +216,7 @@ export default function AddToScheduleButton({ userId, campaignId, defaultTitle, 
                     </div>
 
                     <div>
-                      <label className="text-[10px] font-black text-slate-400 block mb-2 uppercase">상태</label>
+                      <label className="text-[10px] font-black text-slate-400 block mb-2">상태</label>
                       <select
                         value={form.status}
                         onChange={(e) => setForm((p) => ({ ...p, status: e.target.value }))}
@@ -218,14 +224,14 @@ export default function AddToScheduleButton({ userId, campaignId, defaultTitle, 
                       >
                         <option value="APPLIED">지원</option>
                         <option value="SELECTED">선정</option>
-                        <option value="SCHEDULED">예정</option>
-                        <option value="REVIEWING">리뷰중</option>
+                        <option value="SCHEDULED">예약</option>
+                        <option value="REVIEWING">검토중</option>
                         <option value="COMPLETED">완료</option>
                       </select>
                     </div>
 
                     <div>
-                      <label className="text-[10px] font-black text-slate-400 block mb-2">날짜 유형</label>
+                      <label className="text-[10px] font-black text-slate-400 block mb-2">날짜 기준</label>
                       <select
                         value={form.dateTarget}
                         onChange={(e) =>
@@ -244,8 +250,8 @@ export default function AddToScheduleButton({ userId, campaignId, defaultTitle, 
                     </div>
 
                     <div>
-                      <label className="text-[10px] font-black text-slate-400 block mb-2 uppercase">
-                        {form.dateTarget === "visit" ? "방문일 : " : "마감일 : "}
+                      <label className="text-[10px] font-black text-slate-400 block mb-2">
+                        {form.dateTarget === "visit" ? "방문일 선택" : "마감일 선택"}
                       </label>
                       <input
                         type="date"
@@ -256,7 +262,9 @@ export default function AddToScheduleButton({ userId, campaignId, defaultTitle, 
                     </div>
 
                     <div className="md:col-span-2">
-                      <label className="text-[10px] font-black text-slate-400 block mb-2">기본 마감일 (직접 설정 가능)</label>
+                      <label className="text-[10px] font-black text-slate-400 block mb-2">
+                        기본 마감일 (참고: {form.dateTarget === "deadline" ? "현재 선택된 값" : "자동입력 값"})
+                      </label>
                       <input
                         type="date"
                         value={form.deadlineDate}
@@ -267,7 +275,7 @@ export default function AddToScheduleButton({ userId, campaignId, defaultTitle, 
 
                     <div className="md:col-span-2">
                       <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-3 text-sm font-bold text-slate-700 dark:text-slate-200">
-                        현재 마감일: <span className="font-black">{deadlineLabel}</span>
+                        마감일: <span className="font-black">{deadlineLabel}</span>
                       </div>
                     </div>
 
@@ -296,7 +304,7 @@ export default function AddToScheduleButton({ userId, campaignId, defaultTitle, 
                           checked={form.alarm_enabled}
                           onChange={(e) => setForm((p) => ({ ...p, alarm_enabled: e.target.checked }))}
                         />
-                        알림 사용
+                        알림 발송
                       </label>
                     </div>
                   </div>
@@ -314,7 +322,7 @@ export default function AddToScheduleButton({ userId, campaignId, defaultTitle, 
                       disabled={saving || !canSubmit}
                       className="flex-1 py-3 bg-slate-900 dark:bg-blue-600 text-white rounded-xl text-sm font-black hover:bg-slate-800 dark:hover:bg-blue-700 transition-colors shadow-lg shadow-blue-500/10 active:scale-95 disabled:opacity-50"
                     >
-                      {saving ? "추가 중..." : "일정 추가"}
+                      {saving ? "등록 중..." : "일정 등록"}
                     </button>
                   </div>
                 </>
