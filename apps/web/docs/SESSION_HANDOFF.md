@@ -27,25 +27,21 @@
     }
   },
   "last_session": {
-    "summary": "Phase-2 잔여 반영건(테스트 스크립트, Prisma 시드, 리포트) 모두 커밋(98ad45b) 완료.",
+    "summary": "Phase-2 파싱 점검 완료. Ringble/Mobble 셀렉터 수정 및 검증 성공. 4blog/tble/cloudreview의 API 의존성 및 에러 원인 확인 완료.",
     "files_modified": [
-      "apps/web/package.json",
-      "apps/web/docs/PROJECT_STATUS_NEXT_ACTIONS.md",
-      "apps/web/reports/PROJECT_SCORECARD_2026-03-06.md",
       "apps/web/sources/registry.ts",
-      "apps/web/test-phase2.ts",
-      "apps/web/prisma/seed.ts"
+      "apps/web/docs/PROJECT_STATUS_NEXT_ACTIONS.md"
     ],
-    "tests_status": "quality:standard PASS (build, CI lint/type/tests excluded from blockers)",
-    "build_status": "GREEN (quality:standard PASS)"
+    "tests_status": "test-phase2.ts 실행 성공 (ringble 16, mobble 32 items 확인)",
+    "build_status": "GREEN"
   },
   "pending_work": {
-    "immediate": "git push origin main — 사용자가 터미널에서 직접 실행 필요 (인증 대화형)",
+    "immediate": "4Blog (JSON API 파싱 전환), Tble (TLS/500 에러 우회), Cloudreview (API 엔드포인트 수정) 어댑터 안정화 진행",
     "next_tracks": [
-      "DOM 파싱 안정화: HTML 구조에 맞춰 Phase-2 6종 사이트 맞춤 선택자(Selector) 및 정규식 교정 요망",
-      "cloudreview/4blog/tble: TLS/404 방어용 HTTP/https 헤더 또는 User-Agent 추가 테스트 필요"
+      "4blog: GenericAdapter 대신 전용 API 어댑터(apps/web/sources/adapters/4blog.ts) 구현",
+      "tble/cloudreview: fetch axios의 httpsAgent 또는 우회 URL 적용하여 에러 수정"
     ],
-    "blocked_items": "git push 인증 대기"
+    "blocked_items": "없음"
   },
   "cost_hint": "어댑터 CSS 파싱 정밀 반복 → Codex 효율적 / 전체 배포 게이트 연동 → Claude"
 }

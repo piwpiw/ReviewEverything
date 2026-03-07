@@ -29,6 +29,7 @@
     - `npm run agent:review` => `lint + typecheck + test:ci`
     - `npm run agent:qa` => `lint + typecheck + test:ci + smoke:ci + build`
   - Reports are generated at apps/web/reports/agent-<mode>-summary.md
+  - Local execution baseline is now centralized in `docs/LOCAL_TEST_STRATEGY.md`
 
 
 ## API 정합성 추적 (추가)
@@ -338,6 +339,10 @@
 - 실행 방식:
 - [ ] 1단계 대형군(리뷰노트/레뷰/디너의여왕/리뷰플레이스/서울오빠) 5개 파일럿 완료 후 일일 정상성 지표 기록.
 - [ ] 2단계 중형군(링블/티블/포블로그/미블/클라우드리뷰/모블) 6개 파싱 안정성 검증.
+  - [x] Ringble (링블): CSS Selector 업데이트 완료 (`.store_list_wrap`)
+  - [x] Mobble (모블): CSS Selector 업데이트 완료 (`.c_box`)
+  - [ ] 4Blog (포블로그): HTML 미허용(SPA) / JSON API `/loadMoreDataCategory` 파싱으로 전환 구현 필요
+  - [ ] Tble (티블), Cloudreview: 500 / 404 에러 원인 규명 및 API 엔드포인트 파악 필요
 - [ ] 3단계 롱테일(강남맛집/슈퍼멤버스/아싸뷰/스타일C/체험단닷컴/리뷰윙/놀러와체험단/체험뷰) 순차 투입.
 - [x] 수집 워커 `runJobs`를 배치 병렬 처리(기본 동시성: `INGEST_JOB_CONCURRENCY`)로 전환 및 `canRunInParallel=false` 플랫폼 직렬 가드 적용.
 - [x] 수집 대상은 `maxPagesPerRun` 가중치 기반 정렬로 병렬 슬롯 우선순위를 조절해 처리량을 우선 확보.
