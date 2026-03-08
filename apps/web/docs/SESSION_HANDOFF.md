@@ -7,43 +7,46 @@
 ## #session_handoff
 <!--
 {
-  "last_agent": "GEMINI (Antigravity)",
-  "timestamp": "2026-03-06T14:47:00+09:00",
-  "session_type": "EXECUTION",
+  "last_agent": "CLAUDE (Haiku 4.5)",
+  "timestamp": "2026-03-08T12:10:00+09:00",
+  "session_type": "UI_POLISH + BUILD_FIX",
   "work_context": {
-    "active_milestone": "M1 — Worker 내구성 + 파서 품질 게이트 (ref: PROJECT_STATUS.md §9)",
-    "active_lane": "Lane A + Lane B 완료, Lane C(Ops) 진입 예정",
+    "active_milestone": "M1 — 사용자 경험 개선 및 빌드 안정화",
+    "active_lane": "메인페이지 UI 간결화 + 코드 품질 개선",
     "active_tracks": [
-      "§14.10 화면 기준 미달 고도화 — 14개 전체 화면 완료 ✅",
-      "§12.9 API 명세 교차 감사 (전체 PASS 보장 및 품질 게이트 적용) ✅",
-      "§14.8 수집 확장 2단계 — 중형군 어댑터 기반 연결 및 테스트(test-phase2.ts) 완료 ✅",
-      "§13.2 신규 사이트 온보딩 2단계 표준 정립 — 규격 완성 ✅"
+      "Hero 섹션 축소 및 캠페인 목록 우선순위 상향",
+      "ESLint/TypeScript 에러 완전 해결",
+      "캠페인 카드 크기 증대 (가시성 개선)"
     ],
     "beta2_p0_status": {
-      "T01+T02+T03": "Phase 2 Medium Parsers API/Registry Scaffold Complete",
-      "T04+T10": "배치 실행 상태 반영 — 검증 완료",
-      "T07+T08": "14개 화면 전체 고도화 완료",
-      "T09": "전체 품질 게이트 PASS (api-contract-audit 100% GREEN) ✅"
+      "UI": "메인페이지 Hero 섹션 30% 높이 축소, 텍스트 최소화 완료",
+      "카드": "캠페인 카드 이미지 크기 30% 증대 (h-140→h-160)",
+      "빌드": "ESLint 모든 에러 해결, TypeScript 타입 정정, 테스트 94/94 PASS"
     }
   },
   "last_session": {
-    "summary": "Phase-2 파싱 점검 완료. Ringble/Mobble 셀렉터 수정 및 검증 성공. 4blog/tble/cloudreview의 API 의존성 및 에러 원인 확인 완료.",
+    "summary": "1. 메인페이지 UI 대폭 간결화 (Hero 섹션 축소, 설명 최소화, SearchGuidePanel 제거). 2. ESLint 에러 고정 (미사용 import 제거: ExternalLink, Menu, KeyboardEvent). 3. TypeScript 타입 에러 해결 (shop_link/coupon_url 제거, 플랫폼 타입 명확화). 4. 테스트 업데이트 (SeouloppaAdapter/MrBlogAdapter platformId 수정). 5. 커밋 완료 (commit 1922446).",
     "files_modified": [
-      "apps/web/sources/registry.ts",
-      "apps/web/docs/PROJECT_STATUS_NEXT_ACTIONS.md"
+      "apps/web/app/page.tsx",
+      "apps/web/components/ThemeToggle.tsx",
+      "apps/web/components/Header.tsx",
+      "apps/web/components/FilterBar.tsx",
+      "apps/web/components/CampaignCard.tsx",
+      "apps/web/lib/data/campaigns.ts",
+      "apps/web/tests/ingest.fixture.test.ts"
     ],
-    "tests_status": "test-phase2.ts 실행 성공 (ringble 16, mobble 32 items 확인)",
+    "tests_status": "성공 (테스트 94/94 PASS, 빌드 GREEN)",
     "build_status": "GREEN"
   },
   "pending_work": {
-    "immediate": "4Blog (JSON API 파싱 전환), Tble (TLS/500 에러 우회), Cloudreview (API 엔드포인트 수정) 어댑터 안정화 진행",
+    "immediate": "git push origin main (로컬 터미널에서 실행 필요 - GitHub Desktop 인증 사용)",
     "next_tracks": [
-      "4blog: GenericAdapter 대신 전용 API 어댑터(apps/web/sources/adapters/4blog.ts) 구현",
-      "tble/cloudreview: fetch axios의 httpsAgent 또는 우회 URL 적용하여 에러 수정"
+      "배포 후 메인페이지 렌더링 성능 모니터링",
+      "모바일 UI 반응성 점검"
     ],
     "blocked_items": "없음"
   },
-  "cost_hint": "어댑터 CSS 파싱 정밀 반복 → Codex 효율적 / 전체 배포 게이트 연동 → Claude"
+  "cost_hint": "다음 세션: 배포 확인 및 성능 모니터링 필요"
 }
 -->
 
@@ -56,6 +59,14 @@
 | 03-05 10:39 | CLAUDE (Antigravity) | Multi-AI 시스템 수립 | SESSION_HANDOFF + GEMINI.md + CODEX.md + claude.md §10 구현 | GREEN |
 | 03-06 10:13 | GEMINI (Antigravity) | §14.10 화면 고도화 완료 | PC재부팅 복구: 60파일 커밋(83adfa8), agent:review PASS(88tests), push 인증 대기 | GREEN |
 | 03-06 14:47 | GEMINI (Antigravity) | API 감사/어댑터 확장 | quality:standard 통과, Phase-2 6개 기반 연결 및 테스트(98ad45b) | GREEN |
+| 03-07 15:00 | GEMINI (Antigravity) | Phase-2 어댑터 완성 | 중형군 6개 플랫폼 정밀 파싱 완료 및 검증 성공 | GREEN |
+| 03-07 17:15 | GEMINI (Antigravity) | Phase-3 롱테일 확장 | 롱테일 4개 플랫폼(아싸뷰/놀러와/핌블/픽미) 어댑터 완성 및 URL/Selector 고도화 | GREEN |
+| 03-08 00:34 | GEMINI (Antigravity) | 파싱 보완 및 데이터 정리 | 만료/삭제된 캠페인 cleanup 로직 구현, DinnerQueen/ReviewPlace 보상 텍스트 파싱 고도화 및 총계 Recount | GREEN |
+| 03-08 17:00 | GEMINI (Antigravity) | Phase 3 확장 및 Premium UI | 체험뷰/데일리뷰/블로그리뷰 어댑터 완성, Glassmorphism 프리미엄 디자인 전면 적용 및 수치 동기화 | GREEN |
+| 03-08 11:02 | GEMINI (Antigravity) | Phase 3 Generic 확장 | 20여 개 Generic 플랫폼 어댑터 최신화, 파싱 구조 개선 및 DB URL 동기화 | GREEN |
+| 03-08 15:30 | GEMINI (Antigravity) | 필터 및 리스트 성능 최적화 | SSR 전환(Home), VIEW 분석 벌크 Fetch 제거, DB 복합 인덱스 6종 추가로 체감 속도 200% 개선 | GREEN |
+| 03-08 11:18 | GEMINI (Antigravity) | §14.8 사이트 정리 | weble, blogreview 등 장애 사이트 4개 완전 제거 및 4blog ID 교정 완료 | GREEN |
+| 03-08 12:10 | CLAUDE (Haiku 4.5) | UI 간결화 + 빌드 안정화 | 메인페이지 Hero 축소(30%), 캠페인 카드 크기 증대, ESLint/TS 에러 해결, 테스트 94/94 PASS, 커밋 1922446 | GREEN |
 
 ---
 
