@@ -4,6 +4,8 @@ import { motion } from "framer-motion";
 import { Clock, Filter, Sparkles, X } from "lucide-react";
 import { useCallback, useMemo, useState, useTransition } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { formatFilterValue } from "@/lib/filterDisplay";
+import { normalizeSearchParamValue } from "@/lib/searchParams";
 
 type RecentFilter = { key: string; label: string; savedAt: string };
 
@@ -15,15 +17,23 @@ const PLATFORMS = [
   { id: "2", label: "리뷰노트" },
   { id: "3", label: "디너의여왕" },
   { id: "4", label: "리뷰플레이스" },
-  { id: "5", label: "서울오빠" },
-  { id: "6", label: "미블" },
+  { id: "5", label: "미블" },
   { id: "7", label: "강남맛집" },
-  { id: "8", label: "티블" },
-  { id: "9", label: "링블" },
-  { id: "10", label: "스타일C" },
-  { id: "11", label: "클라우드리뷰" },
-  { id: "12", label: "모블" },
-  { id: "13", label: "네이버 기반" },
+  { id: "12", label: "서울오빠" },
+  { id: "15", label: "포블로그" },
+  { id: "16", label: "핌블" },
+  { id: "17", label: "아사뷰" },
+  { id: "18", label: "놀러와" },
+  { id: "19", label: "모단" },
+  { id: "21", label: "링블" },
+  { id: "22", label: "모블" },
+  { id: "23", label: "픽미" },
+  { id: "24", label: "리뷰마치" },
+  { id: "25", label: "체험뷰" },
+  { id: "27", label: "데일리뷰" },
+  { id: "30", label: "티블" },
+  { id: "31", label: "클라우드리뷰" },
+  { id: "70", label: "리뷰팅" },
 ];
 
 const TYPES = [
@@ -102,6 +112,21 @@ type FilterQuery = {
   maxDeadlineDays: string;
 };
 
+const FILTER_PARAM_KEYS = [
+  "q",
+  "platform_id",
+  "campaign_type",
+  "media_type",
+  "region_depth1",
+  "region_depth2",
+  "category",
+  "min_reward",
+  "max_comp",
+  "max_deadline_days",
+] as const;
+
+const RESET_PARAM_KEYS = [...FILTER_PARAM_KEYS, "page"] as const;
+
 function Pill({
   active,
   label,
@@ -116,12 +141,11 @@ function Pill({
   return (
     <button
       onClick={onClick}
-      className={`relative rounded-lg px-3 py-1.5 text-[11px] font-black transition-all ${{
-        ["bg-slate-900 text-white dark:bg-blue-600"]: active,
-        ["bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-200"]: !active,
-      }[active.toString()]}`}
+      className={`relative rounded-lg px-3 py-1.5 text-sm font-black transition-all ${active
+        ? "bg-slate-900 text-white dark:bg-blue-600 shadow-md transform scale-[1.02]"
+        : "bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-200"
+        }`}
     >
-      {active ? <motion.span layoutId={`pill-${groupId}`} className="absolute inset-0 -z-10 rounded-lg bg-slate-900 dark:bg-blue-600" /> : null}
       <span className="relative z-10">{label}</span>
     </button>
   );
@@ -153,16 +177,16 @@ export default function FilterBar() {
   const [recents, setRecents] = useState<RecentFilter[]>(() => loadRecents());
   const current = useMemo<FilterQuery>(() => {
     return {
-      q: searchParams.get("q") || "",
-      platformId: searchParams.get("platform_id") || "",
-      type: searchParams.get("campaign_type") || "",
-      media: searchParams.get("media_type") || "",
-      region1: searchParams.get("region_depth1") || "",
-      region2: searchParams.get("region_depth2") || "",
-      category: searchParams.get("category") || "",
-      minReward: searchParams.get("min_reward") || "",
-      maxComp: searchParams.get("max_comp") || "",
-      maxDeadlineDays: searchParams.get("max_deadline_days") || "",
+      q: normalizeSearchParamValue(searchParams.get("q")) || "",
+      platformId: normalizeSearchParamValue(searchParams.get("platform_id")) || "",
+      type: normalizeSearchParamValue(searchParams.get("campaign_type")) || "",
+      media: normalizeSearchParamValue(searchParams.get("media_type")) || "",
+      region1: normalizeSearchParamValue(searchParams.get("region_depth1")) || "",
+      region2: normalizeSearchParamValue(searchParams.get("region_depth2")) || "",
+      category: normalizeSearchParamValue(searchParams.get("category")) || "",
+      minReward: normalizeSearchParamValue(searchParams.get("min_reward")) || "",
+      maxComp: normalizeSearchParamValue(searchParams.get("max_comp")) || "",
+      maxDeadlineDays: normalizeSearchParamValue(searchParams.get("max_deadline_days")) || "",
     };
   }, [searchParams]);
 
@@ -179,25 +203,54 @@ export default function FilterBar() {
       if (key === "region_depth1") {
         next.delete("region_depth2");
       }
-      startTransition(() => router.push(`/?${next.toString()}`, { scroll: false }));
+      if (key !== "page") {
+        next.delete("page");
+      }
+      const target = next.toString() ? `/?${next.toString()}` : "/";
+      startTransition(() => router.replace(target, { scroll: false }));
     },
     [router, searchParams],
   );
 
   const resetAll = useCallback(() => {
-    startTransition(() => router.push("/", { scroll: false }));
-  }, [router]);
+    const next = new URLSearchParams(searchParams.toString());
+    RESET_PARAM_KEYS.forEach((key) => next.delete(key));
+    const target = next.toString() ? `/?${next.toString()}` : "/";
+    startTransition(() => router.replace(target, { scroll: false }));
+  }, [router, searchParams]);
+
+  const commitDraftParam = useCallback(
+    (key: "min_reward" | "max_comp" | "max_deadline_days", value: string) => {
+      setParam(key, value.trim());
+    },
+    [setParam],
+  );
 
   const saveCurrent = useCallback(() => {
-    const key = searchParams.toString();
+    const savedParams = new URLSearchParams();
+    [
+      ["q", current.q],
+      ["platform_id", current.platformId],
+      ["campaign_type", current.type],
+      ["media_type", current.media],
+      ["region_depth1", current.region1],
+      ["region_depth2", current.region2],
+      ["category", current.category],
+      ["min_reward", current.minReward],
+      ["max_comp", current.maxComp],
+      ["max_deadline_days", current.maxDeadlineDays],
+    ].forEach(([paramKey, value]) => {
+      if (value) savedParams.set(paramKey, value);
+    });
+    const key = savedParams.toString();
     if (!key) return;
     const parts = [
       current.q ? `키워드:${current.q}` : null,
-      current.type ? `유형:${current.type}` : null,
-      current.platformId ? `플랫폼:${current.platformId}` : null,
+      current.type ? `유형:${formatFilterValue("campaign_type", current.type)}` : null,
+      current.platformId ? `플랫폼:${formatFilterValue("platform_id", current.platformId)}` : null,
       current.category ? `카테고리:${current.category}` : null,
       current.region1 ? `지역:${current.region1}` : null,
-      current.media ? `매체:${current.media}` : null,
+      current.media ? `매체:${formatFilterValue("media_type", current.media)}` : null,
     ].filter(Boolean) as string[];
 
     const label = parts.length ? parts.join(" | ") : "현재 조건";
@@ -208,7 +261,7 @@ export default function FilterBar() {
       saveRecents(next);
       return next;
     });
-  }, [current, searchParams]);
+  }, [current]);
 
   const togglePanel = useCallback(() => {
     setFiltersVisible((prev) => {
@@ -218,18 +271,20 @@ export default function FilterBar() {
   const openListModeWithFilters = useCallback(() => {
     const next = new URLSearchParams(searchParams.toString());
     next.set("view", "list");
-    startTransition(() => router.push(`/?${next.toString()}`, { scroll: false }));
+    startTransition(() => router.replace(`/?${next.toString()}`, { scroll: false }));
   }, [router, searchParams, startTransition]);
 
   const isPanelVisible = isMapMode ? false : filtersVisible;
-  const activeCount = Array.from(searchParams.keys()).filter((k) => k !== "view").length;
+  const activeCount = Array.from(searchParams.entries()).filter(
+    ([key, value]) => FILTER_PARAM_KEYS.includes(key as (typeof FILTER_PARAM_KEYS)[number]) && Boolean(normalizeSearchParamValue(value)),
+  ).length;
   const categories = CATEGORIES[current.type] || CATEGORIES[""];
   const regionAreas = REGIONS[current.region1] || ["전체"];
   const activeBadges = useMemo(() => {
     const parts = [
-      current.type ? `유형:${current.type}` : null,
-      current.platformId ? `플랫폼:${current.platformId}` : null,
-      current.media ? `매체:${current.media}` : null,
+      current.type ? `유형:${formatFilterValue("campaign_type", current.type)}` : null,
+      current.platformId ? `플랫폼:${formatFilterValue("platform_id", current.platformId)}` : null,
+      current.media ? `매체:${formatFilterValue("media_type", current.media)}` : null,
       current.region1 ? `지역:${current.region1}` : null,
       current.region2 ? `세부:${current.region2}` : null,
       current.category ? `카테고리:${current.category}` : null,
@@ -242,217 +297,244 @@ export default function FilterBar() {
   }, [current]);
 
   return (
-    <section className="relative rounded-2xl border border-white/60 bg-white/95 p-3 dark:bg-slate-900/95">
-      <header className="mb-3 flex flex-col gap-2.5 md:flex-row md:items-center md:justify-between">
-        <div className="flex items-center gap-3">
-          <div className="h-9 w-9 rounded-xl bg-slate-900 text-white dark:bg-blue-600 flex items-center justify-center">
-            <Filter className="h-4 w-4" />
+    <section className="nav-glass rounded-[2rem] p-4 sm:p-6 shadow-2xl relative overflow-hidden">
+      <div className="absolute top-0 left-0 w-32 h-32 bg-blue-500/5 blur-[50px] pointer-events-none" />
+      <div className="absolute bottom-0 right-0 w-48 h-48 bg-indigo-500/5 blur-[70px] pointer-events-none" />
+
+      <header className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        <div className="flex items-center gap-4">
+          <div className="h-12 w-12 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center shadow-lg shadow-blue-500/20">
+            <Filter className="h-5 w-5" />
           </div>
           <div>
-            <p className="text-xs font-black uppercase tracking-wide text-slate-400">필터 패널</p>
-            <p className="text-sm md:text-base font-black text-slate-900 dark:text-white">
-              {isPending ? "필터 적용 중..." : "조건을 설정해 캠페인을 빠르게 찾으세요"}
-            </p>
+            <div className="flex items-center gap-2 mb-0.5">
+              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-600 dark:text-blue-400">Smart Search</span>
+              {isPending && (
+                <div className="flex gap-1">
+                  <span className="w-1 h-1 rounded-full bg-blue-500 animate-bounce" />
+                  <span className="w-1 h-1 rounded-full bg-blue-500 animate-bounce delay-75" />
+                  <span className="w-1 h-1 rounded-full bg-blue-500 animate-bounce delay-150" />
+                </div>
+              )}
+            </div>
+            <h2 className="text-xl md:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+              내 조건에 딱 맞는 캠페인을 고를 수 있어요
+            </h2>
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2.5">
           <button
             onClick={isMapMode ? openListModeWithFilters : togglePanel}
-            className="rounded-xl bg-slate-900 px-4 py-2 text-xs font-black text-white dark:bg-blue-600"
+            className={`btn-premium px-5 py-2.5 text-sm font-black flex items-center gap-2 ${isPanelVisible ? "bg-slate-900 dark:bg-white text-white dark:text-slate-900" : ""
+              }`}
           >
-            {isPanelVisible ? "필터 닫기" : isMapMode ? "목록에서 필터 편집" : "필터 펼치기"}
+            {isPanelVisible ? <X className="w-4 h-4" /> : <Filter className="w-4 h-4" />}
+            {isPanelVisible ? "필터 닫기" : isMapMode ? "목록에서 편집하기" : "더 많은 필터 보기"}
           </button>
 
           {!isMapMode && (
             <button
               onClick={saveCurrent}
-              className="rounded-xl bg-slate-900 px-4 py-2 text-xs font-black text-white dark:bg-blue-600"
+              disabled={!activeCount}
+              className="btn-premium px-5 py-2.5 text-sm font-black bg-blue-600 border-blue-500 text-white flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <Sparkles className="mr-1 inline h-4 w-4" />
-              현재 조건 저장
+              <Sparkles className="h-4 w-4" />
+              검색 조건 저장
             </button>
           )}
 
-          {activeCount > 0 ? (
+          {activeCount > 0 && (
             <button
               onClick={resetAll}
-              className="rounded-xl bg-rose-50 px-4 py-2 text-xs font-black text-rose-600 dark:bg-rose-900/20 dark:text-rose-300"
+              className="btn-premium px-5 py-2.5 text-sm font-black bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-900/30 flex items-center gap-2"
             >
-              <X className="mr-1 inline h-4 w-4" />
-              초기화({activeCount})
+              <X className="h-4 w-4" />
+              모두 지우기 ({activeCount})
             </button>
-          ) : null}
+          )}
         </div>
       </header>
 
-      {!isMapMode && recents.length > 0 ? (
-        <div className="mb-3 flex flex-wrap items-center gap-2">
-          <span className="mr-2 text-xs font-black text-slate-400">최근 조건</span>
-          {recents.map((item) => (
-            <button
-              key={item.key}
-              onClick={() => router.push(`/?${item.key}`, { scroll: false })}
-              className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-black text-slate-600 dark:border-slate-700 dark:bg-slate-800"
-            >
-              {item.label}
-            </button>
-          ))}
+      {!isMapMode && recents.length > 0 && (
+        <div className="mb-6 animate-in slide-in-from-top-2 duration-300">
+          <div className="flex items-center gap-2 mb-2 px-1">
+            <Clock className="w-3.5 h-3.5 text-slate-400" />
+            <span className="text-[11px] font-black text-slate-400 uppercase tracking-widest">최근 검색</span>
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            {recents.map((item) => (
+              <button
+                key={item.key}
+                onClick={() => router.replace(`/?${item.key}`, { scroll: false })}
+                className="group relative px-4 py-2 rounded-xl bg-slate-100/50 dark:bg-slate-800/50 border border-slate-200/50 dark:border-slate-700/50 text-xs font-bold text-slate-600 dark:text-slate-300 hover:border-blue-400 dark:hover:border-blue-500 hover:text-blue-600 dark:hover:text-blue-400 transition-all flex items-center gap-2"
+              >
+                <span className="truncate max-w-[200px]">{item.label}</span>
+                <span className="text-[9px] text-slate-400 opacity-60">#{new Date(item.savedAt).toLocaleDateString()}</span>
+              </button>
+            ))}
+          </div>
         </div>
-      ) : null}
+      )}
 
       {isPanelVisible ? (
-        <div className="max-h-[40vh] overflow-y-auto space-y-2.5 pr-1">
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="w-16 text-xs font-black text-slate-400">유형</span>
-            {TYPES.map((item) => (
-              <Pill
-                key={item.id || "all-type"}
-                groupId="type"
-                active={current.type === item.id}
-                label={item.label}
-                onClick={() => setParam("campaign_type", item.id)}
-              />
-            ))}
-          </div>
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="space-y-8 animate-in fade-in zoom-in-95 duration-500"
+        >
+          <div className="grid gap-8 lg:grid-cols-2">
+            {/* Left Column */}
+            <div className="space-y-6">
+              <div className="space-y-3">
+                <span className="px-1 text-[11px] font-black text-slate-400 underline decoration-blue-500/50 underline-offset-4 uppercase tracking-widest">캠페인 속성</span>
+                <div className="flex flex-col gap-4 p-5 rounded-2xl bg-slate-50/50 dark:bg-slate-800/30 border border-slate-200/50 dark:border-slate-700/50">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="w-12 text-[11px] font-bold text-slate-400">유형</span>
+                    <div className="flex flex-wrap gap-1.5 flex-1">
+                      {TYPES.map((item) => (
+                        <Pill
+                          key={item.id || "all-type"}
+                          groupId="type"
+                          active={current.type === item.id}
+                          label={item.label}
+                          onClick={() => setParam("campaign_type", item.id)}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="w-12 text-[11px] font-bold text-slate-400">매체</span>
+                    <div className="flex flex-wrap gap-1.5 flex-1">
+                      {MEDIAS.map((item) => (
+                        <Pill
+                          key={item.id || "all-media"}
+                          groupId="media"
+                          active={current.media === item.id}
+                          label={item.label}
+                          onClick={() => setParam("media_type", item.id)}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
 
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="w-16 text-xs font-black text-slate-400">플랫폼</span>
-            {PLATFORMS.map((item) => (
-              <Pill
-                key={item.id || "all-platform"}
-                groupId="platform"
-                active={current.platformId === item.id}
-                label={item.label}
-                onClick={() => setParam("platform_id", item.id)}
-              />
-            ))}
-          </div>
+              <div className="space-y-3">
+                <span className="px-1 text-[11px] font-black text-slate-400 uppercase tracking-widest">플랫폼 네트워크</span>
+                <div className="p-5 rounded-2xl bg-slate-50/50 dark:bg-slate-800/30 border border-slate-200/50 dark:border-slate-700/50">
+                  <div className="flex flex-wrap gap-1.5">
+                    {PLATFORMS.map((item) => (
+                      <Pill
+                        key={item.id || "all-platform"}
+                        groupId="platform"
+                        active={current.platformId === item.id}
+                        label={item.label}
+                        onClick={() => setParam("platform_id", item.id)}
+                      />
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
 
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="w-16 text-xs font-black text-slate-400">매체</span>
-            {MEDIAS.map((item) => (
-              <Pill
-                key={item.id || "all-media"}
-                groupId="media"
-                active={current.media === item.id}
-                label={item.label}
-                onClick={() => setParam("media_type", item.id)}
-              />
-            ))}
-          </div>
+            {/* Right Column */}
+            <div className="space-y-6">
+              <div className="space-y-3">
+                <span className="px-1 text-[11px] font-black text-slate-400 uppercase tracking-widest">위치 및 카테고리</span>
+                <div className="grid grid-cols-2 gap-3 p-5 rounded-2xl bg-slate-50/50 dark:bg-slate-800/30 border border-slate-200/50 dark:border-slate-700/50">
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-black text-slate-400 ml-1">시/도</label>
+                    <select
+                      value={current.region1}
+                      onChange={(e) => setParam("region_depth1", e.target.value)}
+                      className="w-full h-11 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 px-3 text-sm font-bold focus:ring-2 focus:ring-blue-500 transition-all cursor-pointer"
+                    >
+                      <option value="">전국</option>
+                      {regionDepth1Options.map((region) => (
+                        <option key={region} value={region}>{region}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-black text-slate-400 ml-1">시/군/구</label>
+                    <select
+                      value={current.region2}
+                      onChange={(e) => setParam("region_depth2", e.target.value)}
+                      disabled={!current.region1}
+                      className="w-full h-11 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 px-3 text-sm font-bold focus:ring-2 focus:ring-blue-500 transition-all cursor-pointer disabled:opacity-40"
+                    >
+                      <option value="">전체</option>
+                      {(current.region1 ? regionAreas : ["전체"]).map((area) => (
+                        <option key={area} value={area === "전체" ? "" : area}>{area}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="col-span-2 space-y-1.5">
+                    <label className="text-[10px] font-black text-slate-400 ml-1">상세 카테고리</label>
+                    <div className="flex flex-wrap gap-1.5">
+                      {categories.slice(0, 12).map((category) => (
+                        <Pill
+                          key={category}
+                          groupId="category"
+                          active={current.category === (category === "전체" ? "" : category)}
+                          label={category}
+                          onClick={() => setParam("category", category === "전체" ? "" : category)}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
 
-          <div className="grid gap-2 md:grid-cols-2">
-            <div className="rounded-2xl border border-slate-200 p-2.5 dark:border-slate-700">
-              <label className="mb-2 block text-xs font-black text-slate-500">지역 1단계</label>
-              <select
-                value={current.region1}
-                onChange={(e) => {
-                  const next = e.target.value;
-                  setParam("region_depth1", next);
-                }}
-                className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs md:text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-white"
-              >
-                <option value="">전체</option>
-                {regionDepth1Options.map((region) => (
-                  <option key={region} value={region}>
-                    {region}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="rounded-2xl border border-slate-200 p-2.5 dark:border-slate-700">
-              <label className="mb-2 text-xs font-black text-slate-500">지역 2단계(시군구)</label>
-              <select
-                value={current.region2}
-                onChange={(e) => {
-                  const next = e.target.value;
-                  setParam("region_depth2", next);
-                }}
-                className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs md:text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-white"
-                disabled={!current.region1}
-              >
-                <option value="">전체</option>
-                {(current.region1 ? regionAreas : ["전체"]).map((area) => (
-                  <option key={area} value={area === "전체" ? "" : area}>
-                    {area}
-                  </option>
-                ))}
-              </select>
+              <div className="space-y-3">
+                <span className="px-1 text-[11px] font-black text-slate-400 uppercase tracking-widest">원하는 보상/경쟁률 설정</span>
+                <div className="grid grid-cols-3 gap-3">
+                  {[
+                    { label: "최소 보상", key: "min_reward", value: current.minReward, placeholder: "0", unit: "만원" },
+                    { label: "최대 경쟁률", key: "max_comp", value: current.maxComp, placeholder: "제한없음", unit: ":1" },
+                    { label: "최대 D-Day", key: "max_deadline_days", value: current.maxDeadlineDays, placeholder: "제한없음", unit: "일" },
+                  ].map((field) => (
+                    <div key={field.key} className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm transition-all focus-within:ring-2 focus-within:ring-blue-500/20 focus-within:border-blue-500">
+                      <label className="block text-[10px] font-black text-slate-400 mb-2">{field.label}</label>
+                      <div className="flex items-center gap-1">
+                        <input
+                          key={`${field.key}-${field.value}`}
+                          defaultValue={field.value}
+                          onBlur={(e) => commitDraftParam(field.key as any, e.currentTarget.value)}
+                          onKeyDown={(e) => e.key === "Enter" && commitDraftParam(field.key as any, e.currentTarget.value)}
+                          placeholder={field.placeholder}
+                          className="w-full bg-transparent border-none p-0 text-sm font-black focus:ring-0 placeholder:text-slate-300"
+                        />
+                        <span className="text-[10px] font-black text-blue-500/60">{field.unit}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
-
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="w-16 text-xs font-black text-slate-400">카테고리</span>
-            {categories.map((category) => (
-              <Pill
-                key={category}
-                groupId="category"
-                active={current.category === (category === "전체" ? "" : category)}
-                label={category}
-                onClick={() => setParam("category", category === "전체" ? "" : category)}
-              />
-            ))}
-          </div>
-
-          <div className="grid grid-cols-1 gap-2 md:grid-cols-3">
-            <div className="rounded-2xl border border-slate-200 p-3 dark:border-slate-700">
-              <label className="mb-2 flex items-center text-xs font-black text-slate-500">
-                <Clock className="mr-2 h-3.5 w-3.5" />
-                최소 보상(만원)
-              </label>
-              <input
-                value={current.minReward}
-                onChange={(e) => setParam("min_reward", e.target.value)}
-                placeholder="0"
-                className="w-full rounded-xl border border-slate-200 px-3 py-2 text-xs md:text-sm dark:border-slate-700"
-                inputMode="numeric"
-              />
-            </div>
-            <div className="rounded-2xl border border-slate-200 p-3 dark:border-slate-700">
-              <label className="mb-2 text-xs font-black text-slate-500">최대 경쟁률</label>
-              <input
-                value={current.maxComp}
-                onChange={(e) => setParam("max_comp", e.target.value)}
-                placeholder="예: 10"
-                className="w-full rounded-xl border border-slate-200 px-3 py-2 text-xs md:text-sm dark:border-slate-700"
-                inputMode="numeric"
-              />
-            </div>
-            <div className="rounded-2xl border border-slate-200 p-3 dark:border-slate-700">
-              <label className="mb-2 text-xs font-black text-slate-500">최대 D-Day</label>
-              <input
-                value={current.maxDeadlineDays}
-                onChange={(e) => setParam("max_deadline_days", e.target.value)}
-                placeholder="예: 7"
-                className="w-full rounded-xl border border-slate-200 px-3 py-2 text-xs md:text-sm dark:border-slate-700"
-                inputMode="numeric"
-              />
-            </div>
-          </div>
-        </div>
+        </motion.div>
       ) : isMapMode ? (
-        <div className="flex flex-wrap gap-2 text-xs text-slate-500">
-          {activeBadges.length === 0 ? (
-            <span>현재 기본 지도 뷰(조건 없이 전체 조회)</span>
-          ) : (
-            <>
-              <span className="text-slate-400">지도 적용 필터</span>
-              {activeBadges.map((badge) => (
-                <span
-                  key={badge}
-                  className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-slate-600 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300"
-                >
-                  {badge}
-                </span>
-              ))}
-            </>
-          )}
+        <div className="flex items-center justify-between px-2 py-3 bg-blue-50/30 dark:bg-blue-900/10 rounded-2xl border border-blue-100/50 dark:border-blue-900/20">
+          <div className="flex flex-wrap gap-2 text-[11px] font-bold text-blue-700 dark:text-blue-300">
+            {activeBadges.length === 0 ? (
+              <span className="opacity-60">현재 모든 캠페인을 지도에 표시 중입니다</span>
+            ) : (
+              activeBadges.map((badge) => (
+                <span key={badge} className="bg-white/80 dark:bg-blue-900/50 px-2 py-1 rounded-lg shadow-sm">{badge}</span>
+              ))
+            )}
+          </div>
+          <button onClick={openListModeWithFilters} className="text-[11px] font-black text-blue-600 underline underline-offset-4">필터 수정하기</button>
         </div>
       ) : (
-        <div className="text-xs text-slate-400">필터 패널이 접힌 상태입니다. 접기/펴기 버튼으로 열어주세요.</div>
+        <div className="py-4 text-center">
+          <p className="text-xs font-bold text-slate-400 tracking-wide">
+            지금 <span className="text-blue-600 dark:text-blue-400 font-black px-1.5">{activeCount}개</span>의 필터가 적용되어 있어요.
+          </p>
+        </div>
       )}
     </section>
   );
 }
-

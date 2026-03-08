@@ -26,11 +26,18 @@ import { MrBlogAdapter } from '../sources/adapters/mrblog';
 import { GangnamFoodAdapter } from '../sources/adapters/gangnamfood';
 import { InitializedAdapters } from '../sources/registry';
 
+type AdapterConstructor = new () => {
+    platformId: number;
+    baseUrl: string;
+};
+
+const mockedAxiosGet = vi.mocked(axios.get);
+
 beforeEach(() => {
     vi.clearAllMocks();
     // Default: simulate an empty HTML page (axis returns no recognized DOM)
     // Adapters with stub fallbacks will still return data
-    (axios.get as any).mockResolvedValue({ data: '<html><body></body></html>' });
+    mockedAxiosGet.mockResolvedValue({ data: '<html><body></body></html>' } as never);
 });
 
 // ??????????????????????????????????????????????????????????????????????????????
@@ -42,11 +49,11 @@ describe('Adapter Metadata (platformId + baseUrl)', () => {
         { Adapter: ReviewnoteAdapter, platformId: 2, baseUrl: 'https://www.reviewnote.co.kr' },
         { Adapter: DinnerQueenAdapter, platformId: 3, baseUrl: 'https://dinnerqueen.net' },
         { Adapter: ReviewPlaceAdapter, platformId: 4, baseUrl: 'https://www.reviewplace.co.kr' },
-        { Adapter: SeouloppaAdapter, platformId: 5, baseUrl: 'https://www.seoulouba.co.kr' },
-        { Adapter: MrBlogAdapter, platformId: 6, baseUrl: 'https://mrblog.net' },
+        { Adapter: SeouloppaAdapter, platformId: 12, baseUrl: 'https://www.seoulouba.co.kr' },
+        { Adapter: MrBlogAdapter, platformId: 5, baseUrl: 'https://mrblog.net' },
         { Adapter: GangnamFoodAdapter, platformId: 7, baseUrl: 'https://xn--939au0g4vj8sq.net' },
     ])('$Adapter.name has correct platformId and baseUrl', ({ Adapter, platformId, baseUrl }) => {
-        const instance = new (Adapter as any)();
+        const instance = new (Adapter as AdapterConstructor)();
         expect(instance.platformId).toBe(platformId);
         expect(instance.baseUrl).toBe(baseUrl);
     });
@@ -57,7 +64,7 @@ describe('Adapter Metadata (platformId + baseUrl)', () => {
 // ??????????????????????????????????????????????????????????????????????????????
 describe('RevuAdapter', () => {
     it('returns an array for empty page HTML and handles network responses safely', async () => {
-        (axios.get as any).mockResolvedValue({ data: '<html><body></body></html>' });
+        mockedAxiosGet.mockResolvedValue({ data: '<html><body></body></html>' } as never);
         const adapter = new RevuAdapter();
         const result = await adapter.fetchList(1);
 
@@ -66,7 +73,7 @@ describe('RevuAdapter', () => {
     });
 
     it('returns empty array when endpoint does not return items', async () => {
-        (axios.get as any).mockResolvedValue({ data: JSON.stringify({ items: [] }) });
+        mockedAxiosGet.mockResolvedValue({ data: JSON.stringify({ items: [] }) } as never);
         const adapter = new RevuAdapter();
         const result = await adapter.fetchList(1);
         expect(Array.isArray(result)).toBe(true);
