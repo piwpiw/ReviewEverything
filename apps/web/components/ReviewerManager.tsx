@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { type FormEvent, Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import { AlertCircle, Edit, Plus, RefreshCcw, Save, Search, SquareCheckBig, SquareX, Trash2 } from "lucide-react";
@@ -57,16 +57,16 @@ const STATES = ["all", "connected", "disconnected", "needs_reauth", "error"];
 const PROVIDER_PRIORITY = ["naver", "instagram", "youtube", "kakaotalk", "google"];
 const AUTO_FILTERS = ["all", "true", "false"];
 const AUTOLOGIN_POLICY = [
-  "자동 로그인 정책: is_active가 true인 리뷰어만 auto_signin_enabled를 활성화할 수 있습니다.",
-  "정렬/필터 우선순위: auto_login + connection_state (connected > needs_reauth > disconnected > error), 제공처 우선순위로 정렬.",
-  "실패 코드 매핑을 사용자/운영 라벨에 일관되게 표시합니다.",
+  "활성 리뷰어만 자동 로그인 운영 대상에 포함합니다.",
+  "정렬 우선순위는 auto-login 상태, 연결 상태, provider 우선순위입니다.",
+  "실패 코드는 UI와 API에서 동일한 기준으로 표시합니다.",
 ];
 
 const FAILURE_CODE_LABELS: Record<string, string> = {
   REAUTH_REQUIRED: "재인증 필요",
   LOGIN_ERROR: "로그인 오류",
   NOT_CONNECTED: "미연결",
-  CONNECTED: "연결됨",
+  CONNECTED: "정상 연결",
 };
 
 const failureCodeFromState = (state: string) => {
@@ -99,10 +99,12 @@ const connectionLabel = (state: string) => {
 };
 
 const safeDateText = (value: string | null) => (value ? new Date(value).toLocaleString() : "-");
-
 const toArray = (value: Set<number>) => Array.from(value.values());
 
-export default function ReviewerManager() {
+export default function ReviewerManager({ adminPassword = "" }: { adminPassword?: string }) {
+  const getAdminHeader = () => ({
+    "x-admin-password": adminPassword || (typeof window !== "undefined" ? window.sessionStorage.getItem("re_admin_pwd") || "" : ""),
+  });
   const [items, setItems] = useState<CreatorItem[]>([]);
   const [search, setSearch] = useState("");
   const [provider, setProvider] = useState("all");
@@ -143,6 +145,7 @@ export default function ReviewerManager() {
   const loadCreators = useCallback(async () => {
     setLoading(true);
     setError(null);
+
     try {
       const params = new URLSearchParams();
       if (search.trim()) params.set("q", search.trim());
@@ -151,11 +154,12 @@ export default function ReviewerManager() {
       if (autoFilter !== "all") params.set("auto", autoFilter);
       params.set("sort", sort);
 
-      const res = await fetch(`/api/admin/creators?${params.toString()}`);
+      const res = await fetch(`/api/admin/creators?${params.toString()}`, { headers: getAdminHeader() });
       if (!res.ok) {
         const payload = (await res.json()) as { error?: string };
-        throw new Error(payload.error || `리뷰어 목록 조회 실패 (${res.status})`);
+        throw new Error(payload.error || `리뷰어 목록을 불러오지 못했습니다. (${res.status})`);
       }
+
       const data = (await res.json()) as CreatorsResponse;
       setItems(Array.isArray(data.items) ? data.items : []);
       setSelected(new Set());
@@ -173,7 +177,7 @@ export default function ReviewerManager() {
   const statusText = useMemo(() => {
     const failed = items.filter((item) => item.auto_signin_ready_count < 1 && item.authCredentials.length > 0).length;
     const active = items.filter((item) => item.is_active).length;
-    return `전체 리뷰어: ${items.length}, 활성: ${active}, 자동로그인 준비 미완료: ${failed}`;
+    return `전체 리뷰어 ${items.length}명, 활성 ${active}명, 자동 로그인 미준비 ${failed}명`;
   }, [items]);
 
   const toCredentialSummary = useCallback((item: CreatorItem) => {
@@ -187,8 +191,8 @@ export default function ReviewerManager() {
       return (
         <span
           key={`${item.id}-${credential.provider}`}
-          className={`px-2 py-1 text-[11px] rounded-md border ${stateTone(credential.connection_state)}`}
-      title={`채널: ${credential.account_label || "-"} | 프로필: ${credential.profile_name || "-"} | 오류 코드: ${failureCode}`}
+          className={`rounded-md border px-2 py-1 text-[11px] ${stateTone(credential.connection_state)}`}
+          title={`채널: ${credential.account_label || "-"} | 프로필: ${credential.profile_name || "-"} | 실패 코드: ${failureCode}`}
         >
           {credential.provider.toUpperCase()}[{autoLabel}] {connectionLabel(credential.connection_state)}
           <span className="ml-1 text-[10px] opacity-80">({FAILURE_CODE_LABELS[failureCode]})</span>
@@ -208,10 +212,11 @@ export default function ReviewerManager() {
 
     if (!failure) {
       const first = item.authCredentials[0];
-      if (!first) return "실패 이력 없음";
+      if (!first) return "실패 이력이 없습니다.";
       const code = failureCodeFromState(first.connection_state);
       return `${first.provider.toUpperCase()} ${FAILURE_CODE_LABELS[code]}`;
     }
+
     const code = failureCodeFromState(failure.connection_state);
     return `${failure.provider.toUpperCase()} (${FAILURE_CODE_LABELS[code]}): ${failure.last_error_message || "-"}`;
   }, []);
@@ -277,12 +282,13 @@ export default function ReviewerManager() {
   const patchCreator = async (id: number, payload: Record<string, unknown>) => {
     const res = await fetch(`/api/admin/creators/${id}`, {
       method: "PATCH",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...getAdminHeader() },
       body: JSON.stringify(payload),
     });
+
     if (!res.ok) {
       const body = (await res.json()) as { error?: string };
-      throw new Error(body.error || `수정 실패 (${res.status})`);
+      throw new Error(body.error || `수정에 실패했습니다. (${res.status})`);
     }
   };
 
@@ -290,11 +296,13 @@ export default function ReviewerManager() {
     e.preventDefault();
     const nextName = form.displayName.trim();
     if (!nextName) {
-      setStatusMessage("리뷰어명은 필수입니다.");
+      setStatusMessage("리뷰어 이름은 필수입니다.");
       return;
     }
+
     setIsSubmitting(true);
     setStatusMessage(null);
+
     try {
       const payload: CreatorPayload = {
         display_name: nextName,
@@ -304,6 +312,7 @@ export default function ReviewerManager() {
         auto_signin_enabled: form.autoSignIn,
         is_active: form.isActive,
       };
+
       if (form.provider) {
         payload.authCredentials = [
           {
@@ -318,19 +327,20 @@ export default function ReviewerManager() {
 
       const res = await fetch("/api/admin/creators", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...getAdminHeader() },
         body: JSON.stringify(payload),
       });
+
       if (!res.ok) {
         const body = (await res.json()) as { error?: string };
-        throw new Error(body.error || `생성 실패 (${res.status})`);
+        throw new Error(body.error || `생성에 실패했습니다. (${res.status})`);
       }
 
       resetCreateForm();
-      setStatusMessage("리뷰어가 등록되었습니다.");
+      setStatusMessage("리뷰어를 등록했습니다.");
       await loadCreators();
     } catch (e: unknown) {
-      setStatusMessage(e instanceof Error ? e.message : "리뷰어 등록 실패");
+      setStatusMessage(e instanceof Error ? e.message : "리뷰어 등록에 실패했습니다.");
     } finally {
       setIsSubmitting(false);
     }
@@ -338,6 +348,7 @@ export default function ReviewerManager() {
 
   const handleEditSave = async (id: number, e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
     const payload: Record<string, unknown> = {
       display_name: editForm.displayName.trim(),
       handle: editForm.handle.trim() || null,
@@ -349,32 +360,36 @@ export default function ReviewerManager() {
 
     setIsSubmitting(true);
     setStatusMessage(null);
+
     try {
       await patchCreator(id, payload);
       resetEdit();
-      setStatusMessage("리뷰어 정보가 수정되었습니다.");
+      setStatusMessage("리뷰어 정보를 수정했습니다.");
       await loadCreators();
     } catch (e: unknown) {
-      setStatusMessage(e instanceof Error ? e.message : "수정 실패");
+      setStatusMessage(e instanceof Error ? e.message : "수정에 실패했습니다.");
     } finally {
       setIsSubmitting(false);
     }
   };
 
   const handleDelete = async (item: CreatorItem) => {
-    if (!window.confirm(`"${item.display_name}" 삭제하시겠습니까?`)) return;
+    if (!window.confirm(`"${item.display_name}" 리뷰어를 삭제하시겠습니까?`)) return;
+
     setIsSubmitting(true);
     setStatusMessage(null);
+
     try {
-      const res = await fetch(`/api/admin/creators/${item.id}`, { method: "DELETE" });
+      const res = await fetch(`/api/admin/creators/${item.id}`, { method: "DELETE", headers: getAdminHeader() });
       if (!res.ok) {
         const body = (await res.json()) as { error?: string };
-        throw new Error(body.error || `삭제 실패 (${res.status})`);
+        throw new Error(body.error || `삭제에 실패했습니다. (${res.status})`);
       }
+
       await loadCreators();
-      setStatusMessage("리뷰어가 삭제되었습니다.");
+      setStatusMessage("리뷰어를 삭제했습니다.");
     } catch (e: unknown) {
-      setStatusMessage(e instanceof Error ? e.message : "삭제 실패");
+      setStatusMessage(e instanceof Error ? e.message : "삭제에 실패했습니다.");
     } finally {
       setIsSubmitting(false);
     }
@@ -382,15 +397,17 @@ export default function ReviewerManager() {
 
   const handleBulkAuto = async (nextAuto: boolean) => {
     if (selectedCount === 0) return;
+
     setIsSubmitting(true);
     setStatusMessage(null);
+
     try {
       await Promise.all(toArray(selected).map((id) => patchCreator(id, { auto_signin_enabled: nextAuto })));
       setSelected(new Set());
-      setStatusMessage(`일괄 변경: 자동로그인 ${nextAuto ? "사용" : "미사용"} (${selectedCount}명)`);
+      setStatusMessage(`선택한 ${selectedCount}건의 자동 로그인을 ${nextAuto ? "활성화" : "비활성화"}했습니다.`);
       await loadCreators();
     } catch (e: unknown) {
-      setStatusMessage(e instanceof Error ? e.message : "일괄 자동로그인 변경 실패");
+      setStatusMessage(e instanceof Error ? e.message : "일괄 변경에 실패했습니다.");
     } finally {
       setIsSubmitting(false);
     }
@@ -401,9 +418,9 @@ export default function ReviewerManager() {
     try {
       await patchCreator(item.id, { is_active: !item.is_active });
       await loadCreators();
-      setStatusMessage(`"${item.display_name}" 상태가 변경되었습니다.`);
+      setStatusMessage(`"${item.display_name}" 상태를 변경했습니다.`);
     } catch (e: unknown) {
-      setStatusMessage(e instanceof Error ? e.message : "상태 변경 실패");
+      setStatusMessage(e instanceof Error ? e.message : "상태 변경에 실패했습니다.");
     }
   };
 
@@ -412,42 +429,44 @@ export default function ReviewerManager() {
     try {
       await patchCreator(item.id, { auto_signin_enabled: !item.auto_signin_enabled });
       await loadCreators();
-      setStatusMessage(`"${item.display_name}" 자동로그인 설정이 변경되었습니다.`);
+      setStatusMessage(`"${item.display_name}" 자동 로그인 설정을 변경했습니다.`);
     } catch (e: unknown) {
-      setStatusMessage(e instanceof Error ? e.message : "자동로그인 변경 실패");
+      setStatusMessage(e instanceof Error ? e.message : "자동 로그인 변경에 실패했습니다.");
     }
   };
 
   return (
     <div className="space-y-5">
-      <section className="grid md:grid-cols-3 gap-3">
-        <p className="text-[11px] text-slate-400 col-span-3">자동 로그인 정책: {AUTOLOGIN_POLICY[0]}</p>
-        <p className="text-[11px] text-slate-400 col-span-3">정렬 정책: {AUTOLOGIN_POLICY[1]}</p>
-        <p className="text-[11px] text-slate-400 col-span-3">실패 정책: {AUTOLOGIN_POLICY[2]}</p>
+      <section className="grid gap-3 md:grid-cols-3">
+        <p className="col-span-3 text-[11px] text-slate-400">정책: {AUTOLOGIN_POLICY[0]}</p>
+        <p className="col-span-3 text-[11px] text-slate-400">정렬: {AUTOLOGIN_POLICY[1]}</p>
+        <p className="col-span-3 text-[11px] text-slate-400">실패 코드: {AUTOLOGIN_POLICY[2]}</p>
       </section>
 
-      <section className="grid md:grid-cols-3 gap-3">
-        <label className="flex items-center gap-2 border border-slate-800 rounded-xl px-3 py-2 bg-slate-950/40">
-          <Search className="w-4 h-4 text-slate-400" />
+      <section className="grid gap-3 md:grid-cols-3">
+        <label className="flex items-center gap-2 rounded-xl border border-slate-800 bg-slate-950/40 px-3 py-2">
+          <Search className="h-4 w-4 text-slate-400" />
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="이름 또는 계정으로 검색"
+            placeholder="이름 또는 계정명으로 검색"
             className="w-full bg-transparent text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none"
           />
         </label>
+
         <select
           value={provider}
           onChange={(e) => setProvider(e.target.value)}
           className="rounded-xl border border-slate-800 bg-slate-950/40 px-3 py-2 text-sm text-slate-100"
         >
-          <option value="all">전체 제공처</option>
+          <option value="all">전체 provider</option>
           {PROVIDERS.map((item) => (
             <option value={item} key={item}>
               {item}
             </option>
           ))}
         </select>
+
         <select
           value={state}
           onChange={(e) => setState(e.target.value)}
@@ -456,7 +475,7 @@ export default function ReviewerManager() {
           {STATES.map((item) => (
             <option value={item} key={item}>
               {item === "all"
-                ? "전체"
+                ? "전체 상태"
                 : item === "connected"
                   ? "연결됨"
                   : item === "disconnected"
@@ -471,7 +490,7 @@ export default function ReviewerManager() {
         </select>
       </section>
 
-      <section className="grid md:grid-cols-3 gap-3">
+      <section className="grid gap-3 md:grid-cols-3">
         <select
           value={autoFilter}
           onChange={(e) => setAutoFilter(e.target.value)}
@@ -479,10 +498,11 @@ export default function ReviewerManager() {
         >
           {AUTO_FILTERS.map((item) => (
             <option value={item} key={item}>
-              {item === "all" ? "전체" : item === "true" ? "사용" : "미사용"}
+              {item === "all" ? "전체" : item === "true" ? "자동 로그인 사용" : "자동 로그인 미사용"}
             </option>
           ))}
         </select>
+
         <select
           value={sort}
           onChange={(e) => setSort(e.target.value)}
@@ -494,28 +514,29 @@ export default function ReviewerManager() {
             </option>
           ))}
         </select>
+
         <button
           onClick={() => void loadCreators()}
-          className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-700 bg-slate-800/70 text-slate-100 px-3 py-2 text-xs font-black"
+          className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-700 bg-slate-800/70 px-3 py-2 text-xs font-black text-slate-100"
         >
-          <RefreshCcw className="w-4 h-4" />
+          <RefreshCcw className="h-4 w-4" />
           새로고침
         </button>
       </section>
 
       <section className="rounded-2xl border border-slate-800 bg-slate-900/50 p-5">
-        <div className="text-sm text-slate-300 mb-3">{statusText}</div>
-        <form onSubmit={handleCreate} className="grid md:grid-cols-7 gap-3">
+        <div className="mb-3 text-sm text-slate-300">{statusText}</div>
+        <form onSubmit={handleCreate} className="grid gap-3 md:grid-cols-7">
           <input
             value={form.displayName}
             onChange={(e) => setForm((prev) => ({ ...prev, displayName: e.target.value }))}
-            placeholder="리뷰어명*"
+            placeholder="리뷰어 이름*"
             className="rounded-xl border border-slate-700 bg-slate-950/40 px-3 py-2 text-sm text-slate-100"
           />
           <input
             value={form.handle}
             onChange={(e) => setForm((prev) => ({ ...prev, handle: e.target.value }))}
-            placeholder="계정명"
+            placeholder="핸들 또는 계정명"
             className="rounded-xl border border-slate-700 bg-slate-950/40 px-3 py-2 text-sm text-slate-100"
           />
           <select
@@ -538,80 +559,79 @@ export default function ReviewerManager() {
           <input
             value={form.profileName}
             onChange={(e) => setForm((prev) => ({ ...prev, profileName: e.target.value }))}
-            placeholder="프로필명"
+            placeholder="프로필 이름"
             className="rounded-xl border border-slate-700 bg-slate-950/40 px-3 py-2 text-sm text-slate-100"
           />
-          <label className="flex items-center gap-2 text-sm text-slate-200 border border-slate-700 rounded-xl px-3 py-2 bg-slate-950/40">
+          <label className="flex items-center gap-2 rounded-xl border border-slate-700 bg-slate-950/40 px-3 py-2 text-sm text-slate-200">
             <input
               type="checkbox"
               checked={form.autoSignIn}
               onChange={(e) => setForm((prev) => ({ ...prev, autoSignIn: e.target.checked }))}
             />
-            자동로그인
+            자동 로그인
           </label>
           <button
             disabled={isSubmitting}
-            className="inline-flex items-center justify-center gap-2 rounded-xl bg-slate-200 text-slate-900 font-black px-3 py-2 text-sm disabled:opacity-50"
+            className="inline-flex items-center justify-center gap-2 rounded-xl bg-slate-200 px-3 py-2 text-sm font-black text-slate-900 disabled:opacity-50"
           >
-            <Plus className="w-4 h-4" />
+            <Plus className="h-4 w-4" />
             등록
           </button>
         </form>
       </section>
 
       <section className="rounded-2xl border border-slate-800 bg-slate-900/50 p-4">
-        <div className="flex justify-between gap-2 items-center mb-3">
+        <div className="mb-3 flex items-center justify-between gap-2">
           <h3 className="text-sm font-black text-slate-200">리뷰어 목록</h3>
           <div className="flex gap-2">
             <button
               onClick={() => handleBulkAuto(true)}
-              className="px-3 py-2 text-xs rounded-xl border border-emerald-500/40 text-emerald-200"
+              className="rounded-xl border border-emerald-500/40 px-3 py-2 text-xs text-emerald-200"
             >
-              자동로그인 사용
+              자동 로그인 사용
             </button>
             <button
               onClick={() => handleBulkAuto(false)}
-              className="px-3 py-2 text-xs rounded-xl border border-amber-500/40 text-amber-200"
+              className="rounded-xl border border-amber-500/40 px-3 py-2 text-xs text-amber-200"
             >
-              자동로그인 미사용
+              자동 로그인 중지
             </button>
           </div>
         </div>
 
-        {loading ? <div className="text-slate-400 text-sm">불러오는 중…</div> : null}
+        {loading ? <div className="text-sm text-slate-400">불러오는 중...</div> : null}
         {error ? (
-          <div className="rounded-lg border border-rose-500/40 bg-rose-500/10 text-rose-200 px-3 py-2 text-sm flex items-center gap-2">
-            <AlertCircle className="w-4 h-4" />
+          <div className="flex items-center gap-2 rounded-lg border border-rose-500/40 bg-rose-500/10 px-3 py-2 text-sm text-rose-200">
+            <AlertCircle className="h-4 w-4" />
             {error}
           </div>
         ) : null}
         {statusMessage ? (
-          <div className="text-xs border border-emerald-500/40 bg-emerald-500/10 text-emerald-200 px-3 py-2 rounded-lg">{statusMessage}</div>
+          <div className="rounded-lg border border-emerald-500/40 bg-emerald-500/10 px-3 py-2 text-xs text-emerald-200">{statusMessage}</div>
         ) : null}
 
-        <div className="overflow-x-auto mt-3">
+        <div className="mt-3 overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="text-left border-b border-slate-800">
+              <tr className="border-b border-slate-800 text-left">
                 <th className="py-2 pr-3">
                   <button onClick={toggleSelectedAll} className="text-xs">
-                    {isAllSelected ? <SquareCheckBig className="w-4 h-4" /> : <SquareX className="w-4 h-4" />}
+                    {isAllSelected ? <SquareCheckBig className="h-4 w-4" /> : <SquareX className="h-4 w-4" />}
                   </button>
                 </th>
                 <th className="py-2 pr-3">리뷰어</th>
                 <th className="py-2 pr-3">상태</th>
-                <th className="py-2 pr-3">자동로그인</th>
+                <th className="py-2 pr-3">자동 로그인</th>
                 <th className="py-2 pr-3">연결</th>
-                <th className="py-2 pr-3">실패 코드</th>
                 <th className="py-2 pr-3">최근 연결</th>
-                <th className="py-2 pr-3">실패 시각</th>
+                <th className="py-2 pr-3">최근 실패</th>
                 <th className="py-2 pr-3">작업</th>
               </tr>
             </thead>
             <tbody>
               {items.length === 0 ? (
                 <tr>
-                  <td colSpan={9} className="py-5 text-center text-slate-400">
+                  <td colSpan={8} className="py-5 text-center text-slate-400">
                     등록된 리뷰어가 없습니다.
                   </td>
                 </tr>
@@ -629,10 +649,10 @@ export default function ReviewerManager() {
                     <td className="py-3 pr-3 align-top">
                       <button
                         onClick={() => void handleToggleActive(item)}
-                        className={`px-2 py-1 rounded-md text-[11px] border ${
+                        className={`rounded-md border px-2 py-1 text-[11px] ${
                           item.is_active
-                            ? "text-emerald-300 border-emerald-500/50 bg-emerald-500/10"
-                            : "text-rose-300 border-rose-500/50 bg-rose-500/10"
+                            ? "border-emerald-500/50 bg-emerald-500/10 text-emerald-300"
+                            : "border-rose-500/50 bg-rose-500/10 text-rose-300"
                         }`}
                       >
                         {item.is_active ? "활성" : "비활성"}
@@ -641,38 +661,28 @@ export default function ReviewerManager() {
                     <td className="py-3 pr-3 align-top">
                       <button
                         onClick={() => void handleToggleAuto(item)}
-                        className={`px-2 py-1 rounded-md text-[11px] border ${
+                        className={`rounded-md border px-2 py-1 text-[11px] ${
                           item.auto_signin_enabled
-                            ? "text-blue-300 border-blue-500/50 bg-blue-500/10"
-                            : "text-slate-300 border-slate-500/50 bg-slate-500/10"
+                            ? "border-blue-500/50 bg-blue-500/10 text-blue-300"
+                            : "border-slate-500/50 bg-slate-500/10 text-slate-300"
                         }`}
                       >
-                        {item.auto_signin_enabled ? "사용" : "미사용"}
+                        {item.auto_signin_enabled ? "사용" : "중지"}
                       </button>
                     </td>
                     <td className="py-3 pr-3 align-top">
                       <div className="flex flex-wrap gap-1">{toCredentialSummary(item)}</div>
                     </td>
-                    <td className="py-3 pr-3 align-top text-xs text-slate-300">
-                      {safeDateText(item.last_connected_at)}
-                    </td>
-                    <td className="py-3 pr-3 align-top text-xs text-slate-300 max-w-[220px] break-words">
-                      {latestFailure(item)}
-                    </td>
+                    <td className="py-3 pr-3 align-top text-xs text-slate-300">{safeDateText(item.last_connected_at)}</td>
+                    <td className="max-w-[220px] break-words py-3 pr-3 align-top text-xs text-slate-300">{latestFailure(item)}</td>
                     <td className="py-3 pr-3 align-top">
-                      <div className="flex gap-2 flex-wrap">
-                        <button
-                          onClick={() => startEdit(item)}
-                          className="px-2 py-1 rounded-md border border-slate-600 text-slate-200 text-xs"
-                        >
-                          <Edit className="w-3.5 h-3.5 mr-1 inline-block" />
+                      <div className="flex flex-wrap gap-2">
+                        <button onClick={() => startEdit(item)} className="rounded-md border border-slate-600 px-2 py-1 text-xs text-slate-200">
+                          <Edit className="mr-1 inline-block h-3.5 w-3.5" />
                           수정
                         </button>
-                        <button
-                          onClick={() => void handleDelete(item)}
-                          className="px-2 py-1 rounded-md border border-rose-600/40 text-rose-200 text-xs"
-                        >
-                          <Trash2 className="w-3.5 h-3.5 mr-1 inline-block" />
+                        <button onClick={() => void handleDelete(item)} className="rounded-md border border-rose-600/40 px-2 py-1 text-xs text-rose-200">
+                          <Trash2 className="mr-1 inline-block h-3.5 w-3.5" />
                           삭제
                         </button>
                       </div>
@@ -680,19 +690,19 @@ export default function ReviewerManager() {
                   </tr>
                   {editingId === item.id ? (
                     <tr className="border-b border-slate-800 bg-slate-900/60">
-                      <td colSpan={9} className="p-3">
-                        <form onSubmit={(e) => void handleEditSave(item.id, e)} className="grid md:grid-cols-6 gap-2">
+                      <td colSpan={8} className="p-3">
+                        <form onSubmit={(e) => void handleEditSave(item.id, e)} className="grid gap-2 md:grid-cols-6">
                           <input
                             value={editForm.displayName}
                             onChange={(e) => setEditForm((prev) => ({ ...prev, displayName: e.target.value }))}
                             className="rounded-lg border border-slate-700 bg-slate-950/40 px-3 py-2 text-sm"
-                            placeholder="리뷰어명"
+                            placeholder="리뷰어 이름"
                           />
                           <input
                             value={editForm.handle}
                             onChange={(e) => setEditForm((prev) => ({ ...prev, handle: e.target.value }))}
                             className="rounded-lg border border-slate-700 bg-slate-950/40 px-3 py-2 text-sm"
-                            placeholder="계정명"
+                            placeholder="핸들 또는 계정명"
                           />
                           <input
                             value={editForm.statusNote}
@@ -706,15 +716,15 @@ export default function ReviewerManager() {
                             className="rounded-lg border border-slate-700 bg-slate-950/40 px-3 py-2 text-sm"
                             placeholder="메모"
                           />
-                          <label className="flex items-center text-xs gap-2 text-slate-200 border border-slate-700 rounded-lg px-3">
+                          <label className="flex items-center gap-2 rounded-lg border border-slate-700 px-3 text-xs text-slate-200">
                             <input
                               type="checkbox"
                               checked={editForm.autoSignIn}
                               onChange={(e) => setEditForm((prev) => ({ ...prev, autoSignIn: e.target.checked }))}
                             />
-                            자동로그인
+                            자동 로그인
                           </label>
-                          <label className="flex items-center text-xs gap-2 text-slate-200 border border-slate-700 rounded-lg px-3">
+                          <label className="flex items-center gap-2 rounded-lg border border-slate-700 px-3 text-xs text-slate-200">
                             <input
                               type="checkbox"
                               checked={editForm.isActive}
@@ -722,19 +732,12 @@ export default function ReviewerManager() {
                             />
                             활성
                           </label>
-                          <div className="flex gap-2 col-span-6">
-                            <button
-                              type="submit"
-                              className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-200 text-slate-900 text-xs font-black"
-                            >
-                              <Save className="w-4 h-4" />
+                          <div className="col-span-6 flex gap-2">
+                            <button type="submit" className="inline-flex items-center gap-2 rounded-lg bg-slate-200 px-3 py-2 text-xs font-black text-slate-900">
+                              <Save className="h-4 w-4" />
                               저장
                             </button>
-                            <button
-                              type="button"
-                              onClick={resetEdit}
-                              className="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-slate-700 text-slate-200 text-xs"
-                            >
+                            <button type="button" onClick={resetEdit} className="inline-flex items-center gap-2 rounded-lg border border-slate-700 px-3 py-2 text-xs text-slate-200">
                               취소
                             </button>
                           </div>
